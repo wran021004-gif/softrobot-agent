@@ -1,0 +1,109 @@
+[
+  {
+    "label": "A",
+    "decision": {
+      "action": "physical_replay",
+      "decision": {
+        "version": "research_decision_v1",
+        "hypothesis_id": "fresh_replay_resolves_candidate_acceptance_and_mechanism",
+        "claimed_inference": "empirical_search",
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_method": "fresh_independent_passive_response_v2_replay",
+        "selected_variables": [
+          "plus_x and minus_x displacement bounds",
+          "progressive-stiffness ratios",
+          "slack-to-taut transitions",
+          "paired mechanism criteria",
+          "every-step stage qualifications",
+          "contact and route legality"
+        ],
+        "selected_candidate": {
+          "artifact_id": "bd44597274f2f056b4d0cee43b6b050649178f9e2905922637bc3a2404268175",
+          "media_type": "application/json"
+        },
+        "requested_budget": 1
+      },
+      "next_step": "diagnose",
+      "hypothesis": "A fresh independent replay of the unchanged candidate under the complete passive_response_v2 protocol will determine whether its apparent progressive stiffness is realized as a qualified slack-to-taut mechanism in both load directions and whether the candidate satisfies the original task, rather than merely reproducing sampled diagnostic bounds.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "c0b844d23ed27d8b9c077e6167f03ee886a040611cec61573f26beabf4e979e4",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "bd44597274f2f056b4d0cee43b6b050649178f9e2905922637bc3a2404268175",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "7df0162f9b8d9e8213fb2ef6dbd8bb20628bcd4a411e3788c0532b8402b0e340",
+          "media_type": "application/json"
+        }
+      ],
+      "expected_observation": "The fresh replay completes both 20 s load episodes without contact, route, or numerical failure; every-step qualification passes in every scoring window; low, high, and recovery displacement bounds pass; stiffness ratio is at least 1.5 in both directions; and the direction-appropriate tendon is slack with tension at most 0.005 N at low load but engaged with tension at least 0.05 N and constraint residual at most 5e-05 m at high load, thereby supplying the previously missing paired-mechanism and task-acceptance measurements.",
+      "weakening_observation": "The hypothesis is weakened by any incomplete episode, contact or route failure, any original displacement or progressive-stiffness bound failure, absence of the required low-slack/high-taut transition in either direction, or any every-step qualification failure—especially recurrence of low-stage or recovery tip speed, monitor speed, or static-balance violations seen only in sampled diagnostics.",
+      "fixed_conditions": "Keep the candidate identity and all geometry, four fixed payout lengths of 0.3292 m, zero pretensions, material properties, masses, two cells per segment, gravity, mount, solver settings, 0.000125 s timestep, 0.01 s sampling/control period, fresh unloaded hard-equilibrium initialization, symmetric prescribed load programs, full-physics recording, every-step route checks, evaluator thresholds, and passive no-active-control treatment unchanged. Omit a control source and saved initial state so the registered passive loading protocol and fresh initialization are used.",
+      "stopping_condition": "Stop after one fresh independent replay has completed and the original evaluator has issued complete results for both load directions; do not add repetitions. If the replay is incomplete or any required bound, mechanism criterion, qualification, contact, or route check fails, retain the result and diagnose that specific failure before considering redesign.",
+      "interpretation": "This action directly tests the unresolved distinction between favorable sampled model observations and independent task acceptance. A passing replay would support only this exact candidate under the frozen task and protocol, with repeatability still unassessed; a failure would localize the next design question but would not establish global or structural infeasibility.",
+      "physical_replay": {
+        "candidate": {
+          "artifact_id": "bd44597274f2f056b4d0cee43b6b050649178f9e2905922637bc3a2404268175",
+          "media_type": "application/json"
+        }
+      }
+    }
+  },
+  {
+    "label": "B",
+    "decision": {
+      "action": "physical_replay",
+      "decision": {
+        "version": "research_decision_v1",
+        "hypothesis_id": "paired-directional-tendon-mechanism-validation",
+        "claimed_inference": "empirical_search",
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_method": "fresh paired passive-limit ablation replay",
+        "selected_variables": [
+          "passive_limit.tendon_1",
+          "passive_limit.tendon_3",
+          "plus_x progressive-stiffness response",
+          "minus_x progressive-stiffness response",
+          "every-step stage qualification",
+          "original evaluator acceptance"
+        ],
+        "selected_candidate": {
+          "artifact_id": "bd44597274f2f056b4d0cee43b6b050649178f9e2905922637bc3a2404268175",
+          "media_type": "application/json"
+        },
+        "requested_budget": 4
+      },
+      "hypothesis": "The candidate's bilateral progressive stiffness is produced collectively by direction-selective engagement of tendon_1 under plus_x loading and tendon_3 under minus_x loading, and a fresh paired replay that disables those two passive limits will both resolve the missing paired-mechanism check and determine whether the intact candidate satisfies every-physics-step qualification and the original evaluator.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "c0b844d23ed27d8b9c077e6167f03ee886a040611cec61573f26beabf4e979e4",
+          "media_type": "application/json"
+        }
+      ],
+      "expected_observation": "In the intact member of the fresh pair, both load directions complete without contact, preserve the recorded displacement and recovery bounds, show stiffness ratio at least 1.5, exhibit low-stage slack and high-stage tension through tendon_1 for plus_x and tendon_3 for minus_x, and pass every-step speed, balance, and length qualifications. Relative to that intact member, disabling tendon_1 and tendon_3 produces the frozen paired-mechanism signature in both directions, including the required high-displacement increase and late-stiffness reduction, so the original evaluator returns a complete result rather than UNKNOWN paired-mechanism values.",
+      "weakening_observation": "The hypothesis is weakened if disabling tendon_1 and tendon_3 does not materially reduce progressive stiffening or does not satisfy the frozen paired-mechanism contrasts in either direction. The candidate-level acceptance hypothesis is weakened if the intact replay retains low or recovery qualification failures, violates any displacement, recovery, transition, tension, length, or no-contact bound, terminates incompletely, or still lacks a complete evaluator result.",
+      "fixed_conditions": "Use the exact candidate bd44597274f2f056b4d0cee43b6b050649178f9e2905922637bc3a2404268175 with no design edits and no active control source. Run the registered passive_response_v2 protocol from a fresh unloaded hard equilibrium for plus_x and minus_x, with the frozen 20 s load programs, 0.000125 s timestep, two cells per segment, gravity, mount, solver settings, full-physics recording, every-step route and qualification checks, and all original evaluator thresholds unchanged. The only intervention is disabling the passive limits of tendon_1 and tendon_3 in the ablated member of the fresh paired replay.",
+      "stopping_condition": "Stop after the single fresh paired replay has completed or terminated and the original evaluator has reported intact-versus-ablated outcomes for both load directions, including every-step qualifications and paired-mechanism status; do not repeat automatically. A complete pass can support a later selection decision, while any failure or incomplete result requires a separate diagnosis rather than being treated as infeasibility.",
+      "interpretation": "This action tests the collective contribution of the two direction-associated passive tendon limits while simultaneously obtaining the independent full-protocol evidence that is currently missing. A successful paired contrast would support the specified collective engagement mechanism only under the frozen candidate, loads, and protocol; it would not isolate the individual causal effect of either tendon, establish robustness or repeatability, or justify extrapolation beyond the tested conditions. The existing finite sampled contrasts are not treated as gradients or as task acceptance.",
+      "physical_replay": {
+        "candidate": {
+          "artifact_id": "bd44597274f2f056b4d0cee43b6b050649178f9e2905922637bc3a2404268175",
+          "media_type": "application/json"
+        },
+        "source": null,
+        "passive_ablation": [
+          "tendon_1",
+          "tendon_3"
+        ],
+        "initial_state_result": null,
+        "initial_state_episode": null,
+        "validation_source": null
+      },
+      "next_step": null,
+      "revise_selection": false
+    }
+  }
+]

@@ -1,0 +1,1731 @@
+{
+  "provider": {
+    "adapter": "chatgpt_gateway",
+    "adapter_version": "8.0.0",
+    "base_url": "http://127.0.0.1:8789/v1",
+    "context_bytes": 1048576,
+    "context_guard": {
+      "context_limit_tokens": 1050000,
+      "framing_headroom_tokens": 8192
+    },
+    "investigation_max_tokens": 32768,
+    "max_no_progress": 3,
+    "max_repairs": 10,
+    "max_tokens": null,
+    "max_turns": 48,
+    "model": "gpt-5.6-sol",
+    "model_capabilities": {
+      "catalog_source": "2026-11-11 read-only authenticated /v1/models HTTP200 confirmed the existing primary gpt-5.6-sol at configured account3 Gateway. No model change. Historical same-model/transport live tool/handoff proof is checked separately.",
+      "max_request_bytes": 1048576,
+      "model": "gpt-5.6-sol",
+      "reasoning": [
+        "none",
+        "medium"
+      ],
+      "tools": true,
+      "verification": "account_verified"
+    },
+    "output_context_reserve_tokens": 32768,
+    "parameters": {},
+    "protocol_recovery": {
+      "max_consecutive": 0,
+      "max_total": 0
+    },
+    "reasoning": "medium",
+    "strategy": "strategy.tool",
+    "strategy_version": "1.0.0",
+    "supports_images": false,
+    "supports_text": true,
+    "supports_tools": true,
+    "thinking": null,
+    "timeout_s": 600.0
+  },
+  "credentials_reference": "~/.softrobot-agent/chatgpt-api-account3.json",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "evidence_read",
+        "description": "Read whitelisted immutable historical raw evidence only. No reports or scientific execution.",
+        "parameters": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Exact evidence review and formal acceptance, also retained for saved callers.",
+          "properties": {
+            "reference": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "pointer": {
+              "default": "",
+              "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+              "title": "Pointer",
+              "type": "string"
+            },
+            "view": {
+              "default": "full",
+              "enum": [
+                "full",
+                "summary",
+                "fields",
+                "range",
+                "capabilities",
+                "mathematical_capabilities",
+                "working_set",
+                "acceptance_certificate"
+              ],
+              "title": "View",
+              "type": "string"
+            },
+            "fields": {
+              "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 32,
+              "title": "Fields",
+              "type": "array"
+            },
+            "start": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Start",
+              "type": "integer"
+            },
+            "count": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "reference"
+          ],
+          "title": "EvidenceQuery",
+          "type": "object",
+          "if": {},
+          "then": {
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "view": {
+                      "const": "fields"
+                    }
+                  },
+                  "required": [
+                    "view"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "fields": {
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "fields"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "research_plan",
+        "description": "Record exactly one next proposed research action using the existing Core Plan/ResearchDecision and end this replay. No worker is executed.",
+        "parameters": {
+          "$defs": {
+            "Attachment": {
+              "additionalProperties": false,
+              "properties": {
+                "part": {
+                  "default": "fixed_base",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Part",
+                  "type": "string"
+                },
+                "s": {
+                  "default": 0.0,
+                  "maximum": 1,
+                  "minimum": 0,
+                  "title": "S",
+                  "type": "number"
+                },
+                "position_m": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "quaternion_wxyz": {
+                  "default": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Quaternion Wxyz",
+                  "type": "array"
+                }
+              },
+              "title": "Attachment",
+              "type": "object"
+            },
+            "ControlSeedRequest": {
+              "additionalProperties": false,
+              "properties": {
+                "condition_id": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Optional frozen task condition. Returns a candidate bound to this condition on the identical structure; use the returned candidate for analysis, search and replay.",
+                  "title": "Condition Id"
+                },
+                "candidate": {
+                  "$ref": "#/$defs/EvidenceRef",
+                  "description": "Target candidate; decision.selected_candidate must equal control_seed.candidate."
+                },
+                "source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Explicit schedule or a registered complete NMPC execution / independent RL evaluation with a sealed actual-input trace. For Native T1/Direct use /control_schedule_reference, not the analysis result. Measured NMPC/RL conversion requires exact parent=candidate without channel_map; the new schedule inherits no acceptance. Use independent physical_replay for each frozen condition before joint SELECT."
+                },
+                "parent": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Required with source. For measured NMPC input, exact parent equals candidate; source is the complete execution result."
+                },
+                "channel_map": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Channel Map"
+                },
+                "tensions_n": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "type": "array"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Tensions N"
+                },
+                "method": {
+                  "default": "baseline",
+                  "description": "baseline with only candidate uses candidate pretensions over the full task grid, without task evaluation. Use the returned source as control_optimization.source, never candidate. An initialization Plan replaces the latest diagnose; submit diagnose again with your own candidate and method before research_analysis.",
+                  "enum": [
+                    "baseline",
+                    "mathematical_response",
+                    "physical_response",
+                    "capability_sequence"
+                  ],
+                  "title": "Method",
+                  "type": "string"
+                },
+                "response_evidence": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "capability_sequence requires a verified current-candidate Conic/SOCP task_capability result, never a Native T1/Direct result. mathematical_response requires verified input_sensitivity. A saved Native optimized schedule instead uses baseline source+parent or serves directly as Native control_optimization.source."
+                },
+                "channels": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Channels"
+                },
+                "difference_step_n": {
+                  "default": 0.02,
+                  "exclusiveMinimum": 0,
+                  "title": "Difference Step N",
+                  "type": "number"
+                },
+                "trust_radius_n": {
+                  "default": 0.2,
+                  "exclusiveMinimum": 0,
+                  "title": "Trust Radius N",
+                  "type": "number"
+                },
+                "regularization": {
+                  "default": 1e-06,
+                  "exclusiveMinimum": 0,
+                  "title": "Regularization",
+                  "type": "number"
+                },
+                "evaluation_requests": {
+                  "default": 8,
+                  "maximum": 64,
+                  "minimum": 1,
+                  "title": "Evaluation Requests",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "candidate"
+              ],
+              "title": "ControlSeedRequest",
+              "type": "object"
+            },
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            },
+            "GenerationRequest": {
+              "additionalProperties": false,
+              "properties": {
+                "version": {
+                  "const": "serial_family_generation_v1",
+                  "default": "serial_family_generation_v1",
+                  "title": "Version",
+                  "type": "string"
+                },
+                "family_space_identity": {
+                  "minLength": 1,
+                  "title": "Family Space Identity",
+                  "type": "string"
+                },
+                "segment_count": {
+                  "default": 2,
+                  "minimum": 1,
+                  "title": "Segment Count",
+                  "type": "integer"
+                },
+                "tendon_count": {
+                  "minimum": 1,
+                  "title": "Tendon Count",
+                  "type": "integer"
+                },
+                "strategy": {
+                  "const": "polar_consecutive_spans_v1",
+                  "default": "polar_consecutive_spans_v1",
+                  "title": "Strategy",
+                  "type": "string"
+                },
+                "spans": {
+                  "items": {
+                    "$ref": "#/$defs/Span"
+                  },
+                  "title": "Spans",
+                  "type": "array"
+                },
+                "segments": {
+                  "additionalProperties": {
+                    "$ref": "#/$defs/SegmentChoice"
+                  },
+                  "title": "Segments",
+                  "type": "object"
+                },
+                "tendon_parameters": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Tendon Parameters",
+                  "type": "object"
+                },
+                "control_weights": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Control Weights",
+                  "type": "object"
+                },
+                "route_overrides": {
+                  "additionalProperties": {
+                    "items": {
+                      "$ref": "#/$defs/RoutePoint"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Route Overrides",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "family_space_identity",
+                "tendon_count"
+              ],
+              "title": "GenerationRequest",
+              "type": "object"
+            },
+            "GenerationRequestV2": {
+              "additionalProperties": false,
+              "properties": {
+                "version": {
+                  "const": "serial_family_generation_v2",
+                  "default": "serial_family_generation_v2",
+                  "title": "Version",
+                  "type": "string"
+                },
+                "family_space_identity": {
+                  "minLength": 1,
+                  "title": "Family Space Identity",
+                  "type": "string"
+                },
+                "segment_count": {
+                  "default": 2,
+                  "minimum": 1,
+                  "title": "Segment Count",
+                  "type": "integer"
+                },
+                "tendon_count": {
+                  "minimum": 1,
+                  "title": "Tendon Count",
+                  "type": "integer"
+                },
+                "strategy": {
+                  "const": "polar_consecutive_spans_v1",
+                  "default": "polar_consecutive_spans_v1",
+                  "title": "Strategy",
+                  "type": "string"
+                },
+                "spans": {
+                  "items": {
+                    "$ref": "#/$defs/Span"
+                  },
+                  "title": "Spans",
+                  "type": "array"
+                },
+                "segments": {
+                  "additionalProperties": {
+                    "$ref": "#/$defs/SegmentChoiceV2"
+                  },
+                  "title": "Segments",
+                  "type": "object"
+                },
+                "tendon_parameters": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Tendon Parameters",
+                  "type": "object"
+                },
+                "control_weights": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Control Weights",
+                  "type": "object"
+                },
+                "route_overrides": {
+                  "additionalProperties": {
+                    "items": {
+                      "$ref": "#/$defs/RoutePoint"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Route Overrides",
+                  "type": "object"
+                },
+                "controller_recipe": {
+                  "additionalProperties": true,
+                  "title": "Controller Recipe",
+                  "type": "object"
+                },
+                "controller_solver": {
+                  "additionalProperties": true,
+                  "title": "Controller Solver",
+                  "type": "object"
+                },
+                "payout_lengths_m": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Payout Lengths M",
+                  "type": "object"
+                },
+                "payout_offsets_m": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Payout Offsets M",
+                  "type": "object"
+                },
+                "guide_hole_positions_m": {
+                  "additionalProperties": {
+                    "additionalProperties": {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    "type": "object"
+                  },
+                  "title": "Guide Hole Positions M",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "family_space_identity",
+                "tendon_count"
+              ],
+              "title": "GenerationRequestV2",
+              "type": "object"
+            },
+            "LocalDiagnostic": {
+              "additionalProperties": false,
+              "properties": {
+                "execution": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "update_id": {
+                  "minimum": 0,
+                  "title": "Update Id",
+                  "type": "integer"
+                },
+                "repetitions": {
+                  "default": 2,
+                  "maximum": 2,
+                  "minimum": 1,
+                  "title": "Repetitions",
+                  "type": "integer"
+                },
+                "mode": {
+                  "default": "research_policy",
+                  "enum": [
+                    "research_policy",
+                    "research_current"
+                  ],
+                  "title": "Mode",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "execution",
+                "update_id"
+              ],
+              "title": "LocalDiagnostic",
+              "type": "object"
+            },
+            "MechanicsRequest": {
+              "additionalProperties": false,
+              "properties": {
+                "candidate": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "substeps": {
+                  "default": 1,
+                  "maximum": 4,
+                  "minimum": 1,
+                  "title": "Substeps",
+                  "type": "integer"
+                },
+                "initialization": {
+                  "default": "constant_0_2",
+                  "enum": [
+                    "constant_0_2",
+                    "ramp_0_2_to_0_4",
+                    "saved_candidate_trajectory",
+                    "saved_candidate_controls"
+                  ],
+                  "title": "Initialization",
+                  "type": "string"
+                },
+                "warm_source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "objective_mode": {
+                  "default": "task_gap",
+                  "enum": [
+                    "task_gap",
+                    "task_gap_with_effort",
+                    "maximum_original_violation",
+                    "minimum_signed_task_excess",
+                    "task_capability",
+                    "task_feasible_effort"
+                  ],
+                  "title": "Objective Mode",
+                  "type": "string"
+                },
+                "check_only": {
+                  "default": false,
+                  "title": "Check Only",
+                  "type": "boolean"
+                },
+                "diagnostic_source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "diagnostic_mode": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "regularity",
+                        "lagrangian"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Diagnostic Mode"
+                },
+                "max_iterations": {
+                  "default": 120,
+                  "maximum": 120,
+                  "minimum": 1,
+                  "title": "Max Iterations",
+                  "type": "integer"
+                },
+                "position_weight": {
+                  "default": 1,
+                  "exclusiveMinimum": 0,
+                  "title": "Position Weight",
+                  "type": "number"
+                },
+                "speed_weight": {
+                  "default": 1,
+                  "exclusiveMinimum": 0,
+                  "title": "Speed Weight",
+                  "type": "number"
+                },
+                "secondary_coefficient": {
+                  "default": 0.001,
+                  "minimum": 0,
+                  "title": "Secondary Coefficient",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "candidate"
+              ],
+              "title": "MechanicsRequest",
+              "type": "object"
+            },
+            "PhysicalReplayRequest": {
+              "additionalProperties": false,
+              "properties": {
+                "candidate": {
+                  "$ref": "#/$defs/EvidenceRef",
+                  "description": "Replay candidate; decision.selected_candidate must equal this reference. Both candidate and source belong inside physical_replay."
+                },
+                "source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Active: exact complete control schedule. Registered passive task: omit to bind its frozen loading protocol."
+                },
+                "passive_ablation": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 64,
+                      "minItems": 1,
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "passive_response_v2 only: exact passive tendon entities; two fresh paired native executions, double episode budget.",
+                  "title": "Passive Ablation"
+                },
+                "initial_state_result": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "passive_response_v2 only: current owned completed physical result containing a qualified complete integration state."
+                },
+                "initial_state_episode": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Initial State Episode"
+                },
+                "validation_source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Registered passive numerical confirmation only: current owned completed paired physical result. A fresh independent pair, constrained half-timestep and initial perturbation executions plus saved-CSV state checks form the complete frozen confirmation scope. No historical candidate transfer."
+                }
+              },
+              "required": [
+                "candidate"
+              ],
+              "title": "PhysicalReplayRequest",
+              "type": "object"
+            },
+            "ResearchDecision": {
+              "additionalProperties": false,
+              "properties": {
+                "version": {
+                  "const": "research_decision_v1",
+                  "default": "research_decision_v1",
+                  "title": "Version",
+                  "type": "string"
+                },
+                "hypothesis_id": {
+                  "minLength": 1,
+                  "title": "Hypothesis Id",
+                  "type": "string"
+                },
+                "claimed_inference": {
+                  "default": "empirical_search",
+                  "description": "Use empirical_search for a proposed experiment, including testing a prediction in physics. Unsupported stronger claims remain annotated hypotheses and do not veto an otherwise legal experiment. Formal conclusions and SELECT/CONFIRM/STOP still require registered scoped evidence; execution always requires valid identity, authorization, applicability and budget.",
+                  "minLength": 1,
+                  "title": "Claimed Inference",
+                  "type": "string"
+                },
+                "research_intent": {
+                  "enum": [
+                    "DIAGNOSE",
+                    "MATHEMATICAL_ANALYSIS",
+                    "CONTROL_SEARCH",
+                    "DESIGN_MODIFICATION",
+                    "NMPC_EXECUTION",
+                    "RL_TRAINING",
+                    "PHYSICAL_VALIDATION",
+                    "SELECT",
+                    "STOP"
+                  ],
+                  "title": "Research Intent",
+                  "type": "string"
+                },
+                "selected_method": {
+                  "description": "Intent label only; does not dispatch a worker or grant permission. Plan action and its payload determine execution. Native mathematical methods require research_analysis with the registered request_template. diagnose without diagnostic only reads existing evidence.",
+                  "minLength": 1,
+                  "title": "Selected Method",
+                  "type": "string"
+                },
+                "selected_variables": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Selected Variables",
+                  "type": "array"
+                },
+                "selected_candidate": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Required for execute/initialize_control/control_search/physical_replay. Match candidate, control_seed.candidate, control_search.candidate or physical_replay.candidate respectively; never substitute the control source."
+                },
+                "requested_budget": {
+                  "default": 0,
+                  "description": "Declared request cap, not actual cost or authorization. For Plan control_search match settings.evaluation_requests (physical replay callbacks); otherwise declared operation units. Zero independent physical evaluations does not imply zero Native integration. Missing formal scope and unknown costs remain unresolved until normal admission.",
+                  "minimum": 0,
+                  "title": "Requested Budget",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "hypothesis_id",
+                "research_intent",
+                "selected_method"
+              ],
+              "title": "ResearchDecision",
+              "type": "object"
+            },
+            "RoutePoint": {
+              "additionalProperties": false,
+              "properties": {
+                "attachment": {
+                  "$ref": "#/$defs/Attachment"
+                },
+                "hole": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Hole"
+                },
+                "role": {
+                  "enum": [
+                    "start",
+                    "guide",
+                    "anchor"
+                  ],
+                  "title": "Role",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "attachment",
+                "role"
+              ],
+              "title": "RoutePoint",
+              "type": "object"
+            },
+            "ScientificGeneration": {
+              "additionalProperties": false,
+              "description": "An explicit physical edit of the selected parent; no automatic experiment.",
+              "properties": {
+                "changes": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "description": "Registered physical parameter IDs mapped to absolute SI values. Copy all other parent fields exactly. Empty explicitly reconstructs the unchanged selected parent at the current implementation; old results and acceptance do not transfer. Parent is decision.selected_candidate.",
+                  "maxProperties": 8,
+                  "title": "Changes",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "changes"
+              ],
+              "title": "ScientificGeneration",
+              "type": "object"
+            },
+            "Section": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "circle",
+                    "tube",
+                    "ellipse",
+                    "rectangle",
+                    "polygon"
+                  ],
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "parameters": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Parameters",
+                  "type": "object"
+                },
+                "outer_yz_m": {
+                  "items": {
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  "title": "Outer Yz M",
+                  "type": "array"
+                },
+                "holes_yz_m": {
+                  "items": {
+                    "items": {
+                      "maxItems": 2,
+                      "minItems": 2,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Holes Yz M",
+                  "type": "array"
+                },
+                "angle_rad": {
+                  "default": 0.0,
+                  "title": "Angle Rad",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "title": "Section",
+              "type": "object"
+            },
+            "SegmentChoice": {
+              "additionalProperties": false,
+              "properties": {
+                "length_m": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Length M"
+                },
+                "young_pa": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Young Pa"
+                },
+                "sections": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "$ref": "#/$defs/Section"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Sections"
+                }
+              },
+              "title": "SegmentChoice",
+              "type": "object"
+            },
+            "SegmentChoiceV2": {
+              "additionalProperties": false,
+              "properties": {
+                "length_m": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Length M"
+                },
+                "young_pa": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Young Pa"
+                },
+                "sections": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "$ref": "#/$defs/Section"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Sections"
+                },
+                "cells": {
+                  "anyOf": [
+                    {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Cells"
+                },
+                "physical_parameters": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Physical Parameters",
+                  "type": "object"
+                },
+                "interpolation": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "step",
+                        "linear"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Interpolation"
+                }
+              },
+              "title": "SegmentChoiceV2",
+              "type": "object"
+            },
+            "Span": {
+              "additionalProperties": false,
+              "properties": {
+                "first_segment": {
+                  "default": 0,
+                  "minimum": 0,
+                  "title": "First Segment",
+                  "type": "integer"
+                },
+                "last_segment": {
+                  "minimum": 0,
+                  "title": "Last Segment",
+                  "type": "integer"
+                },
+                "count": {
+                  "minimum": 1,
+                  "title": "Count",
+                  "type": "integer"
+                },
+                "phase_rad": {
+                  "default": 0.0,
+                  "title": "Phase Rad",
+                  "type": "number"
+                },
+                "angular_offsets_rad": {
+                  "description": "Extra offsets: theta_j = phase_rad + 2*pi*j/count + angular_offsets_rad[j]. Empty uses equal spacing. These are not absolute angles.",
+                  "items": {
+                    "type": "number"
+                  },
+                  "title": "Angular Offsets Rad",
+                  "type": "array"
+                },
+                "radius_m": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Radius M"
+                },
+                "guide_s": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "number"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Guide S"
+                },
+                "anchor_s": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Anchor S"
+                },
+                "guide_angle_offset_rad": {
+                  "default": 0.0,
+                  "title": "Guide Angle Offset Rad",
+                  "type": "number"
+                },
+                "anchor_angle_offset_rad": {
+                  "default": 0.0,
+                  "title": "Anchor Angle Offset Rad",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "last_segment",
+                "count"
+              ],
+              "title": "Span",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "diagnose",
+                "generate",
+                "initialize_control",
+                "physical_replay",
+                "mechanics"
+              ]
+            },
+            "control_seed": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ControlSeedRequest"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "decision": {
+              "$ref": "#/$defs/ResearchDecision"
+            },
+            "next_step": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "adjust_training",
+                    "revise_design",
+                    "diagnose",
+                    "stop"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Next Step"
+            },
+            "hypothesis": {
+              "minLength": 1,
+              "title": "Hypothesis",
+              "type": "string"
+            },
+            "supporting_evidence": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Supporting Evidence",
+              "type": "array"
+            },
+            "expected_observation": {
+              "minLength": 1,
+              "title": "Expected Observation",
+              "type": "string"
+            },
+            "weakening_observation": {
+              "minLength": 1,
+              "title": "Weakening Observation",
+              "type": "string"
+            },
+            "fixed_conditions": {
+              "minLength": 1,
+              "title": "Fixed Conditions",
+              "type": "string"
+            },
+            "stopping_condition": {
+              "minLength": 1,
+              "title": "Stopping Condition",
+              "type": "string"
+            },
+            "interpretation": {
+              "minLength": 1,
+              "title": "Interpretation",
+              "type": "string"
+            },
+            "generation": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/GenerationRequest"
+                },
+                {
+                  "$ref": "#/$defs/GenerationRequestV2"
+                },
+                {
+                  "$ref": "#/$defs/ScientificGeneration"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Generation"
+            },
+            "revise_selection": {
+              "default": false,
+              "description": "Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs",
+              "title": "Revise Selection",
+              "type": "boolean"
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LocalDiagnostic"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "mechanics": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/MechanicsRequest"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "physical_replay": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/PhysicalReplayRequest"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "experience_disposition": {
+              "additionalProperties": {
+                "enum": [
+                  "adopted",
+                  "rejected",
+                  "context_only"
+                ],
+                "type": "string"
+              },
+              "description": "Actual full-read receipt IDs / entry_id@revision, or a confirmed delivered summary:entry_id@revision. Summary citation does not imply full reading. Omit without a matching source.",
+              "title": "Experience Disposition",
+              "type": "object"
+            }
+          },
+          "required": [
+            "action",
+            "hypothesis",
+            "expected_observation",
+            "weakening_observation",
+            "fixed_conditions",
+            "stopping_condition",
+            "interpretation",
+            "decision"
+          ],
+          "title": "Plan",
+          "type": "object",
+          "if": {},
+          "then": {
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "diagnose"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "DIAGNOSE"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "generate"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "DESIGN_MODIFICATION"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "initialize_control"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "CONTROL_SEARCH"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "physical_replay"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "PHYSICAL_VALIDATION"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "mechanics"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "MATHEMATICAL_ANALYSIS"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "initialize_control"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "control_seed"
+                  ],
+                  "properties": {
+                    "control_seed": {
+                      "not": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "control_seed": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "generate"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "generation"
+                  ],
+                  "properties": {
+                    "generation": {
+                      "not": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "generation": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "mechanics"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "mechanics"
+                  ],
+                  "properties": {
+                    "mechanics": {
+                      "not": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "mechanics": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "physical_replay"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "physical_replay"
+                  ],
+                  "properties": {
+                    "physical_replay": {
+                      "not": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "physical_replay": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "diagnose"
+                      ]
+                    }
+                  }
+                },
+                "then": {},
+                "else": {
+                  "properties": {
+                    "diagnostic": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "not": {
+                        "enum": [
+                          "select",
+                          "confirm"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "revise_selection": {
+                      "const": false
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "initialize_control",
+                        "physical_replay"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "required": [
+                        "selected_candidate"
+                      ],
+                      "properties": {
+                        "selected_candidate": {
+                          "$ref": "#/$defs/EvidenceRef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "system": "You are Softrobot-Agent Main performing one decision-only historical replay.\nUse only the frozen mathematical facts, physical observations, task, candidate and raw evidence supplied here.\nIf an additional scientific interpretation is present, treat it as non-authoritative and check it against raw facts.\nDo not mention whether an interpretation was present, the Reporter, the experimental condition, or this instruction.\nUse English. Submit exactly one concrete next scientific decision through the existing research_plan tool.\nUse its hypothesis, interpretation, supporting_evidence, expected_observation, weakening_observation,\nfixed_conditions, stopping_condition and typed decision fields to explain the key question, mechanism,\nnext action, its evidence, expected/weakening outcomes and scope. Cite only raw scientific EvidenceRefs.\nYou may read whitelisted historical evidence with evidence_read. Maximum four Provider requests.\nThis is not a new Study. research_plan records a proposed action and ends the session; no action is executed.\nDo not run mathematics, generate candidates or simulate. Any proposed future action must respect the frozen\ntask/domain and evidence limits. Missing values remain unknown. Do not equate finite contrasts with strict\ngradients, sampled/model results with independent task acceptance, stagnation with infeasibility, or multiple\nchanged parameters with single-factor causal proof. Prefer a specific informative action to generic repetition.\nAll evidence delivered initially is already available to you; only read more if needed for the decision.\n",
+  "provider_budget_per_session": 4,
+  "schema_owner": "D:\\softrobot-agent-core\\tools\\research\\agent.py",
+  "execution_entry": "Minimal decision-only Provider replay; existing request_settings, Plan schema and original Reporter artifacts. No production Harness changes.",
+  "independent_review_model": null,
+  "effective_reasoning": "gateway_default_not_exposed",
+  "transport": "text_only_existing_gateway",
+  "initial_400s_counted": true,
+  "upstream_for_initial_400s": false,
+  "original_explicit_medium_not_supported": true,
+  "usage_reporting": "Not exposed by current gateway; unknown remains null."
+}

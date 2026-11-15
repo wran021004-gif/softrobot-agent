@@ -1,0 +1,1140 @@
+{
+  "experiment": "E2-R2",
+  "historical_FULL": "D:/softrobot-agent/runs/psd2d-core-only-20261112/FINAL_RESULT.md",
+  "snapshots": {
+    "PHS_C037_A": {
+      "conditions": {
+        "Flat": {
+          "session": {
+            "snapshot_id": "PHS_C037_A",
+            "condition": "Flat",
+            "initial_input_tokens_actual": 877197,
+            "cumulative_input_tokens_actual": 877197,
+            "output_tokens_actual": 1092,
+            "total_provider_requests": 1,
+            "evidence_read_requests": 0,
+            "unique_evidence_records": 0,
+            "repeated_reads": 0,
+            "initial_input_tokens_estimated": 903090,
+            "cumulative_input_tokens_estimated": 903090,
+            "cumulative_system_tokens_estimated": 391,
+            "cumulative_tool_schema_tokens_estimated": 12761,
+            "repeated_context_tokens_estimated": 0,
+            "evidence_retrieval_tokens_sent_estimated": 0,
+            "online_wall_s": 39.741977400000906,
+            "actual_usage_complete": true,
+            "rejected_requests": 0,
+            "transport_errors": 0,
+            "raw_records_delivered_in_flat_initial": 106,
+            "deep_levels_actually_read": [],
+            "additional_full_records_not_fetched": null,
+            "unfetched_record_note": "",
+            "token_estimate_basis": "estimated_generic_proxy: same tiktoken 0.12.0/o200k_base over EXACT COMPLETE serialized wire, including tools, metadata and repeated history. Not a verified model mapping or billing measure."
+          },
+          "requests": [
+            {
+              "snapshot_id": "PHS_C037_A",
+              "condition": "Flat",
+              "session_id": "997b390e-061a-426c-9b78-518d098342d5",
+              "request_turn": 1,
+              "http_status": 200,
+              "input_tokens_actual": 877197,
+              "output_tokens_actual": 1092,
+              "total_tokens_actual": 878289,
+              "usage_status": "provider_actual",
+              "cached_input_tokens_actual": 14170,
+              "wire_bytes": 3375828,
+              "wire_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/997b390e-061a-426c-9b78-518d098342d5/request_1.json",
+              "response_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/997b390e-061a-426c-9b78-518d098342d5/response_1.txt",
+              "whole_wire_input_tokens_estimated": 903090,
+              "system_prompt_tokens_estimated": 391,
+              "tool_schema_tokens_estimated": 12761,
+              "repeated_context_tokens_estimated": 0,
+              "evidence_retrieval_tokens_sent_estimated": 0,
+              "evidence_reads_requested_in_response": 0,
+              "token_estimate_basis": "estimated_generic_proxy: same tiktoken 0.12.0/o200k_base over EXACT COMPLETE serialized wire, including tools, metadata and repeated history. Not a verified model mapping or billing measure.",
+              "component_allocations_estimated": {
+                "framing": 36,
+                "system": 391,
+                "tool_schema": 12761,
+                "task": 43937,
+                "question": 67,
+                "history": 32175,
+                "evidence": 813723
+              },
+              "per_tool_feedback_tokens_estimated": {}
+            }
+          ],
+          "decision": {
+            "action": "diagnose",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "route_validity_before_damping_or_stiffness",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DIAGNOSE",
+              "selected_method": "mechanism_research",
+              "selected_variables": [
+                "route geometry validity at the distal span",
+                "constraint active/slack state under s7_positive",
+                "tip-to-loaded-point transfer",
+                "loaded-stage settling qualification"
+              ],
+              "selected_candidate": {
+                "artifact_id": "279ab69ea2fded0a9786f94af6f41e819c739abd25c30fabf4afc76e272486f2",
+                "media_type": "application/json"
+              },
+              "requested_budget": 0
+            },
+            "next_step": "diagnose",
+            "next_research_action": "mechanism_research",
+            "hypothesis": "Key physical problem: the present design must produce at least 10 mm local material displacement while holding tip displacement below 5 mm and settling by the frozen tail window, but the installed tendon path is already reported to intersect segment_2_cell_4 at time zero. Competing H1: sparse/illegal distal routing and associated loss or misdirection of unilateral constraint authority causes the large distal tip transfer; a geometry-valid redistributed route is therefore prerequisite. Competing H2: the route report is incidental to the simulated transfer and the remaining failures are mainly finite-time damping/relaxation, so increasing or redistributing viscosity would fix qualification while preserving response. A third plausible alternative is insufficient distal structural stiffness, requiring stiffness redistribution rather than more damping. Existing evidence discriminates only partly: matched viscosity changes improve drift and some velocity measures but do not reliably resolve speed or static-balance qualification, while s7_positive has 82.95 mm point motion but 72.29 mm tip motion (ratio 0.871), strongly weakening a damping-only account; however no legal-route matched comparison exists, so routing versus stiffness remains unresolved. Next route: use the existing mechanism-research interface to diagnose route validity and unilateral constraint state first, then design a geometry-valid distal guide/anchor redistribution before any further full-task or acceptance run; do not change the frozen task and do not infer acceptance from this diagnosis.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "a0d46ae00ea166f3c5a21bd6e3e5431f652a9d733b2825a9a3b3d945856f2f04",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "6edaf72199c8f424561dd32d351692723c88bad0ae5869bf178eb9bd2d7e5d91",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "7529b3d0e639653de0be383325f6ed7d3074c075cbc1ac5b03addd097411fbbc",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "04a756ba628855ddda807820f904cbf3b12a18ac3e3e889d6a197166cb3ab99f",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "If H1 is correct, route diagnostics will reproduce the distal cable-solid intersection and show that the current installed path cannot supply a geometry-valid constraint transfer; a later legal redistribution should sharply reduce s7 tip/point ratio while retaining point displacement. If H2 is correct, routing will prove legal or irrelevant and matched damping changes will monotonically reduce tip speed, monitor speed, qvel and static-balance residual without materially degrading point, tip and ratio margins. If stiffness redistribution is primary, route validity will be recoverable but distal transfer will remain excessive unless distal tangent stiffness is increased relative to the loaded region.",
+            "weakening_observation": "H1 is weakened if a complete checked route is legal and a matched geometry-valid routing change leaves distal tip transfer unchanged. H2 is refuted by the observed non-monotonic/static-balance response to viscosity and would be further weakened if additional legal damping cannot meet all four loaded qualification limits. The stiffness alternative is weakened if a legal routing correction alone reduces the distal ratio below 0.3 with acceptable response and settling.",
+            "fixed_conditions": "Keep the frozen ten-condition task, gravity, mount, force programs, 0.000125 s timestep, solver settings, qualification windows and thresholds unchanged. Hold segment count, total 0.28 m flexible length, mesh, masses, 3 mm circular sections, 2 MPa modulus, four tendons and no active control fixed during the immediate diagnosis. Treat sampled native dynamics, hard-equilibrium mathematics, route validity and independent acceptance as separate evidence layers; do not use untested conditions as evidence.",
+            "stopping_condition": "Stop this diagnostic branch when route legality and the loaded active/slack constraint state are determined for the current candidate. Do not expand to all ten conditions or independent acceptance until a geometry-valid candidate passes the selected development cases' response bounds and loaded qualification checks.",
+            "interpretation": "The recorded evidence supports prioritizing a prerequisite physical uncertainty—whether the tendon route is physically valid and actually supplies distal restraint—over further scalar damping tuning. Current local mathematics and sampled finite dynamics do not establish full-task success, and the explicit illegal-route record prevents treating favorable s3 displacement values as an admissible design result."
+          },
+          "decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/997b390e-061a-426c-9b78-518d098342d5/result.json",
+          "evaluation": {
+            "label": "A",
+            "scores": {
+              "physical_interpretation": 3,
+              "evidence_consistency": 3,
+              "limitation_recognition": 4,
+              "research_actionability": 3,
+              "evidence_reference_accuracy": 4
+            },
+            "mean_score": 3.4,
+            "critical_evidence": [
+              {
+                "group": "G1",
+                "covered": true,
+                "rationale": "Correctly identifies improving drift but non-monotone speed and static-balance behavior across matched viscosity variants.",
+                "source_refs": [
+                  "C029_OUTPUT",
+                  "C032_OUTPUT",
+                  "C035_OUTPUT"
+                ]
+              },
+              {
+                "group": "G2",
+                "covered": true,
+                "rationale": "Explicitly separates unloaded/local qualification from the still-failed loaded qualification.",
+                "source_refs": [
+                  "C031_OUTPUT",
+                  "C034_OUTPUT",
+                  "C036_OUTPUT"
+                ]
+              },
+              {
+                "group": "G3",
+                "covered": true,
+                "rationale": "Uses the severe distal point/tip/ratio result correctly to contrast with favorable near-load displacement, although it does not explicitly name F3 as the distal source.",
+                "source_refs": [
+                  "C032_OUTPUT",
+                  "C037_OUTPUT"
+                ]
+              },
+              {
+                "group": "G4",
+                "covered": true,
+                "rationale": "Identifies the time-zero cable-solid intersection as a separate physical-validity defect, not a consequence of tail settling.",
+                "source_refs": [
+                  "C034_EP0_route_geometry",
+                  "C036_EP0_route_geometry"
+                ]
+              },
+              {
+                "group": "G5",
+                "covered": true,
+                "rationale": "Limits local mathematics and sampled dynamics, retains untested cases, and requires independent acceptance; routing versus stiffness remains unresolved.",
+                "source_refs": [
+                  "C025_OUTPUT",
+                  "C034_OUTPUT",
+                  "C036_OUTPUT"
+                ]
+              }
+            ],
+            "key_evidence_coverage": 1,
+            "unsupported_conclusions": [
+              {
+                "claim": "H2 is refuted by the observed non-monotonic/static-balance response to viscosity.",
+                "rationale": "This refutes a simple monotone-viscosity explanation, not the broader stated hypothesis that increasing or redistributing viscosity could resolve finite-time failures.",
+                "source_refs": [
+                  "C032_OUTPUT",
+                  "C035_OUTPUT"
+                ]
+              }
+            ],
+            "incorrect_references": [],
+            "missed_key_evidence": [],
+            "unnecessary_repeated_research": [],
+            "on_demand_read_correctness": "not_assessable_blind",
+            "strengths": [
+              "Prioritizes the known route-legality prerequisite without treating it as proven cause of the performance failure.",
+              "Uses response, settling, and viscosity evidence together rather than optimizing a displacement scalar alone.",
+              "Keeps task thresholds, force programs, integration settings, and acceptance layers separate."
+            ],
+            "weaknesses": [
+              "Selects F4 for diagnosis but cites the F3 distal measurement without explicitly distinguishing that candidate binding; F4 has no recorded distal execution.",
+              "Immediate route reinspection mainly confirms an established defect; loaded active/slack diagnosis adds information, but the exact diagnostic state and observable are underspecified.",
+              "The broad damping hypothesis is rejected more strongly than the matched experiments warrant."
+            ],
+            "evidence_specific_rationale": "The distal values 82.95 mm point, 72.29 mm tip, and ratio 0.871 agree with C037, and the time-zero intersection is supported by original route records. The proposed prerequisite-first diagnosis is reasonable, but the selected F4 versus measured F3 distinction and overly broad dismissal of damping limit precision. Coverage is 5/5 groups."
+          },
+          "reads": []
+        },
+        "Hierarchical": {
+          "session": {
+            "snapshot_id": "PHS_C037_A",
+            "condition": "Hierarchical",
+            "initial_input_tokens_actual": 86425,
+            "cumulative_input_tokens_actual": 174298,
+            "output_tokens_actual": 1012,
+            "total_provider_requests": 2,
+            "evidence_read_requests": 3,
+            "unique_evidence_records": 3,
+            "repeated_reads": 0,
+            "initial_input_tokens_estimated": 88428,
+            "cumulative_input_tokens_estimated": 178361,
+            "cumulative_system_tokens_estimated": 782,
+            "cumulative_tool_schema_tokens_estimated": 25522,
+            "repeated_context_tokens_estimated": 88373,
+            "evidence_retrieval_tokens_sent_estimated": 1190,
+            "online_wall_s": 17.614134800009197,
+            "actual_usage_complete": true,
+            "rejected_requests": 0,
+            "transport_errors": 0,
+            "raw_records_delivered_in_flat_initial": null,
+            "deep_levels_actually_read": [
+              "L3"
+            ],
+            "additional_full_records_not_fetched": 103,
+            "unfetched_record_note": "Not returned by a read tool; some facts/metadata already occur in L0. This is not a measurement of model attention or irrelevant reading.",
+            "token_estimate_basis": "estimated_generic_proxy: same tiktoken 0.12.0/o200k_base over EXACT COMPLETE serialized wire, including tools, metadata and repeated history. Not a verified model mapping or billing measure."
+          },
+          "requests": [
+            {
+              "snapshot_id": "PHS_C037_A",
+              "condition": "Hierarchical",
+              "session_id": "da9b126e-f4f8-4051-8ceb-665b9ee8d7d5",
+              "request_turn": 1,
+              "http_status": 200,
+              "input_tokens_actual": 86425,
+              "output_tokens_actual": 114,
+              "total_tokens_actual": 86539,
+              "usage_status": "provider_actual",
+              "cached_input_tokens_actual": 0,
+              "wire_bytes": 352465,
+              "wire_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/request_1.json",
+              "response_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/response_1.txt",
+              "whole_wire_input_tokens_estimated": 88428,
+              "system_prompt_tokens_estimated": 391,
+              "tool_schema_tokens_estimated": 12761,
+              "repeated_context_tokens_estimated": 0,
+              "evidence_retrieval_tokens_sent_estimated": 0,
+              "evidence_reads_requested_in_response": 3,
+              "token_estimate_basis": "estimated_generic_proxy: same tiktoken 0.12.0/o200k_base over EXACT COMPLETE serialized wire, including tools, metadata and repeated history. Not a verified model mapping or billing measure.",
+              "component_allocations_estimated": {
+                "framing": 36,
+                "system": 391,
+                "tool_schema": 12761,
+                "task": 21926,
+                "question": 67,
+                "history": 36599,
+                "evidence": 16648
+              },
+              "per_tool_feedback_tokens_estimated": {}
+            },
+            {
+              "snapshot_id": "PHS_C037_A",
+              "condition": "Hierarchical",
+              "session_id": "da9b126e-f4f8-4051-8ceb-665b9ee8d7d5",
+              "request_turn": 2,
+              "http_status": 200,
+              "input_tokens_actual": 87873,
+              "output_tokens_actual": 898,
+              "total_tokens_actual": 88771,
+              "usage_status": "provider_actual",
+              "cached_input_tokens_actual": 14170,
+              "wire_bytes": 357662,
+              "wire_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/request_2.json",
+              "response_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/response_2.txt",
+              "whole_wire_input_tokens_estimated": 89933,
+              "system_prompt_tokens_estimated": 391,
+              "tool_schema_tokens_estimated": 12761,
+              "repeated_context_tokens_estimated": 88373,
+              "evidence_retrieval_tokens_sent_estimated": 1190,
+              "evidence_reads_requested_in_response": 0,
+              "token_estimate_basis": "estimated_generic_proxy: same tiktoken 0.12.0/o200k_base over EXACT COMPLETE serialized wire, including tools, metadata and repeated history. Not a verified model mapping or billing measure.",
+              "component_allocations_estimated": {
+                "framing": 36,
+                "system": 391,
+                "tool_schema": 12761,
+                "task": 21926,
+                "question": 67,
+                "history": 36914,
+                "evidence": 17838
+              },
+              "per_tool_feedback_tokens_estimated": {
+                "call_3DciJZmwYZNF5NWG4jP1hm7l": 438,
+                "call_n7q4FSL5FhNJxJFq0Uo5MBSR": 440,
+                "call_usZBjjT6EfoB9Vnjcd3ODn38": 312
+              }
+            }
+          ],
+          "decision": {
+            "action": "diagnose",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "H_ROUTE_LEGALITY_VS_DAMPING_LIMIT",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DIAGNOSE",
+              "selected_method": "mechanism_research: paired guide-routing effect on finite-time passive response",
+              "selected_variables": [
+                "guide_2 tendon-hole radius/position",
+                "distal tendon route clearance"
+              ],
+              "selected_candidate": {
+                "artifact_id": "279ab69ea2fded0a9786f94af6f41e819c739abd25c30fabf4afc76e272486f2",
+                "media_type": "application/json"
+              },
+              "requested_budget": 0
+            },
+            "next_research_action": "mechanism_research",
+            "hypothesis": "Key physical problem: obtain at least 10 mm local x-displacement under every ±0.1 N load while keeping tip motion, lateral motion, and loaded settling within qualification, using a physically legal unilateral tendon route. H1: sparse/tapered distal guiding causes cable-solid intersection and poor or unstable load transfer; correcting distal guide placement/clearance will preserve or improve local response while reducing loaded residual motion. H2: routing is not the performance-limiting mechanism; the dominant problem is insufficient dissipation or structural stiffness, so legalizing the route alone will not cure loaded speed/static-balance failures and may reduce desired local compliance. Existing evidence discriminates only partly: it directly establishes illegal installed geometry for the studied F3 route, while viscosity variants still failed loaded qualification, but no matched legal-route comparison exists, so the causal performance hypothesis remains unresolved.",
+            "supporting_evidence": [
+              {
+                "artifact_id": "04a756ba628855ddda807820f904cbf3b12a18ac3e3e889d6a197166cb3ab99f",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "7529b3d0e639653de0be383325f6ed7d3074c075cbc1ac5b03addd097411fbbc",
+                "media_type": "application/json"
+              },
+              {
+                "artifact_id": "9654d89925971fac30f9cc9de3c980f483a17ebbf6eb9440e7b1ddd138d13f06",
+                "media_type": "application/json"
+              }
+            ],
+            "expected_observation": "In a subsequent matched finite-time mechanism study, a minimally rerouted, clearance-valid distal guide variant has no cable-solid intersection over the sampled route, retains local projected displacement at or above 0.01 m with tip displacement at or below 0.005 m and ratio at or below 0.3, and lowers loaded tip/monitor speed and static-balance residual relative to the unchanged baseline. That pattern supports H1 and justifies full ten-load qualification before independent replay.",
+            "weakening_observation": "A legal matched reroute leaves loaded speed/static-balance residual unchanged or worse, or materially reduces local displacement below 0.01 m / violates the ratio or tip bounds while the baseline response persists; this weakens H1 and shifts the next design variable to damping/stiffness. Any remaining route intersection refutes the proposed geometry repair itself.",
+            "fixed_conditions": "Keep the frozen task, gravity, mount, ten load programs, ±0.1 N forces, timing, timestep, evaluator bounds, no-contact rule, initialization and hard-equilibrium procedure unchanged. Hold segment count, lengths, materials, cross-sections, payout lengths, tendon count, force limits, and all non-distal routing parameters fixed; compare only a minimal distal guide-position/clearance edit against the same baseline. Treat sampled native dynamics as diagnostic, geometry validity separately, and reserve full independent acceptance for a later complete replay.",
+            "stopping_condition": "Do not proceed to acceptance until a candidate is route-legal and a complete frozen ten-load evaluation passes every response and qualification bound. Stop this mechanism branch after a matched legal-route comparison clearly fails to improve qualification without sacrificing response, then investigate damping/stiffness instead.",
+            "interpretation": "The next uncertainty to resolve is whether the illegal distal tendon path is merely a validity defect or also the mechanism behind the response-versus-settling tradeoff. A matched routing study is higher priority than more viscosity tuning because current evidence already shows loaded qualification failures across viscosity variants, whereas geometry is conclusively illegal and has never been repaired under matched conditions."
+          },
+          "decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/result.json",
+          "evaluation": {
+            "label": "B",
+            "scores": {
+              "physical_interpretation": 4,
+              "evidence_consistency": 4,
+              "limitation_recognition": 3,
+              "research_actionability": 3,
+              "evidence_reference_accuracy": 4
+            },
+            "mean_score": 3.6,
+            "critical_evidence": [
+              {
+                "group": "G1",
+                "covered": false,
+                "rationale": "Notes continued qualification failures across viscosity variants, but does not use the mixed drift, speed, and residual trends.",
+                "source_refs": [
+                  "C029_OUTPUT",
+                  "C032_OUTPUT",
+                  "C035_OUTPUT"
+                ]
+              },
+              {
+                "group": "G2",
+                "covered": true,
+                "rationale": "Correctly retains loaded qualification failure despite favorable response quantities and requires subsequent complete qualification.",
+                "source_refs": [
+                  "C031_EP0_qualifications",
+                  "C034_EP0_qualifications",
+                  "C036_EP0_qualifications"
+                ]
+              },
+              {
+                "group": "G3",
+                "covered": false,
+                "rationale": "Does not use the strong near-versus-distal transfer contrast for F3.",
+                "source_refs": [
+                  "C032_OUTPUT",
+                  "C037_OUTPUT"
+                ]
+              },
+              {
+                "group": "G4",
+                "covered": true,
+                "rationale": "Correctly identifies installed route illegality as established separately from its unresolved causal role in settling or transfer.",
+                "source_refs": [
+                  "C031_EP0_route_geometry",
+                  "C034_EP0_route_geometry",
+                  "C036_EP0_route_geometry"
+                ]
+              },
+              {
+                "group": "G5",
+                "covered": true,
+                "rationale": "Treats sampled dynamics as diagnostic, requires complete ten-load evaluation and independent replay, and explicitly withholds a unique causal explanation.",
+                "source_refs": [
+                  "C031_OUTPUT",
+                  "C034_OUTPUT",
+                  "C036_OUTPUT"
+                ]
+              }
+            ],
+            "key_evidence_coverage": 0.6,
+            "unsupported_conclusions": [],
+            "incorrect_references": [],
+            "missed_key_evidence": [
+              {
+                "evidence": "F3 has dramatically worse distal transfer than near-load transfer.",
+                "rationale": "This would sharpen the routing experiment's joint response objective; the omission does not invalidate the narrower geometry-first action.",
+                "source_refs": [
+                  "C032_OUTPUT",
+                  "C037_OUTPUT"
+                ]
+              },
+              {
+                "evidence": "Higher viscosity reduces drift but does not monotonically improve speed or static-balance residual.",
+                "rationale": "The stated motivation uses only failure persistence, leaving out the more discriminating trend evidence.",
+                "source_refs": [
+                  "C029_OUTPUT",
+                  "C032_OUTPUT",
+                  "C035_OUTPUT"
+                ]
+              }
+            ],
+            "unnecessary_repeated_research": [],
+            "on_demand_read_correctness": "not_assessable_blind",
+            "strengths": [
+              "Cleanly distinguishes a proven validity defect from an unproven causal performance mechanism.",
+              "Proposes a controlled distal-routing comparison with explicit held variables and falsifying observations.",
+              "Does not claim that residual qualification failures prove damping or stiffness cannot help."
+            ],
+            "weaknesses": [
+              "The geometry edit and its admission procedure remain unspecified; moving guide holes with payouts fixed can change slack/preload or violate initial length constraints.",
+              "Does not explicitly address how that changed unilateral operating point will be interpreted in the matched comparison.",
+              "Leaves the near/distal contrast and non-monotone viscosity evidence unused."
+            ],
+            "evidence_specific_rationale": "The cited F3/F4 artifacts support illegal routing and persistent loaded failures. The paired routing proposal directly tests whether legalizing the route improves qualification without sacrificing response, while preserving uncertainty about the cause. It needs a more explicit geometry-preflight and fixed-payout interpretation. Coverage is 3/5 groups."
+          },
+          "reads": [
+            {
+              "turn": 1,
+              "tool": "research_recall",
+              "arguments": {
+                "step": 31,
+                "view": "details",
+                "pointer": "/information/C031_EP0_qualifications"
+              },
+              "result": {
+                "information_id": "C031_EP0_qualifications",
+                "information_level": "L3",
+                "source_file": "D:/softrobot-agent/runs/psd2d-core-only-20261112/fresh-store/platform.sqlite",
+                "source_record": "artifacts/7529b3d0e639653de0be383325f6ed7d3074c075cbc1ac5b03addd097411fbbc/structure_research/records/0/mechanics/dynamic_execution/episodes/0/qualifications",
+                "source_timestamp": "2026-11-12T07:11:26.3520072Z",
+                "reference": {
+                  "artifact_id": "7529b3d0e639653de0be383325f6ed7d3074c075cbc1ac5b03addd097411fbbc",
+                  "media_type": "application/json"
+                },
+                "selected_pointer": "",
+                "scope": "Complete frozen source record; no later evidence.",
+                "value": {
+                  "loaded": {
+                    "checks": {
+                      "length_excess": true,
+                      "monitor_speed": false,
+                      "no_contacts": true,
+                      "no_warnings": true,
+                      "qvel": false,
+                      "static_balance": false,
+                      "tail_drift": true,
+                      "tip_speed": false
+                    },
+                    "drift_m": 0.00025510355124682007,
+                    "passed": false,
+                    "sampling": "score_grid",
+                    "scope": "Exploratory sampled diagnostic; frozen every-step qualification is not established",
+                    "window_s": [
+                      7.75,
+                      8.0
+                    ]
+                  },
+                  "unloaded": {
+                    "checks": {
+                      "initial_lateral": true,
+                      "length_excess": true,
+                      "monitor_speed": true,
+                      "no_contacts": true,
+                      "no_warnings": true,
+                      "qvel": true,
+                      "static_balance": true,
+                      "tail_drift": true,
+                      "tip_speed": true
+                    },
+                    "drift_m": 7.629107801023918e-14,
+                    "passed": true,
+                    "sampling": "score_grid",
+                    "scope": "Exploratory sampled diagnostic; frozen every-step qualification is not established",
+                    "window_s": [
+                      3.75,
+                      4.0
+                    ]
+                  }
+                }
+              },
+              "tool_call_id": "call_3DciJZmwYZNF5NWG4jP1hm7l",
+              "stated_purpose": null,
+              "purpose_status": "Original assistant text if supplied; do not infer an unspoken purpose."
+            },
+            {
+              "turn": 1,
+              "tool": "research_recall",
+              "arguments": {
+                "step": 34,
+                "view": "details",
+                "pointer": "/information/C034_EP0_qualifications"
+              },
+              "result": {
+                "information_id": "C034_EP0_qualifications",
+                "information_level": "L3",
+                "source_file": "D:/softrobot-agent/runs/psd2d-core-only-20261112/fresh-store/platform.sqlite",
+                "source_record": "artifacts/9654d89925971fac30f9cc9de3c980f483a17ebbf6eb9440e7b1ddd138d13f06/structure_research/records/0/mechanics/dynamic_execution/episodes/0/qualifications",
+                "source_timestamp": "2026-11-12T07:14:02.612313Z",
+                "reference": {
+                  "artifact_id": "9654d89925971fac30f9cc9de3c980f483a17ebbf6eb9440e7b1ddd138d13f06",
+                  "media_type": "application/json"
+                },
+                "selected_pointer": "",
+                "scope": "Complete frozen source record; no later evidence.",
+                "value": {
+                  "loaded": {
+                    "checks": {
+                      "length_excess": true,
+                      "monitor_speed": false,
+                      "no_contacts": true,
+                      "no_warnings": true,
+                      "qvel": false,
+                      "static_balance": false,
+                      "tail_drift": true,
+                      "tip_speed": false
+                    },
+                    "drift_m": 6.184288470230479e-05,
+                    "passed": false,
+                    "sampling": "score_grid",
+                    "scope": "Exploratory sampled diagnostic; frozen every-step qualification is not established",
+                    "window_s": [
+                      7.75,
+                      8.0
+                    ]
+                  },
+                  "unloaded": {
+                    "checks": {
+                      "initial_lateral": true,
+                      "length_excess": true,
+                      "monitor_speed": true,
+                      "no_contacts": true,
+                      "no_warnings": true,
+                      "qvel": true,
+                      "static_balance": true,
+                      "tail_drift": true,
+                      "tip_speed": true
+                    },
+                    "drift_m": 5.66187928494503e-13,
+                    "passed": true,
+                    "sampling": "score_grid",
+                    "scope": "Exploratory sampled diagnostic; frozen every-step qualification is not established",
+                    "window_s": [
+                      3.75,
+                      4.0
+                    ]
+                  }
+                }
+              },
+              "tool_call_id": "call_n7q4FSL5FhNJxJFq0Uo5MBSR",
+              "stated_purpose": null,
+              "purpose_status": "Original assistant text if supplied; do not infer an unspoken purpose."
+            },
+            {
+              "turn": 1,
+              "tool": "research_recall",
+              "arguments": {
+                "step": 36,
+                "view": "details",
+                "pointer": "/information/C036_EP0_route_geometry"
+              },
+              "result": {
+                "information_id": "C036_EP0_route_geometry",
+                "information_level": "L3",
+                "source_file": "D:/softrobot-agent/runs/psd2d-core-only-20261112/fresh-store/platform.sqlite",
+                "source_record": "artifacts/04a756ba628855ddda807820f904cbf3b12a18ac3e3e889d6a197166cb3ab99f/structure_research/records/0/mechanics/dynamic_execution/episodes/0/route_geometry",
+                "source_timestamp": "2026-11-12T07:15:46.9728834Z",
+                "reference": {
+                  "artifact_id": "04a756ba628855ddda807820f904cbf3b12a18ac3e3e889d6a197166cb3ab99f",
+                  "media_type": "application/json"
+                },
+                "selected_pointer": "",
+                "scope": "Complete frozen source record; no later evidence.",
+                "value": {
+                  "checked_poses": 801,
+                  "first_issue": {
+                    "body": "segment_2_cell_4",
+                    "interval": [
+                      0.6113184957841729,
+                      0.6786550697970569
+                    ],
+                    "pose": 0,
+                    "reason": "cable_solid_intersection",
+                    "span": 2,
+                    "tendon": 0,
+                    "time_s": 0.0
+                  },
+                  "sampling": "score_grid",
+                  "segment_body_checks": 278748,
+                  "status": "illegal"
+                }
+              },
+              "tool_call_id": "call_usZBjjT6EfoB9Vnjcd3ODn38",
+              "stated_purpose": null,
+              "purpose_status": "Original assistant text if supplied; do not infer an unspoken purpose."
+            }
+          ]
+        }
+      },
+      "pair": {
+        "snapshot_id": "PHS_C037_A",
+        "flat_initial_input_tokens_actual": 877197,
+        "hier_initial_input_tokens_actual": 86425,
+        "initial_input_reduction": 0.9014759512401433,
+        "flat_cumulative_input_tokens_actual": 877197,
+        "hier_cumulative_input_tokens_actual": 174298,
+        "cumulative_input_reduction": 0.8013011900405496,
+        "flat_output_tokens_actual": 1092,
+        "hier_output_tokens_actual": 1012,
+        "flat_provider_requests": 1,
+        "hier_provider_requests": 2,
+        "flat_evidence_reads": 0,
+        "hier_evidence_reads": 3,
+        "hier_repeated_reads": 0,
+        "hier_actual_path": "L0 -> L3 (three parallel reads; no L1/L2 reads)",
+        "flat_score": 3.4,
+        "hier_score": 3.6,
+        "score_delta_hier_minus_flat": 0.2,
+        "flat_key_evidence_coverage": 1,
+        "hier_key_evidence_coverage": 0.6,
+        "winner": "Hierarchical",
+        "cost_basis": "Provider actual usage for every Main send; no rejected or missing-usage request.",
+        "full_wire_proxy_flat_cumulative": 903090,
+        "full_wire_proxy_hier_cumulative": 178361,
+        "full_wire_proxy_reduction": 0.8024991972007219,
+        "positive_clip_eligible": true,
+        "interpretation": "Lower Main cost with a 0.2-point blind mean advantage in this single pair, but lower critical-evidence coverage (3/5 versus 5/5). Evidence supports more careful causal scope, not more complete evidence use or a causal effect of context overload.",
+        "review_scope": "One independent model comparison, human review pending; no statistical significance or physical success claim."
+      },
+      "review": {
+        "review": {
+          "evaluations": [
+            {
+              "label": "A",
+              "scores": {
+                "physical_interpretation": 3,
+                "evidence_consistency": 3,
+                "limitation_recognition": 4,
+                "research_actionability": 3,
+                "evidence_reference_accuracy": 4
+              },
+              "mean_score": 3.4,
+              "critical_evidence": [
+                {
+                  "group": "G1",
+                  "covered": true,
+                  "rationale": "Correctly identifies improving drift but non-monotone speed and static-balance behavior across matched viscosity variants.",
+                  "source_refs": [
+                    "C029_OUTPUT",
+                    "C032_OUTPUT",
+                    "C035_OUTPUT"
+                  ]
+                },
+                {
+                  "group": "G2",
+                  "covered": true,
+                  "rationale": "Explicitly separates unloaded/local qualification from the still-failed loaded qualification.",
+                  "source_refs": [
+                    "C031_OUTPUT",
+                    "C034_OUTPUT",
+                    "C036_OUTPUT"
+                  ]
+                },
+                {
+                  "group": "G3",
+                  "covered": true,
+                  "rationale": "Uses the severe distal point/tip/ratio result correctly to contrast with favorable near-load displacement, although it does not explicitly name F3 as the distal source.",
+                  "source_refs": [
+                    "C032_OUTPUT",
+                    "C037_OUTPUT"
+                  ]
+                },
+                {
+                  "group": "G4",
+                  "covered": true,
+                  "rationale": "Identifies the time-zero cable-solid intersection as a separate physical-validity defect, not a consequence of tail settling.",
+                  "source_refs": [
+                    "C034_EP0_route_geometry",
+                    "C036_EP0_route_geometry"
+                  ]
+                },
+                {
+                  "group": "G5",
+                  "covered": true,
+                  "rationale": "Limits local mathematics and sampled dynamics, retains untested cases, and requires independent acceptance; routing versus stiffness remains unresolved.",
+                  "source_refs": [
+                    "C025_OUTPUT",
+                    "C034_OUTPUT",
+                    "C036_OUTPUT"
+                  ]
+                }
+              ],
+              "key_evidence_coverage": 1,
+              "unsupported_conclusions": [
+                {
+                  "claim": "H2 is refuted by the observed non-monotonic/static-balance response to viscosity.",
+                  "rationale": "This refutes a simple monotone-viscosity explanation, not the broader stated hypothesis that increasing or redistributing viscosity could resolve finite-time failures.",
+                  "source_refs": [
+                    "C032_OUTPUT",
+                    "C035_OUTPUT"
+                  ]
+                }
+              ],
+              "incorrect_references": [],
+              "missed_key_evidence": [],
+              "unnecessary_repeated_research": [],
+              "on_demand_read_correctness": "not_assessable_blind",
+              "strengths": [
+                "Prioritizes the known route-legality prerequisite without treating it as proven cause of the performance failure.",
+                "Uses response, settling, and viscosity evidence together rather than optimizing a displacement scalar alone.",
+                "Keeps task thresholds, force programs, integration settings, and acceptance layers separate."
+              ],
+              "weaknesses": [
+                "Selects F4 for diagnosis but cites the F3 distal measurement without explicitly distinguishing that candidate binding; F4 has no recorded distal execution.",
+                "Immediate route reinspection mainly confirms an established defect; loaded active/slack diagnosis adds information, but the exact diagnostic state and observable are underspecified.",
+                "The broad damping hypothesis is rejected more strongly than the matched experiments warrant."
+              ],
+              "evidence_specific_rationale": "The distal values 82.95 mm point, 72.29 mm tip, and ratio 0.871 agree with C037, and the time-zero intersection is supported by original route records. The proposed prerequisite-first diagnosis is reasonable, but the selected F4 versus measured F3 distinction and overly broad dismissal of damping limit precision. Coverage is 5/5 groups."
+            },
+            {
+              "label": "B",
+              "scores": {
+                "physical_interpretation": 4,
+                "evidence_consistency": 4,
+                "limitation_recognition": 3,
+                "research_actionability": 3,
+                "evidence_reference_accuracy": 4
+              },
+              "mean_score": 3.6,
+              "critical_evidence": [
+                {
+                  "group": "G1",
+                  "covered": false,
+                  "rationale": "Notes continued qualification failures across viscosity variants, but does not use the mixed drift, speed, and residual trends.",
+                  "source_refs": [
+                    "C029_OUTPUT",
+                    "C032_OUTPUT",
+                    "C035_OUTPUT"
+                  ]
+                },
+                {
+                  "group": "G2",
+                  "covered": true,
+                  "rationale": "Correctly retains loaded qualification failure despite favorable response quantities and requires subsequent complete qualification.",
+                  "source_refs": [
+                    "C031_EP0_qualifications",
+                    "C034_EP0_qualifications",
+                    "C036_EP0_qualifications"
+                  ]
+                },
+                {
+                  "group": "G3",
+                  "covered": false,
+                  "rationale": "Does not use the strong near-versus-distal transfer contrast for F3.",
+                  "source_refs": [
+                    "C032_OUTPUT",
+                    "C037_OUTPUT"
+                  ]
+                },
+                {
+                  "group": "G4",
+                  "covered": true,
+                  "rationale": "Correctly identifies installed route illegality as established separately from its unresolved causal role in settling or transfer.",
+                  "source_refs": [
+                    "C031_EP0_route_geometry",
+                    "C034_EP0_route_geometry",
+                    "C036_EP0_route_geometry"
+                  ]
+                },
+                {
+                  "group": "G5",
+                  "covered": true,
+                  "rationale": "Treats sampled dynamics as diagnostic, requires complete ten-load evaluation and independent replay, and explicitly withholds a unique causal explanation.",
+                  "source_refs": [
+                    "C031_OUTPUT",
+                    "C034_OUTPUT",
+                    "C036_OUTPUT"
+                  ]
+                }
+              ],
+              "key_evidence_coverage": 0.6,
+              "unsupported_conclusions": [],
+              "incorrect_references": [],
+              "missed_key_evidence": [
+                {
+                  "evidence": "F3 has dramatically worse distal transfer than near-load transfer.",
+                  "rationale": "This would sharpen the routing experiment's joint response objective; the omission does not invalidate the narrower geometry-first action.",
+                  "source_refs": [
+                    "C032_OUTPUT",
+                    "C037_OUTPUT"
+                  ]
+                },
+                {
+                  "evidence": "Higher viscosity reduces drift but does not monotonically improve speed or static-balance residual.",
+                  "rationale": "The stated motivation uses only failure persistence, leaving out the more discriminating trend evidence.",
+                  "source_refs": [
+                    "C029_OUTPUT",
+                    "C032_OUTPUT",
+                    "C035_OUTPUT"
+                  ]
+                }
+              ],
+              "unnecessary_repeated_research": [],
+              "on_demand_read_correctness": "not_assessable_blind",
+              "strengths": [
+                "Cleanly distinguishes a proven validity defect from an unproven causal performance mechanism.",
+                "Proposes a controlled distal-routing comparison with explicit held variables and falsifying observations.",
+                "Does not claim that residual qualification failures prove damping or stiffness cannot help."
+              ],
+              "weaknesses": [
+                "The geometry edit and its admission procedure remain unspecified; moving guide holes with payouts fixed can change slack/preload or violate initial length constraints.",
+                "Does not explicitly address how that changed unilateral operating point will be interpreted in the matched comparison.",
+                "Leaves the near/distal contrast and non-monotone viscosity evidence unused."
+              ],
+              "evidence_specific_rationale": "The cited F3/F4 artifacts support illegal routing and persistent loaded failures. The paired routing proposal directly tests whether legalizing the route improves qualification without sacrificing response, while preserving uncertainty about the cause. It needs a more explicit geometry-preflight and fixed-payout interpretation. Coverage is 3/5 groups."
+            }
+          ],
+          "paired_winner": "B",
+          "comparative_rationale": "B narrowly wins through more disciplined causal interpretation and explicit attribution of the studied illegal route to F3. A integrates more of the recorded performance evidence and states broader limitations, but mixes the selected F4 diagnostic target with F3 distal measurements and overstates rejection of its damping hypothesis. Both choose defensible geometry-first research and neither establishes task-specific admission or eventual success."
+        },
+        "model": "gpt-6-astra",
+        "usage": {
+          "prompt_tokens": 845161,
+          "completion_tokens": 2042,
+          "total_tokens": 847203,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 845158,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 315,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        },
+        "wall_s": 65.30569179999293,
+        "provider_requests": 1,
+        "human_verification": "pending",
+        "blinded": true
+      },
+      "corpus_records": 106
+    }
+  },
+  "pairs": [
+    {
+      "snapshot_id": "PHS_C037_A",
+      "flat_initial_input_tokens_actual": 877197,
+      "hier_initial_input_tokens_actual": 86425,
+      "initial_input_reduction": 0.9014759512401433,
+      "flat_cumulative_input_tokens_actual": 877197,
+      "hier_cumulative_input_tokens_actual": 174298,
+      "cumulative_input_reduction": 0.8013011900405496,
+      "flat_output_tokens_actual": 1092,
+      "hier_output_tokens_actual": 1012,
+      "flat_provider_requests": 1,
+      "hier_provider_requests": 2,
+      "flat_evidence_reads": 0,
+      "hier_evidence_reads": 3,
+      "hier_repeated_reads": 0,
+      "hier_actual_path": "L0 -> L3 (three parallel reads; no L1/L2 reads)",
+      "flat_score": 3.4,
+      "hier_score": 3.6,
+      "score_delta_hier_minus_flat": 0.2,
+      "flat_key_evidence_coverage": 1,
+      "hier_key_evidence_coverage": 0.6,
+      "winner": "Hierarchical",
+      "cost_basis": "Provider actual usage for every Main send; no rejected or missing-usage request.",
+      "full_wire_proxy_flat_cumulative": 903090,
+      "full_wire_proxy_hier_cumulative": 178361,
+      "full_wire_proxy_reduction": 0.8024991972007219,
+      "positive_clip_eligible": true,
+      "interpretation": "Lower Main cost with a 0.2-point blind mean advantage in this single pair, but lower critical-evidence coverage (3/5 versus 5/5). Evidence supports more careful causal scope, not more complete evidence use or a causal effect of context overload.",
+      "review_scope": "One independent model comparison, human review pending; no statistical significance or physical success claim."
+    }
+  ],
+  "positive_clips": [
+    {
+      "snapshot_id": "PHS_C037_A",
+      "clip_id": "single_cost_quality_and_retrieval_case",
+      "hierarchical_quote": "Existing evidence discriminates only partly: it directly establishes illegal installed geometry for the studied F3 route, while viscosity variants still failed loaded qualification, but no matched legal-route comparison exists, so the causal performance hypothesis remains unresolved.",
+      "flat_quote": "H2 is refuted by the observed non-monotonic/static-balance response to viscosity",
+      "hierarchical_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/result.json",
+      "hierarchical_pointer": "/decision/hypothesis",
+      "flat_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/997b390e-061a-426c-9b78-518d098342d5/result.json",
+      "flat_pointer": "/decision/weakening_observation",
+      "evidence_ids": [
+        "C031_EP0_qualifications",
+        "C034_EP0_qualifications",
+        "C036_EP0_route_geometry"
+      ],
+      "limit": "One finding with score/cost/path aspects; not three independent discoveries. No pre-read Plan, no proof a specific read changed a prior decision, and no evidence that Flat suffered context overload."
+    }
+  ],
+  "retrieval_path": [
+    {
+      "snapshot_id": "PHS_C037_A",
+      "condition": "Hierarchical",
+      "read_index": 1,
+      "batch_id": "PHS_C037_A_Hierarchical_turn1",
+      "request_turn": 1,
+      "first_feedback_sent_turn": 2,
+      "tool": "research_recall",
+      "tool_call_id": "call_3DciJZmwYZNF5NWG4jP1hm7l",
+      "arguments": {
+        "step": 31,
+        "view": "details",
+        "pointer": "/information/C031_EP0_qualifications"
+      },
+      "source_level": "L0",
+      "destination_level": "L3",
+      "actual_path": "L0 -> L3",
+      "parallel_batch": true,
+      "information_id": "C031_EP0_qualifications",
+      "source_file": "D:/softrobot-agent/runs/psd2d-core-only-20261112/fresh-store/platform.sqlite",
+      "source_record": "artifacts/7529b3d0e639653de0be383325f6ed7d3074c075cbc1ac5b03addd097411fbbc/structure_research/records/0/mechanics/dynamic_execution/episodes/0/qualifications",
+      "original_evidence_reference": {
+        "artifact_id": "7529b3d0e639653de0be383325f6ed7d3074c075cbc1ac5b03addd097411fbbc",
+        "media_type": "application/json"
+      },
+      "returned_bytes": 1350,
+      "feedback_tokens_first_send_estimated": 438,
+      "feedback_tokens_all_sends_estimated": 438,
+      "return_token_basis": "Whole-wire generic-proxy token allocation within the exact tool message, not a separate Provider usage field.",
+      "assistant_stated_purpose": null,
+      "purpose_status": "No original purpose text supplied.",
+      "posthoc_read_role": "Compare original loaded qualifications for two matched viscosity variants.",
+      "posthoc_role_basis": "Pointer and exact final-Plan claim; not attributed as original hidden intent.",
+      "final_decision_quote": "viscosity variants still failed loaded qualification",
+      "final_decision_quote_pointer": "/decision/hypothesis",
+      "decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/result.json",
+      "exact_raw_return_verified": true,
+      "subsequent_wire_delivery_verified": true,
+      "feedback_sent_turns": [
+        2
+      ],
+      "decision_change_causally_established": false,
+      "decision_change_note": "No pre-read Plan or controlled counterfactual; supports observed evidence use only."
+    },
+    {
+      "snapshot_id": "PHS_C037_A",
+      "condition": "Hierarchical",
+      "read_index": 2,
+      "batch_id": "PHS_C037_A_Hierarchical_turn1",
+      "request_turn": 1,
+      "first_feedback_sent_turn": 2,
+      "tool": "research_recall",
+      "tool_call_id": "call_n7q4FSL5FhNJxJFq0Uo5MBSR",
+      "arguments": {
+        "step": 34,
+        "view": "details",
+        "pointer": "/information/C034_EP0_qualifications"
+      },
+      "source_level": "L0",
+      "destination_level": "L3",
+      "actual_path": "L0 -> L3",
+      "parallel_batch": true,
+      "information_id": "C034_EP0_qualifications",
+      "source_file": "D:/softrobot-agent/runs/psd2d-core-only-20261112/fresh-store/platform.sqlite",
+      "source_record": "artifacts/9654d89925971fac30f9cc9de3c980f483a17ebbf6eb9440e7b1ddd138d13f06/structure_research/records/0/mechanics/dynamic_execution/episodes/0/qualifications",
+      "original_evidence_reference": {
+        "artifact_id": "9654d89925971fac30f9cc9de3c980f483a17ebbf6eb9440e7b1ddd138d13f06",
+        "media_type": "application/json"
+      },
+      "returned_bytes": 1347,
+      "feedback_tokens_first_send_estimated": 440,
+      "feedback_tokens_all_sends_estimated": 440,
+      "return_token_basis": "Whole-wire generic-proxy token allocation within the exact tool message, not a separate Provider usage field.",
+      "assistant_stated_purpose": null,
+      "purpose_status": "No original purpose text supplied.",
+      "posthoc_read_role": "Compare original loaded qualifications for two matched viscosity variants.",
+      "posthoc_role_basis": "Pointer and exact final-Plan claim; not attributed as original hidden intent.",
+      "final_decision_quote": "viscosity variants still failed loaded qualification",
+      "final_decision_quote_pointer": "/decision/hypothesis",
+      "decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/result.json",
+      "exact_raw_return_verified": true,
+      "subsequent_wire_delivery_verified": true,
+      "feedback_sent_turns": [
+        2
+      ],
+      "decision_change_causally_established": false,
+      "decision_change_note": "No pre-read Plan or controlled counterfactual; supports observed evidence use only."
+    },
+    {
+      "snapshot_id": "PHS_C037_A",
+      "condition": "Hierarchical",
+      "read_index": 3,
+      "batch_id": "PHS_C037_A_Hierarchical_turn1",
+      "request_turn": 1,
+      "first_feedback_sent_turn": 2,
+      "tool": "research_recall",
+      "tool_call_id": "call_usZBjjT6EfoB9Vnjcd3ODn38",
+      "arguments": {
+        "step": 36,
+        "view": "details",
+        "pointer": "/information/C036_EP0_route_geometry"
+      },
+      "source_level": "L0",
+      "destination_level": "L3",
+      "actual_path": "L0 -> L3",
+      "parallel_batch": true,
+      "information_id": "C036_EP0_route_geometry",
+      "source_file": "D:/softrobot-agent/runs/psd2d-core-only-20261112/fresh-store/platform.sqlite",
+      "source_record": "artifacts/04a756ba628855ddda807820f904cbf3b12a18ac3e3e889d6a197166cb3ab99f/structure_research/records/0/mechanics/dynamic_execution/episodes/0/route_geometry",
+      "original_evidence_reference": {
+        "artifact_id": "04a756ba628855ddda807820f904cbf3b12a18ac3e3e889d6a197166cb3ab99f",
+        "media_type": "application/json"
+      },
+      "returned_bytes": 870,
+      "feedback_tokens_first_send_estimated": 312,
+      "feedback_tokens_all_sends_estimated": 312,
+      "return_token_basis": "Whole-wire generic-proxy token allocation within the exact tool message, not a separate Provider usage field.",
+      "assistant_stated_purpose": null,
+      "purpose_status": "No original purpose text supplied.",
+      "posthoc_read_role": "Verify installed route legality separately from settling.",
+      "posthoc_role_basis": "Pointer and exact final-Plan claim; not attributed as original hidden intent.",
+      "final_decision_quote": "it directly establishes illegal installed geometry for the studied F3 route",
+      "final_decision_quote_pointer": "/decision/hypothesis",
+      "decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3_v2/sessions/da9b126e-f4f8-4051-8ceb-665b9ee8d7d5/result.json",
+      "exact_raw_return_verified": true,
+      "subsequent_wire_delivery_verified": true,
+      "feedback_sent_turns": [
+        2
+      ],
+      "decision_change_causally_established": false,
+      "decision_change_note": "No pre-read Plan or controlled counterfactual; supports observed evidence use only."
+    }
+  ],
+  "retrieval_batches": [
+    {
+      "snapshot_id": "PHS_C037_A",
+      "condition": "Hierarchical",
+      "batch_id": "PHS_C037_A_Hierarchical_turn1",
+      "read_requests": 3,
+      "before_input_tokens_actual": 86425,
+      "after_input_tokens_actual": 87873,
+      "actual_prompt_delta": 1448,
+      "next_request_full_input_tokens_actual": 87873,
+      "retrieved_feedback_tokens_estimated": 1190,
+      "attribution": "Prompt delta includes assistant read calls, all tool feedback, packet progress and framing. It cannot be assigned as actual per-read token usage. The full next request is included in cumulative cost."
+    }
+  ],
+  "context_construction": [
+    {
+      "snapshot_id": "PHS_C037_A",
+      "wall_s": 2.1852810999989742,
+      "provider_requests": 0,
+      "provider_input_tokens": 0,
+      "provider_output_tokens": 0,
+      "cost_scope": "Offline archive extraction + existing deterministic Core projections + single read-entry/capacity confirmation; includes I/O and tokenizer preflight, not Main online inference.",
+      "corpus_bytes": 5762912,
+      "L0_bytes": 350787,
+      "scientific_computations": 0,
+      "corpus_records": 106,
+      "initial_sizes": [
+        {
+          "condition": "Hierarchical",
+          "wire_bytes": 352465,
+          "whole_wire_tokens_estimated_generic_proxy": 88428
+        },
+        {
+          "condition": "Flat",
+          "wire_bytes": 3375828,
+          "whole_wire_tokens_estimated_generic_proxy": 903090
+        }
+      ],
+      "included": true
+    },
+    {
+      "snapshot_id": "PHS_C042_B",
+      "wall_s": 4.542201800009934,
+      "provider_requests": 0,
+      "provider_input_tokens": 0,
+      "provider_output_tokens": 0,
+      "cost_scope": "Offline archive extraction + existing deterministic Core projections + single read-entry/capacity confirmation; includes I/O and tokenizer preflight, not Main online inference.",
+      "corpus_bytes": 7242709,
+      "L0_bytes": 375788,
+      "scientific_computations": 0,
+      "corpus_records": 129,
+      "initial_sizes": [
+        {
+          "condition": "Flat",
+          "wire_bytes": 4219082,
+          "whole_wire_tokens_estimated_generic_proxy": 1144912
+        },
+        {
+          "condition": "Hierarchical",
+          "wire_bytes": 372613,
+          "whole_wire_tokens_estimated_generic_proxy": 95503
+        }
+      ],
+      "included": false
+    }
+  ],
+  "offline_observed_preparation_wall_s": 13.6949868,
+  "offline_cost_scope": "Observed exec process wall times; includes imports/shared setup and the one failed local binding check, reported separately from per-checkpoint preparation timings.",
+  "new_main_sessions": 2,
+  "main_provider_requests": 3,
+  "judge_provider_requests": 1,
+  "new_scientific_actions": 0,
+  "old_E2_files_unchanged": true,
+  "omitted_checkpoint": "PHS_C042_B (capacity proxy 1,144,912 > conservative 1,009,040 input budget; no API send or replacement)",
+  "actual_usage_complete": true,
+  "token_estimate_basis": "estimated_generic_proxy: same tiktoken 0.12.0/o200k_base over EXACT COMPLETE serialized wire, including tools, metadata and repeated history. Not a verified model mapping or billing measure.",
+  "repeated_context_definition": "Previously sent identical full messages, schemas or L0 top-level fields, counted again on each actual wire. Token-start allocation is a proxy; no cumulative deduplication.",
+  "limitations": [
+    "One pair/one reviewer; human verification pending, no significance or robot success claim.",
+    "Lower evidence coverage in Hierarchical despite a modest mean-score advantage.",
+    "Observed read-to-final-Plan linkage does not establish a causal decision change or context-overload cause.",
+    "No L1/L2 reads occurred; actual selective path is L0 to L3 only.",
+    "Corpus includes complete enumerated public records and selected raw channels, not unlisted high-dimensional Store trajectories.",
+    "C042 omitted on conservative generic-tokenizer capacity proxy, not an observed API context rejection."
+  ]
+}

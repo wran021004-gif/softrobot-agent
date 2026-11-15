@@ -1,0 +1,92 @@
+{
+  "snapshot_id": "P3_B",
+  "condition": "OFF",
+  "session_id": "81a52ad1-2a34-45b1-abbc-b6fbaa4b27c6",
+  "ordinal": 9,
+  "status": "completed",
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "paired-passive-limit-mechanism-validation",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "fresh paired passive-limit ablation replay",
+      "selected_variables": [
+        "tendon_1 passive limit",
+        "tendon_3 passive limit",
+        "bilateral progressive-stiffness acceptance",
+        "every-step stage qualification",
+        "paired mechanism metrics"
+      ],
+      "selected_candidate": {
+        "artifact_id": "dd09a7b59586106a7e6f30286d366f4517327f877f10bb7d784a906e207b2a6c",
+        "media_type": "application/json"
+      },
+      "requested_budget": 2
+    },
+    "hypothesis": "The intact candidate's progressive stiffening is produced by direction-selective slack-to-taut engagement of tendon_3 and tendon_1; a fresh paired replay jointly disabling those passive limits will weaken late-load stiffening while the intact replay retains the frozen displacement, recovery, no-contact, qualification, and progressive-stiffness requirements.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "5f1e0a3b7c320eb72d9d4849f6179006c609d54af9771a7852c1c0712ad1774f",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "dd09a7b59586106a7e6f30286d366f4517327f877f10bb7d784a906e207b2a6c",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "The fresh intact execution completes both load programs with full recording and passes every frozen evaluator and qualification check, including stiffness ratio at least 1.5, low-stage slack and tension limits, high-stage tension at least 0.05 N, high constraint residual at most 5e-05 m, displacement and recovery bounds, and no contact. Relative to that intact execution, the jointly ablated execution remains comparable and shows high displacement increasing by at least 1.25-fold and late stiffness ratio at most 0.8, thereby satisfying the registered paired-mechanism criteria.",
+    "weakening_observation": "The hypothesis is weakened if the intact execution fails any frozen acceptance or every-step qualification check, if the direction-selective tendons do not undergo the required slack-to-taut transitions, or if the comparable joint ablation produces less than the registered high-displacement increase or insufficient reduction of late stiffness. A non-comparable or incomplete pair leaves the mechanism unresolved and does not establish acceptance.",
+    "fixed_conditions": "Use the exact referenced candidate without structural or parameter edits, the frozen passive task, fresh unloaded hard equilibrium, formal task fidelity, original timestep, complete load programs, full physics recording, route checks at every physics step, and all frozen evaluator thresholds. Disable only the passive limits of tendon_1 and tendon_3 in the ablated member of the fresh pair; this is a joint mechanism test and does not identify either tendon's individual causal effect.",
+    "stopping_condition": "Stop after one complete fresh intact-versus-joint-ablation pair has been evaluated under the frozen protocol, or immediately on numerical failure or protocol invalidation. Do not repeat to infer repeatability; use the resulting formal acceptance and paired-mechanism outcomes for the next decision.",
+    "interpretation": "The saved numerical evidence records bilateral displacement bounds, stiffness ratios near 1.645, no contact, and direction-selective slack-to-taut transitions, but it lacks independent task acceptance and qualified paired-mechanism evidence, while sampled low and recovery windows did not establish the frozen every-step qualifications. A fresh paired replay is therefore the most direct test of both candidate acceptance and the proposed unilateral-tendon mechanism; only the registered replay outcome can support either conclusion.",
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "dd09a7b59586106a7e6f30286d366f4517327f877f10bb7d784a906e207b2a6c",
+        "media_type": "application/json"
+      },
+      "source": null,
+      "passive_ablation": [
+        "tendon_1",
+        "tendon_3"
+      ],
+      "initial_state_result": null,
+      "initial_state_episode": null,
+      "validation_source": null
+    },
+    "next_step": null,
+    "revise_selection": false
+  },
+  "requests": [
+    {
+      "turn": 1,
+      "sent_at": "2026-11-14T14:38:55.475336+00:00",
+      "http_status": 400,
+      "wall_s": 0.006120999998529442,
+      "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:8789/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400"
+    },
+    {
+      "turn": 2,
+      "sent_at": "2026-11-14T14:45:47.885312+00:00",
+      "http_status": 200,
+      "wall_s": 44.371605200001795,
+      "usage": null,
+      "model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-67eb43f6-451b-4db9-b013-0ebe6f486a26"
+    }
+  ],
+  "evidence_reads": [],
+  "errors": [
+    "Client error '400 Bad Request' for url 'http://127.0.0.1:8789/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400"
+  ],
+  "effective_reasoning": "gateway_default_not_exposed",
+  "decision_transport": "text_serialized_existing_Core_tool_schema",
+  "decision_tool_call": {
+    "id": "text-call-2",
+    "function": {
+      "name": "research_plan",
+      "arguments": "{\"action\": \"physical_replay\", \"decision\": {\"version\": \"research_decision_v1\", \"hypothesis_id\": \"paired-passive-limit-mechanism-validation\", \"claimed_inference\": \"empirical_search\", \"research_intent\": \"PHYSICAL_VALIDATION\", \"selected_method\": \"fresh paired passive-limit ablation replay\", \"selected_variables\": [\"tendon_1 passive limit\", \"tendon_3 passive limit\", \"bilateral progressive-stiffness acceptance\", \"every-step stage qualification\", \"paired mechanism metrics\"], \"selected_candidate\": {\"artifact_id\": \"dd09a7b59586106a7e6f30286d366f4517327f877f10bb7d784a906e207b2a6c\", \"media_type\": \"application/json\"}, \"requested_budget\": 2}, \"hypothesis\": \"The intact candidate's progressive stiffening is produced by direction-selective slack-to-taut engagement of tendon_3 and tendon_1; a fresh paired replay jointly disabling those passive limits will weaken late-load stiffening while the intact replay retains the frozen displacement, recovery, no-contact, qualification, and progressive-stiffness requirements.\", \"supporting_evidence\": [{\"artifact_id\": \"5f1e0a3b7c320eb72d9d4849f6179006c609d54af9771a7852c1c0712ad1774f\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"dd09a7b59586106a7e6f30286d366f4517327f877f10bb7d784a906e207b2a6c\", \"media_type\": \"application/json\"}], \"expected_observation\": \"The fresh intact execution completes both load programs with full recording and passes every frozen evaluator and qualification check, including stiffness ratio at least 1.5, low-stage slack and tension limits, high-stage tension at least 0.05 N, high constraint residual at most 5e-05 m, displacement and recovery bounds, and no contact. Relative to that intact execution, the jointly ablated execution remains comparable and shows high displacement increasing by at least 1.25-fold and late stiffness ratio at most 0.8, thereby satisfying the registered paired-mechanism criteria.\", \"weakening_observation\": \"The hypothesis is weakened if the intact execution fails any frozen acceptance or every-step qualification check, if the direction-selective tendons do not undergo the required slack-to-taut transitions, or if the comparable joint ablation produces less than the registered high-displacement increase or insufficient reduction of late stiffness. A non-comparable or incomplete pair leaves the mechanism unresolved and does not establish acceptance.\", \"fixed_conditions\": \"Use the exact referenced candidate without structural or parameter edits, the frozen passive task, fresh unloaded hard equilibrium, formal task fidelity, original timestep, complete load programs, full physics recording, route checks at every physics step, and all frozen evaluator thresholds. Disable only the passive limits of tendon_1 and tendon_3 in the ablated member of the fresh pair; this is a joint mechanism test and does not identify either tendon's individual causal effect.\", \"stopping_condition\": \"Stop after one complete fresh intact-versus-joint-ablation pair has been evaluated under the frozen protocol, or immediately on numerical failure or protocol invalidation. Do not repeat to infer repeatability; use the resulting formal acceptance and paired-mechanism outcomes for the next decision.\", \"interpretation\": \"The saved numerical evidence records bilateral displacement bounds, stiffness ratios near 1.645, no contact, and direction-selective slack-to-taut transitions, but it lacks independent task acceptance and qualified paired-mechanism evidence, while sampled low and recovery windows did not establish the frozen every-step qualifications. A fresh paired replay is therefore the most direct test of both candidate acceptance and the proposed unilateral-tendon mechanism; only the registered replay outcome can support either conclusion.\", \"physical_replay\": {\"candidate\": {\"artifact_id\": \"dd09a7b59586106a7e6f30286d366f4517327f877f10bb7d784a906e207b2a6c\", \"media_type\": \"application/json\"}, \"source\": null, \"passive_ablation\": [\"tendon_1\", \"tendon_3\"], \"initial_state_result\": null, \"initial_state_episode\": null, \"validation_source\": null}, \"next_step\": null, \"revise_selection\": false}"
+    }
+  }
+}

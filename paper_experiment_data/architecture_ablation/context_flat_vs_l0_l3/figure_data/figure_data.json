@@ -1,0 +1,509 @@
+{
+  "experiment": "E2",
+  "snapshot_id": "PHS_C035",
+  "source": "D:/softrobot-agent/runs/psd2d-core-only-20261112/FINAL_RESULT.md",
+  "snapshot_manifest": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/figure_data/snapshot_manifest.csv",
+  "information_manifest": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/figure_data/information_manifest.json",
+  "conditions": {
+    "Flat": {
+      "accounting": {
+        "snapshot_id": "PHS_C035",
+        "condition": "Flat",
+        "session_id": "2b730049-978d-4824-939e-d961c9bfa617",
+        "initial_system_tokens": 299,
+        "initial_task_tokens": 44043,
+        "initial_history_tokens": 29685,
+        "initial_evidence_tokens": 610096,
+        "initial_tool_schema_tokens": 12735,
+        "initial_wire_framing_tokens": 36,
+        "initial_components_basis": "estimated_generic_proxy: tiktoken 0.12.0 o200k_base on the exact complete serialized wire payload. No registered mapping for gpt-5.6-sol; NOT a verified model-matched tokenizer or billing measure. Components assign each token by its first byte in the full serialization; sum includes framing.",
+        "initial_total_input_tokens": 675802,
+        "initial_total_basis": "provider_actual_first_accepted_decision_request",
+        "initial_accepted_request_turn": 1,
+        "initial_total_input_tokens_estimated": 696894,
+        "first_attempt_input_tokens_actual": 675802,
+        "first_attempt_input_tokens_estimated": 696894,
+        "total_input_tokens": 675802,
+        "total_output_tokens": 1253,
+        "all_attempts_actual_usage_complete": true,
+        "accepted_total_input_tokens_actual": 675802,
+        "accepted_total_output_tokens_actual": 1253,
+        "accepted_total_input_basis": "Provider actual usage summed for every HTTP200 inference; rejected attempt has no usage and is separately retained.",
+        "total_input_tokens_estimated_all_attempts": 696894,
+        "accepted_total_input_tokens_estimated": 696894,
+        "total_output_tokens_estimated_accepted_assistant_messages": 1316,
+        "output_estimate_scope": "Complete serialized assistant message; API envelope/error body/hidden reasoning excluded; not billing.",
+        "repeated_context_tokens": 0,
+        "repeated_context_tokens_basis": "estimated_generic_proxy: re-sent identical messages and tool schemas, allocated in each complete wire. Includes the rejected send; initial context is NOT deduplicated from cumulative totals.",
+        "evidence_read_tokens": 0,
+        "evidence_read_tokens_basis": "estimated_generic_proxy_complete_tool_result_message; zero because no evidence reads occurred.",
+        "number_of_provider_requests": 1,
+        "number_of_accepted_provider_requests": 1,
+        "number_of_rejected_provider_requests": 0,
+        "number_of_requests_with_usage": 1,
+        "number_of_evidence_reads": 0,
+        "number_of_repeated_reads": 0,
+        "read_levels": [],
+        "model": "gpt-5.6-sol",
+        "effective_reasoning": "none",
+        "provider_usage_source": [
+          "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/2b730049-978d-4824-939e-d961c9bfa617/response_1.txt"
+        ],
+        "missing_usage_note": "",
+        "estimated_tokenizer_model_match_verified": false,
+        "estimate_basis": "estimated_generic_proxy: tiktoken 0.12.0 o200k_base on the exact complete serialized wire payload. No registered mapping for gpt-5.6-sol; NOT a verified model-matched tokenizer or billing measure."
+      },
+      "requests": [
+        {
+          "snapshot_id": "PHS_C035",
+          "condition": "Flat",
+          "session_id": "2b730049-978d-4824-939e-d961c9bfa617",
+          "turn": 1,
+          "http_status": 200,
+          "model": "gpt-5.6-sol",
+          "reasoning_effort": "none",
+          "exact_wire_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/2b730049-978d-4824-939e-d961c9bfa617/request_1.json",
+          "wire_bytes": 2636905,
+          "whole_wire_tokens_estimated": 696894,
+          "components_estimated": {
+            "framing": 36,
+            "system": 299,
+            "task": 44043,
+            "history": 29685,
+            "evidence": 610096,
+            "tool_schema": 12735
+          },
+          "repeated_context_tokens_estimated": 0,
+          "input_tokens_actual": 675802,
+          "output_tokens_actual": 1253,
+          "cached_input_tokens_actual": 14051,
+          "cache_write_tokens_actual": 661748,
+          "usage_status": "provider_actual",
+          "full_wire_proxy_basis": "estimated_generic_proxy: tiktoken 0.12.0 o200k_base on the exact complete serialized wire payload. No registered mapping for gpt-5.6-sol; NOT a verified model-matched tokenizer or billing measure."
+        }
+      ],
+      "decision": {
+        "action": "generate",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "F5_viscosity_optimum_bracket",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DESIGN_MODIFICATION",
+          "selected_method": "matched_single_parameter_viscosity_bracketing",
+          "selected_variables": [
+            "segments.0.physical_parameters.viscosity_y_nm2_s",
+            "segments.0.physical_parameters.viscosity_z_nm2_s",
+            "segments.1.physical_parameters.viscosity_y_nm2_s",
+            "segments.1.physical_parameters.viscosity_z_nm2_s",
+            "segments.2.physical_parameters.viscosity_y_nm2_s",
+            "segments.2.physical_parameters.viscosity_z_nm2_s"
+          ],
+          "selected_candidate": {
+            "artifact_id": "279ab69ea2fded0a9786f94af6f41e819c739abd25c30fabf4afc76e272486f2",
+            "media_type": "application/json"
+          },
+          "requested_budget": 0
+        },
+        "hypothesis": "The unresolved tail-window failure is governed by a non-monotone damping tradeoff, with a useful common bending viscosity between 1e-4 and 2e-4 N m^2 s. A matched intermediate candidate at 1.5e-4 may reduce speed and generalized-velocity excess while avoiding the large static-balance regression observed at 2e-4, and retain the already favorable finite-load displacement transfer.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "7529b3d0e639653de0be383325f6ed7d3074c075cbc1ac5b03addd097411fbbc",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "9654d89925971fac30f9cc9de3c980f483a17ebbf6eb9440e7b1ddd138d13f06",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "6edaf72199c8f424561dd32d351692723c88bad0ae5869bf178eb9bd2d7e5d91",
+            "media_type": "application/json"
+          }
+        ],
+        "generation": {
+          "changes": {
+            "segments.0.physical_parameters.viscosity_y_nm2_s": 0.00015,
+            "segments.0.physical_parameters.viscosity_z_nm2_s": 0.00015,
+            "segments.1.physical_parameters.viscosity_y_nm2_s": 0.00015,
+            "segments.1.physical_parameters.viscosity_z_nm2_s": 0.00015,
+            "segments.2.physical_parameters.viscosity_y_nm2_s": 0.00015,
+            "segments.2.physical_parameters.viscosity_z_nm2_s": 0.00015
+          }
+        },
+        "expected_observation": "The generated candidate exactly preserves F4 topology, geometry, stiffness, masses, mesh, routes and payouts while setting every bending-viscosity component to 1.5e-4 N m^2 s. In a later identical s3_positive finite-time diagnostic, the working prediction is tail drift remains below 5e-4 m, qvel and speeds lie between or below the F3/F4 values, static balance is materially closer to F3's 7.53e-5 N m than F4's 3.71e-3 N m, and point/tip/ratio bounds remain satisfied.",
+        "weakening_observation": "Generation changes any non-viscosity field; or a later matched finite-time observation still has tip speed near or above 0.002 m/s, monitor speed near or above 0.0018 m/s, qvel above 0.01 rad/s, static balance far above 1e-5 N m, or loses the point/tip/ratio margins. Such evidence would weaken the viscosity-only explanation and favor revising stiffness/routing rather than further viscosity continuation.",
+        "fixed_conditions": "Use current F4 as the exact parent. Preserve three equal 0.09333333333333334 m segments, 3 mm circular sections, 2 MPa modulus, four cardinal tendons, guide radii 15/8 mm, base radius 22 mm, payload radius 1 mm, payout 0.3087181692307814 m, all masses, 8 cells per segment, no actuators, and every frozen task threshold and protocol. Do not infer acceptance from generation or from prior local QP evidence.",
+        "stopping_condition": "Stop this isolated replay after recording the candidate-generation decision. If generated later, the immediate scientific follow-up is one matched s3_positive finite-time diagnostic; do not broaden to other loads or seek acceptance unless that case satisfies every loaded qualification.",
+        "interpretation": "Key question: can the already successful displacement mechanism be dynamically qualified by tuning dissipation alone? C025/C026 provide only local hard-constraint equilibrium/QP evidence: F2 was statically qualified and predicted a 0.1518 tip/point ratio, not finite-load acceptance. C027/C029 showed finite s3_positive displacement bounds passed but loaded qualification failed. The matched viscosity change to 1e-4 improved tip speed 0.00346→0.00198 m/s, monitor speed 0.00304→0.00179 m/s, qvel 0.0433→0.0231 rad/s, static balance 0.00369→7.53e-5 N m, and drift 6.93e-4→2.55e-4 m. At 2e-4, drift and qvel improved further, but tip/monitor speeds did not and static balance regressed to 0.00371 N m. This brackets a non-monotone finite-time response and motivates an intermediate empirical test, not a gradient, causal proof, or global optimum. Evidence scope is one sampled exploratory s3_positive case; all other loads, dense qualification, independent replay, complete-task acceptance, robustness and repeatability remain unknown. Archived sources: C025/C026, C027/C029, C031/C032, C034/C035, and current candidate C033."
+      },
+      "decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/2b730049-978d-4824-939e-d961c9bfa617/result.json",
+      "decision_pointer": "/decision",
+      "reads": [],
+      "evaluation": {
+        "label": "A",
+        "scores": {
+          "research_decision_quality": 4,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "mean_score": 4.0,
+        "strengths": [
+          "Proposes an untested, legal intermediate viscosity while explicitly holding the remaining design fixed.",
+          "Correctly identifies mixed trends rather than extrapolating monotone damping improvement.",
+          "Separates generation, local hard-constraint mathematics, sampled finite dynamics and independent acceptance."
+        ],
+        "weaknesses": [
+          "The proposed intermediate viscosity remains an empirical hypothesis; the recorded trends do not establish a useful interior value or a damping-based cause."
+        ],
+        "supporting_source_refs": [
+          "SPEC_family_space",
+          "C026_OUTPUT",
+          "C029_OUTPUT",
+          "C031_OUTPUT",
+          "C032_OUTPUT",
+          "C033_OUTPUT",
+          "C034_OUTPUT",
+          "C035_OUTPUT",
+          "CURRENT_CANDIDATE"
+        ],
+        "evidence_specific_rationale": "The stated next action is a controlled candidate generation at 1.5e-4 N m² s, within the declared viscosity domains. The numerical motivation is accurate: F3 to F4 lowers qvel and drift, but tip speed rises from 0.001978 to 0.002056 m/s and static-balance residual rises from 7.53e-5 to 3.71e-3 N m. F4 retains displacement bounds with only about 0.100 mm tip margin. A treats interpolation as a falsifiable search hypothesis and does not claim that generation or the proposed later diagnostic has succeeded. The cited artifacts and candidate lineage resolve correctly."
+      }
+    },
+    "Hierarchical": {
+      "accounting": {
+        "snapshot_id": "PHS_C035",
+        "condition": "Hierarchical",
+        "session_id": "fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be",
+        "initial_system_tokens": 299,
+        "initial_task_tokens": 21999,
+        "initial_history_tokens": 24593,
+        "initial_evidence_tokens": 21224,
+        "initial_tool_schema_tokens": 12735,
+        "initial_wire_framing_tokens": 36,
+        "initial_components_basis": "estimated_generic_proxy: tiktoken 0.12.0 o200k_base on the exact complete serialized wire payload. No registered mapping for gpt-5.6-sol; NOT a verified model-matched tokenizer or billing measure. Components assign each token by its first byte in the full serialization; sum includes framing.",
+        "initial_total_input_tokens": 78785,
+        "initial_total_basis": "provider_actual_first_accepted_decision_request",
+        "initial_accepted_request_turn": 2,
+        "initial_total_input_tokens_estimated": 80886,
+        "first_attempt_input_tokens_actual": null,
+        "first_attempt_input_tokens_estimated": 80886,
+        "total_input_tokens": null,
+        "total_output_tokens": null,
+        "all_attempts_actual_usage_complete": false,
+        "accepted_total_input_tokens_actual": 78785,
+        "accepted_total_output_tokens_actual": 940,
+        "accepted_total_input_basis": "Provider actual usage summed for every HTTP200 inference; rejected attempt has no usage and is separately retained.",
+        "total_input_tokens_estimated_all_attempts": 161772,
+        "accepted_total_input_tokens_estimated": 80886,
+        "total_output_tokens_estimated_accepted_assistant_messages": 1000,
+        "output_estimate_scope": "Complete serialized assistant message; API envelope/error body/hidden reasoning excluded; not billing.",
+        "repeated_context_tokens": 80850,
+        "repeated_context_tokens_basis": "estimated_generic_proxy: re-sent identical messages and tool schemas, allocated in each complete wire. Includes the rejected send; initial context is NOT deduplicated from cumulative totals.",
+        "evidence_read_tokens": 0,
+        "evidence_read_tokens_basis": "estimated_generic_proxy_complete_tool_result_message; zero because no evidence reads occurred.",
+        "number_of_provider_requests": 2,
+        "number_of_accepted_provider_requests": 1,
+        "number_of_rejected_provider_requests": 1,
+        "number_of_requests_with_usage": 1,
+        "number_of_evidence_reads": 0,
+        "number_of_repeated_reads": 0,
+        "read_levels": [],
+        "model": "gpt-5.6-sol",
+        "effective_reasoning": "none",
+        "provider_usage_source": [
+          "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be/response_1.txt",
+          "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be/response_2.txt"
+        ],
+        "missing_usage_note": "One initial HTTP400 incompatible reasoning/tool request has no usage. All-attempt actual cumulative usage is unknown; not assigned zero.",
+        "estimated_tokenizer_model_match_verified": false,
+        "estimate_basis": "estimated_generic_proxy: tiktoken 0.12.0 o200k_base on the exact complete serialized wire payload. No registered mapping for gpt-5.6-sol; NOT a verified model-matched tokenizer or billing measure."
+      },
+      "requests": [
+        {
+          "snapshot_id": "PHS_C035",
+          "condition": "Hierarchical",
+          "session_id": "fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be",
+          "turn": 1,
+          "http_status": 400,
+          "model": "gpt-5.6-sol",
+          "reasoning_effort": "medium",
+          "exact_wire_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be/request_1.json",
+          "wire_bytes": 329562,
+          "whole_wire_tokens_estimated": 80886,
+          "components_estimated": {
+            "framing": 36,
+            "system": 299,
+            "task": 21999,
+            "history": 24593,
+            "evidence": 21224,
+            "tool_schema": 12735
+          },
+          "repeated_context_tokens_estimated": 0,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "cached_input_tokens_actual": null,
+          "cache_write_tokens_actual": null,
+          "usage_status": "missing_on_rejected_request_not_zero",
+          "full_wire_proxy_basis": "estimated_generic_proxy: tiktoken 0.12.0 o200k_base on the exact complete serialized wire payload. No registered mapping for gpt-5.6-sol; NOT a verified model-matched tokenizer or billing measure."
+        },
+        {
+          "snapshot_id": "PHS_C035",
+          "condition": "Hierarchical",
+          "session_id": "fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be",
+          "turn": 2,
+          "http_status": 200,
+          "model": "gpt-5.6-sol",
+          "reasoning_effort": "none",
+          "exact_wire_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be/request_2.json",
+          "wire_bytes": 329560,
+          "whole_wire_tokens_estimated": 80886,
+          "components_estimated": {
+            "framing": 36,
+            "system": 299,
+            "task": 21999,
+            "history": 24593,
+            "evidence": 21224,
+            "tool_schema": 12735
+          },
+          "repeated_context_tokens_estimated": 80850,
+          "input_tokens_actual": 78785,
+          "output_tokens_actual": 940,
+          "cached_input_tokens_actual": 0,
+          "cache_write_tokens_actual": 78782,
+          "usage_status": "provider_actual",
+          "full_wire_proxy_basis": "estimated_generic_proxy: tiktoken 0.12.0 o200k_base on the exact complete serialized wire payload. No registered mapping for gpt-5.6-sol; NOT a verified model-matched tokenizer or billing measure."
+        }
+      ],
+      "decision": {
+        "action": "diagnose",
+        "next_step": "revise_design",
+        "next_research_action": "single_parameter_effect",
+        "hypothesis": "Key question: has increasing bending viscosity from the earlier matched values to 2e-4 N m^2 s entered a slow-relaxation regime, so that more viscosity cannot satisfy the loaded settling qualifications while preserving the required localized displacement? Mathematical/physical evidence: F4 has a qualified contact-free unloaded hard equilibrium (KKT, LICQ, strict complementarity and second-order sufficiency), but its only finite-load observation covers s3_positive and fails loaded tip-speed, monitor-speed and qvel checks; the reported normalized static-balance residual is also 0.4529 and the task result is incomplete. Working hypothesis: the remaining failure is not evidence for inadequate damping alone; it is a damping–relaxation tradeoff, and the next useful route is a read-only matched comparison of F2/F3/F4 saved responses before any new candidate is generated. If residual and speed improved monotonically through F4, retain viscosity as a design variable and broaden finite-load screening; if improvement saturated or reversed, revise routing/material distribution rather than increasing viscosity again.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "9654d89925971fac30f9cc9de3c980f483a17ebbf6eb9440e7b1ddd138d13f06",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "279ab69ea2fded0a9786f94af6f41e819c739abd25c30fabf4afc76e272486f2",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "A matched saved-response trend across F2, F3 and F4 will show whether loaded-window tip speed, monitor speed, qvel, static-balance residual and tail drift continue to decrease at 2e-4 viscosity without degrading the measured point/tip displacement constraints. Continued monotone improvement would support a bounded viscosity-focused revision followed by multi-load finite-time screening; saturation or reversal would support changing routing or spatial material distribution.",
+        "weakening_observation": "The hypothesis is weakened if F4 clearly improves every loaded settling metric relative to F3 while retaining displacement margins, or if the saved records are not comparable in candidate structure, load, sampling, or protocol. It is also weakened if the dominant failure is instead tendon length/capacity, contact, lateral-plane motion, or displacement localization rather than settling dynamics.",
+        "fixed_conditions": "Keep the frozen passive task, gravity, ten load definitions, original bounds and qualifications, no active control, candidate lineage geometry/routing/payout except for the already recorded viscosity changes, and compare only saved matched s3_positive finite-time observations. This diagnosis does not establish performance for the nine unmeasured load cases, every-step qualification, independent numerical confirmation, or task acceptance.",
+        "stopping_condition": "End the diagnosis once the comparable saved F2/F3/F4 loaded-window metrics and displacement components are tabulated and the trend is classified as monotone improvement, saturation/reversal, or non-comparable. Do not infer an ordinary gradient, structural descent, global causality, or acceptance.",
+        "interpretation": "Concrete proposed action: perform a read-only candidate-bound diagnosis of archived matched viscosity responses and choose between (A) a bounded viscosity-centered design revision plus broader load screening, or (B) a routing/material-distribution revision. Evidence scope is local and diagnostic: the current finite-load record is sampled s3_positive native physics only; hard-equilibrium mathematics does not transfer to dynamic success, and no independent full ten-case acceptance exists. Archived sources: C033–C035, especially C034 artifact 9654d899... and current candidate artifact 279ab69e....",
+        "decision": {
+          "version": "research_decision_v1",
+          "hypothesis_id": "H-F4-damping-relaxation-trend",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "read-only matched saved-stage viscosity comparison",
+          "selected_variables": [
+            "segments.*.physical_parameters.viscosity_y_nm2_s",
+            "segments.*.physical_parameters.viscosity_z_nm2_s",
+            "loaded tip_speed",
+            "loaded monitor_speed",
+            "loaded qvel",
+            "loaded static_balance",
+            "loaded tail_drift",
+            "point/tip displacement components"
+          ],
+          "selected_candidate": {
+            "artifact_id": "279ab69ea2fded0a9786f94af6f41e819c739abd25c30fabf4afc76e272486f2",
+            "media_type": "application/json"
+          },
+          "requested_budget": 0
+        }
+      },
+      "decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be/result.json",
+      "decision_pointer": "/decision",
+      "reads": [],
+      "evaluation": {
+        "label": "B",
+        "scores": {
+          "research_decision_quality": 3,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "mean_score": 3.8,
+        "strengths": [
+          "Specifies a feasible, read-only matched comparison with explicit metrics and a stopping classification.",
+          "Correctly interprets F4's unloaded qualification and sampled loaded failures.",
+          "Keeps relaxation as a working hypothesis and preserves missing-case and independent-acceptance limitations."
+        ],
+        "weaknesses": [
+          "The immediate comparison has limited additional scientific yield: archived F2/F3/F4 observations already establish saturation or reversal in speed and static balance, alongside improvement in qvel and drift.",
+          "The proposed monotone-improvement branch does not reflect the already recorded F3-to-F4 regression."
+        ],
+        "supporting_source_refs": [
+          "C027_OUTPUT",
+          "C031_OUTPUT",
+          "C032_OUTPUT",
+          "C034_OUTPUT",
+          "C035_OUTPUT",
+          "CURRENT_CANDIDATE"
+        ],
+        "evidence_specific_rationale": "B accurately reports F4's qualified unloaded equilibrium, normalized static-balance residual of 0.4529 and incomplete one-case dynamic evidence. Tabulating saved matched observations is concrete and feasible, and earlier responses named for comparison are not falsely presented as measurements from the two cited artifacts. However, the proposed classification largely synthesizes an already explicit mixed trend rather than testing a new parameter value or mechanism. No penalty is assigned for its unproven slow-relaxation hypothesis or for choosing diagnosis instead of generation."
+      }
+    }
+  },
+  "comparison": {
+    "snapshot_id": "PHS_C035",
+    "task_id": "PHS-2D",
+    "flat_initial_input_tokens_actual": 675802,
+    "hierarchical_initial_input_tokens_actual": 78785,
+    "initial_measurement_scope": "First accepted inference in each condition; initial Hier HTTP400 reported separately.",
+    "initial_input_reduction_actual": 0.8834199957975857,
+    "flat_accepted_cumulative_input_tokens_actual": 675802,
+    "hierarchical_accepted_cumulative_input_tokens_actual": 78785,
+    "accepted_cumulative_input_reduction_actual": 0.8834199957975857,
+    "flat_all_attempts_input_tokens_actual": 675802,
+    "hierarchical_all_attempts_input_tokens_actual": null,
+    "all_attempts_input_reduction_actual": null,
+    "flat_all_attempts_input_tokens_estimated": 696894,
+    "hierarchical_all_attempts_input_tokens_estimated": 161772,
+    "all_attempts_input_reduction_estimated_generic_proxy": 0.7678671361785293,
+    "accepted_input_reduction_estimated_generic_proxy": 0.8839335680892646,
+    "flat_output_tokens_actual": 1253,
+    "hierarchical_output_tokens_actual": 940,
+    "flat_provider_requests": 1,
+    "hierarchical_provider_requests": 2,
+    "flat_accepted_provider_requests": 1,
+    "hierarchical_accepted_provider_requests": 1,
+    "flat_reads": 0,
+    "hierarchical_reads": 0,
+    "flat_score": 4.0,
+    "hierarchical_score": 3.8,
+    "score_delta_hier_minus_flat": -0.2,
+    "paired_winner": "Flat",
+    "positive_quality_preservation_clip_eligible": false,
+    "decision_difference": "Flat proposes an intermediate 1.5e-4 N m^2 s viscosity candidate; Hier proposes a read-only F2/F3/F4 comparison of already recorded trends.",
+    "interpretation": "Large input reduction with a 0.2-point mean-score decrease in this single pair; four of five dimensions remain equal. No overall quality-preservation claim.",
+    "actual_usage_caveat": "All-attempt actual reduction is unavailable because initial Hier rejection has no usage. Accepted-inference and generic whole-wire all-send estimates remain separate.",
+    "sample_scope": "One checkpoint, one decision per condition, one blind model reviewer; human review pending; no statistical significance or physical success claim."
+  },
+  "clips": [
+    {
+      "condition": "Hierarchical",
+      "quote": "hard-equilibrium mathematics does not transfer to dynamic success, and no independent full ten-case acceptance exists.",
+      "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/fec86d8b-3f0d-4bb3-b255-cc50fc5ba8be/result.json",
+      "pointer": "/decision/interpretation"
+    },
+    {
+      "condition": "Flat",
+      "quote": "At 2e-4, drift and qvel improved further, but tip/monitor speeds did not and static balance regressed to 0.00371 N m.",
+      "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/sessions/2b730049-978d-4824-939e-d961c9bfa617/result.json",
+      "pointer": "/decision/interpretation"
+    }
+  ],
+  "qualifying_overall_positive_clip": false,
+  "blind_review_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/context_flat_vs_l0_l3/figure_data/blind_review/independent_model_review.json",
+  "blind_review": {
+    "review": {
+      "evaluations": [
+        {
+          "label": "A",
+          "scores": {
+            "research_decision_quality": 4,
+            "evidence_consistency": 4,
+            "limitation_recognition": 4,
+            "research_actionability": 4,
+            "evidence_reference_accuracy": 4
+          },
+          "mean_score": 4.0,
+          "strengths": [
+            "Proposes an untested, legal intermediate viscosity while explicitly holding the remaining design fixed.",
+            "Correctly identifies mixed trends rather than extrapolating monotone damping improvement.",
+            "Separates generation, local hard-constraint mathematics, sampled finite dynamics and independent acceptance."
+          ],
+          "weaknesses": [
+            "The proposed intermediate viscosity remains an empirical hypothesis; the recorded trends do not establish a useful interior value or a damping-based cause."
+          ],
+          "supporting_source_refs": [
+            "SPEC_family_space",
+            "C026_OUTPUT",
+            "C029_OUTPUT",
+            "C031_OUTPUT",
+            "C032_OUTPUT",
+            "C033_OUTPUT",
+            "C034_OUTPUT",
+            "C035_OUTPUT",
+            "CURRENT_CANDIDATE"
+          ],
+          "evidence_specific_rationale": "The stated next action is a controlled candidate generation at 1.5e-4 N m² s, within the declared viscosity domains. The numerical motivation is accurate: F3 to F4 lowers qvel and drift, but tip speed rises from 0.001978 to 0.002056 m/s and static-balance residual rises from 7.53e-5 to 3.71e-3 N m. F4 retains displacement bounds with only about 0.100 mm tip margin. A treats interpolation as a falsifiable search hypothesis and does not claim that generation or the proposed later diagnostic has succeeded. The cited artifacts and candidate lineage resolve correctly."
+        },
+        {
+          "label": "B",
+          "scores": {
+            "research_decision_quality": 3,
+            "evidence_consistency": 4,
+            "limitation_recognition": 4,
+            "research_actionability": 4,
+            "evidence_reference_accuracy": 4
+          },
+          "mean_score": 3.8,
+          "strengths": [
+            "Specifies a feasible, read-only matched comparison with explicit metrics and a stopping classification.",
+            "Correctly interprets F4's unloaded qualification and sampled loaded failures.",
+            "Keeps relaxation as a working hypothesis and preserves missing-case and independent-acceptance limitations."
+          ],
+          "weaknesses": [
+            "The immediate comparison has limited additional scientific yield: archived F2/F3/F4 observations already establish saturation or reversal in speed and static balance, alongside improvement in qvel and drift.",
+            "The proposed monotone-improvement branch does not reflect the already recorded F3-to-F4 regression."
+          ],
+          "supporting_source_refs": [
+            "C027_OUTPUT",
+            "C031_OUTPUT",
+            "C032_OUTPUT",
+            "C034_OUTPUT",
+            "C035_OUTPUT",
+            "CURRENT_CANDIDATE"
+          ],
+          "evidence_specific_rationale": "B accurately reports F4's qualified unloaded equilibrium, normalized static-balance residual of 0.4529 and incomplete one-case dynamic evidence. Tabulating saved matched observations is concrete and feasible, and earlier responses named for comparison are not falsely presented as measurements from the two cited artifacts. However, the proposed classification largely synthesizes an already explicit mixed trend rather than testing a new parameter value or mechanism. No penalty is assigned for its unproven slow-relaxation hypothesis or for choosing diagnosis instead of generation."
+        }
+      ],
+      "paired_winner": "A",
+      "comparative_rationale": "A narrowly leads because it converts the established non-monotone response into a specific, controlled and untested intermediate candidate. B's read-only comparison is sound but offers less new scientific information at this checkpoint. Both correctly preserve the distinction between exploratory native physics and full independent task acceptance; neither proposed action has been executed."
+    },
+    "model": "gpt-6-astra",
+    "usage": {
+      "prompt_tokens": 643783,
+      "completion_tokens": 1246,
+      "total_tokens": 645029,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 643780,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 393,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "provider_requests": 1,
+    "wall_s": 46.52207449999696,
+    "blinded": true,
+    "human_verification": "pending"
+  },
+  "limitations": [
+    "All-attempt actual reduction is unavailable because initial Hier rejection has no usage. Accepted-inference and generic whole-wire all-send estimates remain separate.",
+    "estimated_generic_proxy: tiktoken 0.12.0 o200k_base on the exact complete serialized wire payload. No registered mapping for gpt-5.6-sol; NOT a verified model-matched tokenizer or billing measure.",
+    "One checkpoint, one decision per condition, one blind model reviewer; human review pending; no statistical significance or physical success claim.",
+    "The replay context uses existing Core pure projections and ephemeral CURRENT_RESEARCH_PACKET delivery with a minimal read-only archive adapter, not a live historical Host or recovered Main dialogue.",
+    "No additional evidence reads occurred; L1–L3 accessibility was checked on all 66 records before inference, but behavior here only tests direct full delivery versus automatic L0 delivery.",
+    "A first incompatible API request was rejected before inference; subsequent successful requests in both conditions use reasoning none."
+  ],
+  "actual_new_main_sessions": 2,
+  "actual_main_provider_sends": 3,
+  "accepted_main_provider_requests": 2,
+  "independent_review_requests": 1,
+  "new_scientific_executions": 0,
+  "component_allocation": "Every token of the exact serialized wire is allocated by its first byte into system/task/history/evidence/tool_schema/framing. This partitions only generic-proxy estimates; Provider actual totals are not apportioned."
+}

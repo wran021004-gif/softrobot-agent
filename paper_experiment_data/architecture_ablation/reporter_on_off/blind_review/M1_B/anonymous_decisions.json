@@ -1,0 +1,114 @@
+[
+  {
+    "label": "A",
+    "decision": {
+      "action": "physical_replay",
+      "decision": {
+        "version": "research_decision_v1",
+        "hypothesis_id": "independent_full_replay_of_saved_native_schedule",
+        "claimed_inference": "empirical_search",
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_method": "independent full-horizon replay of the exact saved control schedule",
+        "selected_variables": [
+          "holding maximum position error",
+          "holding maximum speed",
+          "terminal position error",
+          "task acceptance"
+        ],
+        "selected_candidate": {
+          "artifact_id": "11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03",
+          "media_type": "application/json"
+        },
+        "requested_budget": 1
+      },
+      "hypothesis": "An independent full 0-to-0.6 s replay of the exact saved schedule will resolve whether the candidate satisfies the frozen task under replay, because the existing sampled native calculation lies extremely close to the holding-position and holding-speed boundaries but does not constitute independent acceptance.",
+      "interpretation": "Replay the unchanged candidate with the exact saved schedule rather than inferring success or infeasibility from the finite local search. A passing replay would establish only the registered replay-scope result for this candidate and schedule; a failing replay would localize the observed failure under the replay measurements but would not prove that other legal controls or structures are infeasible.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "13fb1a8eb4846cb1d8b81197db27f32c9752bf611db35fbee1e36f402b936637",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "012b9c45a8baf8fe6bee139e0e2a98259619e9275f8929c02335c3c9acf2d289",
+          "media_type": "application/json"
+        }
+      ],
+      "expected_observation": "The fresh replay returns complete 0-to-0.6 s measurements and a frozen-task verdict for the exact schedule; if the near-boundary native prediction transfers, the limiting observation will occur near the holding window and will be close to the 0.01 m position-error or 0.03 m/s speed boundary.",
+      "weakening_observation": "A replay trajectory that differs materially from the saved native prediction, or a clear pass or failure with substantial margin away from both reported boundaries, would weaken the hypothesis that the near-boundary sampled native behavior transfers to independent replay.",
+      "fixed_conditions": "Keep the candidate structure, frozen task, standardized initial state, 0.6 s horizon, 0.02 s control period, tendon order, 0-to-8 N bounds, and every value in the saved control schedule unchanged; perform one fresh independent full-horizon replay with no control re-optimization or design modification.",
+      "stopping_condition": "Stop after one fresh replay completes with a valid full-horizon record and frozen-task verdict, or after a recorded execution failure makes that verdict unavailable; do not add repetitions because repeatability is outside the frozen confirmation scope.",
+      "physical_replay": {
+        "candidate": {
+          "artifact_id": "11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "012b9c45a8baf8fe6bee139e0e2a98259619e9275f8929c02335c3c9acf2d289",
+          "media_type": "application/json"
+        },
+        "passive_ablation": null,
+        "initial_state_result": null,
+        "initial_state_episode": null,
+        "validation_source": null
+      },
+      "next_step": "diagnose",
+      "revise_selection": false
+    }
+  },
+  {
+    "label": "B",
+    "decision": {
+      "action": "physical_replay",
+      "decision": {
+        "version": "research_decision_v1",
+        "hypothesis_id": "saved_schedule_full_replay_acceptance",
+        "claimed_inference": "empirical_search",
+        "research_intent": "PHYSICAL_VALIDATION",
+        "selected_method": "independent full-horizon replay of the saved native control schedule",
+        "selected_variables": [
+          "frozen task acceptance under the exact saved tendon-tension schedule"
+        ],
+        "selected_candidate": {
+          "artifact_id": "11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03",
+          "media_type": "application/json"
+        },
+        "requested_budget": 1
+      },
+      "next_step": null,
+      "hypothesis": "The exact saved bounded tendon-tension schedule will satisfy the frozen task in an independent full 0-to-0.6 s replay from the standardized initial state; this is plausible because its sampled model excess was only 3.870725961974131e-11, but only the independent replay can establish task acceptance.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "13fb1a8eb4846cb1d8b81197db27f32c9752bf611db35fbee1e36f402b936637",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "012b9c45a8baf8fe6bee139e0e2a98259619e9275f8929c02335c3c9acf2d289",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03",
+          "media_type": "application/json"
+        }
+      ],
+      "expected_observation": "A fresh complete replay reports passing frozen acceptance for terminal position, holding-window position, and holding-window speed under the exact saved schedule.",
+      "weakening_observation": "The fresh replay fails any frozen acceptance component, is incomplete, or cannot preserve the bound candidate, schedule, initialization, timing, tendon ordering, and input limits; such an outcome weakens the schedule-transfer hypothesis without proving structural infeasibility.",
+      "fixed_conditions": "Keep the exact candidate, frozen task, standardized zero initial state, 0.6 s horizon, 0.02 s control period, tendon order, 0-to-8 N tension bounds, and saved control schedule unchanged; do not reoptimize controls or alter structure, model discretization, loading, or acceptance thresholds.",
+      "stopping_condition": "Stop after one fresh complete independent replay. If it passes, retain it as the task-acceptance result with repeatability unassessed; if it fails or is incomplete, do not claim acceptance or infeasibility and return to diagnosis or control refinement.",
+      "interpretation": "This replay directly tests whether the near-boundary sampled native prediction transfers to complete frozen-task evaluation. Agreement would support this exact candidate-schedule pair only; disagreement would identify a realization or coverage gap, not a general design impossibility.",
+      "physical_replay": {
+        "candidate": {
+          "artifact_id": "11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03",
+          "media_type": "application/json"
+        },
+        "source": {
+          "artifact_id": "012b9c45a8baf8fe6bee139e0e2a98259619e9275f8929c02335c3c9acf2d289",
+          "media_type": "application/json"
+        },
+        "passive_ablation": null,
+        "initial_state_result": null,
+        "initial_state_episode": null,
+        "validation_source": null
+      }
+    }
+  }
+]

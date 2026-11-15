@@ -1,0 +1,101 @@
+{
+  "checked_once_before_inference": true,
+  "checks": [
+    {
+      "snapshot_id": "PHS_C037_A",
+      "corpus_records": 106,
+      "all_named_reads_exact": true,
+      "original_artifact_pointer_reads_exact": true,
+      "L0_auto_injected": true,
+      "read_tools": [
+        "research_plan",
+        "research_recall",
+        "evidence_read"
+      ],
+      "main_reading_not_forced": true
+    },
+    {
+      "snapshot_id": "PHS_C042_B",
+      "corpus_records": 129,
+      "all_named_reads_exact": true,
+      "original_artifact_pointer_reads_exact": true,
+      "L0_auto_injected": true,
+      "read_tools": [
+        "research_plan",
+        "research_recall",
+        "evidence_read"
+      ],
+      "main_reading_not_forced": true
+    }
+  ],
+  "construction": [
+    {
+      "snapshot_id": "PHS_C037_A",
+      "wall_s": 2.1852810999989742,
+      "provider_requests": 0,
+      "provider_input_tokens": 0,
+      "provider_output_tokens": 0,
+      "cost_scope": "Offline archive extraction + existing deterministic Core projections + single read-entry/capacity confirmation; includes I/O and tokenizer preflight, not Main online inference.",
+      "corpus_bytes": 5762912,
+      "L0_bytes": 350787,
+      "scientific_computations": 0,
+      "corpus_records": 106,
+      "initial_sizes": [
+        {
+          "condition": "Hierarchical",
+          "wire_bytes": 352465,
+          "whole_wire_tokens_estimated_generic_proxy": 88428
+        },
+        {
+          "condition": "Flat",
+          "wire_bytes": 3375828,
+          "whole_wire_tokens_estimated_generic_proxy": 903090
+        }
+      ],
+      "included": true
+    },
+    {
+      "snapshot_id": "PHS_C042_B",
+      "wall_s": 4.542201800009934,
+      "provider_requests": 0,
+      "provider_input_tokens": 0,
+      "provider_output_tokens": 0,
+      "cost_scope": "Offline archive extraction + existing deterministic Core projections + single read-entry/capacity confirmation; includes I/O and tokenizer preflight, not Main online inference.",
+      "corpus_bytes": 7242709,
+      "L0_bytes": 375788,
+      "scientific_computations": 0,
+      "corpus_records": 129,
+      "initial_sizes": [
+        {
+          "condition": "Flat",
+          "wire_bytes": 4219082,
+          "whole_wire_tokens_estimated_generic_proxy": 1144912
+        },
+        {
+          "condition": "Hierarchical",
+          "wire_bytes": 372613,
+          "whole_wire_tokens_estimated_generic_proxy": 95503
+        }
+      ],
+      "included": false
+    }
+  ],
+  "method": "Each original directory and artifact pointer resolved against its complete frozen value; same actual tool schemas and initial packet serialized into both request prototypes. Actual online delivery is verified later from saved wire.",
+  "old_E2_unchanged": true,
+  "proxy_tokenizer": "tiktoken o200k_base, not a verified model mapping; conservative capacity proxy only.",
+  "local_entry_binding_repair": "Null observation source.reference bound via exact original TOOL_TRACE evidence_read argument and preceding mathematical result; no source content changed.",
+  "final_main_sessions": 2,
+  "omitted_checkpoint": "PHS_C042_B, conservative whole-wire capacity gate; no re-selection.",
+  "offline_preparation_attempts": [
+    {
+      "wall_s": 4.5702494,
+      "status": "Stopped in local entry check on null reference, zero Provider calls."
+    },
+    {
+      "wall_s": 9.1247374,
+      "status": "Entry and capacity confirmation completed, zero Provider calls."
+    }
+  ],
+  "offline_observed_total_wall_s": 13.6949868,
+  "offline_wall_source": "Observed exec process wall times; includes imports/shared setup and the one failed local binding check, reported separately from per-checkpoint preparation timings."
+}

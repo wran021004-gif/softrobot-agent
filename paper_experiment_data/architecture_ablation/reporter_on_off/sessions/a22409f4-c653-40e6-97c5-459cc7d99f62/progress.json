@@ -1,0 +1,92 @@
+{
+  "snapshot_id": "M1_A",
+  "condition": "OFF",
+  "session_id": "a22409f4-c653-40e6-97c5-459cc7d99f62",
+  "ordinal": 1,
+  "status": "completed",
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "H_exact_schedule_full_replay_acceptance",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "independent full-horizon replay of saved native control schedule",
+      "selected_variables": [
+        "terminal_error_m",
+        "holding_max_error_m",
+        "holding_max_speed_m_s"
+      ],
+      "selected_candidate": {
+        "artifact_id": "697fd5d64c7a6994400362950391ded57677c9876e70ca4d69a06da86c79ed00",
+        "media_type": "application/json"
+      },
+      "requested_budget": 1
+    },
+    "hypothesis": "For the unchanged candidate, replaying the exact saved optimized tension schedule from the standardized initial state will satisfy the frozen reach task over the complete 0.0–0.6 s horizon. The proposed mechanism is coordinated time-varying tendon loading that reaches the target and then limits residual motion during the holding window; this is a prediction for this exact candidate and schedule, not a claim of global feasibility or robustness.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "ddc70950942a1e4ef4226443e32debcc1f7b2b41c80f294a65d0db87075536d6",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "49ec0d18e64c929f2fc1127c01c179cf948c13f5e18d90210bb98a50896d003c",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "697fd5d64c7a6994400362950391ded57677c9876e70ca4d69a06da86c79ed00",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "One independent full-horizon replay reports terminal position error at or below 0.01 m, holding-window position error at or below 0.01 m, and holding-window speed at or below 0.03 m/s under the frozen acceptance calculation. This is plausible because the saved finite native search recorded 0.003452366584264502 m terminal error, 0.004096331370682971 m maximum holding position error, and 0.028321836968032563 m/s maximum holding speed, with speed as the narrowest sampled margin.",
+    "weakening_observation": "The hypothesis is weakened if the replay is complete and applicable but any frozen constraint fails, especially if holding speed exceeds 0.03 m/s near the end of the horizon; an incomplete, identity-mismatched, or inapplicable replay is unresolved rather than evidence of infeasibility.",
+    "fixed_conditions": "Keep candidate 697fd5d64c7a6994400362950391ded57677c9876e70ca4d69a06da86c79ed00 unchanged; use frozen task bf7-shared-reach-v1-positive_high, target [0.285,0.035,0.185] m, standardized all-zero candidate state at 0 s, the exact complete saved schedule 49ec0d18e64c929f2fc1127c01c179cf948c13f5e18d90210bb98a50896d003c, tendon order tendon_0 through tendon_5, 0–8 N bounds, 0.02 s control period, and the full 0.6 s task horizon. Do not alter geometry, material properties, routing, initialization, control values, task thresholds, or sampling protocol.",
+    "stopping_condition": "Stop after one fresh, completed, applicable independent replay and record pass or the first identified frozen-constraint failure; do not add repetitions or redesign within this decision.",
+    "interpretation": "The existing result is a finite sampled model observation and does not itself establish task acceptance. The next informative decision is therefore an exact independent full-horizon replay rather than further local sensitivity analysis or structural modification. A pass would support acceptance only for the bound candidate, task, initialization, and saved schedule, with repeatability and robustness still unassessed. A failure would localize the discrepancy by constraint and time but would not establish structural infeasibility.",
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "697fd5d64c7a6994400362950391ded57677c9876e70ca4d69a06da86c79ed00",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "49ec0d18e64c929f2fc1127c01c179cf948c13f5e18d90210bb98a50896d003c",
+        "media_type": "application/json"
+      },
+      "passive_ablation": null,
+      "initial_state_result": null,
+      "initial_state_episode": null,
+      "validation_source": null
+    }
+  },
+  "requests": [
+    {
+      "turn": 1,
+      "sent_at": "2026-11-14T14:38:55.319046+00:00",
+      "http_status": 400,
+      "wall_s": 0.02248449999751756,
+      "error": "Client error '400 Bad Request' for url 'http://127.0.0.1:8789/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400"
+    },
+    {
+      "turn": 2,
+      "sent_at": "2026-11-14T14:48:13.466007+00:00",
+      "http_status": 200,
+      "wall_s": 27.620099800002208,
+      "usage": null,
+      "model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-4622caac-cc40-4b57-9870-745c109a675d"
+    }
+  ],
+  "evidence_reads": [],
+  "errors": [
+    "Client error '400 Bad Request' for url 'http://127.0.0.1:8789/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400"
+  ],
+  "effective_reasoning": "gateway_default_not_exposed",
+  "decision_transport": "text_serialized_existing_Core_tool_schema",
+  "decision_tool_call": {
+    "id": "text-call-2",
+    "function": {
+      "name": "research_plan",
+      "arguments": "{\"action\": \"physical_replay\", \"decision\": {\"version\": \"research_decision_v1\", \"hypothesis_id\": \"H_exact_schedule_full_replay_acceptance\", \"claimed_inference\": \"empirical_search\", \"research_intent\": \"PHYSICAL_VALIDATION\", \"selected_method\": \"independent full-horizon replay of saved native control schedule\", \"selected_variables\": [\"terminal_error_m\", \"holding_max_error_m\", \"holding_max_speed_m_s\"], \"selected_candidate\": {\"artifact_id\": \"697fd5d64c7a6994400362950391ded57677c9876e70ca4d69a06da86c79ed00\", \"media_type\": \"application/json\"}, \"requested_budget\": 1}, \"hypothesis\": \"For the unchanged candidate, replaying the exact saved optimized tension schedule from the standardized initial state will satisfy the frozen reach task over the complete 0.0\\u20130.6 s horizon. The proposed mechanism is coordinated time-varying tendon loading that reaches the target and then limits residual motion during the holding window; this is a prediction for this exact candidate and schedule, not a claim of global feasibility or robustness.\", \"supporting_evidence\": [{\"artifact_id\": \"ddc70950942a1e4ef4226443e32debcc1f7b2b41c80f294a65d0db87075536d6\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"49ec0d18e64c929f2fc1127c01c179cf948c13f5e18d90210bb98a50896d003c\", \"media_type\": \"application/json\"}, {\"artifact_id\": \"697fd5d64c7a6994400362950391ded57677c9876e70ca4d69a06da86c79ed00\", \"media_type\": \"application/json\"}], \"expected_observation\": \"One independent full-horizon replay reports terminal position error at or below 0.01 m, holding-window position error at or below 0.01 m, and holding-window speed at or below 0.03 m/s under the frozen acceptance calculation. This is plausible because the saved finite native search recorded 0.003452366584264502 m terminal error, 0.004096331370682971 m maximum holding position error, and 0.028321836968032563 m/s maximum holding speed, with speed as the narrowest sampled margin.\", \"weakening_observation\": \"The hypothesis is weakened if the replay is complete and applicable but any frozen constraint fails, especially if holding speed exceeds 0.03 m/s near the end of the horizon; an incomplete, identity-mismatched, or inapplicable replay is unresolved rather than evidence of infeasibility.\", \"fixed_conditions\": \"Keep candidate 697fd5d64c7a6994400362950391ded57677c9876e70ca4d69a06da86c79ed00 unchanged; use frozen task bf7-shared-reach-v1-positive_high, target [0.285,0.035,0.185] m, standardized all-zero candidate state at 0 s, the exact complete saved schedule 49ec0d18e64c929f2fc1127c01c179cf948c13f5e18d90210bb98a50896d003c, tendon order tendon_0 through tendon_5, 0\\u20138 N bounds, 0.02 s control period, and the full 0.6 s task horizon. Do not alter geometry, material properties, routing, initialization, control values, task thresholds, or sampling protocol.\", \"stopping_condition\": \"Stop after one fresh, completed, applicable independent replay and record pass or the first identified frozen-constraint failure; do not add repetitions or redesign within this decision.\", \"interpretation\": \"The existing result is a finite sampled model observation and does not itself establish task acceptance. The next informative decision is therefore an exact independent full-horizon replay rather than further local sensitivity analysis or structural modification. A pass would support acceptance only for the bound candidate, task, initialization, and saved schedule, with repeatability and robustness still unassessed. A failure would localize the discrepancy by constraint and time but would not establish structural infeasibility.\", \"physical_replay\": {\"candidate\": {\"artifact_id\": \"697fd5d64c7a6994400362950391ded57677c9876e70ca4d69a06da86c79ed00\", \"media_type\": \"application/json\"}, \"source\": {\"artifact_id\": \"49ec0d18e64c929f2fc1127c01c179cf948c13f5e18d90210bb98a50896d003c\", \"media_type\": \"application/json\"}, \"passive_ablation\": null, \"initial_state_result\": null, \"initial_state_episode\": null, \"validation_source\": null}}"
+    }
+  }
+}

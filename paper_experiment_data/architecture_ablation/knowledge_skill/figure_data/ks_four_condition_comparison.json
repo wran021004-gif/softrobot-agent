@@ -1,0 +1,2281 @@
+{
+  "experiment": "E1_complete_four_Main_LLM_conditions",
+  "tasks": {
+    "T04": {
+      "conditions": {
+        "K-S-": {
+          "decision": {
+            "action": "generate",
+            "hypothesis": "The key research question is whether a simple two-segment candidate with four independently actuated, evenly distributed external tendons spanning both segments is a suitable first structure for later equilibrium, capability, and figure-eight tracking assessment. The next research route is to generate exactly this candidate because no current scientific candidate exists, the task requires four independent channels, and transverse figure-eight motion plausibly requires antagonistic actuation in both cross-sectional directions. No archived experience was supplied, so none is used. No registered mathematical method needs to be consulted before this construction step; such methods require a concrete candidate. The proposed scientific action is one serial-family generation request retaining the supplied baseline segment geometry and material properties while adding one four-tendon consecutive span across both segments.",
+            "supporting_evidence": [],
+            "expected_observation": "Generation is expected to return a candidate-owned two-segment structure with four distinct independently actuated tendons routed in one evenly spaced consecutive span across segments 0 and 1, with all requested values inside the frozen family bounds. This would provide a concrete candidate for later initial-state qualification and scoped capability diagnosis, but would not demonstrate equilibrium, feasibility, tracking performance, or acceptance.",
+            "weakening_observation": "The hypothesis would be weakened if generation rejects the requested topology, cannot create four distinct valid full-span routes, reports a family-bound or routing-clearance violation, or returns a structure without four independent candidate-owned actuation channels. Subsequent qualified evidence showing inadequate transverse authority or inability to remain within the frozen tension limits would also weaken the rationale, although this generation action will not produce such evidence.",
+            "fixed_conditions": "Keep the frozen T04 figure-eight task, environment, gravity, mount, rigid tool, timing, evaluator, initial-state semantics, tension limits, actuator semantics, and serial_external_tendons_base_only_v1 family unchanged. Retain two segments with the supplied baseline lengths, Young's moduli, section shapes, dimensions, and orientations. Use exactly four tendons with equal angular spacing in one consecutive span covering segments 0 and 1, the family-default routing radius and endpoint, and an interior pretension. Do not infer present executability, equilibrium, controller compatibility, numerical feasibility, or task acceptance from generation success.",
+            "stopping_condition": "Stop after one schema-valid generation request returns either a candidate artifact or a generation rejection. Do not launch mathematical analysis, initial-state construction, control search, NMPC execution, physical replay, or selection in this decision. If construction is rejected, a future decision should diagnose the reported issue rather than alter the frozen task or infer infeasibility.",
+            "interpretation": "This is a scoped first-candidate generation decision rather than a feasibility or tracking claim. The four-channel full-span arrangement is a low-complexity topology aligned with the frozen requirement for four independent channels and bidirectional transverse motion. Retaining baseline structural values avoids adding unsupported design complexity. No historical experience was delivered, and therefore none is cited or assigned an experience disposition. Existing registered mathematical methods need not be consulted for this step because there is no candidate to analyze; after successful generation, a future decision should determine whether qualified equilibrium and scoped capability evidence justify control search. A valid candidate would support that next diagnosis, while generation failure or later evidence of inadequate motion authority would motivate a scoped routing or structural revision.",
+            "generation": {
+              "version": "serial_family_generation_v1",
+              "family_space_identity": "serial_external_tendons_base_only_v1",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 4,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.018,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 7200000.0,
+                  "sections": [
+                    {
+                      "kind": "ellipse",
+                      "parameters": {
+                        "semi_y_m": 0.0095,
+                        "semi_z_m": 0.0076
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.35
+                    }
+                  ]
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 5400000.0,
+                  "sections": [
+                    {
+                      "kind": "rectangle",
+                      "parameters": {
+                        "height_z_m": 0.0095,
+                        "width_y_m": 0.0133
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": -0.25
+                    },
+                    {
+                      "kind": "rectangle",
+                      "parameters": {
+                        "height_z_m": 0.008549999999999999,
+                        "width_y_m": 0.0114
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.15000000000000002
+                    }
+                  ]
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "length_servo_gain_n_m": 900.0,
+                "pretension_n": 0.6,
+                "force_limit_n": 8.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "route_overrides": {}
+            },
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "T04_first_four_channel_full_span_candidate",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v1 polar consecutive full-span four-tendon generation without prior mathematical consultation",
+              "selected_variables": [
+                "segment_count",
+                "tendon_count",
+                "tendon_span",
+                "tendon_phase_rad",
+                "tendon_radius_m",
+                "tendon_pretension_n"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1
+            }
+          },
+          "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/10fe9d9a-ad75-45f0-a77b-5b8c4026681b/result.json",
+          "session_id": "10fe9d9a-ad75-45f0-a77b-5b8c4026681b",
+          "evaluation": {
+            "label": "A",
+            "scores": {
+              "decision_quality": 4,
+              "evidence_consistency": 4,
+              "historical_experience_utilization": 0,
+              "research_actionability": 4
+            },
+            "knowledge_observations": {
+              "historical_facts": "not_observed",
+              "historical_conclusions": "not_observed",
+              "reasonable_route": "observed",
+              "avoids_known_ineffective_attempts": "not_observed"
+            },
+            "skill_observations": {
+              "workflow": "not_observed",
+              "structure_consistency": "observed",
+              "initial_state_and_control_seed": "not_observed",
+              "critical_constraints": "observed"
+            },
+            "experience_integration": "No identifiable historical fact or procedure is positively used. The generation rationale instead follows the frozen four-channel requirement and legal baseline geometry.",
+            "invalid_research_actions": [],
+            "strengths": [
+              "Provides a concrete, bounded generation request with legal lengths, routing radius, tendon count and material values.",
+              "Separates candidate generation from equilibrium, controller compatibility and acceptance.",
+              "Names useful immediate rejection observations and stops after one attempt."
+            ],
+            "weaknesses": [
+              "Does not develop the candidate-owned construction, independent qualification and control-seeding workflow beyond a general later assessment."
+            ],
+            "evidence_specific_rationale": "This is an appropriate first action at a checkpoint without a candidate. Four full-span tendons and two baseline segments are justified without claiming transverse authority is established. Historical utilization is absent, but that does not reduce the quality of the scoped generation decision."
+          }
+        },
+        "K+S-": {
+          "decision": {
+            "action": "generate",
+            "hypothesis": "The key research question is whether a legal two-segment structure with four independent, equally spaced tendons spanning both segments can provide a suitable current candidate for the frozen T04 figure-eight task. The next route is to generate that minimal antagonistic structure first, then, in future decisions, construct and separately qualify its native equilibrium before attempting equilibrium-continuation feedforward and complete physical replay. The supplied T04 historical experience supports this procedural route but supplies no current feasibility or acceptance credit.",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "T04-H1-legal-two-segment-four-tendon-candidate",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v2 polar_consecutive_spans_v1",
+              "selected_variables": [
+                "segment_count",
+                "tendon_count",
+                "tendon_span",
+                "routing_radius_m",
+                "segment_lengths_m",
+                "segment_young_pa"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1
+            },
+            "generation": {
+              "version": "serial_family_generation_v2",
+              "family_space_identity": "serial_external_tendons_base_only_v1",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 4,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.018,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 7200000.0,
+                  "sections": null,
+                  "cells": 12,
+                  "physical_parameters": {},
+                  "interpolation": "step"
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 5400000.0,
+                  "sections": null,
+                  "cells": 12,
+                  "physical_parameters": {},
+                  "interpolation": "linear"
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "length_servo_gain_n_m": 900.0,
+                "pretension_n": 0.2,
+                "force_limit_n": 8.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "route_overrides": {},
+              "controller_recipe": {},
+              "controller_solver": {},
+              "payout_lengths_m": {},
+              "payout_offsets_m": {},
+              "guide_hole_positions_m": {}
+            },
+            "supporting_evidence": [],
+            "expected_observation": "The concrete proposed action is generation of one candidate-owned, executable two-segment structure with exactly four independent tendon channels, consecutive full-length spans, and family-legal dimensions and routing. A successful generation should return a candidate that can later be subjected to native equilibrium construction and qualification; it would not establish equilibrium, controllability, tracking quality, or task acceptance.",
+            "weakening_observation": "The hypothesis is weakened immediately if generation rejects the topology, routing, clearances, channel independence, or any declared value. After generation, failure to construct and qualify a balanced initial state, inability to obtain interior bounded tension references along the path, or a complete replay violating tracking, cycle drift, lobe, speed, stroke, warning, contact, or tension requirements would further weaken or refute the proposed structure-and-feedforward route.",
+            "fixed_conditions": "Keep the supplied frozen T04 task, gravity, mount, payload and pointer, timing, reference path, initial-state semantics, evaluator thresholds, signal requirements, family identity, executable topology limits, and physical tension bounds unchanged. Historical outcomes are guidance only and will not be transferred. No current candidate or current scientific evidence exists. The existing native-equilibrium reference-bank method should be consulted before a later construction decision; the archived recommendation to consult it is adopted, but that method resource was not delivered here and is not claimed as read.",
+            "stopping_condition": "End this scoped action after one schema-valid generation attempt. If generation succeeds, retain that returned structure as the sole candidate for a future equilibrium-construction decision without claiming scientific success. If generation is rejected or produces an invalid structure, stop this route and diagnose the reported generation failure before proposing another design. Eventual pursuit of this route should stop upon fresh complete task acceptance or upon candidate-specific evidence showing that qualified initialization or bounded full-path tracking cannot be achieved within the remaining budgets.",
+            "interpretation": "This is a deliberately minimal generation decision rather than control execution. Four antagonistic channels match the task's independent-channel requirement, while two legal segments preserve approximately the historically useful overall reach without copying the historical out-of-domain single-segment hardware. The supplied expert history, method-selection guidance, and phase/preload guidance are used only to choose the sequence: legal structure first, then native equilibrium construction with interior tension search, independent initial qualification, schedule binding, and full replay. Those later steps are plans, not completed work. The registered initial-state interfaces will be used only after a candidate exists, and the recommended native-equilibrium reference-bank method needs consultation before selecting its concrete request. Current feasibility, executable admission, equilibrium quality, and acceptance remain unknown until fresh candidate-specific results are produced.",
+            "experience_disposition": {
+              "expert-t04-history@1": "adopted",
+              "expert-t04-method-selection@1": "adopted",
+              "expert-t04-phase-and-preload@1": "adopted"
+            }
+          },
+          "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/f962ce0d-cc86-4c5b-ae2d-6a8579115b07/result.json",
+          "session_id": "f962ce0d-cc86-4c5b-ae2d-6a8579115b07",
+          "evaluation": {
+            "label": "C",
+            "scores": {
+              "decision_quality": 4,
+              "evidence_consistency": 4,
+              "historical_experience_utilization": 3,
+              "research_actionability": 4
+            },
+            "knowledge_observations": {
+              "historical_facts": "observed",
+              "historical_conclusions": "observed",
+              "reasonable_route": "observed",
+              "avoids_known_ineffective_attempts": "observed"
+            },
+            "skill_observations": {
+              "workflow": "observed",
+              "structure_consistency": "observed",
+              "initial_state_and_control_seed": "observed",
+              "critical_constraints": "observed"
+            },
+            "experience_integration": "Uses the historical reach and feedforward guidance to select legal two-segment geometry, then proposes interior-tension construction, independent qualification, binding and full replay. Historical outcomes remain guidance rather than current evidence.",
+            "invalid_research_actions": [],
+            "strengths": [
+              "Preserves legal segment lengths and routing while avoiding historical hardware transfer.",
+              "Explicitly retains a fresh candidate identity and separates generation, initialization and physical acceptance.",
+              "Identifies bank feasibility and full-path constraint failures as refuting observations."
+            ],
+            "weaknesses": [
+              "The serial_family_generation_v2 request and null-section inheritance are executable assumptions not verified by the supplied generation schemas.",
+              "The downstream plan does not specify reference-bank sampling or transfer of returned tension knots into control."
+            ],
+            "evidence_specific_rationale": "The physical design and prospective route are grounded and comparable to B. The unverified generation version is not a proven invalid action. Historical procedure is meaningfully used, but the detailed bank ownership and control-transfer steps remain unspecified."
+          }
+        },
+        "K-S+": {
+          "decision": {
+            "action": "generate",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "t04-four-channel-full-span-baseline-001",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v1 polar_consecutive_spans_v1",
+              "selected_variables": [
+                "segment_count",
+                "tendon_count",
+                "full-span tendon routing",
+                "tendon phase",
+                "routing radius",
+                "segment lengths",
+                "segment stiffnesses",
+                "tendon pretension",
+                "tendon force limit"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1
+            },
+            "hypothesis": "The key research question is whether the frozen two-segment serial structure with four evenly spaced full-span tendons can provide the four independent channels and bidirectional transverse authority needed for the frozen figure-eight task while retaining a qualifiable native equilibrium. The next research route is to generate one simple candidate using the supplied segment prototypes and four symmetric tendons spanning both segments. This route is preferred because it directly matches the required independent-channel count, offers antagonistic actuation in both transverse directions, remains inside the executable topology scope, and avoids unsupported complexity. The concrete proposed scientific action is candidate generation only; it makes no claim of feasibility, equilibrium qualification, tracking performance, or acceptance.",
+            "supporting_evidence": [],
+            "expected_observation": "The immediate expected result is one candidate-owned configuration containing two serial segments and four distinct, evenly spaced tendons routed across both segments at 0.018 m radius, with 0.2 N pretension and 8 N force limits. If generation succeeds, future work should construct and independently qualify its native initial state before initializing any absolute-tension schedule. Later support for the hypothesis would require a qualified equilibrium, sufficient trajectory reach without invalid tension behavior, and a complete replay that passes every original acceptance requirement.",
+            "weakening_observation": "The hypothesis would be weakened by generation rejection, invalid routing or clearance, failure to create four distinct actuator channels, inability to construct and independently qualify equilibrium, inadequate reach in either transverse direction, persistent use of tension bounds incompatible with valid tracking, numerical failure, missing required signals, or a later complete replay that violates any tracking, lobe, drift, speed, tension, warning, contact, or static-balance requirement.",
+            "fixed_conditions": "Keep the canonical T04 task, gravity, mount, rigid tool, timing and evaluation grid, qualified-candidate-equilibrium initial-state semantics, original hard tension and tracking limits, serial_external_tendons_base_only_v1 family, straight frictionless tendon model, native collision policy, and supplied two-segment prototype geometry fixed. Only the explicitly requested candidate topology is generated. No historical state, control schedule, feasibility result, or acceptance status transfers.",
+            "stopping_condition": "Stop this proposed action after exactly one candidate is returned or the generation request fails. Do not execute physics or infer feasibility from successful generation. If generation succeeds, the next decision should address candidate-specific native equilibrium construction and qualification. If it fails or reports invalid topology, diagnose that result before another design change.",
+            "interpretation": "The decision addresses whether the minimum topology aligned with the task's four-channel requirement is worth advancing. It chooses one bounded generation rather than premature control search, simulation, or greater structural complexity. The delivered skill-native-equilibrium-reference-bank@1 is adopted for the planned post-generation route: use the registered native initial-state construction interface, inspect returned residuals and errors, independently qualify time zero, initialize compact absolute-tension knots, and only later request an independent complete replay. The delivered skill-native-equilibrium-reference@1 is context only because it reinforces the separation between construction, qualification, and task acceptance. Neither resource provides historical measurements or current feasibility. No existing mathematical research method needs consultation before this generation because no scientific candidate yet exists; candidate-specific mathematical analysis remains optional afterward. The registered initial-state method will need to be consulted and used before any physical validation. Generation would establish candidate identity only. Generation failure, qualification failure, inadequate reach, invalid tensions, or failure of any complete-task acceptance criterion would weaken or refute the working hypothesis.",
+            "generation": {
+              "version": "serial_family_generation_v1",
+              "family_space_identity": "serial_external_tendons_base_only_v1",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 4,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.018,
+                  "guide_s": null,
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 7200000.0,
+                  "sections": null
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 5400000.0,
+                  "sections": null
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "length_servo_gain_n_m": 900.0,
+                "pretension_n": 0.2,
+                "force_limit_n": 8.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "route_overrides": {}
+            },
+            "next_step": "diagnose",
+            "experience_disposition": {
+              "skill-native-equilibrium-reference-bank@1": "adopted",
+              "skill-native-equilibrium-reference@1": "context_only"
+            }
+          },
+          "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/4afdde5b-6e0f-4e46-9e03-4f1434e7e0d4/result.json",
+          "session_id": "4afdde5b-6e0f-4e46-9e03-4f1434e7e0d4",
+          "evaluation": {
+            "label": "D",
+            "scores": {
+              "decision_quality": 4,
+              "evidence_consistency": 4,
+              "historical_experience_utilization": 3,
+              "research_actionability": 4
+            },
+            "knowledge_observations": {
+              "historical_facts": "not_observed",
+              "historical_conclusions": "observed",
+              "reasonable_route": "observed",
+              "avoids_known_ineffective_attempts": "observed"
+            },
+            "skill_observations": {
+              "workflow": "observed",
+              "structure_consistency": "observed",
+              "initial_state_and_control_seed": "observed",
+              "critical_constraints": "observed"
+            },
+            "experience_integration": "Applies identifiable R3/R4 procedures: inspect native construction residuals and errors, independently qualify time zero, initialize absolute-tension knots and require independent complete replay. It does not use historical numerical results or claim present feasibility.",
+            "invalid_research_actions": [],
+            "strengths": [
+              "Proposes a simple legal four-channel candidate with explicit immediate and downstream failure observations.",
+              "Uses the separation of construction, qualification and physical acceptance rather than treating a numerical result as acceptance.",
+              "Preserves original timing, evaluation grid and qualified-initial-state semantics."
+            ],
+            "weaknesses": [
+              "Does not explicitly bind an owned qualification or establish that control knots come from the candidate's returned reference bank.",
+              "Null guide and section defaults require interface confirmation; their resolution is not established here."
+            ],
+            "evidence_specific_rationale": "The scoped generation decision is sound. Its historical utilization is procedural rather than numerical and deserves credit independently of citations. The downstream route is mostly grounded, although bank construction, qualification binding and knot provenance are not fully connected."
+          }
+        },
+        "K+S+": {
+          "decision": {
+            "action": "generate",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "T04-H1-legal-four-channel-two-segment-basis",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "Generate a legal two-segment candidate with four antagonistic tendon channels",
+              "selected_variables": [
+                "segment_count",
+                "tendon_count",
+                "tendon_span",
+                "tendon_phase_rad",
+                "tendon_radius_m",
+                "segment_lengths_m",
+                "segment_sections",
+                "segment_young_pa",
+                "tendon_pretension_n"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1
+            },
+            "next_step": "diagnose",
+            "hypothesis": "The key research question is whether the frozen serial family can instantiate a simple legal two-segment structure with four independent antagonistic tendon channels suitable for later native equilibrium-bank construction and figure-eight evaluation. The next route is to generate one candidate from the supplied two-segment prototypes with four equally spaced tendons spanning both segments. This route is preferred because the delivered T04 history supports four-channel slow native feedforward as a prospective strategy, while its historical 0.27 m single-segment hardware exceeds the current root-segment bound and cannot be transferred. The concrete proposed scientific action is candidate generation only. No equilibrium, control, simulation, replay, feasibility, or acceptance claim is included.",
+            "supporting_evidence": [],
+            "expected_observation": "Core is expected to return one fresh candidate-owned configuration containing two legal segments and four independent, equally spaced tendons spanning segments 0 and 1 at a legal routing radius. All requested lengths, material values, section dimensions, tendon properties, and counts should remain within the frozen family. If generated, the candidate would provide an owned identity for a later plan to construct and separately qualify a native equilibrium bank before control initialization and complete replay.",
+            "weakening_observation": "The hypothesis would be weakened if generation rejects the topology or geometry, fails to provide four independent channels, reports invalid routing or clearance, or cannot instantiate the supplied two-segment prototypes within the frozen family. In later work, failure of native equilibrium construction or qualification, excessive bank residual or target error, or complete replay violations of any original tracking, drift, lobe, speed, stroke, warning, contact, or tension requirement would further weaken or refute the broader feedforward hypothesis. Historical success and successful generation would not override fresh failures.",
+            "fixed_conditions": "Preserve the frozen T04 task, timing, gravity, mount, payload tool, evaluator, initial-state semantics, acceptance limits, serial_external_tendons_base_only_v1 family, straight frictionless tendon model, and independent tension channels. Retain the supplied segment lengths, sections, material values, and control weights. Do not transfer historical structure state, schedules, feasibility, measurements, or acceptance.",
+            "stopping_condition": "Stop this proposed step when Core either returns one schema-valid fresh candidate or rejects the generation request. Do not infer equilibrium, tracking, feasibility, or acceptance from generation. If a candidate is returned, the next decision must use its owned identity and inspect it before planning native equilibrium construction. If generation is rejected or violates the frozen family declaration, revise the design rather than proceeding to control or replay.",
+            "interpretation": "This is a scoped first-candidate generation decision. The delivered expert-t04-history@1 and expert-t04-method-selection@1 are adopted only for the route choice: use legal two-segment geometry and investigate native quasistatic feedforward before more complex control routes. skill-native-equilibrium-reference-bank@1 and expert-t04-phase-and-preload@1 are adopted as future procedural guidance: after generation, the plan should use the registered constructor, inspect the returned bank, independently qualify time zero, and only then initialize control and request a complete independent replay with interior tensions. The existing native-equilibrium method therefore needs to be consulted after a candidate exists; no registered mathematical analysis is needed before this generation step. The historical numerical results provide no current scientific credit.",
+            "generation": {
+              "version": "serial_family_generation_v1",
+              "family_space_identity": "serial_external_tendons_base_only_v1@serial_family_space_v2",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 4,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.018,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 7200000.0,
+                  "sections": [
+                    {
+                      "kind": "ellipse",
+                      "parameters": {
+                        "semi_y_m": 0.0095,
+                        "semi_z_m": 0.0076
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.35
+                    }
+                  ]
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 5400000.0,
+                  "sections": [
+                    {
+                      "kind": "rectangle",
+                      "parameters": {
+                        "height_z_m": 0.0095,
+                        "width_y_m": 0.0133
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": -0.25
+                    },
+                    {
+                      "kind": "rectangle",
+                      "parameters": {
+                        "height_z_m": 0.00855,
+                        "width_y_m": 0.0114
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.15
+                    }
+                  ]
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "length_servo_gain_n_m": 900.0,
+                "pretension_n": 0.2,
+                "force_limit_n": 8.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "route_overrides": {}
+            },
+            "experience_disposition": {
+              "expert-t04-history@1": "adopted",
+              "expert-t04-method-selection@1": "adopted",
+              "skill-native-equilibrium-reference-bank@1": "adopted",
+              "expert-t04-phase-and-preload@1": "adopted"
+            }
+          },
+          "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/cc450f31-34b8-4928-8122-60e3863d3136/result.json",
+          "session_id": "cc450f31-34b8-4928-8122-60e3863d3136",
+          "evaluation": {
+            "label": "B",
+            "scores": {
+              "decision_quality": 4,
+              "evidence_consistency": 4,
+              "historical_experience_utilization": 3,
+              "research_actionability": 4
+            },
+            "knowledge_observations": {
+              "historical_facts": "observed",
+              "historical_conclusions": "observed",
+              "reasonable_route": "observed",
+              "avoids_known_ineffective_attempts": "observed"
+            },
+            "skill_observations": {
+              "workflow": "observed",
+              "structure_consistency": "observed",
+              "initial_state_and_control_seed": "observed",
+              "critical_constraints": "observed"
+            },
+            "experience_integration": "Connects the historical four-channel quasistatic route and illegal 0.27 m root design to fresh legal two-segment generation. Uses bank inspection, independent time-zero qualification and complete replay as prospective gates, without transferring historical acceptance.",
+            "invalid_research_actions": [],
+            "strengths": [
+              "Correctly transfers the historical procedure rather than the out-of-domain single-segment hardware.",
+              "Specifies legal baseline geometry and four independent full-span channels.",
+              "Plans candidate-owned equilibrium work, interior tensions and complete original acceptance checks."
+            ],
+            "weaknesses": [
+              "The downstream outline does not explicitly specify owned qualification binding or initialization from returned bank knots.",
+              "The version-qualified family identity's interface acceptance is unverified from the supplied schemas."
+            ],
+            "evidence_specific_rationale": "The next action is as well justified and informative as A's, with additional identifiable historical integration. Its procedural use is substantial but not fully specified: R4/R5 are translated into several gates, not the complete bank-to-bound-control workflow. The generation pretension of 0.2 N is not itself a proposal to accept a saturated trajectory."
+          }
+        }
+      },
+      "results": [
+        {
+          "task_id": "T04",
+          "condition": "K-S-",
+          "knowledge_on": false,
+          "skill_on": false,
+          "origin": "Main_LLM_decision_replay",
+          "historical_reference_only": false,
+          "frozen_inputs_and_requested_settings_match": true,
+          "temporal_backend_matching": "Unverified: new K+S+ acquired later; Gateway default reasoning/backend revision not exposed.",
+          "anonymous_label": "A",
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 0,
+          "research_actionability": 4,
+          "mean_of_four_scores": 3,
+          "decision_quality_delta_vs_KminusSminus": 0,
+          "evidence_consistency_delta_vs_KminusSminus": 0,
+          "historical_experience_utilization_delta_vs_KminusSminus": 0,
+          "research_actionability_delta_vs_KminusSminus": 0,
+          "invalid_research_actions_count": 0,
+          "invalid_research_actions": [],
+          "invalid_action_scope": "Independent review of final proposed decision; parsing and future execution admission are separate.",
+          "schema_or_parse_repairs": 1,
+          "knowledge_observations": {
+            "historical_facts": "not_observed",
+            "historical_conclusions": "not_observed",
+            "reasonable_route": "observed",
+            "avoids_known_ineffective_attempts": "not_observed"
+          },
+          "skill_observations": {
+            "workflow": "not_observed",
+            "structure_consistency": "observed",
+            "initial_state_and_control_seed": "not_observed",
+            "critical_constraints": "observed"
+          },
+          "experience_integration": "No identifiable historical fact or procedure is positively used. The generation rationale instead follows the frozen four-channel requirement and legal baseline geometry.",
+          "evidence_specific_rationale": "This is an appropriate first action at a checkpoint without a candidate. Four full-span tendons and two baseline segments are justified without claiming transverse authority is established. Historical utilization is absent, but that does not reduce the quality of the scoped generation decision.",
+          "action": "generate",
+          "selected_method": "serial_family_generation_v1 polar consecutive full-span four-tendon generation without prior mathematical consultation",
+          "experience_entries_delivered": [],
+          "provider_requests": 2,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "context_token_estimate": 13695,
+          "cumulative_full_wire_input_token_estimate": 29044,
+          "decision_source_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/10fe9d9a-ad75-45f0-a77b-5b8c4026681b/result.json",
+          "decision_json_pointer": "/decision",
+          "raw_decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/10fe9d9a-ad75-45f0-a77b-5b8c4026681b/response_2.txt#/choices/0/message/content",
+          "score_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T04/independent_model_review.json",
+          "judge_model": "gpt-6-astra",
+          "human_verification": "pending",
+          "interpretation_limit": "One Main decision per cell, one joint independent-model review/task; no significance, population synergy or robot-success claim."
+        },
+        {
+          "task_id": "T04",
+          "condition": "K+S-",
+          "knowledge_on": true,
+          "skill_on": false,
+          "origin": "Main_LLM_decision_replay",
+          "historical_reference_only": false,
+          "frozen_inputs_and_requested_settings_match": true,
+          "temporal_backend_matching": "Unverified: new K+S+ acquired later; Gateway default reasoning/backend revision not exposed.",
+          "anonymous_label": "C",
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 3,
+          "research_actionability": 4,
+          "mean_of_four_scores": 3.75,
+          "decision_quality_delta_vs_KminusSminus": 0,
+          "evidence_consistency_delta_vs_KminusSminus": 0,
+          "historical_experience_utilization_delta_vs_KminusSminus": 3,
+          "research_actionability_delta_vs_KminusSminus": 0,
+          "invalid_research_actions_count": 0,
+          "invalid_research_actions": [],
+          "invalid_action_scope": "Independent review of final proposed decision; parsing and future execution admission are separate.",
+          "schema_or_parse_repairs": 0,
+          "knowledge_observations": {
+            "historical_facts": "observed",
+            "historical_conclusions": "observed",
+            "reasonable_route": "observed",
+            "avoids_known_ineffective_attempts": "observed"
+          },
+          "skill_observations": {
+            "workflow": "observed",
+            "structure_consistency": "observed",
+            "initial_state_and_control_seed": "observed",
+            "critical_constraints": "observed"
+          },
+          "experience_integration": "Uses the historical reach and feedforward guidance to select legal two-segment geometry, then proposes interior-tension construction, independent qualification, binding and full replay. Historical outcomes remain guidance rather than current evidence.",
+          "evidence_specific_rationale": "The physical design and prospective route are grounded and comparable to B. The unverified generation version is not a proven invalid action. Historical procedure is meaningfully used, but the detailed bank ownership and control-transfer steps remain unspecified.",
+          "action": "generate",
+          "selected_method": "serial_family_generation_v2 polar_consecutive_spans_v1",
+          "experience_entries_delivered": [
+            "expert-t04-history@1",
+            "expert-t04-method-selection@1",
+            "expert-t04-phase-and-preload@1"
+          ],
+          "provider_requests": 1,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "context_token_estimate": 18113,
+          "cumulative_full_wire_input_token_estimate": 18113,
+          "decision_source_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/f962ce0d-cc86-4c5b-ae2d-6a8579115b07/result.json",
+          "decision_json_pointer": "/decision",
+          "raw_decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/f962ce0d-cc86-4c5b-ae2d-6a8579115b07/response_1.txt#/choices/0/message/content",
+          "score_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T04/independent_model_review.json",
+          "judge_model": "gpt-6-astra",
+          "human_verification": "pending",
+          "interpretation_limit": "One Main decision per cell, one joint independent-model review/task; no significance, population synergy or robot-success claim."
+        },
+        {
+          "task_id": "T04",
+          "condition": "K-S+",
+          "knowledge_on": false,
+          "skill_on": true,
+          "origin": "Main_LLM_decision_replay",
+          "historical_reference_only": false,
+          "frozen_inputs_and_requested_settings_match": true,
+          "temporal_backend_matching": "Unverified: new K+S+ acquired later; Gateway default reasoning/backend revision not exposed.",
+          "anonymous_label": "D",
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 3,
+          "research_actionability": 4,
+          "mean_of_four_scores": 3.75,
+          "decision_quality_delta_vs_KminusSminus": 0,
+          "evidence_consistency_delta_vs_KminusSminus": 0,
+          "historical_experience_utilization_delta_vs_KminusSminus": 3,
+          "research_actionability_delta_vs_KminusSminus": 0,
+          "invalid_research_actions_count": 0,
+          "invalid_research_actions": [],
+          "invalid_action_scope": "Independent review of final proposed decision; parsing and future execution admission are separate.",
+          "schema_or_parse_repairs": 1,
+          "knowledge_observations": {
+            "historical_facts": "not_observed",
+            "historical_conclusions": "observed",
+            "reasonable_route": "observed",
+            "avoids_known_ineffective_attempts": "observed"
+          },
+          "skill_observations": {
+            "workflow": "observed",
+            "structure_consistency": "observed",
+            "initial_state_and_control_seed": "observed",
+            "critical_constraints": "observed"
+          },
+          "experience_integration": "Applies identifiable R3/R4 procedures: inspect native construction residuals and errors, independently qualify time zero, initialize absolute-tension knots and require independent complete replay. It does not use historical numerical results or claim present feasibility.",
+          "evidence_specific_rationale": "The scoped generation decision is sound. Its historical utilization is procedural rather than numerical and deserves credit independently of citations. The downstream route is mostly grounded, although bank construction, qualification binding and knot provenance are not fully connected.",
+          "action": "generate",
+          "selected_method": "serial_family_generation_v1 polar_consecutive_spans_v1",
+          "experience_entries_delivered": [
+            "skill-native-equilibrium-reference@1",
+            "skill-native-equilibrium-reference-bank@1"
+          ],
+          "provider_requests": 2,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "context_token_estimate": 15146,
+          "cumulative_full_wire_input_token_estimate": 31922,
+          "decision_source_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/4afdde5b-6e0f-4e46-9e03-4f1434e7e0d4/result.json",
+          "decision_json_pointer": "/decision",
+          "raw_decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/4afdde5b-6e0f-4e46-9e03-4f1434e7e0d4/response_2.txt#/choices/0/message/content",
+          "score_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T04/independent_model_review.json",
+          "judge_model": "gpt-6-astra",
+          "human_verification": "pending",
+          "interpretation_limit": "One Main decision per cell, one joint independent-model review/task; no significance, population synergy or robot-success claim."
+        },
+        {
+          "task_id": "T04",
+          "condition": "K+S+",
+          "knowledge_on": true,
+          "skill_on": true,
+          "origin": "Main_LLM_decision_replay",
+          "historical_reference_only": false,
+          "frozen_inputs_and_requested_settings_match": true,
+          "temporal_backend_matching": "Unverified: new K+S+ acquired later; Gateway default reasoning/backend revision not exposed.",
+          "anonymous_label": "B",
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 3,
+          "research_actionability": 4,
+          "mean_of_four_scores": 3.75,
+          "decision_quality_delta_vs_KminusSminus": 0,
+          "evidence_consistency_delta_vs_KminusSminus": 0,
+          "historical_experience_utilization_delta_vs_KminusSminus": 3,
+          "research_actionability_delta_vs_KminusSminus": 0,
+          "invalid_research_actions_count": 0,
+          "invalid_research_actions": [],
+          "invalid_action_scope": "Independent review of final proposed decision; parsing and future execution admission are separate.",
+          "schema_or_parse_repairs": 1,
+          "knowledge_observations": {
+            "historical_facts": "observed",
+            "historical_conclusions": "observed",
+            "reasonable_route": "observed",
+            "avoids_known_ineffective_attempts": "observed"
+          },
+          "skill_observations": {
+            "workflow": "observed",
+            "structure_consistency": "observed",
+            "initial_state_and_control_seed": "observed",
+            "critical_constraints": "observed"
+          },
+          "experience_integration": "Connects the historical four-channel quasistatic route and illegal 0.27 m root design to fresh legal two-segment generation. Uses bank inspection, independent time-zero qualification and complete replay as prospective gates, without transferring historical acceptance.",
+          "evidence_specific_rationale": "The next action is as well justified and informative as A's, with additional identifiable historical integration. Its procedural use is substantial but not fully specified: R4/R5 are translated into several gates, not the complete bank-to-bound-control workflow. The generation pretension of 0.2 N is not itself a proposal to accept a saturated trajectory.",
+          "action": "generate",
+          "selected_method": "Generate a legal two-segment candidate with four antagonistic tendon channels",
+          "experience_entries_delivered": [
+            "expert-t04-history@1",
+            "expert-t04-method-selection@1",
+            "skill-native-equilibrium-reference@1",
+            "skill-native-equilibrium-reference-bank@1",
+            "expert-t04-phase-and-preload@1"
+          ],
+          "provider_requests": 2,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "context_token_estimate": 19564,
+          "cumulative_full_wire_input_token_estimate": 40971,
+          "decision_source_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/cc450f31-34b8-4928-8122-60e3863d3136/result.json",
+          "decision_json_pointer": "/decision",
+          "raw_decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/cc450f31-34b8-4928-8122-60e3863d3136/response_2.txt#/choices/0/message/content",
+          "score_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T04/independent_model_review.json",
+          "judge_model": "gpt-6-astra",
+          "human_verification": "pending",
+          "interpretation_limit": "One Main decision per cell, one joint independent-model review/task; no significance, population synergy or robot-success claim."
+        }
+      ],
+      "token_costs": [
+        {
+          "task_id": "T04",
+          "condition": "K-S-",
+          "origin": "Main_LLM_decision_replay",
+          "session_id": "10fe9d9a-ad75-45f0-a77b-5b8c4026681b",
+          "model": "gpt-5.6-sol",
+          "acquisition_phase": "original_six_replays",
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "total_tokens_actual": null,
+          "actual_usage_status": "gateway_usage_missing_not_zero",
+          "provider_requests": 2,
+          "schema_or_parse_repairs": 1,
+          "initial_context_tokens_estimate": 13695,
+          "total_sent_input_full_wire_tokens_estimate": 29044,
+          "total_output_serialized_assistant_tokens_estimate": 2465,
+          "legacy_initial_visible_text_tokens_estimate": 12633,
+          "context_estimate_scope": "Complete wire JSON for every send; repeated context is counted repeatedly. Native tools are serialized inside the system prompt exactly as original E1.",
+          "estimate_basis": "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+          "wire_scope": "Reconstructed compact HTTPX json=wire serialization from original saved request object; original transport bytes were not separately captured.",
+          "effective_reasoning": "gateway_default_not_exposed",
+          "reporter_requests": 0,
+          "delivered_entry_keys": [],
+          "optional_experience_retrieve_calls": 0,
+          "experience_read_claim": "Entry bodies were preloaded on real Main wire. Optional retrieval calls are separate; no fabricated tool-read claim.",
+          "source_directory": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/10fe9d9a-ad75-45f0-a77b-5b8c4026681b"
+        },
+        {
+          "task_id": "T04",
+          "condition": "K+S-",
+          "origin": "Main_LLM_decision_replay",
+          "session_id": "f962ce0d-cc86-4c5b-ae2d-6a8579115b07",
+          "model": "gpt-5.6-sol",
+          "acquisition_phase": "original_six_replays",
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "total_tokens_actual": null,
+          "actual_usage_status": "gateway_usage_missing_not_zero",
+          "provider_requests": 1,
+          "schema_or_parse_repairs": 0,
+          "initial_context_tokens_estimate": 18113,
+          "total_sent_input_full_wire_tokens_estimate": 18113,
+          "total_output_serialized_assistant_tokens_estimate": 1113,
+          "legacy_initial_visible_text_tokens_estimate": 16899,
+          "context_estimate_scope": "Complete wire JSON for every send; repeated context is counted repeatedly. Native tools are serialized inside the system prompt exactly as original E1.",
+          "estimate_basis": "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+          "wire_scope": "Reconstructed compact HTTPX json=wire serialization from original saved request object; original transport bytes were not separately captured.",
+          "effective_reasoning": "gateway_default_not_exposed",
+          "reporter_requests": 0,
+          "delivered_entry_keys": [
+            "expert-t04-history@1",
+            "expert-t04-method-selection@1",
+            "expert-t04-phase-and-preload@1"
+          ],
+          "optional_experience_retrieve_calls": 0,
+          "experience_read_claim": "Entry bodies were preloaded on real Main wire. Optional retrieval calls are separate; no fabricated tool-read claim.",
+          "source_directory": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/f962ce0d-cc86-4c5b-ae2d-6a8579115b07"
+        },
+        {
+          "task_id": "T04",
+          "condition": "K-S+",
+          "origin": "Main_LLM_decision_replay",
+          "session_id": "4afdde5b-6e0f-4e46-9e03-4f1434e7e0d4",
+          "model": "gpt-5.6-sol",
+          "acquisition_phase": "original_six_replays",
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "total_tokens_actual": null,
+          "actual_usage_status": "gateway_usage_missing_not_zero",
+          "provider_requests": 2,
+          "schema_or_parse_repairs": 1,
+          "initial_context_tokens_estimate": 15146,
+          "total_sent_input_full_wire_tokens_estimate": 31922,
+          "total_output_serialized_assistant_tokens_estimate": 2366,
+          "legacy_initial_visible_text_tokens_estimate": 14017,
+          "context_estimate_scope": "Complete wire JSON for every send; repeated context is counted repeatedly. Native tools are serialized inside the system prompt exactly as original E1.",
+          "estimate_basis": "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+          "wire_scope": "Reconstructed compact HTTPX json=wire serialization from original saved request object; original transport bytes were not separately captured.",
+          "effective_reasoning": "gateway_default_not_exposed",
+          "reporter_requests": 0,
+          "delivered_entry_keys": [
+            "skill-native-equilibrium-reference@1",
+            "skill-native-equilibrium-reference-bank@1"
+          ],
+          "optional_experience_retrieve_calls": 0,
+          "experience_read_claim": "Entry bodies were preloaded on real Main wire. Optional retrieval calls are separate; no fabricated tool-read claim.",
+          "source_directory": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/4afdde5b-6e0f-4e46-9e03-4f1434e7e0d4"
+        },
+        {
+          "task_id": "T04",
+          "condition": "K+S+",
+          "origin": "Main_LLM_decision_replay",
+          "session_id": "cc450f31-34b8-4928-8122-60e3863d3136",
+          "model": "gpt-5.6-sol",
+          "acquisition_phase": "supplement_KplusSplus",
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "total_tokens_actual": null,
+          "actual_usage_status": "gateway_usage_missing_not_zero",
+          "provider_requests": 2,
+          "schema_or_parse_repairs": 1,
+          "initial_context_tokens_estimate": 19564,
+          "total_sent_input_full_wire_tokens_estimate": 40971,
+          "total_output_serialized_assistant_tokens_estimate": 2734,
+          "legacy_initial_visible_text_tokens_estimate": 18283,
+          "context_estimate_scope": "Complete wire JSON for every send; repeated context is counted repeatedly. Native tools are serialized inside the system prompt exactly as original E1.",
+          "estimate_basis": "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+          "wire_scope": "Exact bytes captured for new supplement.",
+          "effective_reasoning": "gateway_default_not_exposed",
+          "reporter_requests": 0,
+          "delivered_entry_keys": [
+            "expert-t04-history@1",
+            "expert-t04-method-selection@1",
+            "skill-native-equilibrium-reference@1",
+            "skill-native-equilibrium-reference-bank@1",
+            "expert-t04-phase-and-preload@1"
+          ],
+          "optional_experience_retrieve_calls": 0,
+          "experience_read_claim": "Entry bodies were preloaded on real Main wire. Optional retrieval calls are separate; no fabricated tool-read claim.",
+          "source_directory": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/cc450f31-34b8-4928-8122-60e3863d3136"
+        }
+      ],
+      "main_effects": [
+        {
+          "task_id": "T04",
+          "metric": "decision_quality",
+          "y00_KminusSminus": 4,
+          "y10_KplusSminus": 4,
+          "y01_KminusSplus": 4,
+          "y11_KplusSplus": 4,
+          "K_effect_at_Soff": 0,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 0,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 0.0,
+          "S_main_effect": 0.0,
+          "beta_K_plusminus1": 0.0,
+          "beta_S_plusminus1": 0.0,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T04",
+          "metric": "evidence_consistency",
+          "y00_KminusSminus": 4,
+          "y10_KplusSminus": 4,
+          "y01_KminusSplus": 4,
+          "y11_KplusSplus": 4,
+          "K_effect_at_Soff": 0,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 0,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 0.0,
+          "S_main_effect": 0.0,
+          "beta_K_plusminus1": 0.0,
+          "beta_S_plusminus1": 0.0,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T04",
+          "metric": "historical_experience_utilization",
+          "y00_KminusSminus": 0,
+          "y10_KplusSminus": 3,
+          "y01_KminusSplus": 3,
+          "y11_KplusSplus": 3,
+          "K_effect_at_Soff": 3,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 3,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 1.5,
+          "S_main_effect": 1.5,
+          "beta_K_plusminus1": 0.75,
+          "beta_S_plusminus1": 0.75,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T04",
+          "metric": "research_actionability",
+          "y00_KminusSminus": 4,
+          "y10_KplusSminus": 4,
+          "y01_KminusSplus": 4,
+          "y11_KplusSplus": 4,
+          "K_effect_at_Soff": 0,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 0,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 0.0,
+          "S_main_effect": 0.0,
+          "beta_K_plusminus1": 0.0,
+          "beta_S_plusminus1": 0.0,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T04",
+          "metric": "mean_of_four_scores",
+          "y00_KminusSminus": 3,
+          "y10_KplusSminus": 3.75,
+          "y01_KminusSplus": 3.75,
+          "y11_KplusSplus": 3.75,
+          "K_effect_at_Soff": 0.75,
+          "K_effect_at_Son": 0.0,
+          "S_effect_at_Koff": 0.75,
+          "S_effect_at_Kon": 0.0,
+          "K_main_effect": 0.375,
+          "S_main_effect": 0.375,
+          "beta_K_plusminus1": 0.1875,
+          "beta_S_plusminus1": 0.1875,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T04",
+          "metric": "invalid_research_actions_count",
+          "y00_KminusSminus": 0,
+          "y10_KplusSminus": 0,
+          "y01_KminusSplus": 0,
+          "y11_KplusSplus": 0,
+          "K_effect_at_Soff": 0,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 0,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 0.0,
+          "S_main_effect": 0.0,
+          "beta_K_plusminus1": 0.0,
+          "beta_S_plusminus1": 0.0,
+          "outcome_direction": "lower_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        }
+      ],
+      "interaction_effects": [
+        {
+          "task_id": "T04",
+          "metric": "decision_quality",
+          "interaction_difference_in_differences": 0,
+          "beta_KS_plusminus1": 0.0,
+          "K_effect_change_when_S_on": 0,
+          "S_effect_change_when_K_on": 0,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 0,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T04",
+          "metric": "evidence_consistency",
+          "interaction_difference_in_differences": 0,
+          "beta_KS_plusminus1": 0.0,
+          "K_effect_change_when_S_on": 0,
+          "S_effect_change_when_K_on": 0,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 0,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T04",
+          "metric": "historical_experience_utilization",
+          "interaction_difference_in_differences": -3,
+          "beta_KS_plusminus1": -0.75,
+          "K_effect_change_when_S_on": -3,
+          "S_effect_change_when_K_on": -3,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 3,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T04",
+          "metric": "research_actionability",
+          "interaction_difference_in_differences": 0,
+          "beta_KS_plusminus1": 0.0,
+          "K_effect_change_when_S_on": 0,
+          "S_effect_change_when_K_on": 0,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 0,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T04",
+          "metric": "mean_of_four_scores",
+          "interaction_difference_in_differences": -0.75,
+          "beta_KS_plusminus1": -0.1875,
+          "K_effect_change_when_S_on": -0.75,
+          "S_effect_change_when_K_on": -0.75,
+          "joint_minus_best_single": 0.0,
+          "joint_minus_neither": 0.75,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T04",
+          "metric": "invalid_research_actions_count",
+          "interaction_difference_in_differences": 0,
+          "beta_KS_plusminus1": 0.0,
+          "K_effect_change_when_S_on": 0,
+          "S_effect_change_when_K_on": 0,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 0,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        }
+      ],
+      "comparative_rationale": "All four propose essentially the same reasonable first scientific action: generate a legal two-segment, four-channel candidate and withhold feasibility or acceptance claims. They therefore receive equal next-action quality, consistency and actionability scores. A shows no identifiable historical utilization. B and C connect historical hardware limitations and quasistatic guidance to fresh generation; D instead integrates identifiable construction/qualification/replay procedures. B, C and D earn equal substantial but incomplete utilization credit because none fully specifies the candidate-owned bank-to-qualified-binding-to-returned-knot workflow. Interface defaults, version identifiers and parsing are not proof of task admission, but the supplied materials do not establish any concrete invalid action.",
+      "review_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T04/independent_model_review.json"
+    },
+    "T07": {
+      "conditions": {
+        "K-S-": {
+          "decision": {
+            "action": "generate",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "H1_baseline_four_tendon_shared_structure",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v1 baseline four-tendon construction",
+              "selected_variables": [
+                "segment_count",
+                "tendon_count",
+                "tendon_span",
+                "tendon_phase",
+                "routing_radius",
+                "pretension",
+                "force_limit"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1
+            },
+            "hypothesis": "The key research question is whether a minimally complex two-segment structure based on the supplied family prototypes and four symmetric full-length tendons is a suitable first scientific candidate for the three reach tasks and the position-plus-tool-axis task. The next research route is to generate that concrete candidate before seeking candidate-specific mathematical analysis or control execution. This route is chosen because no scientific candidate currently exists, the tasks require four independent channels, and four circumferential tendons offer directional bending authority without adding unsupported complexity. No archived experience was supplied or used. An existing registered mechanism-structure or nonlinear task-capability method should be consulted after the candidate exists, not before this initial construction. The concrete proposed scientific action is one serial_family_generation_v1 request with two prototype-based segments and four equally spaced tendons spanning both segments at the nominal routing radius, with zero pretension and family-default tendon properties.",
+            "supporting_evidence": [],
+            "expected_observation": "Generation is expected to return one candidate-owned two-segment structure with four distinct tendon entities, symmetric routes spanning both segments, zero tendon pretension, and values within the declared family domains. This would provide a concrete candidate for subsequent registered structural or task-capability analysis and later task-specific control assessment; it would not establish feasibility or acceptance.",
+            "weakening_observation": "The hypothesis would be weakened if generation rejects the requested two-segment span, produces anything other than four independent tendon entities, reports invalid routing or clearance, fails to preserve a valid serial assembly, or returns values outside the executable two-segment and four-tendon scope. Subsequent candidate-specific evidence of deficient directional authority, unreachable goals, numerical failure, geometric actuator-limit violations, or failure on any frozen task would further weaken the candidate-suitability hypothesis.",
+            "fixed_conditions": "Keep the frozen T07 family, serial assembly semantics, environment, mount, gravity, payload and rigid-tool properties, all four task goals, timing, seed, zero-DOF initializer, required four independent channels, zero initial tension, tension bounds, geometric tendon stroke and speed limits, and all acceptance thresholds unchanged. Use the supplied segment prototypes through their family defaults and change only the explicit generation variables. This action generates a candidate only and makes no claim of feasibility, acceptance, or executable admission.",
+            "stopping_condition": "Stop this proposed step when one schema-valid candidate artifact is returned. Do not automatically proceed to mathematical analysis, control work, physical replay, or selection. If generation is rejected or the result lacks the requested two-segment identity, four independent tendons, full two-segment spans, or zero pretension, stop this route and diagnose the generation failure before proposing another candidate.",
+            "interpretation": "Successful generation would mean only that the simplest task-aligned candidate has been instantiated within the declared family. It would support a later plan to consult an authorized registered mechanism-structure or nonlinear task-capability method, followed by task-specific control work if justified. It would not demonstrate current feasibility, transfer acceptance, or establish performance on any task. No historical measurements or archived experience are available. Failure or topology mismatch would refute this concrete construction route, not the broader family.",
+            "generation": {
+              "version": "serial_family_generation_v1",
+              "family_space_identity": "serial_external_tendons_base_only_v1",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 4,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.018,
+                  "guide_s": null,
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 7200000.0,
+                  "sections": null
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 5400000.0,
+                  "sections": null
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "length_servo_gain_n_m": 900.0,
+                "pretension_n": 0.0,
+                "force_limit_n": 8.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "route_overrides": {}
+            }
+          },
+          "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/439c18bd-9aa0-4fba-befd-4b65532cd8bd/result.json",
+          "session_id": "439c18bd-9aa0-4fba-befd-4b65532cd8bd",
+          "evaluation": {
+            "label": "B",
+            "scores": {
+              "decision_quality": 4,
+              "evidence_consistency": 4,
+              "historical_experience_utilization": 0,
+              "research_actionability": 4
+            },
+            "knowledge_observations": {
+              "historical_facts": "not_observed",
+              "historical_conclusions": "not_observed",
+              "reasonable_route": "observed",
+              "avoids_known_ineffective_attempts": "not_observed"
+            },
+            "skill_observations": {
+              "workflow": "observed",
+              "structure_consistency": "observed",
+              "initial_state_and_control_seed": "observed",
+              "critical_constraints": "observed"
+            },
+            "experience_integration": "No identifiable historical fact or distinctive reference procedure is used. Candidate-first construction and subsequent capability consultation are grounded in the frozen checkpoint; administrative resource statements do not affect scoring.",
+            "invalid_research_actions": [],
+            "strengths": [
+              "Proposes a concrete, simple full-span baseline using legal prototype and tendon values.",
+              "Treats generation as construction rather than scientific acceptance.",
+              "Identifies routing, independence, clearance and later authority failures as useful refutations."
+            ],
+            "weaknesses": [
+              "The downstream plan does not explicitly detail hardest-case prioritization or complete same-identity validation before aggregation.",
+              "Full-span directional authority remains a hypothesis rather than demonstrated proximal/distal control separation."
+            ],
+            "evidence_specific_rationale": "Four symmetric full-span tendons are a justified alternative initial experiment, not an invalid route merely because R1 recommends split spans. Default section resolution and routing remain generation-time checks, not proven interface violations. No historical-utilization credit is warranted."
+          }
+        },
+        "K+S-": {
+          "decision": {
+            "action": "generate",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "t07_shared_four_tendon_baseline_h1",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v1_historical_geometry_reconstruction",
+              "selected_variables": [
+                "segment_0.length_m",
+                "segment_0.young_pa",
+                "segment_0.circle_radius_m",
+                "segment_1.length_m",
+                "segment_1.young_pa",
+                "segment_1.circle_radius_m",
+                "four_tendon_span_topology",
+                "tendon_route_radius_m"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1
+            },
+            "next_step": "diagnose",
+            "hypothesis": "The key research question is whether a frozen-domain reconstruction of the historically useful two-root-only plus two-full-span, four-independent-tendon architecture provides a credible shared structural starting point for all four T07 tasks without assuming historical acceptance. The next route is to generate one candidate with the historically reported segment lengths of 0.16 m and 0.11 m, 12 MPa circular segments with radii of 8 mm and 7 mm, and a 14.1 mm tendon routing radius. The delivered expert-t07-history@1 knowledge is used only to prioritize this low-complexity baseline; its prior outcomes provide no current feasibility or acceptance credit. No registered research method needs consultation for this generation step. The concrete proposed action is candidate generation only, followed in a future decision by hardest-task-first diagnosis rather than immediate execution or selection.",
+            "supporting_evidence": [],
+            "expected_observation": "Generation is expected to return a candidate-owned two-segment structure within the declared family domain, with exactly four independent tendons arranged as two opposing root-only routes and two opposing full-span routes. If generation succeeds, the candidate will provide a concrete identity for later current-candidate analysis and control work. Useful proximal and distal authority is expected but not yet claimed. No task pass, actuator-envelope compliance, numerical feasibility, or executable admission is inferred from generation.",
+            "weakening_observation": "The hypothesis would be weakened if current family validation rejects the requested structure, four independent channels cannot be preserved, or the generated tendon routes are invalid. It would also be weakened if later candidate-specific analysis shows inadequate authority for the negative-low reach or tool-axis objective, or if fresh execution shows persistent position, holding-speed, tendon-speed, stroke, tension, or numerical failures. Passing only a subset of the four tasks would refute the shared-structure acceptance hypothesis.",
+            "fixed_conditions": "Keep the frozen T07 task suite, zero candidate-DOF initializer, gravity, mount, payload, timing, acceptance grids, four-channel requirement, ideal-tension limits, geometric stroke and tendon-speed limits, and all undeclared family fields unchanged. Use two segments, four tendons, zero pretension, 8 N force limits, the family-default tendon diameter and servo gain, and no unsupported mechanics. Historical outcomes remain context only and do not transfer to the generated candidate.",
+            "stopping_condition": "Stop this route immediately if generation is inadmissible or fails family-domain or routing validation. If a candidate is returned, stop the present generation step and require a separate current-candidate diagnosis before execution. Abandon this baseline after candidate-specific evidence establishes insufficient relevant authority or fresh retained results show that it cannot satisfy the hardest task within the frozen actuator envelope. Do not proceed to joint selection unless the identical structure later has independent passing physical evidence for every frozen task.",
+            "interpretation": "This is a scoped baseline-generation decision, not a performance conclusion. It asks whether the simplest historically motivated split-span topology is worth current-candidate investigation before adding segments, tendons, or geometric complexity. The historical record is adopted because it identifies a concrete architecture and a known difficult failure mode, while its measurements and outcomes remain non-transferable. If generation succeeds, the next research route is diagnosis of M1_B followed, if warranted, by current capability or control work. A registered mathematical method should be consulted only if that later diagnosis requires mechanism-structure or bounded task-capability analysis. Subsequent observations will determine whether to retain the architecture, revise its design, or stop.",
+            "generation": {
+              "version": "serial_family_generation_v1",
+              "family_space_identity": "serial_external_tendons_base_only_v1",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 0,
+                  "count": 2,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.0141,
+                  "guide_s": null,
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                },
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 2,
+                  "phase_rad": 1.5707963267948966,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.0141,
+                  "guide_s": null,
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 12000000.0,
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.0
+                    }
+                  ]
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 12000000.0,
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.007
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.0
+                    }
+                  ]
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "length_servo_gain_n_m": 900.0,
+                "pretension_n": 0.0,
+                "force_limit_n": 8.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "route_overrides": {}
+            },
+            "experience_disposition": {
+              "expert-t07-history@1": "adopted"
+            }
+          },
+          "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5147d10f-391d-4bac-8e16-f150b8037ea3/result.json",
+          "session_id": "5147d10f-391d-4bac-8e16-f150b8037ea3",
+          "evaluation": {
+            "label": "D",
+            "scores": {
+              "decision_quality": 4,
+              "evidence_consistency": 4,
+              "historical_experience_utilization": 3,
+              "research_actionability": 4
+            },
+            "knowledge_observations": {
+              "historical_facts": "observed",
+              "historical_conclusions": "observed",
+              "reasonable_route": "observed",
+              "avoids_known_ineffective_attempts": "not_observed"
+            },
+            "skill_observations": {
+              "workflow": "observed",
+              "structure_consistency": "observed",
+              "initial_state_and_control_seed": "observed",
+              "critical_constraints": "observed"
+            },
+            "experience_integration": "Uses R1's exact common geometry and split-span mechanism to construct a fresh baseline, prioritizes M1_B diagnosis, and requires all-case evidence on the identical design. It acknowledges a historical failure mode but does not explicitly describe the common geometry's measured failures or use the saved schedule.",
+            "invalid_research_actions": [],
+            "strengths": [
+              "Provides a legal, concrete historical-geometry reconstruction without transferring acceptance.",
+              "Requires a separate current-candidate diagnosis before execution.",
+              "Retains zero initialization, four independent channels and shared-structure physical validation."
+            ],
+            "weaknesses": [
+              "Historical failure information is summarized vaguely rather than used to specify a targeted braking or tendon-speed diagnostic.",
+              "No schedule-to-control-seed procedure is proposed."
+            ],
+            "evidence_specific_rationale": "Reconstructing a historically imperfect baseline for diagnosis is informative and is not itself repetition of a disproven acceptance claim. The stated parameters satisfy frozen bounds. Null guide placement requires generator resolution, but the supplied materials do not establish an invalid action."
+          }
+        },
+        "K-S+": {
+          "decision": {
+            "action": "generate",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "H1_shared_four_tendon_baseline",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "generate_owned_four_tendon_shared_structure_before_candidate_bound_capability_diagnosis",
+              "selected_variables": [
+                "segment_count=2",
+                "tendon_count=4",
+                "full_structure_consecutive_tendon_span",
+                "equal_polar_tendon_spacing",
+                "route_radius_m=0.018",
+                "segment_0_length_m=0.16",
+                "segment_1_length_m=0.11",
+                "segment_0_young_pa=7200000",
+                "segment_1_young_pa=5400000",
+                "initial_pretension_n=0"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1
+            },
+            "hypothesis": "The key research question is whether one candidate-owned two-segment structure with four independently actuated, equally spaced external tendons spanning the complete serial body is a viable shared starting design for all four frozen tasks. The next route is to generate exactly that simple candidate before attempting candidate-bound mathematics or control. This route is justified because no scientific candidate or current evidence exists, the tasks require four independent channels, and the supplied family provides a two-segment prototype whose undeformed axial extent is aligned with the target range. This is an empirical starting hypothesis, not a claim of feasibility or acceptance.",
+            "supporting_evidence": [],
+            "expected_observation": "The proposed scientific action should return one current owned candidate preserving the supplied two-segment prototype geometry and material values, with exactly four independent zero-pretension tendons at equal polar spacing over complete consecutive spans, and should satisfy generation-time identity and structural checks. If generated, it should provide a common structure identity on which a registered mechanism or nonlinear task-capability method can subsequently be consulted and the most demanding frozen task diagnosed before control search. Generation alone will not establish reach, tool-axis authority, transient compliance, or task acceptance.",
+            "weakening_observation": "The hypothesis would be weakened if the generator cannot instantiate the requested two-segment, four-channel full-span routing within the registered family, if route or clearance validation rejects it, or if the resulting artifact cannot provide one structure identity for every frozen task. Later candidate-bound evidence showing deficient directional or tool-axis authority, unreachable targets, or required actuation beyond the frozen tension, stroke, or tendon-speed limits would further weaken or refute the starting-design hypothesis. Failure of one controller recipe alone would not prove structural infeasibility.",
+            "fixed_conditions": "Keep the canonical task suite, environment, gravity, mount, payload and tool properties, zero-DOF initializer, timing, seed, acceptance limits, geometric actuator limits, and family semantics frozen. Use one identical generated structure for every frozen task, exactly four independent tendon channels, zero initial pretension, and no transfer of historical feasibility or acceptance. Copy the supplied segment prototypes except for explicitly specifying their values in the generation request. No simulation, mathematical analysis, control optimization, or physical replay is proposed by this decision.",
+            "stopping_condition": "End this generation route after one schema-valid candidate is created or after a definitive generation or structural-validation rejection. Do not add complexity merely because budget remains. If a candidate is created, the next planned decision is a scoped candidate-bound diagnosis using an actually registered capability method. If generation is rejected, inspect the stated rejection before proposing a minimal family-compliant revision.",
+            "interpretation": "The concrete next action is candidate generation because candidate-bound analysis and execution cannot yet be grounded in a current structure. The delivered shared-structure feasibility skill is adopted: it recommends stating one shared-structure hypothesis, generating a current owned candidate, then diagnosing the hardest task and validating every task on the same identity. The delivered feedback-dynamics diagnosis skill is context only because there is no execution trace or transient failure yet. No archived measurement or historical success is used. An existing research method does not need consultation before this minimal generation action; after generation, the actual registered mechanism_structure_v1 or mujoco-nonlinear-task-capability-v1 method should be consulted before selecting a control route. Their authorization and presence do not imply current admission, feasibility, or acceptance.",
+            "generation": {
+              "version": "serial_family_generation_v1",
+              "family_space_identity": "serial_external_tendons_base_only_v1",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 4,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.018,
+                  "guide_s": null,
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 7200000.0,
+                  "sections": [
+                    {
+                      "kind": "ellipse",
+                      "parameters": {
+                        "semi_y_m": 0.0095,
+                        "semi_z_m": 0.0076
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.35
+                    }
+                  ]
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 5400000.0,
+                  "sections": [
+                    {
+                      "kind": "rectangle",
+                      "parameters": {
+                        "height_z_m": 0.0095,
+                        "width_y_m": 0.0133
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": -0.25
+                    },
+                    {
+                      "kind": "rectangle",
+                      "parameters": {
+                        "height_z_m": 0.00855,
+                        "width_y_m": 0.0114
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.15
+                    }
+                  ]
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "length_servo_gain_n_m": 900.0,
+                "pretension_n": 0.0,
+                "force_limit_n": 8.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "route_overrides": {}
+            },
+            "experience_disposition": {
+              "skill-shared-structure-feasibility@1": "adopted",
+              "skill-feedback-dynamics-diagnosis@1": "context_only"
+            }
+          },
+          "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/1b35c5a6-478e-4864-8e02-1a5917d26d80/result.json",
+          "session_id": "1b35c5a6-478e-4864-8e02-1a5917d26d80",
+          "evaluation": {
+            "label": "C",
+            "scores": {
+              "decision_quality": 4,
+              "evidence_consistency": 4,
+              "historical_experience_utilization": 3,
+              "research_actionability": 4
+            },
+            "knowledge_observations": {
+              "historical_facts": "not_observed",
+              "historical_conclusions": "observed",
+              "reasonable_route": "observed",
+              "avoids_known_ineffective_attempts": "not_observed"
+            },
+            "skill_observations": {
+              "workflow": "observed",
+              "structure_consistency": "observed",
+              "initial_state_and_control_seed": "observed",
+              "critical_constraints": "observed"
+            },
+            "experience_integration": "Applies R2's shared-structure hypothesis, owned generation, hardest-task diagnosis and same-identity validation sequence. It also uses R3's distinction between one controller failure and structural infeasibility, without importing historical measurements.",
+            "invalid_research_actions": [],
+            "strengths": [
+              "Explicitly reconstructs the supplied ellipse and tapered rectangle prototypes within the frozen domain.",
+              "Requires one structure identity across all four tasks.",
+              "Makes candidate-bound capability consultation the next scoped decision and identifies meaningful authority and actuator-limit refutations."
+            ],
+            "weaknesses": [
+              "Does not yet specify dense result recording and aggregation gates in the detail of R2.",
+              "The full-span architecture has no established current tool-axis or independent segment authority."
+            ],
+            "evidence_specific_rationale": "The concrete baseline is scientifically reasonable and its prototype values are consistent with the checkpoint. Positive procedural use supports historical-utilization credit despite no historical numerical use. Generation and future capability analysis are correctly separated from admission and acceptance."
+          }
+        },
+        "K+S+": {
+          "decision": {
+            "action": "generate",
+            "decision": {
+              "version": "research_decision_v1",
+              "hypothesis_id": "T07_shared_four_tendon_geometry_h1",
+              "claimed_inference": "empirical_search",
+              "research_intent": "DESIGN_MODIFICATION",
+              "selected_method": "serial_family_generation_v1_polar_consecutive_spans",
+              "selected_variables": [
+                "segment_0.length_m",
+                "segment_0.young_pa",
+                "segment_0.section.circle.radius_m",
+                "segment_1.length_m",
+                "segment_1.young_pa",
+                "segment_1.section.circle.radius_m",
+                "root_only_tendon_pair",
+                "full_span_tendon_pair",
+                "tendon_routing_radius_m",
+                "tendon_pretension_n"
+              ],
+              "selected_candidate": null,
+              "requested_budget": 1
+            },
+            "hypothesis": "The key research question is whether one candidate-owned structure with four independent tendons can provide sufficient proximal and distal authority for every frozen T07 case while retaining the potential to satisfy all dense acceptance requirements. The next route is to generate a simple two-segment candidate with two root-only tendons and two full-span tendons arranged as opposing pairs. The proposed scientific action is candidate generation only; it makes no feasibility, acceptance, or executable-admission claim.",
+            "supporting_evidence": [],
+            "expected_observation": "Generation should return one current owned two-segment candidate with four independent tendon channels, zero pretension, two tendons ending on the root segment, and two spanning both segments, with all requested values inside the frozen family domain. If successful, the planned later route is to consult the registered current-candidate capability method, diagnose the historically difficult reach first, distinguish structural authority from tendon-speed and terminal-braking limitations, and then assess every remaining frozen case on the identical structure.",
+            "weakening_observation": "The hypothesis would be weakened if the topology cannot be represented legally, candidate construction or identity validation fails, four independent channels are not produced, or any requested value violates the frozen family domain. Later current-candidate evidence of inadequate task-directed authority, or fresh execution evidence of persistent target, hold-speed, tendon-speed, stroke, tension, tool-axis, numerical, or required-signal failure, would also weaken it. Historical results cannot offset current failures.",
+            "fixed_conditions": "Keep the canonical T07 bundle, all four required frozen cases, the identical-structure requirement, seed, timing, gravity, mount, payload and tool properties, zero-DOF initializer, initial zero tension, four independent channels, dense acceptance grids, actuator bounds, required signals, and family semantics unchanged. Request two segments of lengths 0.16 m and 0.11 m, circular radii 0.008 m and 0.007 m, Young's modulus 12000000 Pa for both, tendon routing radius 0.0141 m, tendon diameter 0.001 m, servo gain 900 N/m, force limit 8 N, and pretension 0 N. This decision does not alter control recipes.",
+            "stopping_condition": "Stop this generation step when one schema-valid candidate artifact is returned or generation is rejected or fails. Do not proceed directly to selection. Later work should revise or stop if registered current-candidate analysis or fresh validation establishes a structural authority deficit, repeated dense actuator-envelope failure, numerical invalidity, or failure of any required frozen case on the identical structure. Selection requires fresh independent passing evidence for every required case.",
+            "interpretation": "Historical T07 knowledge is used only as engineering guidance: it suggests that two root-only and two full-span tendons separate proximal and distal authority and identifies an in-domain simple geometry worth freshly reconstructing. Its historical measurements confer no current scientific credit and do not establish feasibility, acceptance, or admission. The shared-structure skill supports generating one owned structure, diagnosing the hardest case first, separating static authority from tendon-speed and braking limitations, and testing all required cases before aggregation. The feedback-diagnosis skill is context for that later stage. No existing research method needs consultation for this bounded generation action itself; before any later analysis or control dispatch, the applicable registered mathematical and controller method must be consulted. The simple topology is chosen instead of added complexity because it directly tests the suggested mechanism under the current frozen task.",
+            "generation": {
+              "version": "serial_family_generation_v1",
+              "family_space_identity": "serial_external_tendons_base_only_v1",
+              "segment_count": 2,
+              "tendon_count": 4,
+              "strategy": "polar_consecutive_spans_v1",
+              "spans": [
+                {
+                  "first_segment": 0,
+                  "last_segment": 0,
+                  "count": 2,
+                  "phase_rad": 0.0,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.0141,
+                  "guide_s": null,
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                },
+                {
+                  "first_segment": 0,
+                  "last_segment": 1,
+                  "count": 2,
+                  "phase_rad": 1.5707963267948966,
+                  "angular_offsets_rad": [],
+                  "radius_m": 0.0141,
+                  "guide_s": [
+                    0.5
+                  ],
+                  "anchor_s": 1.0,
+                  "guide_angle_offset_rad": 0.0,
+                  "anchor_angle_offset_rad": 0.0
+                }
+              ],
+              "segments": {
+                "0": {
+                  "length_m": 0.16,
+                  "young_pa": 12000000.0,
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.008
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.0
+                    }
+                  ]
+                },
+                "1": {
+                  "length_m": 0.11,
+                  "young_pa": 12000000.0,
+                  "sections": [
+                    {
+                      "kind": "circle",
+                      "parameters": {
+                        "radius_m": 0.007
+                      },
+                      "outer_yz_m": [],
+                      "holes_yz_m": [],
+                      "angle_rad": 0.0
+                    }
+                  ]
+                }
+              },
+              "tendon_parameters": {
+                "diameter_m": 0.001,
+                "length_servo_gain_n_m": 900.0,
+                "pretension_n": 0.0,
+                "force_limit_n": 8.0
+              },
+              "control_weights": {
+                "holding_tip_speed_weight": 0.1,
+                "terminal_tip_speed_weight": 0.1
+              },
+              "route_overrides": {}
+            },
+            "experience_disposition": {
+              "expert-t07-history@1": "adopted",
+              "skill-shared-structure-feasibility@1": "adopted",
+              "skill-feedback-dynamics-diagnosis@1": "context_only"
+            }
+          },
+          "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5646770f-c5e3-4172-bf24-3eee818f1220/result.json",
+          "session_id": "5646770f-c5e3-4172-bf24-3eee818f1220",
+          "evaluation": {
+            "label": "A",
+            "scores": {
+              "decision_quality": 4,
+              "evidence_consistency": 4,
+              "historical_experience_utilization": 3,
+              "research_actionability": 4
+            },
+            "knowledge_observations": {
+              "historical_facts": "observed",
+              "historical_conclusions": "observed",
+              "reasonable_route": "observed",
+              "avoids_known_ineffective_attempts": "not_observed"
+            },
+            "skill_observations": {
+              "workflow": "observed",
+              "structure_consistency": "observed",
+              "initial_state_and_control_seed": "observed",
+              "critical_constraints": "observed"
+            },
+            "experience_integration": "Connects R1's split-span architecture and concrete geometry to current owned generation, and R2/R3's hardest-case and failure-mode diagnosis to the downstream plan. It does not explicitly incorporate the reported failure of this common geometry or the unsuccessful uniform-softening attempt.",
+            "invalid_research_actions": [],
+            "strengths": [
+              "Provides an explicit in-domain four-channel generation request with zero pretension.",
+              "Preserves one structure across all required cases and requires fresh physical evidence.",
+              "Separates authority, tendon-speed and braking limitations before later selection."
+            ],
+            "weaknesses": [
+              "Describes the historical geometry as worth reconstructing without explicitly noting its reported M1_B failure.",
+              "Does not specify historical schedule extraction or control-seed transfer."
+            ],
+            "evidence_specific_rationale": "A bounded baseline reconstruction is appropriate before any current candidate exists. Its dimensions and actuator parameters respect the supplied bounds, and it does not equate generation with admission or acceptance. Historical procedure use is substantial but incomplete."
+          }
+        }
+      },
+      "results": [
+        {
+          "task_id": "T07",
+          "condition": "K-S-",
+          "knowledge_on": false,
+          "skill_on": false,
+          "origin": "Main_LLM_decision_replay",
+          "historical_reference_only": false,
+          "frozen_inputs_and_requested_settings_match": true,
+          "temporal_backend_matching": "Unverified: new K+S+ acquired later; Gateway default reasoning/backend revision not exposed.",
+          "anonymous_label": "B",
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 0,
+          "research_actionability": 4,
+          "mean_of_four_scores": 3,
+          "decision_quality_delta_vs_KminusSminus": 0,
+          "evidence_consistency_delta_vs_KminusSminus": 0,
+          "historical_experience_utilization_delta_vs_KminusSminus": 0,
+          "research_actionability_delta_vs_KminusSminus": 0,
+          "invalid_research_actions_count": 0,
+          "invalid_research_actions": [],
+          "invalid_action_scope": "Independent review of final proposed decision; parsing and future execution admission are separate.",
+          "schema_or_parse_repairs": 1,
+          "knowledge_observations": {
+            "historical_facts": "not_observed",
+            "historical_conclusions": "not_observed",
+            "reasonable_route": "observed",
+            "avoids_known_ineffective_attempts": "not_observed"
+          },
+          "skill_observations": {
+            "workflow": "observed",
+            "structure_consistency": "observed",
+            "initial_state_and_control_seed": "observed",
+            "critical_constraints": "observed"
+          },
+          "experience_integration": "No identifiable historical fact or distinctive reference procedure is used. Candidate-first construction and subsequent capability consultation are grounded in the frozen checkpoint; administrative resource statements do not affect scoring.",
+          "evidence_specific_rationale": "Four symmetric full-span tendons are a justified alternative initial experiment, not an invalid route merely because R1 recommends split spans. Default section resolution and routing remain generation-time checks, not proven interface violations. No historical-utilization credit is warranted.",
+          "action": "generate",
+          "selected_method": "serial_family_generation_v1 baseline four-tendon construction",
+          "experience_entries_delivered": [],
+          "provider_requests": 2,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "context_token_estimate": 18926,
+          "cumulative_full_wire_input_token_estimate": 39494,
+          "decision_source_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/439c18bd-9aa0-4fba-befd-4b65532cd8bd/result.json",
+          "decision_json_pointer": "/decision",
+          "raw_decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/439c18bd-9aa0-4fba-befd-4b65532cd8bd/response_2.txt#/choices/0/message/content",
+          "score_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T07/independent_model_review.json",
+          "judge_model": "gpt-6-astra",
+          "human_verification": "pending",
+          "interpretation_limit": "One Main decision per cell, one joint independent-model review/task; no significance, population synergy or robot-success claim."
+        },
+        {
+          "task_id": "T07",
+          "condition": "K+S-",
+          "knowledge_on": true,
+          "skill_on": false,
+          "origin": "Main_LLM_decision_replay",
+          "historical_reference_only": false,
+          "frozen_inputs_and_requested_settings_match": true,
+          "temporal_backend_matching": "Unverified: new K+S+ acquired later; Gateway default reasoning/backend revision not exposed.",
+          "anonymous_label": "D",
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 3,
+          "research_actionability": 4,
+          "mean_of_four_scores": 3.75,
+          "decision_quality_delta_vs_KminusSminus": 0,
+          "evidence_consistency_delta_vs_KminusSminus": 0,
+          "historical_experience_utilization_delta_vs_KminusSminus": 3,
+          "research_actionability_delta_vs_KminusSminus": 0,
+          "invalid_research_actions_count": 0,
+          "invalid_research_actions": [],
+          "invalid_action_scope": "Independent review of final proposed decision; parsing and future execution admission are separate.",
+          "schema_or_parse_repairs": 1,
+          "knowledge_observations": {
+            "historical_facts": "observed",
+            "historical_conclusions": "observed",
+            "reasonable_route": "observed",
+            "avoids_known_ineffective_attempts": "not_observed"
+          },
+          "skill_observations": {
+            "workflow": "observed",
+            "structure_consistency": "observed",
+            "initial_state_and_control_seed": "observed",
+            "critical_constraints": "observed"
+          },
+          "experience_integration": "Uses R1's exact common geometry and split-span mechanism to construct a fresh baseline, prioritizes M1_B diagnosis, and requires all-case evidence on the identical design. It acknowledges a historical failure mode but does not explicitly describe the common geometry's measured failures or use the saved schedule.",
+          "evidence_specific_rationale": "Reconstructing a historically imperfect baseline for diagnosis is informative and is not itself repetition of a disproven acceptance claim. The stated parameters satisfy frozen bounds. Null guide placement requires generator resolution, but the supplied materials do not establish an invalid action.",
+          "action": "generate",
+          "selected_method": "serial_family_generation_v1_historical_geometry_reconstruction",
+          "experience_entries_delivered": [
+            "expert-t07-history@1"
+          ],
+          "provider_requests": 2,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "context_token_estimate": 20807,
+          "cumulative_full_wire_input_token_estimate": 43355,
+          "decision_source_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5147d10f-391d-4bac-8e16-f150b8037ea3/result.json",
+          "decision_json_pointer": "/decision",
+          "raw_decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5147d10f-391d-4bac-8e16-f150b8037ea3/response_2.txt#/choices/0/message/content",
+          "score_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T07/independent_model_review.json",
+          "judge_model": "gpt-6-astra",
+          "human_verification": "pending",
+          "interpretation_limit": "One Main decision per cell, one joint independent-model review/task; no significance, population synergy or robot-success claim."
+        },
+        {
+          "task_id": "T07",
+          "condition": "K-S+",
+          "knowledge_on": false,
+          "skill_on": true,
+          "origin": "Main_LLM_decision_replay",
+          "historical_reference_only": false,
+          "frozen_inputs_and_requested_settings_match": true,
+          "temporal_backend_matching": "Unverified: new K+S+ acquired later; Gateway default reasoning/backend revision not exposed.",
+          "anonymous_label": "C",
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 3,
+          "research_actionability": 4,
+          "mean_of_four_scores": 3.75,
+          "decision_quality_delta_vs_KminusSminus": 0,
+          "evidence_consistency_delta_vs_KminusSminus": 0,
+          "historical_experience_utilization_delta_vs_KminusSminus": 3,
+          "research_actionability_delta_vs_KminusSminus": 0,
+          "invalid_research_actions_count": 0,
+          "invalid_research_actions": [],
+          "invalid_action_scope": "Independent review of final proposed decision; parsing and future execution admission are separate.",
+          "schema_or_parse_repairs": 1,
+          "knowledge_observations": {
+            "historical_facts": "not_observed",
+            "historical_conclusions": "observed",
+            "reasonable_route": "observed",
+            "avoids_known_ineffective_attempts": "not_observed"
+          },
+          "skill_observations": {
+            "workflow": "observed",
+            "structure_consistency": "observed",
+            "initial_state_and_control_seed": "observed",
+            "critical_constraints": "observed"
+          },
+          "experience_integration": "Applies R2's shared-structure hypothesis, owned generation, hardest-task diagnosis and same-identity validation sequence. It also uses R3's distinction between one controller failure and structural infeasibility, without importing historical measurements.",
+          "evidence_specific_rationale": "The concrete baseline is scientifically reasonable and its prototype values are consistent with the checkpoint. Positive procedural use supports historical-utilization credit despite no historical numerical use. Generation and future capability analysis are correctly separated from admission and acceptance.",
+          "action": "generate",
+          "selected_method": "generate_owned_four_tendon_shared_structure_before_candidate_bound_capability_diagnosis",
+          "experience_entries_delivered": [
+            "skill-shared-structure-feasibility@1",
+            "skill-feedback-dynamics-diagnosis@1"
+          ],
+          "provider_requests": 2,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "context_token_estimate": 19891,
+          "cumulative_full_wire_input_token_estimate": 41521,
+          "decision_source_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/1b35c5a6-478e-4864-8e02-1a5917d26d80/result.json",
+          "decision_json_pointer": "/decision",
+          "raw_decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/1b35c5a6-478e-4864-8e02-1a5917d26d80/response_2.txt#/choices/0/message/content",
+          "score_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T07/independent_model_review.json",
+          "judge_model": "gpt-6-astra",
+          "human_verification": "pending",
+          "interpretation_limit": "One Main decision per cell, one joint independent-model review/task; no significance, population synergy or robot-success claim."
+        },
+        {
+          "task_id": "T07",
+          "condition": "K+S+",
+          "knowledge_on": true,
+          "skill_on": true,
+          "origin": "Main_LLM_decision_replay",
+          "historical_reference_only": false,
+          "frozen_inputs_and_requested_settings_match": true,
+          "temporal_backend_matching": "Unverified: new K+S+ acquired later; Gateway default reasoning/backend revision not exposed.",
+          "anonymous_label": "A",
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 3,
+          "research_actionability": 4,
+          "mean_of_four_scores": 3.75,
+          "decision_quality_delta_vs_KminusSminus": 0,
+          "evidence_consistency_delta_vs_KminusSminus": 0,
+          "historical_experience_utilization_delta_vs_KminusSminus": 3,
+          "research_actionability_delta_vs_KminusSminus": 0,
+          "invalid_research_actions_count": 0,
+          "invalid_research_actions": [],
+          "invalid_action_scope": "Independent review of final proposed decision; parsing and future execution admission are separate.",
+          "schema_or_parse_repairs": 1,
+          "knowledge_observations": {
+            "historical_facts": "observed",
+            "historical_conclusions": "observed",
+            "reasonable_route": "observed",
+            "avoids_known_ineffective_attempts": "not_observed"
+          },
+          "skill_observations": {
+            "workflow": "observed",
+            "structure_consistency": "observed",
+            "initial_state_and_control_seed": "observed",
+            "critical_constraints": "observed"
+          },
+          "experience_integration": "Connects R1's split-span architecture and concrete geometry to current owned generation, and R2/R3's hardest-case and failure-mode diagnosis to the downstream plan. It does not explicitly incorporate the reported failure of this common geometry or the unsuccessful uniform-softening attempt.",
+          "evidence_specific_rationale": "A bounded baseline reconstruction is appropriate before any current candidate exists. Its dimensions and actuator parameters respect the supplied bounds, and it does not equate generation with admission or acceptance. Historical procedure use is substantial but incomplete.",
+          "action": "generate",
+          "selected_method": "serial_family_generation_v1_polar_consecutive_spans",
+          "experience_entries_delivered": [
+            "expert-t07-history@1",
+            "skill-shared-structure-feasibility@1",
+            "skill-feedback-dynamics-diagnosis@1"
+          ],
+          "provider_requests": 2,
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "context_token_estimate": 21772,
+          "cumulative_full_wire_input_token_estimate": 45361,
+          "decision_source_file": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5646770f-c5e3-4172-bf24-3eee818f1220/result.json",
+          "decision_json_pointer": "/decision",
+          "raw_decision_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5646770f-c5e3-4172-bf24-3eee818f1220/response_2.txt#/choices/0/message/content",
+          "score_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T07/independent_model_review.json",
+          "judge_model": "gpt-6-astra",
+          "human_verification": "pending",
+          "interpretation_limit": "One Main decision per cell, one joint independent-model review/task; no significance, population synergy or robot-success claim."
+        }
+      ],
+      "token_costs": [
+        {
+          "task_id": "T07",
+          "condition": "K-S-",
+          "origin": "Main_LLM_decision_replay",
+          "session_id": "439c18bd-9aa0-4fba-befd-4b65532cd8bd",
+          "model": "gpt-5.6-sol",
+          "acquisition_phase": "original_six_replays",
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "total_tokens_actual": null,
+          "actual_usage_status": "gateway_usage_missing_not_zero",
+          "provider_requests": 2,
+          "schema_or_parse_repairs": 1,
+          "initial_context_tokens_estimate": 18926,
+          "total_sent_input_full_wire_tokens_estimate": 39494,
+          "total_output_serialized_assistant_tokens_estimate": 2254,
+          "legacy_initial_visible_text_tokens_estimate": 17659,
+          "context_estimate_scope": "Complete wire JSON for every send; repeated context is counted repeatedly. Native tools are serialized inside the system prompt exactly as original E1.",
+          "estimate_basis": "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+          "wire_scope": "Reconstructed compact HTTPX json=wire serialization from original saved request object; original transport bytes were not separately captured.",
+          "effective_reasoning": "gateway_default_not_exposed",
+          "reporter_requests": 0,
+          "delivered_entry_keys": [],
+          "optional_experience_retrieve_calls": 0,
+          "experience_read_claim": "Entry bodies were preloaded on real Main wire. Optional retrieval calls are separate; no fabricated tool-read claim.",
+          "source_directory": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/439c18bd-9aa0-4fba-befd-4b65532cd8bd"
+        },
+        {
+          "task_id": "T07",
+          "condition": "K+S-",
+          "origin": "Main_LLM_decision_replay",
+          "session_id": "5147d10f-391d-4bac-8e16-f150b8037ea3",
+          "model": "gpt-5.6-sol",
+          "acquisition_phase": "original_six_replays",
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "total_tokens_actual": null,
+          "actual_usage_status": "gateway_usage_missing_not_zero",
+          "provider_requests": 2,
+          "schema_or_parse_repairs": 1,
+          "initial_context_tokens_estimate": 20807,
+          "total_sent_input_full_wire_tokens_estimate": 43355,
+          "total_output_serialized_assistant_tokens_estimate": 2626,
+          "legacy_initial_visible_text_tokens_estimate": 19486,
+          "context_estimate_scope": "Complete wire JSON for every send; repeated context is counted repeatedly. Native tools are serialized inside the system prompt exactly as original E1.",
+          "estimate_basis": "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+          "wire_scope": "Reconstructed compact HTTPX json=wire serialization from original saved request object; original transport bytes were not separately captured.",
+          "effective_reasoning": "gateway_default_not_exposed",
+          "reporter_requests": 0,
+          "delivered_entry_keys": [
+            "expert-t07-history@1"
+          ],
+          "optional_experience_retrieve_calls": 0,
+          "experience_read_claim": "Entry bodies were preloaded on real Main wire. Optional retrieval calls are separate; no fabricated tool-read claim.",
+          "source_directory": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5147d10f-391d-4bac-8e16-f150b8037ea3"
+        },
+        {
+          "task_id": "T07",
+          "condition": "K-S+",
+          "origin": "Main_LLM_decision_replay",
+          "session_id": "1b35c5a6-478e-4864-8e02-1a5917d26d80",
+          "model": "gpt-5.6-sol",
+          "acquisition_phase": "original_six_replays",
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "total_tokens_actual": null,
+          "actual_usage_status": "gateway_usage_missing_not_zero",
+          "provider_requests": 2,
+          "schema_or_parse_repairs": 1,
+          "initial_context_tokens_estimate": 19891,
+          "total_sent_input_full_wire_tokens_estimate": 41521,
+          "total_output_serialized_assistant_tokens_estimate": 2643,
+          "legacy_initial_visible_text_tokens_estimate": 18570,
+          "context_estimate_scope": "Complete wire JSON for every send; repeated context is counted repeatedly. Native tools are serialized inside the system prompt exactly as original E1.",
+          "estimate_basis": "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+          "wire_scope": "Reconstructed compact HTTPX json=wire serialization from original saved request object; original transport bytes were not separately captured.",
+          "effective_reasoning": "gateway_default_not_exposed",
+          "reporter_requests": 0,
+          "delivered_entry_keys": [
+            "skill-shared-structure-feasibility@1",
+            "skill-feedback-dynamics-diagnosis@1"
+          ],
+          "optional_experience_retrieve_calls": 0,
+          "experience_read_claim": "Entry bodies were preloaded on real Main wire. Optional retrieval calls are separate; no fabricated tool-read claim.",
+          "source_directory": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/1b35c5a6-478e-4864-8e02-1a5917d26d80"
+        },
+        {
+          "task_id": "T07",
+          "condition": "K+S+",
+          "origin": "Main_LLM_decision_replay",
+          "session_id": "5646770f-c5e3-4172-bf24-3eee818f1220",
+          "model": "gpt-5.6-sol",
+          "acquisition_phase": "supplement_KplusSplus",
+          "input_tokens_actual": null,
+          "output_tokens_actual": null,
+          "total_tokens_actual": null,
+          "actual_usage_status": "gateway_usage_missing_not_zero",
+          "provider_requests": 2,
+          "schema_or_parse_repairs": 1,
+          "initial_context_tokens_estimate": 21772,
+          "total_sent_input_full_wire_tokens_estimate": 45361,
+          "total_output_serialized_assistant_tokens_estimate": 2733,
+          "legacy_initial_visible_text_tokens_estimate": 20397,
+          "context_estimate_scope": "Complete wire JSON for every send; repeated context is counted repeatedly. Native tools are serialized inside the system prompt exactly as original E1.",
+          "estimate_basis": "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+          "wire_scope": "Exact bytes captured for new supplement.",
+          "effective_reasoning": "gateway_default_not_exposed",
+          "reporter_requests": 0,
+          "delivered_entry_keys": [
+            "expert-t07-history@1",
+            "skill-shared-structure-feasibility@1",
+            "skill-feedback-dynamics-diagnosis@1"
+          ],
+          "optional_experience_retrieve_calls": 0,
+          "experience_read_claim": "Entry bodies were preloaded on real Main wire. Optional retrieval calls are separate; no fabricated tool-read claim.",
+          "source_directory": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5646770f-c5e3-4172-bf24-3eee818f1220"
+        }
+      ],
+      "main_effects": [
+        {
+          "task_id": "T07",
+          "metric": "decision_quality",
+          "y00_KminusSminus": 4,
+          "y10_KplusSminus": 4,
+          "y01_KminusSplus": 4,
+          "y11_KplusSplus": 4,
+          "K_effect_at_Soff": 0,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 0,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 0.0,
+          "S_main_effect": 0.0,
+          "beta_K_plusminus1": 0.0,
+          "beta_S_plusminus1": 0.0,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T07",
+          "metric": "evidence_consistency",
+          "y00_KminusSminus": 4,
+          "y10_KplusSminus": 4,
+          "y01_KminusSplus": 4,
+          "y11_KplusSplus": 4,
+          "K_effect_at_Soff": 0,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 0,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 0.0,
+          "S_main_effect": 0.0,
+          "beta_K_plusminus1": 0.0,
+          "beta_S_plusminus1": 0.0,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T07",
+          "metric": "historical_experience_utilization",
+          "y00_KminusSminus": 0,
+          "y10_KplusSminus": 3,
+          "y01_KminusSplus": 3,
+          "y11_KplusSplus": 3,
+          "K_effect_at_Soff": 3,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 3,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 1.5,
+          "S_main_effect": 1.5,
+          "beta_K_plusminus1": 0.75,
+          "beta_S_plusminus1": 0.75,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T07",
+          "metric": "research_actionability",
+          "y00_KminusSminus": 4,
+          "y10_KplusSminus": 4,
+          "y01_KminusSplus": 4,
+          "y11_KplusSplus": 4,
+          "K_effect_at_Soff": 0,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 0,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 0.0,
+          "S_main_effect": 0.0,
+          "beta_K_plusminus1": 0.0,
+          "beta_S_plusminus1": 0.0,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T07",
+          "metric": "mean_of_four_scores",
+          "y00_KminusSminus": 3,
+          "y10_KplusSminus": 3.75,
+          "y01_KminusSplus": 3.75,
+          "y11_KplusSplus": 3.75,
+          "K_effect_at_Soff": 0.75,
+          "K_effect_at_Son": 0.0,
+          "S_effect_at_Koff": 0.75,
+          "S_effect_at_Kon": 0.0,
+          "K_main_effect": 0.375,
+          "S_main_effect": 0.375,
+          "beta_K_plusminus1": 0.1875,
+          "beta_S_plusminus1": 0.1875,
+          "outcome_direction": "higher_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        },
+        {
+          "task_id": "T07",
+          "metric": "invalid_research_actions_count",
+          "y00_KminusSminus": 0,
+          "y10_KplusSminus": 0,
+          "y01_KminusSplus": 0,
+          "y11_KplusSplus": 0,
+          "K_effect_at_Soff": 0,
+          "K_effect_at_Son": 0,
+          "S_effect_at_Koff": 0,
+          "S_effect_at_Kon": 0,
+          "K_main_effect": 0.0,
+          "S_main_effect": 0.0,
+          "beta_K_plusminus1": 0.0,
+          "beta_S_plusminus1": 0.0,
+          "outcome_direction": "lower_is_better",
+          "cell_origin": "All four Main LLM outputs; no engineering Core Plan.",
+          "inference_scope": "Descriptive within this four-cell sample; one observation/cell, unverified temporal/backend identity and overlapping entry contents."
+        }
+      ],
+      "interaction_effects": [
+        {
+          "task_id": "T07",
+          "metric": "decision_quality",
+          "interaction_difference_in_differences": 0,
+          "beta_KS_plusminus1": 0.0,
+          "K_effect_change_when_S_on": 0,
+          "S_effect_change_when_K_on": 0,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 0,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T07",
+          "metric": "evidence_consistency",
+          "interaction_difference_in_differences": 0,
+          "beta_KS_plusminus1": 0.0,
+          "K_effect_change_when_S_on": 0,
+          "S_effect_change_when_K_on": 0,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 0,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T07",
+          "metric": "historical_experience_utilization",
+          "interaction_difference_in_differences": -3,
+          "beta_KS_plusminus1": -0.75,
+          "K_effect_change_when_S_on": -3,
+          "S_effect_change_when_K_on": -3,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 3,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T07",
+          "metric": "research_actionability",
+          "interaction_difference_in_differences": 0,
+          "beta_KS_plusminus1": 0.0,
+          "K_effect_change_when_S_on": 0,
+          "S_effect_change_when_K_on": 0,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 0,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T07",
+          "metric": "mean_of_four_scores",
+          "interaction_difference_in_differences": -0.75,
+          "beta_KS_plusminus1": -0.1875,
+          "K_effect_change_when_S_on": -0.75,
+          "S_effect_change_when_K_on": -0.75,
+          "joint_minus_best_single": 0.0,
+          "joint_minus_neither": 0.75,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        },
+        {
+          "task_id": "T07",
+          "metric": "invalid_research_actions_count",
+          "interaction_difference_in_differences": 0,
+          "beta_KS_plusminus1": 0.0,
+          "K_effect_change_when_S_on": 0,
+          "S_effect_change_when_K_on": 0,
+          "joint_minus_best_single": 0,
+          "joint_minus_neither": 0,
+          "algebra": "I=y11-y10-y01+y00; +/-1 regression interaction coefficient=I/4.",
+          "interpretation": "Ordinal/bounded score contrast only. Negative I can reflect overlapping benefits and score ceilings; it is not proof of harmful interaction or robot failure.",
+          "no_statistical_significance_claim": true
+        }
+      ],
+      "comparative_rationale": "All four propose reasonable, bounded first-candidate generation with concrete rejection criteria and no transfer of historical acceptance, so their decision, consistency and actionability scores are equal. A and D use identifiable historical geometry and split-span authority guidance; C instead applies identifiable shared-structure procedures. B supplies a justified alternative baseline but no identifiable historical use. A and D receive no extra credit merely for choosing the reference architecture, and their incomplete treatment of its known failure limits utilization credit. No concrete proposed action is demonstrably contradicted by the frozen domain or interfaces.",
+      "review_source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/blind_review/complete_four_llm/T07/independent_model_review.json"
+    }
+  },
+  "condition_order": [
+    "K-S-",
+    "K+S-",
+    "K-S+",
+    "K+S+"
+  ],
+  "metric_order": [
+    "decision_quality",
+    "evidence_consistency",
+    "historical_experience_utilization",
+    "research_actionability"
+  ],
+  "new_Main_sessions_this_supplement": 2,
+  "new_Main_requests_this_supplement": 4,
+  "all_Main_sessions": 8,
+  "all_Main_requests": 15,
+  "new_independent_review_requests": 2,
+  "engineering_references": [
+    {
+      "task_id": "T04",
+      "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/engineering_reference/T04.json",
+      "actor": "codex_surrogate_main",
+      "historical_provider_calls": 0,
+      "formal_main_executed": false,
+      "used_in_four_condition_scores": false,
+      "used_in_factorial_effects": false
+    },
+    {
+      "task_id": "T07",
+      "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/engineering_reference/T07.json",
+      "actor": "codex_surrogate_main",
+      "historical_provider_calls": 0,
+      "formal_main_executed": false,
+      "used_in_four_condition_scores": false,
+      "used_in_factorial_effects": false
+    }
+  ],
+  "clips": [
+    {
+      "task_id": "T04",
+      "condition": "K+S+",
+      "quote": "its historical 0.27 m single-segment hardware exceeds the current root-segment bound and cannot be transferred.",
+      "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/cc450f31-34b8-4928-8122-60e3863d3136/result.json",
+      "pointer": "/decision/hypothesis",
+      "source_kind": "New Main LLM raw response/validated Plan, not an authored Core Plan."
+    },
+    {
+      "task_id": "T04",
+      "condition": "K+S+",
+      "quote": "after generation, the plan should use the registered constructor, inspect the returned bank, independently qualify time zero, and only then initialize control and request a complete independent replay with interior tensions.",
+      "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/cc450f31-34b8-4928-8122-60e3863d3136/result.json",
+      "pointer": "/decision/interpretation",
+      "source_kind": "New Main LLM raw response/validated Plan, not an authored Core Plan."
+    },
+    {
+      "task_id": "T07",
+      "condition": "K+S+",
+      "quote": "it suggests that two root-only and two full-span tendons separate proximal and distal authority and identifies an in-domain simple geometry worth freshly reconstructing.",
+      "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5646770f-c5e3-4172-bf24-3eee818f1220/result.json",
+      "pointer": "/decision/interpretation",
+      "source_kind": "New Main LLM raw response/validated Plan, not an authored Core Plan."
+    },
+    {
+      "task_id": "T07",
+      "condition": "K+S+",
+      "quote": "The shared-structure skill supports generating one owned structure, diagnosing the hardest case first, separating static authority from tendon-speed and braking limitations, and testing all required cases before aggregation.",
+      "source": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/sessions/5646770f-c5e3-4172-bf24-3eee818f1220/result.json",
+      "pointer": "/decision/interpretation",
+      "source_kind": "New Main LLM raw response/validated Plan, not an authored Core Plan."
+    }
+  ],
+  "main_effect_definition": "Average of conditional ON-minus-OFF differences over the other factor.",
+  "interaction_definition": "Difference-in-differences y11-y10-y01+y00; +/-1 regression coefficient is contrast/4.",
+  "limitations": [
+    "One Main decision per cell and one independent model joint review/task; human verification pending.",
+    "Same frozen inputs/prompts/schema/model/transport/permissions/budgets, but supplemental K+S+ was acquired later and backend/default reasoning identity is unexposed.",
+    "Knowledge and Skill entries overlap; bounded ordinal score interactions do not prove statistical or causal synergy.",
+    "No robot/mathematical follow-up executed; no task-success effect measured.",
+    "estimated_generic_proxy: same local tiktoken 0.12.0/o200k_base on complete serialized HTTP request JSON, not verified model-matched framing, hidden reasoning or billing.",
+    "Original authored engineering Core Plans and their old scores are excluded from the four-LLM factorial tables and plots."
+  ],
+  "prior_materials_archive": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/ks_completion/prior_figure_data",
+  "new_scientific_executions": 0,
+  "figure_files": [
+    "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/T04_knowledge_skill_2x2.svg",
+    "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/T04_knowledge_skill_2x2.png",
+    "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/T04_knowledge_skill_2x2.pdf",
+    "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/T07_knowledge_skill_2x2.svg",
+    "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/T07_knowledge_skill_2x2.png",
+    "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/figure_data/T07_knowledge_skill_2x2.pdf"
+  ]
+}

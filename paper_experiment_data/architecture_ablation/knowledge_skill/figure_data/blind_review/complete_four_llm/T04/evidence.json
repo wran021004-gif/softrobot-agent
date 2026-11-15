@@ -1,0 +1,1376 @@
+{
+  "checkpoint": {
+    "canonical_task": {
+      "acceptance": {
+        "evaluator": "figure_eight",
+        "grid": "physics_including_initial",
+        "historical_status": null,
+        "parameters": {
+          "cycle_drift_m": 0.002,
+          "cycle_windows_s": [
+            [
+              0,
+              11
+            ],
+            [
+              11,
+              22.001
+            ]
+          ],
+          "independent_channels": 4,
+          "initial_state_mode": "qualified_candidate_equilibrium",
+          "initial_static_balance_max_nm": 1e-07,
+          "lobe_y_max_m": 0.018,
+          "lobe_y_min_m": -0.018,
+          "lobe_z_max_m": 0.177,
+          "lobe_z_min_m": 0.163,
+          "rigid_tool": {
+            "body": "payload",
+            "com_local_m": [
+              0.007,
+              0,
+              0
+            ],
+            "inertia_com_local_kg_m2": [
+              [
+                1e-08,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                4e-08,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                4e-08
+              ]
+            ],
+            "mass_kg": 0.002
+          },
+          "speed_m_s": 0.03,
+          "stroke_m": 0.03,
+          "tension_n": [
+            0.2,
+            8
+          ],
+          "tracking_max_m": 0.006,
+          "tracking_rmse_m": 0.003
+        },
+        "required_signals": [
+          "time_s",
+          "tip_m",
+          "qpos",
+          "qvel",
+          "tension_n",
+          "contacts",
+          "warnings",
+          "tendon_length_m"
+        ],
+        "source_files": [
+          {
+            "path": "figure_eight_tracking/task.json",
+            "sha256": "0c5d34455b58ec200580c0602079bb1377bee768d0a8f7e0f5c4a4e296268f9f"
+          },
+          {
+            "path": "scripts/solve_figure_eight.py",
+            "sha256": "66e417e4d2944504b3c387bc0393c3e696f62850da944284320cd1a33e2fdf26"
+          }
+        ],
+        "task_id": "T04",
+        "version": "task_acceptance_v1"
+      },
+      "actuator_channels": [
+        "actuator_commands"
+      ],
+      "contract_version": "1.0.0",
+      "environment": {
+        "contract": "experiment.assembly",
+        "data": {
+          "environment": {
+            "coordinate_frame": "world_base_x_forward_yz_cross_section",
+            "environment_id": "reach_free",
+            "gravity_m_s2": [
+              0.0,
+              0.0,
+              -9.81
+            ],
+            "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+            "lights": [
+              {
+                "direction": [
+                  0.0,
+                  0.0,
+                  -1.0
+                ],
+                "position_m": [
+                  0.0,
+                  0.0,
+                  2.0
+                ]
+              }
+            ],
+            "objects": [
+              {
+                "conaffinity": 1,
+                "contype": 0,
+                "half_size_m": [
+                  2.0,
+                  2.0,
+                  0.1
+                ],
+                "kind": "plane",
+                "name": "floor",
+                "position_m": [
+                  0.0,
+                  0.0,
+                  -0.02
+                ]
+              }
+            ],
+            "schema_version": "1",
+            "truth_status": "HUMAN_OWNED",
+            "units": "SI"
+          },
+          "external_forces": [],
+          "floor_id": "floor",
+          "mount": {
+            "position_m": [
+              0.0,
+              0.0,
+              0.17
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "physical_environment": {
+            "actuator_min_tension_n": 0.2,
+            "bodies": [],
+            "collision_policy": "native_default",
+            "contact_pairs": [],
+            "geometries": [
+              {
+                "body": "payload",
+                "conaffinity": 2,
+                "contype": 1,
+                "kind": "capsule",
+                "name": "pointer_shaft",
+                "position_m": [
+                  0.007,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  0.7071067811865476,
+                  0.0,
+                  0.7071067811865476,
+                  0.0
+                ],
+                "size_m": [
+                  0.002,
+                  0.007
+                ]
+              },
+              {
+                "body": "payload",
+                "conaffinity": 2,
+                "contype": 1,
+                "kind": "sphere",
+                "name": "pointer_head",
+                "position_m": [
+                  0.014,
+                  0.0,
+                  0.0
+                ],
+                "quaternion_wxyz": [
+                  1.0,
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "size_m": [
+                  0.003
+                ]
+              }
+            ],
+            "input_freeze_after_s": null,
+            "replace_robot_geometries": [
+              "payload_shape"
+            ],
+            "robot_hinge_range_rad": [
+              -0.3,
+              0.3
+            ],
+            "sites": [],
+            "solver_iterations": null,
+            "solver_tolerance": null,
+            "version": "physical_environment_v1",
+            "wrenches": []
+          }
+        },
+        "version": "1.0.0"
+      },
+      "evaluator": {
+        "extension_id": "evaluate.tracking",
+        "parameters": {
+          "contract": "reference.tracking_evaluation",
+          "data": {
+            "geometry_step_m": 0.001,
+            "max_error_m": 0.006
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "failure_policy": "retain_invalid_and_constraint_failures",
+      "family": "task.tracking",
+      "goal": {
+        "contract": "reference.parametric_tracking_goal",
+        "data": {
+          "reference": {
+            "amplitude_y_m": 0.02,
+            "amplitude_z_m": 0.008,
+            "center_m": [
+              0.282,
+              0.0,
+              0.17
+            ],
+            "cycles": 2,
+            "duration_s": 22,
+            "frequency_hz": 0.1,
+            "kind": "figure_eight",
+            "start_ramp_s": 2,
+            "stop_ramp_s": 2
+          },
+          "time_requirement": "timed"
+        },
+        "version": "1.0.0"
+      },
+      "initializer": {
+        "extension_id": "initialize.family",
+        "parameters": {
+          "contract": "family.initial",
+          "data": {
+            "rule": "all_candidate_dofs_zero_v1"
+          },
+          "version": "1.0.0"
+        },
+        "version": "1.0.0"
+      },
+      "name": "Frozen figure-eight tracking",
+      "objectives": [
+        {
+          "direction": "minimize",
+          "metric": "rms_position_error",
+          "units": "m",
+          "weight": 1.0
+        }
+      ],
+      "observations": [
+        {
+          "dimension": 3,
+          "entity": "tip",
+          "frame": "world",
+          "missing": "unsupported",
+          "name": "tip_position",
+          "phase": "post_step",
+          "units": "m"
+        }
+      ],
+      "robot_families": [
+        "tendon_robot_family"
+      ],
+      "sampling": {
+        "aggregation": "per_instance",
+        "seeds": [
+          17
+        ],
+        "split": "development",
+        "window_s": [
+          0.01,
+          22.0
+        ]
+      },
+      "source": "Showcase 2e5d1088746df0916e2a7ec60f4780998c6ba004 figure_eight_tracking/task.json and scripts/solve_figure_eight.py; prepared candidate equilibrium required",
+      "status": "development_valid",
+      "task_id": "figure-eight-tracking-v1",
+      "task_version": "1.0.0",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 22.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      }
+    },
+    "family_space": {
+      "actuator_defaults": {
+        "limits_m": [
+          -0.015,
+          0.015
+        ],
+        "rule": "independent_displacement_ideal_tension_v1",
+        "velocity_limit_m_s": 0.025
+      },
+      "assembly": {
+        "components": [
+          {
+            "connection": {
+              "part": "fixed_base",
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 0.0
+            },
+            "id": "segment_0",
+            "interpolation": "step",
+            "kind": "flexible_segment",
+            "length_m": 0.16,
+            "natural_curvature_rad_m": [
+              0.0,
+              0.0
+            ],
+            "physics": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0005,
+                0.0007
+              ],
+              "density_kg_m3": 1100.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 7200000.0
+            },
+            "sections": [
+              {
+                "s": 0.0,
+                "section": {
+                  "angle_rad": 0.35,
+                  "holes_yz_m": [],
+                  "kind": "ellipse",
+                  "outer_yz_m": [],
+                  "parameters": {
+                    "semi_y_m": 0.0095,
+                    "semi_z_m": 0.0076
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "com_local_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "connection": {
+              "part": "segment_0",
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 1.0
+            },
+            "envelope_halfsize_m": [
+              0.002,
+              0.025,
+              0.025
+            ],
+            "guide_holes": {},
+            "hole_radius_m": 0.0015,
+            "id": "mid_guide",
+            "inertia_com_local_kg_m2": [
+              [
+                4e-07,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                2e-07,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                2e-07
+              ]
+            ],
+            "kind": "guide",
+            "mass_kg": 0.002
+          },
+          {
+            "com_local_m": [
+              0.006,
+              0.0,
+              0.0
+            ],
+            "connection": {
+              "part": "mid_guide",
+              "position_m": [
+                0.002,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 0.0
+            },
+            "envelope_halfsize_m": [
+              0.006,
+              0.006,
+              0.006
+            ],
+            "guide_holes": {},
+            "hole_radius_m": 0.0,
+            "id": "connector",
+            "inertia_com_local_kg_m2": [
+              [
+                5e-08,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                7e-08,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                7e-08
+              ]
+            ],
+            "kind": "rigid_connector",
+            "mass_kg": 0.003
+          },
+          {
+            "connection": {
+              "part": "connector",
+              "position_m": [
+                0.012,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 0.0
+            },
+            "id": "segment_1",
+            "interpolation": "linear",
+            "kind": "flexible_segment",
+            "length_m": 0.11,
+            "natural_curvature_rad_m": [
+              0.0,
+              0.0
+            ],
+            "physics": {
+              "bending_ei_nm2": null,
+              "bending_viscosity_nm2_s": [
+                0.0003,
+                0.0004
+              ],
+              "density_kg_m3": 1050.0,
+              "line_density_kg_m": null,
+              "mode": "material",
+              "young_pa": 5400000.0
+            },
+            "sections": [
+              {
+                "s": 0.0,
+                "section": {
+                  "angle_rad": -0.25,
+                  "holes_yz_m": [],
+                  "kind": "rectangle",
+                  "outer_yz_m": [],
+                  "parameters": {
+                    "height_z_m": 0.0095,
+                    "width_y_m": 0.0133
+                  }
+                }
+              },
+              {
+                "s": 1.0,
+                "section": {
+                  "angle_rad": 0.15000000000000002,
+                  "holes_yz_m": [],
+                  "kind": "rectangle",
+                  "outer_yz_m": [],
+                  "parameters": {
+                    "height_z_m": 0.008549999999999999,
+                    "width_y_m": 0.0114
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "com_local_m": [
+              0.007,
+              0.0,
+              0.0
+            ],
+            "connection": {
+              "part": "segment_1",
+              "position_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ],
+              "s": 1.0
+            },
+            "envelope_halfsize_m": [
+              0.009,
+              0.009,
+              0.008
+            ],
+            "guide_holes": {},
+            "hole_radius_m": 0.0,
+            "id": "payload",
+            "inertia_com_local_kg_m2": [
+              [
+                1e-08,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                4e-08,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                4e-08
+              ]
+            ],
+            "kind": "payload",
+            "mass_kg": 0.002
+          }
+        ],
+        "mesh": {
+          "cells": {
+            "segment_0": 12,
+            "segment_1": 12
+          },
+          "coordinates": "two_principal_bending_angles_per_cell",
+          "model": "serial_bending_cells_v1",
+          "version": "serial_bending_discretization_v1"
+        },
+        "provenance": {
+          "ancestry": "Physical prototypes retained from family_space_v1; no source file is loaded to recover physics",
+          "rule": "root uses root_segment; every later index uses repeated_segment with its indexed or generic domain; each boundary repeats guide and connector; payload follows terminal segment",
+          "source": "Stage 0 Base-only space; unchanged public SI serial-family prototypes"
+        },
+        "tip": {
+          "part": "payload",
+          "position_m": [
+            0.014,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "s": 0.0
+        }
+      },
+      "assumptions": [
+        "SI; serial bending only; external frictionless straight tendon spans",
+        "One independent ideal tension per tendon; guide holes have fixed supplied inertia",
+        "Task environment owns mount and forces; assembly prototypes own connector, guide and payload",
+        "Clearance checks cover route stations and guide holes; swept self-collision is not validated"
+      ],
+      "conditional_rules": "base_only_consecutive_spans_v1",
+      "control_domains": {
+        "holding_tip_speed_weight": {
+          "default": 0.1,
+          "maximum": 1.0,
+          "minimum": 0.0
+        },
+        "terminal_tip_speed_weight": {
+          "default": 0.1,
+          "maximum": 1.0,
+          "minimum": 0.0
+        }
+      },
+      "executable_segment_counts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "executable_tendon_count_bounds": [
+        1,
+        7
+      ],
+      "family_id": "serial_external_tendons_base_only_v1",
+      "routing_domains": {
+        "anchor_s": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.8
+        },
+        "angular_offset_rad": {
+          "default": 0.0,
+          "maximum": 3.141592653589793,
+          "minimum": -3.141592653589793
+        },
+        "guide_s": {
+          "default": 0.5,
+          "maximum": 0.75,
+          "minimum": 0.15
+        },
+        "phase_rad": {
+          "default": 0.0,
+          "maximum": 6.283185307179586,
+          "minimum": -6.283185307179586
+        },
+        "radius_m": {
+          "default": 0.018,
+          "maximum": 0.023,
+          "minimum": 0.014
+        }
+      },
+      "segment_count_bounds": [
+        1,
+        9
+      ],
+      "segment_domain": {
+        "length_m": {
+          "default": 0.14,
+          "maximum": 0.24,
+          "minimum": 0.06
+        },
+        "section_dimensions_m": {
+          "circle": {
+            "radius_m": {
+              "default": 0.008,
+              "maximum": 0.012,
+              "minimum": 0.003
+            }
+          },
+          "ellipse": {
+            "semi_y_m": {
+              "default": 0.0095,
+              "maximum": 0.012,
+              "minimum": 0.003
+            },
+            "semi_z_m": {
+              "default": 0.0076,
+              "maximum": 0.012,
+              "minimum": 0.003
+            }
+          },
+          "rectangle": {
+            "height_z_m": {
+              "default": 0.0095,
+              "maximum": 0.018,
+              "minimum": 0.006
+            },
+            "width_y_m": {
+              "default": 0.0133,
+              "maximum": 0.018,
+              "minimum": 0.006
+            }
+          },
+          "tube": {
+            "inner_radius_m": {
+              "default": 0.003,
+              "maximum": 0.004,
+              "minimum": 0.001
+            },
+            "outer_radius_m": {
+              "default": 0.009,
+              "maximum": 0.012,
+              "minimum": 0.005
+            }
+          }
+        },
+        "young_pa": {
+          "default": 7000000.0,
+          "maximum": 15000000.0,
+          "minimum": 2000000.0
+        }
+      },
+      "segment_domains": {
+        "0": {
+          "length_m": {
+            "default": 0.16,
+            "maximum": 0.24,
+            "minimum": 0.08
+          },
+          "section_dimensions_m": {
+            "circle": {
+              "radius_m": {
+                "default": 0.008,
+                "maximum": 0.012,
+                "minimum": 0.003
+              }
+            },
+            "ellipse": {
+              "semi_y_m": {
+                "default": 0.0095,
+                "maximum": 0.012,
+                "minimum": 0.003
+              },
+              "semi_z_m": {
+                "default": 0.0076,
+                "maximum": 0.012,
+                "minimum": 0.003
+              }
+            },
+            "rectangle": {
+              "height_z_m": {
+                "default": 0.0095,
+                "maximum": 0.018,
+                "minimum": 0.006
+              },
+              "width_y_m": {
+                "default": 0.0133,
+                "maximum": 0.018,
+                "minimum": 0.006
+              }
+            },
+            "tube": {
+              "inner_radius_m": {
+                "default": 0.003,
+                "maximum": 0.004,
+                "minimum": 0.001
+              },
+              "outer_radius_m": {
+                "default": 0.009,
+                "maximum": 0.012,
+                "minimum": 0.005
+              }
+            }
+          },
+          "young_pa": {
+            "default": 7200000.0,
+            "maximum": 15000000.0,
+            "minimum": 2000000.0
+          }
+        },
+        "1": {
+          "length_m": {
+            "default": 0.11,
+            "maximum": 0.2,
+            "minimum": 0.06
+          },
+          "section_dimensions_m": {
+            "circle": {
+              "radius_m": {
+                "default": 0.008,
+                "maximum": 0.012,
+                "minimum": 0.003
+              }
+            },
+            "ellipse": {
+              "semi_y_m": {
+                "default": 0.0095,
+                "maximum": 0.012,
+                "minimum": 0.003
+              },
+              "semi_z_m": {
+                "default": 0.0076,
+                "maximum": 0.012,
+                "minimum": 0.003
+              }
+            },
+            "rectangle": {
+              "height_z_m": {
+                "default": 0.0095,
+                "maximum": 0.018,
+                "minimum": 0.006
+              },
+              "width_y_m": {
+                "default": 0.0133,
+                "maximum": 0.018,
+                "minimum": 0.006
+              }
+            },
+            "tube": {
+              "inner_radius_m": {
+                "default": 0.003,
+                "maximum": 0.004,
+                "minimum": 0.001
+              },
+              "outer_radius_m": {
+                "default": 0.009,
+                "maximum": 0.012,
+                "minimum": 0.005
+              }
+            }
+          },
+          "young_pa": {
+            "default": 5400000.0,
+            "maximum": 15000000.0,
+            "minimum": 2000000.0
+          }
+        }
+      },
+      "serial_assembly": {
+        "cell_count_bounds": [
+          1,
+          32
+        ],
+        "connector": "connector",
+        "default_cells": 12,
+        "guide": "mid_guide",
+        "payload": "payload",
+        "repeated_segment": "segment_1",
+        "root_segment": "segment_0",
+        "version": "repeat_serial_prototypes_v1"
+      },
+      "tendon_count_bounds": [
+        1,
+        12
+      ],
+      "tendon_domains": {
+        "diameter_m": {
+          "default": 0.001,
+          "maximum": 0.0012,
+          "minimum": 0.0005
+        },
+        "force_limit_n": {
+          "default": 8.0,
+          "maximum": 8.0,
+          "minimum": 1.0
+        },
+        "length_servo_gain_n_m": {
+          "default": 900.0,
+          "maximum": 1500.0,
+          "minimum": 300.0
+        },
+        "pretension_n": {
+          "default": 0.2,
+          "maximum": 1.0,
+          "minimum": 0.0
+        }
+      },
+      "unsupported": [
+        "8-12 tendons: declared, not execution validated",
+        "polygon section domain not granted in this example",
+        "axial extension",
+        "shear",
+        "twist",
+        "friction",
+        "swept self-collision",
+        "High segment-count dynamics and controller compatibility require candidate-specific validation"
+      ],
+      "version": "serial_family_space_v2"
+    },
+    "topology_scope": {
+      "declarative_segment_counts": [
+        1,
+        9
+      ],
+      "declarative_tendon_counts": [
+        1,
+        12
+      ],
+      "executable_segment_counts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "executable_tendon_counts": [
+        1,
+        7
+      ]
+    },
+    "analysis_protocol": {
+      "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+      "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+      "authority_threshold": null,
+      "baseline_lengths_m": {
+        "segment_0": 0.16,
+        "segment_1": 0.11,
+        "segment_2": 0.14,
+        "segment_3": 0.14,
+        "segment_4": 0.14,
+        "segment_5": 0.14,
+        "segment_6": 0.14,
+        "segment_7": 0.14,
+        "segment_8": 0.14
+      },
+      "candidate_rule": "initial_target_equilibrium_halfway",
+      "comparison_atol": 1e-08,
+      "comparison_rtol": 2e-06,
+      "construction_max_iterations": 20,
+      "derivative_atol": 2e-05,
+      "derivative_rtol": 0.0002,
+      "derivative_step": 1e-05,
+      "duration_s": 22.0,
+      "endpoint_check_atol": 1e-08,
+      "endpoint_max_iterations": 100,
+      "equilibrium_normalized_residual": 1e-05,
+      "frequency_rad_s": [
+        0.1,
+        1.0,
+        10.0,
+        100.0
+      ],
+      "horizon_alignment_atol_s": 1e-12,
+      "input_scale_n": 8.0,
+      "output_scale_m": 0.01,
+      "period_s": 0.01,
+      "pole_margin_s_inv": 1e-07,
+      "protocol_id": "task-local-v2",
+      "rank_atol": 1e-12,
+      "rank_rtol": 1e-09,
+      "samples_s": [
+        0.0,
+        11.0,
+        22.0
+      ],
+      "static_force_tolerance": 1e-10,
+      "static_max_iterations": 20,
+      "windows_s": [
+        0.1,
+        22.0
+      ]
+    },
+    "confirmation": {
+      "configuration": "Fresh Core physical evidence in every frozen case; no historical acceptance transfer.",
+      "fresh_independent_repetitions": 0
+    },
+    "nmpc_limits": {
+      "executions": 18
+    },
+    "rl_limits": {
+      "actions_per_trial": null,
+      "diagnostic_physics_steps": 0,
+      "diagnostic_replays": 0,
+      "evaluation_episodes": 0,
+      "seconds_per_trial": null,
+      "training_actions": null,
+      "training_active_seconds": null,
+      "training_stages": 0
+    },
+    "mathematical_methods": {
+      "mechanism_structure_v1": "User authorizes the existing bounded registered method in this independent surrogate Study.",
+      "mujoco-nonlinear-task-capability-v1": "User authorizes the existing bounded registered method in this independent surrogate Study.",
+      "sampled-affine-conic-minimax-v1": "User authorizes the existing registered conic capability method when applicable."
+    },
+    "capabilities": [
+      "analysis",
+      "mathematics",
+      "nmpc",
+      "physical_replay",
+      "control_correction"
+    ],
+    "candidate_initialization": "all_candidate_dofs_zero_v1",
+    "scoring_window_s": 22.0,
+    "registry_tools": {
+      "reference.generate": "1.0.0",
+      "research.dispatch": "1.0.0",
+      "research.math": "1.0.0",
+      "task.initial_state.construct": "1.0.0",
+      "task.initial_state.qualify": "1.0.0",
+      "task.protocol.aggregate": "1.0.0",
+      "task.protocol.bind": "1.0.0",
+      "task.protocol.evaluate": "1.0.0",
+      "task.protocol.inspect": "1.0.0",
+      "trace.decision": "1.0.0",
+      "trace.replay_export": "1.0.0"
+    },
+    "task_id": "T04",
+    "current_candidate": null,
+    "current_structure": null,
+    "current_mathematical_evidence": [],
+    "current_physical_evidence": [],
+    "checkpoint_description": "After immutable task/family preparation and before the first archived experience read and first scientific candidate.",
+    "source_research_budget_remaining": {
+      "backend_solves": 18,
+      "model_calls": 0,
+      "tool_calls": 446,
+      "wall_s": null,
+      "worker_calls": 0
+    },
+    "frozen_scientific_budgets": {
+      "activity_s": null,
+      "bdf_replays": 0,
+      "delivery_reserve_s": null,
+      "local_solve_s": null,
+      "local_solves": 0,
+      "mathematical_evaluations": 208,
+      "numerical_s": null,
+      "offline_nlp": 0,
+      "physical_launches": 18,
+      "protected_public_operations": 4,
+      "public_operations": 447
+    },
+    "replay_authorization": {
+      "provider_requests": 4,
+      "execute_research_actions": false
+    },
+    "original_execution_instructions": "Begin from the frozen canonical task and family definition. Generate candidate-owned structures; read exact Store evidence as needed. Numerical support and task acceptance are separate. No initial scientific candidate exists. Mathematical analysis is optional.",
+    "registered_initial_state_interface_schemas": {
+      "task.initial_state.construct": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "configuration": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "max_iterations": {
+            "default": 200,
+            "maximum": 1000,
+            "minimum": 1,
+            "title": "Max Iterations",
+            "type": "integer"
+          },
+          "qpos_seed_rad": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Qpos Seed Rad",
+            "type": "object"
+          },
+          "reference_times_s": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "maxItems": 300,
+                "minItems": 2,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional increasing frozen-reference times, starting at zero. Each point consumes one mathematical evaluation. Returns a warm-started native equilibrium bank and absolute tension knots, without integration or qualification.",
+            "title": "Reference Times S"
+          },
+          "tension_interior_margin_n": {
+            "default": 0.0,
+            "description": "Optional inward search margin within the unchanged task/native tension box. Use a positive margin when the original evaluator prohibits saturation; no acceptance limit is relaxed.",
+            "minimum": 0,
+            "title": "Tension Interior Margin N",
+            "type": "number"
+          },
+          "tension_reference_n": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Optional nominal absolute tensions for the existing small regularizer; useful for interior antagonistic preload. Does not change physical bounds.",
+            "title": "Tension Reference N",
+            "type": "object"
+          },
+          "tensions_seed_n": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Tensions Seed N",
+            "type": "object"
+          }
+        },
+        "required": [
+          "configuration"
+        ],
+        "title": "ConstructInitial",
+        "type": "object"
+      },
+      "task.initial_state.qualify": {
+        "$defs": {
+          "EvidenceRef": {
+            "additionalProperties": false,
+            "properties": {
+              "artifact_id": {
+                "pattern": "^[a-f0-9]{64}$",
+                "title": "Artifact Id",
+                "type": "string"
+              },
+              "media_type": {
+                "default": "application/json",
+                "title": "Media Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "artifact_id"
+            ],
+            "title": "EvidenceRef",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "configuration": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "qpos_rad": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Qpos Rad",
+            "type": "object"
+          },
+          "tensions_n": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Tensions N",
+            "type": "object"
+          }
+        },
+        "required": [
+          "configuration",
+          "qpos_rad",
+          "tensions_n"
+        ],
+        "title": "QualifyInitial",
+        "type": "object"
+      }
+    }
+  },
+  "reference_library": [
+    {
+      "resource_id": "R1",
+      "content": {
+        "version": "expert_historical_knowledge_v1",
+        "task_id": "T04",
+        "problem": "Construct and separately qualify a native equilibrium at t=0, then follow the frozen 22 s figure-eight.",
+        "mechanisms": [
+          "Historical success used slow quasistatic tension feedforward, minimum 0.2 N, four antagonistic channels, a periodic smooth interpolation and native force balance.",
+          "Historical single-segment length 0.27 m exceeds the current frozen 0.24 m per-root bound. The principle transfers; that exact single-segment design does not. Use legal geometry and recompute native equilibrium.",
+          "Initial zero joint angles and uniform 0.2 N were not balanced (prior residual 0.093733956 Nm versus 1e-7 Nm). A static constructor is required; qualification cannot be bypassed."
+        ],
+        "next_decision": "Use legal two-segment geometry, construct native equilibrium with task.initial_state.construct, qualify through task.initial_state.qualify, bind and validate the complete path.",
+        "sources": [
+          {
+            "repository": "wran021004-gif/softrobot-demo-showcase",
+            "commit": "2e5d1088746df0916e2a7ec60f4780998c6ba004",
+            "path": "figure_eight_tracking/structure.json",
+            "sha256": "cbd7a7c0e64271cfe5fd9028ba8e75531ba9a5ec4a3aa6c07941708e46b1b8ae"
+          },
+          {
+            "repository": "wran021004-gif/softrobot-demo-showcase",
+            "commit": "2e5d1088746df0916e2a7ec60f4780998c6ba004",
+            "path": "figure_eight_tracking/results.json",
+            "sha256": "170833cc4e0f37e086f36734349a896a534a02ac79701b84b2947474a14055b5"
+          },
+          {
+            "repository": "wran021004-gif/softrobot-demo-showcase",
+            "commit": "2e5d1088746df0916e2a7ec60f4780998c6ba004",
+            "path": "figure_eight_tracking/task.json",
+            "sha256": "0c5d34455b58ec200580c0602079bb1377bee768d0a8f7e0f5c4a4e296268f9f"
+          },
+          {
+            "repository": "wran021004-gif/softrobot-demo-showcase",
+            "commit": "2e5d1088746df0916e2a7ec60f4780998c6ba004",
+            "path": "scripts/solve_figure_eight.py",
+            "sha256": "66e417e4d2944504b3c387bc0393c3e696f62850da944284320cd1a33e2fdf26"
+          },
+          {
+            "repository": "wran021004-gif/softrobot-demo-showcase",
+            "commit": "2e5d1088746df0916e2a7ec60f4780998c6ba004",
+            "path": "ACTUATOR_REQUIREMENTS.md",
+            "sha256": "88d6343966104685c724bef9b04d6ee12e0a83f1dd48a61c0cd3b904974bfb7e"
+          }
+        ],
+        "prior_batch": {
+          "core_sha": "00d74dbe7e3ed5263e4a48a6eef08b2d63ac51ff",
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T04_figure_eight_tracking\\FINAL_RESULT.md"
+        },
+        "limitation": "Historical engineering guidance only. Numerical values require frozen-domain checks, current-candidate recomputation and complete original acceptance. No current scientific credit."
+      },
+      "applicability": "Same frozen task and legal domain; parameters may guide fresh trials with explicit user authorization.",
+      "limitations": "Historical engineering guidance only. Numerical values require frozen-domain checks, current-candidate recomputation and complete original acceptance. No current scientific credit."
+    },
+    {
+      "resource_id": "R2",
+      "content": {
+        "version": "core_research_knowledge_v1",
+        "title": "T04 method selection: native feedforward, GVS NMPC, SoRoSim and RL",
+        "scope": "Frozen timed 22 s figure-eight; no claim of global method optimality or current feasibility.",
+        "observations": [
+          "Historical successful T04 used periodic quasistatic tension feedforward, not NMPC. Its 0.27 m single segment and 12 mm routing radius lie outside the current frozen family bounds; transfer the procedure rather than copying the hardware.",
+          "Current controller.gvs_nmpc@12.0.0 supports timed parameterized tracking and independent MuJoCo execution. A full 2200-update trial is in progress; sustained CPU use does not establish quality or acceptance.",
+          "controller.sorosim_matlab_nmpc@1.0.0 is registered, but its declared task_support is task.reach. The generated task gate rejects tracking and SorosimNMPCController.request reads static target_m. Timed reference objectives must be adapted and verified before using it for T04.",
+          "The existing PPO channel is available for reach and untimed geometric tracking. prepare_input rejects timed tracking and external-force scenes; presence of an RL channel does not establish original T04/M7 semantics.",
+          "Native quasistatic continuation reuses the existing SLSQP equilibrium construction and native mechanics, avoids 2200 online optimizations, and is supported by the historical low-frequency result. Dynamic tracking, cycle drift, tension saturation, stroke and speed remain unmeasured until full independent replay."
+        ],
+        "decision": "Try native equilibrium continuation and independent full feedforward replay first. Keep GVS NMPC evidence. If model error or unmodeled dynamics defeat feedforward, compare adapting SoRoSim timed NMPC or residual RL with explicit task/observation/evaluation semantics; do not claim one failed route proves infeasibility.",
+        "source_refs": [
+          {
+            "repository": "softrobot-agent-core",
+            "path": "extensions/tendon_family/manifest.py",
+            "sha256": "4e0b76a5d42707ade6069790e0e0cab3e23090f37c8b79da4b901ab4f934eb99"
+          },
+          {
+            "repository": "softrobot-agent-core",
+            "path": "extensions/tendon_family/generated_serial.py",
+            "sha256": "c0a1631b6dae1fb71d6fd09eac2afb021eaf5dcbf8a9ade69b528311486a2049"
+          },
+          {
+            "repository": "softrobot-agent-core",
+            "path": "extensions/tendon_family/sorosim_control.py",
+            "sha256": "b9d26c0eb9bb852cb970ceb10df8b0e2d0b091f867a4ea6c22a2f35e284ae57d"
+          },
+          {
+            "repository": "softrobot-agent-core",
+            "path": "tools/research/rl.py",
+            "sha256": "4e9cd94a00333db1b70142230df05d768de5f8a88cfe474353753605591d6bda"
+          },
+          {
+            "repository": "softrobot-agent-core",
+            "path": "tools/research/construct_initial.py",
+            "sha256": "2659b9e0b9df93f3750830d87502faf4b76307bb2d5344c5059cbabb050bd16b"
+          },
+          {
+            "repository": "softrobot-agent-core",
+            "path": "tools/research/physical_replay.py",
+            "sha256": "56271ec5d5d60549e33cea256cecf9f95775630d017e2ee77b1983fefef8dc44"
+          }
+        ],
+        "limitations": "Source-backed applicability and a prospective route choice, not a scientific success or an optimality proof."
+      },
+      "applicability": "Same frozen task and legal domain; parameters may guide fresh trials with explicit user authorization.",
+      "limitations": "Historical engineering guidance only. Numerical values require frozen-domain checks, current-candidate recomputation and complete original acceptance. No current scientific credit."
+    },
+    {
+      "resource_id": "R3",
+      "content": {
+        "version": "core_procedural_skill_v1",
+        "title": "Native reference initial-state construction",
+        "trigger": "Native reference initial-state construction",
+        "steps": [
+          "Read the frozen parametric reference and inspect geometry/domain compatibility.",
+          "Submit task.initial_state.construct with owned configuration and bounded construction budget.",
+          "Read returned residual, target error and native cost; independently submit the returned named qpos/tensions to task.initial_state.qualify.",
+          "Bind task.protocol.bind only with the owned successful qualification. Physical acceptance still requires the full original trajectory."
+        ],
+        "limitations": "Conditional workflow; does not grant authorization or establish current task acceptance."
+      },
+      "applicability": "Supported registered models and frozen task; follow actual Schema and evidence.",
+      "limitations": "Conditional workflow; does not grant authorization or establish current task acceptance."
+    },
+    {
+      "resource_id": "R4",
+      "content": {
+        "version": "core_procedural_skill_v1",
+        "title": "Frozen-reference native equilibrium bank and feedforward replay",
+        "trigger": "Slow periodic timed tracking with qualified native initial-state semantics and historical quasistatic evidence.",
+        "steps": [
+          "Read R1 and R2; verify all generated geometry stays within the frozen family space.",
+          "Generate a fresh candidate. Submit task.initial_state.construct@1.0.0 with its configuration_reference, strictly increasing reference_times_s starting at zero, max_iterations, and optionally named tension_reference_n for interior preload. Each time point consumes one mathematical evaluation.",
+          "Read reference_bank, maximum_static_balance_inf_nm, maximum_position_error_m, optimizer statuses and actual native cost. A numerical optimizer status alone is not equilibrium qualification.",
+          "Submit returned time-zero qpos_rad and tensions_n to task.initial_state.qualify, then task.protocol.bind with the owned qualification. Do not import nonzero trajectory velocities or bypass the independent gate.",
+          "Submit research.dispatch initialize_control with the bound candidate, method baseline and returned tension_knots. Core interpolates absolute tensions at control interval starts and executes zero-order hold; no shell, private interpolation or historical state is required.",
+          "Submit independent physical_replay for the complete frozen 22 s task. Read the original complete acceptance result, diagnose any dynamic/saturation/cycle failures, and SELECT only a fully passing current candidate."
+        ],
+        "limitations": "Quasistatic hypothesis only. No trajectory acceptance from static points; no change to original hard bounds, qualification or evaluation grid."
+      },
+      "applicability": "Supported registered models and frozen task; follow actual Schema and evidence.",
+      "limitations": "Conditional workflow; does not grant authorization or establish current task acceptance."
+    },
+    {
+      "resource_id": "R5",
+      "content": {
+        "version": "core_research_knowledge_v1",
+        "scope": "Original frozen T04 only; interface failure and prospective preload procedure, no current acceptance.",
+        "observations": [
+          "Core 0.2.8 completed the full new native-bank physical rollout but its postprocessor raised KeyError phase_rad because the frozen reference omitted the declared zero default. Worker output, actual source SHA and costs remain retained; no acceptance exists for that call.",
+          "An 89-point native bank had maximum position error 0.602 mm and maximum static residual 5.10e-12 Nm, but included 0.2 N values. Those are static diagnostics, not trajectory success; the original strict no_saturation rule excludes tensions within 0.0001 N of either bound.",
+          "Core 0.2.9 normalizes the declared phase default and supports an optional tension_interior_margin_n in native construction. A 0.01 N inward margin restricts the search to 0.21..7.99 N inside the unchanged 0.2..8 N task box; seed/reference preload may be 4 N. Full independent qualification and trajectory acceptance remain mandatory."
+        ],
+        "procedure": "Read R4. In construct supply tension_interior_margin_n=0.01 and named seed/reference tensions=4 N. Read actual bank residual/error; independently qualify time zero, bind, seed returned knots, then complete original physical replay. Reject numerical or physical failures honestly.",
+        "source_refs": [
+          {
+            "path": "tools/research/construct_initial.py",
+            "sha256": "8246192ef5f2bc16958fd9864090d85226afe06125270e2c2310e002ffed339d"
+          },
+          {
+            "path": "extensions/reference/protocol_evaluation.py",
+            "sha256": "66f941b30e8a73e0de452316bf6767ba22d6634081e63944885a430422301f8e"
+          },
+          {
+            "path": "tests/test_figure_eight_phase_default.py",
+            "sha256": "b9860a8117f708f03960d2fd44a1a9090756e82f75abe879aa745c70af807499"
+          }
+        ],
+        "limitations": "No change to task, generator bounds or acceptance thresholds. A narrower construction search box does not itself prove tracking, no saturation between nodes, drift or actuator limits."
+      },
+      "applicability": "Same frozen task and legal domain; parameters may guide fresh trials with explicit user authorization.",
+      "limitations": "Historical engineering guidance only. Numerical values require frozen-domain checks, current-candidate recomputation and complete original acceptance. No current scientific credit."
+    }
+  ]
+}

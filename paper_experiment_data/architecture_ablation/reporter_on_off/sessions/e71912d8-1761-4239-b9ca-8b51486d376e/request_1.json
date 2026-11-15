@@ -1,0 +1,1692 @@
+{
+  "model": "gpt-5.6-sol",
+  "stream": false,
+  "reasoning_effort": "medium",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are Softrobot-Agent Main performing one decision-only historical replay.\nUse only the frozen mathematical facts, physical observations, task, candidate and raw evidence supplied here.\nIf an additional scientific interpretation is present, treat it as non-authoritative and check it against raw facts.\nDo not mention whether an interpretation was present, the Reporter, the experimental condition, or this instruction.\nUse English. Submit exactly one concrete next scientific decision through the existing research_plan tool.\nUse its hypothesis, interpretation, supporting_evidence, expected_observation, weakening_observation,\nfixed_conditions, stopping_condition and typed decision fields to explain the key question, mechanism,\nnext action, its evidence, expected/weakening outcomes and scope. Cite only raw scientific EvidenceRefs.\nYou may read whitelisted historical evidence with evidence_read. Maximum four Provider requests.\nThis is not a new Study. research_plan records a proposed action and ends the session; no action is executed.\nDo not run mathematics, generate candidates or simulate. Any proposed future action must respect the frozen\ntask/domain and evidence limits. Missing values remain unknown. Do not equate finite contrasts with strict\ngradients, sampled/model results with independent task acceptance, stagnation with infeasibility, or multiple\nchanged parameters with single-factor causal proof. Prefer a specific informative action to generic repetition.\nAll evidence delivered initially is already available to you; only read more if needed for the decision.\n"
+    },
+    {
+      "role": "user",
+      "content": "{\"snapshot_id\":\"M1_C\",\"source_study\":\"m1-core-full-20261111\",\"research_state\":\"Settled immediately after this saved mathematical result and its matching Reporter report; no future decisions or final outcomes supplied.\",\"current_candidate_reference\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"},\"current_candidate_robot\":{\"structure\":{\"contract\":\"family.design\",\"data\":{\"actuators\":[{\"command_type\":\"displacement\",\"drum_radius_m\":null,\"id\":\"actuator_0\",\"limits\":[-0.015,0.015],\"transmission\":[{\"ratio\":1.0,\"tendon\":\"tendon_0\"}],\"units\":\"m\",\"velocity_limit\":0.025},{\"command_type\":\"displacement\",\"drum_radius_m\":null,\"id\":\"actuator_1\",\"limits\":[-0.015,0.015],\"transmission\":[{\"ratio\":1.0,\"tendon\":\"tendon_1\"}],\"units\":\"m\",\"velocity_limit\":0.025},{\"command_type\":\"displacement\",\"drum_radius_m\":null,\"id\":\"actuator_2\",\"limits\":[-0.015,0.015],\"transmission\":[{\"ratio\":1.0,\"tendon\":\"tendon_2\"}],\"units\":\"m\",\"velocity_limit\":0.025},{\"command_type\":\"displacement\",\"drum_radius_m\":null,\"id\":\"actuator_3\",\"limits\":[-0.015,0.015],\"transmission\":[{\"ratio\":1.0,\"tendon\":\"tendon_3\"}],\"units\":\"m\",\"velocity_limit\":0.025},{\"command_type\":\"displacement\",\"drum_radius_m\":null,\"id\":\"actuator_4\",\"limits\":[-0.015,0.015],\"transmission\":[{\"ratio\":1.0,\"tendon\":\"tendon_4\"}],\"units\":\"m\",\"velocity_limit\":0.025},{\"command_type\":\"displacement\",\"drum_radius_m\":null,\"id\":\"actuator_5\",\"limits\":[-0.015,0.015],\"transmission\":[{\"ratio\":1.0,\"tendon\":\"tendon_5\"}],\"units\":\"m\",\"velocity_limit\":0.025}],\"components\":[{\"connection\":{\"part\":\"fixed_base\",\"position_m\":[0.0,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"id\":\"segment_0\",\"interpolation\":\"step\",\"kind\":\"flexible_segment\",\"length_m\":0.16,\"natural_curvature_rad_m\":[0.0,0.0],\"physics\":{\"bending_ei_nm2\":null,\"bending_viscosity_nm2_s\":[0.0005,0.0007],\"density_kg_m3\":1100.0,\"line_density_kg_m\":null,\"mode\":\"material\",\"young_pa\":7200000.0},\"sections\":[{\"s\":0.0,\"section\":{\"angle_rad\":0.35,\"holes_yz_m\":[],\"kind\":\"ellipse\",\"outer_yz_m\":[],\"parameters\":{\"semi_y_m\":0.0095,\"semi_z_m\":0.0076}}}]},{\"com_local_m\":[0.0,0.0,0.0],\"connection\":{\"part\":\"segment_0\",\"position_m\":[0.0,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":1.0},\"envelope_halfsize_m\":[0.002,0.025,0.025],\"guide_holes\":{\"tendon_3_hole\":[0.0,0.009000000000000001,0.015588457268119894],\"tendon_4_hole\":[0.0,-0.018,2.2043642384652355e-18],\"tendon_5_hole\":[0.0,0.008999999999999987,-0.015588457268119901]},\"hole_radius_m\":0.0015,\"id\":\"guide_1\",\"inertia_com_local_kg_m2\":[[4e-07,0.0,0.0],[0.0,2e-07,0.0],[0.0,0.0,2e-07]],\"kind\":\"guide\",\"mass_kg\":0.002},{\"com_local_m\":[0.006,0.0,0.0],\"connection\":{\"part\":\"guide_1\",\"position_m\":[0.002,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"envelope_halfsize_m\":[0.006,0.006,0.006],\"guide_holes\":{},\"hole_radius_m\":0.0,\"id\":\"connector_1\",\"inertia_com_local_kg_m2\":[[5e-08,0.0,0.0],[0.0,7e-08,0.0],[0.0,0.0,7e-08]],\"kind\":\"rigid_connector\",\"mass_kg\":0.003},{\"connection\":{\"part\":\"connector_1\",\"position_m\":[0.012,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"id\":\"segment_1\",\"interpolation\":\"linear\",\"kind\":\"flexible_segment\",\"length_m\":0.11,\"natural_curvature_rad_m\":[0.0,0.0],\"physics\":{\"bending_ei_nm2\":null,\"bending_viscosity_nm2_s\":[0.0003,0.0004],\"density_kg_m3\":1050.0,\"line_density_kg_m\":null,\"mode\":\"material\",\"young_pa\":5400000.0},\"sections\":[{\"s\":0.0,\"section\":{\"angle_rad\":-0.25,\"holes_yz_m\":[],\"kind\":\"rectangle\",\"outer_yz_m\":[],\"parameters\":{\"height_z_m\":0.0095,\"width_y_m\":0.0133}}},{\"s\":1.0,\"section\":{\"angle_rad\":0.15000000000000002,\"holes_yz_m\":[],\"kind\":\"rectangle\",\"outer_yz_m\":[],\"parameters\":{\"height_z_m\":0.008549999999999999,\"width_y_m\":0.0114}}}]},{\"com_local_m\":[0.007,0.001,-0.002],\"connection\":{\"part\":\"segment_1\",\"position_m\":[0.0,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":1.0},\"envelope_halfsize_m\":[0.009,0.009,0.008],\"guide_holes\":{},\"hole_radius_m\":0.0,\"id\":\"payload\",\"inertia_com_local_kg_m2\":[[6e-07,1e-07,0.0],[1e-07,8e-07,1e-07],[0.0,1e-07,9e-07]],\"kind\":\"payload\",\"mass_kg\":0.01}],\"id\":\"serial_family_candidate\",\"metadata\":{},\"tendons\":[{\"diameter_m\":0.001,\"force_limit_n\":8.0,\"id\":\"tendon_0\",\"length_servo_gain_n_m\":900.0,\"model\":\"straight_frictionless\",\"points\":[{\"attachment\":{\"part\":\"fixed_base\",\"position_m\":[0.0,0.018,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":null,\"role\":\"start\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,0.018,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,0.018,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":1.0},\"hole\":null,\"role\":\"anchor\"}],\"pretension_n\":0.2},{\"diameter_m\":0.001,\"force_limit_n\":8.0,\"id\":\"tendon_1\",\"length_servo_gain_n_m\":900.0,\"model\":\"straight_frictionless\",\"points\":[{\"attachment\":{\"part\":\"fixed_base\",\"position_m\":[0.0,-0.008999999999999996,0.015588457268119896],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":null,\"role\":\"start\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,-0.008999999999999996,0.015588457268119896],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,-0.008999999999999996,0.015588457268119896],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":1.0},\"hole\":null,\"role\":\"anchor\"}],\"pretension_n\":0.2},{\"diameter_m\":0.001,\"force_limit_n\":8.0,\"id\":\"tendon_2\",\"length_servo_gain_n_m\":900.0,\"model\":\"straight_frictionless\",\"points\":[{\"attachment\":{\"part\":\"fixed_base\",\"position_m\":[0.0,-0.009000000000000008,-0.015588457268119891],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":null,\"role\":\"start\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,-0.009000000000000008,-0.015588457268119891],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,-0.009000000000000008,-0.015588457268119891],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":1.0},\"hole\":null,\"role\":\"anchor\"}],\"pretension_n\":0.2},{\"diameter_m\":0.001,\"force_limit_n\":8.0,\"id\":\"tendon_3\",\"length_servo_gain_n_m\":900.0,\"model\":\"straight_frictionless\",\"points\":[{\"attachment\":{\"part\":\"fixed_base\",\"position_m\":[0.0,0.009000000000000001,0.015588457268119894],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":null,\"role\":\"start\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,0.009000000000000001,0.015588457268119894],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"guide_1\",\"position_m\":[0.0,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":\"tendon_3_hole\",\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_1\",\"position_m\":[0.0,0.009000000000000001,0.015588457268119894],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_1\",\"position_m\":[0.0,0.009000000000000001,0.015588457268119894],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":1.0},\"hole\":null,\"role\":\"anchor\"}],\"pretension_n\":0.2},{\"diameter_m\":0.001,\"force_limit_n\":8.0,\"id\":\"tendon_4\",\"length_servo_gain_n_m\":900.0,\"model\":\"straight_frictionless\",\"points\":[{\"attachment\":{\"part\":\"fixed_base\",\"position_m\":[0.0,-0.018,2.2043642384652355e-18],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":null,\"role\":\"start\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,-0.018,2.2043642384652355e-18],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"guide_1\",\"position_m\":[0.0,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":\"tendon_4_hole\",\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_1\",\"position_m\":[0.0,-0.018,2.2043642384652355e-18],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_1\",\"position_m\":[0.0,-0.018,2.2043642384652355e-18],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":1.0},\"hole\":null,\"role\":\"anchor\"}],\"pretension_n\":0.2},{\"diameter_m\":0.001,\"force_limit_n\":8.0,\"id\":\"tendon_5\",\"length_servo_gain_n_m\":900.0,\"model\":\"straight_frictionless\",\"points\":[{\"attachment\":{\"part\":\"fixed_base\",\"position_m\":[0.0,0.008999999999999987,-0.015588457268119901],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":null,\"role\":\"start\"},{\"attachment\":{\"part\":\"segment_0\",\"position_m\":[0.0,0.008999999999999987,-0.015588457268119901],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"guide_1\",\"position_m\":[0.0,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"hole\":\"tendon_5_hole\",\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_1\",\"position_m\":[0.0,0.008999999999999987,-0.015588457268119901],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.5},\"hole\":null,\"role\":\"guide\"},{\"attachment\":{\"part\":\"segment_1\",\"position_m\":[0.0,0.008999999999999987,-0.015588457268119901],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":1.0},\"hole\":null,\"role\":\"anchor\"}],\"pretension_n\":0.2}],\"tip\":{\"part\":\"payload\",\"position_m\":[0.014,0.0,0.0],\"quaternion_wxyz\":[1.0,0.0,0.0,0.0],\"s\":0.0},\"version\":\"tendon_family_v1\"},\"version\":\"1.0.0\"}},\"current_policy\":{\"discretization\":{\"contract\":\"family.discretization\",\"data\":{\"cells\":{\"segment_0\":12,\"segment_1\":12},\"coordinates\":\"two_principal_bending_angles_per_cell\",\"model\":\"serial_bending_cells_v1\",\"version\":\"serial_bending_discretization_v1\"},\"version\":\"1.0.0\"}},\"frozen_task\":{\"task_id\":\"bf7-shared-reach-v1-central_high\"},\"frozen_protocols\":{\"analysis_protocol\":{\"authority_reason\":\"No independently justified task-required MIMO gain threshold; usable bandwidth undefined.\",\"authority_rule\":\"Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.\",\"authority_threshold\":null,\"baseline_lengths_m\":{\"segment_0\":0.16,\"segment_1\":0.11,\"segment_2\":0.14,\"segment_3\":0.14,\"segment_4\":0.14,\"segment_5\":0.14,\"segment_6\":0.14,\"segment_7\":0.14,\"segment_8\":0.14},\"candidate_rule\":\"initial_target_equilibrium_halfway\",\"comparison_atol\":1e-08,\"comparison_rtol\":2e-06,\"construction_max_iterations\":20,\"derivative_atol\":2e-05,\"derivative_rtol\":0.0002,\"derivative_step\":1e-05,\"duration_s\":0.6,\"endpoint_check_atol\":1e-08,\"endpoint_max_iterations\":100,\"equilibrium_normalized_residual\":1e-05,\"frequency_rad_s\":[0.1,1.0,10.0,100.0],\"horizon_alignment_atol_s\":1e-12,\"input_scale_n\":8.0,\"output_scale_m\":0.01,\"period_s\":0.02,\"pole_margin_s_inv\":1e-07,\"protocol_id\":\"task-local-v2\",\"rank_atol\":1e-12,\"rank_rtol\":1e-09,\"samples_s\":[0.0,0.1,0.2,0.58],\"static_force_tolerance\":1e-10,\"static_max_iterations\":20,\"windows_s\":[0.05,0.1,0.6]},\"confirmation\":{\"configuration\":\"Select exact fresh completed passing backend evaluation after public read. No extra repetitions; repeatability unassessed.\",\"fresh_independent_repetitions\":0},\"native_control_limits\":{\"evaluation_requests\":800,\"iterations\":100,\"knots_s\":30},\"conditions\":null,\"task\":null,\"topology_scope\":{\"declarative_segment_counts\":[1,9],\"declarative_tendon_counts\":[1,12],\"executable_segment_counts\":[2],\"executable_tendon_counts\":[6,6]}},\"raw_deterministic_cards\":[{\"control_search\":null,\"critical_observations\":[],\"detail_sources\":[{\"pointer\":\"\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}},{\"pointer\":\"/analysis_applicability\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}},{\"pointer\":\"/configuration\",\"reference\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"}},{\"pointer\":\"/parameters\",\"reference\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"}},{\"pointer\":\"/provenance\",\"reference\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"}},{\"pointer\":\"\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}}],\"deterministic_summary\":{\"candidate\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"},\"certificate_verified\":null,\"conclusion\":\"inconclusive\",\"coverage\":\"partial\",\"decision_relevance\":{\"potential_discriminating_checks\":[\"Inspect solver, operating point or another design hypothesis.\"],\"supported_facts\":[\"No verified witness or exclusion certificate.\"],\"unresolved_questions\":[\"Task expressibility does not resolve feasibility.\"],\"unsupported_inferences\":[\"Global/physical feasibility, structural necessity or surrounding-region exclusion.\"]},\"detail_pointer\":\"\",\"diagnostic_layers\":{\"dynamic_validation\":{\"computation_status\":\"not_evaluated\",\"facts\":{},\"failure_reasons\":[],\"missing_checks\":[\"complete dynamics\",\"independent Replay\",\"original task acceptance\"],\"scope\":\"Independent execution and original evaluator remain authoritative; local mathematics grants no task acceptance.\",\"status\":\"not_evaluated\"},\"geometry\":{\"computation_status\":\"completed\",\"facts\":{\"constraint_count\":4,\"contact_count\":1,\"contacts\":[{\"distance_m\":-0.00013816094441274768,\"geom1\":\"floor\",\"geom2\":\"payload_shape\"}],\"time_s\":0.23100000000000018},\"failure_reasons\":[],\"missing_checks\":[],\"scope\":\"Recorded native geometry before state-support rejection; contact observations do not establish an admissible working point.\",\"status\":\"not_evaluated\"},\"numerical_solve\":{\"computation_status\":\"partial\",\"facts\":{\"cost\":{\"forward_evaluations\":11066,\"mechanics_evaluations\":0,\"model_builds\":1,\"physics_step_attempts\":108831,\"physics_steps\":108831,\"rollouts\":182}},\"failure_reasons\":[\"NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE\"],\"missing_checks\":[\"unrecorded worker progress\"],\"scope\":\"Only recorded failure observations; unobserved solver entry and counts remain unknown.\",\"status\":\"unqualified\"},\"static_qualification\":{\"computation_status\":\"not_evaluated\",\"facts\":{},\"failure_reasons\":[],\"missing_checks\":[\"applicable working-point qualification\"],\"scope\":\"Local working point only; no structural infeasibility claim.\",\"status\":\"not_evaluated\"}},\"diagnostic_overview\":{\"computation_status\":{\"dynamic_validation\":\"not_evaluated\",\"geometry\":\"completed\",\"numerical_solve\":\"partial\",\"static_qualification\":\"not_evaluated\"},\"interpretation\":\"Layers are independent information scopes, not sequential Workers. Unqualified results do not establish structural infeasibility.\",\"key_facts\":{\"contact_count\":1},\"layer_status\":{\"dynamic_validation\":\"not_evaluated\",\"geometry\":\"not_evaluated\",\"numerical_solve\":\"unqualified\",\"static_qualification\":\"not_evaluated\"},\"observed_layers\":[\"geometry\",\"numerical_solve\"],\"primary_failure_layer\":\"numerical_solve\",\"qualified_layers\":[],\"unresolved_checks\":{\"dynamic_validation\":[\"complete dynamics\",\"independent Replay\",\"original task acceptance\"],\"numerical_solve\":[\"unrecorded worker progress\"],\"static_qualification\":[\"applicable working-point qualification\"]}},\"diagnostic_pointer\":\"/diagnostic_layers\",\"evaluations\":1,\"evidence_summary\":{\"candidate_identity\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"},\"claim_kind\":\"NUMERICAL_DIAGNOSTIC\",\"design_identity\":\"f0837aacfde3c795e7b305f3e074866425e2b585eb0a152c3ea2c5f6dd6df1e4\",\"evidence_reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"},\"model_identity\":null,\"next_checks\":[\"independent_legal_physical_evaluation\",\"matched_input_refinement\",\"paired_local_response_check\"],\"numerical_evidence_pointer\":\"\",\"prospective_guarantee\":false,\"supported_inferences\":[\"local_diagnostic\"],\"task_identity\":\"52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8\",\"unresolved\":[\"Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.\",\"Original independent physical task acceptance is unmeasured by this evidence.\"],\"unsupported_inferences\":[\"global_nonlinear_feasibility\",\"global_nonlinear_infeasibility\",\"structural_infeasibility\",\"whole_horizon_from_instantaneous_braking\",\"adapted_dynamic_improvement_from_static_sensitivity\",\"unvisited_simulation_descent_guarantee\",\"continuous_time_compliance\",\"hardware_performance\",\"robustness\",\"repeatability\",\"observed_task_pass\"],\"verification_status\":\"insufficient\",\"version\":\"evidence_policy_v1\"},\"failure_pointer\":\"\",\"margins\":[],\"numerical_s\":11.262170300004072,\"operation\":\"mujoco_nonlinear_task_capability_v1\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"},\"scientific_interpretation\":{\"causal_conclusion\":\"Requires controlled conditions or other identifying evidence; unequal outcomes alone do not identify a cause.\",\"horizon_scope\":\"Instantaneous dynamics, local sensitivity or single-time braking authority does not establish complete finite-horizon task feasibility or infeasibility.\",\"measured_observation\":\"Named model or physical execution observations apply only to recorded states, actual inputs, times and sampling conditions.\",\"model_calculation\":\"Calculations depend on the named model, assumptions, operating point, input bounds and horizon; nonlinear physical transfer requires validation.\",\"prediction_difference\":\"Match candidate, task, actual control, initial state, input channels and time grid before computing model prediction differences.\",\"research_hypothesis\":\"A proposed mechanism needs subsequent observations that can support or weaken it.\",\"time_scope\":\"Finite discrete observations alone do not establish between-sample or extrapolated dynamics; state any additional model assumptions.\",\"version\":\"scientific_interpretation_v1\"},\"scope_pointer\":\"/scoped_claim\",\"status\":\"execution_incomplete\",\"task_identity\":null},\"evidence_summary\":{\"assumptions\":{\"legacy_applicability\":{\"constraint_coverage\":[{\"analyzed_indices\":[30],\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"},{\"analyzed_indices\":[27,28,29,30],\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"},{\"analyzed_indices\":[27,28,29,30],\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"}],\"execution_support\":\"independent_full_replay_required\",\"full_task_supported\":false,\"horizon\":{\"analysis_window_s\":[0.0,0.6],\"covers_required_samples\":true,\"earliest_required_sample_s\":0.54,\"interpretation\":\"Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance.\",\"legal_correction_window_s\":[0.0,0.6],\"origin\":0.0,\"period_s\":0.02,\"state_requirement\":\"Frozen standardized initialization is at 0 s. A later origin requires an exact owned native checkpoint or verified measured prefix; a correction window does not move the initial state.\",\"state_time_s\":0.0,\"task_deadline_s\":0.6,\"task_duration_s\":0.6},\"model_assessment\":{\"model_id\":\"model.mujoco_native\",\"model_version\":\"1.0.0\",\"relevant_assumptions\":[\"MuJoCo compiled family model; no GVS projection; ideal absolute tensions.\",\"Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.\",\"Contact-free, unconstrained hinges without activation dynamics; runtime checked.\",\"Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation.\"],\"representation_id\":\"native_named_hinges_v1\",\"uses\":{\"native_numerics\":{\"reasons\":[],\"status\":\"ACCEPT\"}}},\"reasons\":[],\"status\":\"applicable\"},\"model\":{\"model_id\":\"model.mujoco_native\",\"model_version\":\"1.0.0\",\"relevant_assumptions\":[\"MuJoCo compiled family model; no GVS projection; ideal absolute tensions.\",\"Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.\",\"Contact-free, unconstrained hinges without activation dynamics; runtime checked.\",\"Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation.\"],\"representation_id\":\"native_named_hinges_v1\"},\"physical_inputs\":{\"control_period_s\":0.02,\"frame\":\"tendon_path\",\"lower\":[0.0,0.0,0.0,0.0,0.0,0.0],\"phase\":\"pre_step\",\"provenance\":[\"/robot/structure/data/tendons\",\"/task/timing/control_period_s\"],\"signal\":\"tendon_tension\",\"tendon_order\":[\"tendon_0\",\"tendon_1\",\"tendon_2\",\"tendon_3\",\"tendon_4\",\"tendon_5\"],\"units\":\"N\",\"upper\":[8.0,8.0,8.0,8.0,8.0,8.0]},\"source\":\"Trusted resolved tool artifact; not arbitrary LLM assertions\"},\"candidate_identity\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"},\"claim_kind\":\"NUMERICAL_DIAGNOSTIC\",\"covered_samples\":{\"constraints\":[{\"analyzed_indices\":[30],\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"},{\"analyzed_indices\":[27,28,29,30],\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"},{\"analyzed_indices\":[27,28,29,30],\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"}],\"full_task_supported\":false,\"horizon\":{\"analysis_window_s\":[0.0,0.6],\"covers_required_samples\":true,\"earliest_required_sample_s\":0.54,\"interpretation\":\"Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance.\",\"legal_correction_window_s\":[0.0,0.6],\"origin\":0.0,\"period_s\":0.02,\"state_requirement\":\"Frozen standardized initialization is at 0 s. A later origin requires an exact owned native checkpoint or verified measured prefix; a correction window does not move the initial state.\",\"state_time_s\":0.0,\"task_deadline_s\":0.6,\"task_duration_s\":0.6}},\"design_identity\":\"f0837aacfde3c795e7b305f3e074866425e2b585eb0a152c3ea2c5f6dd6df1e4\",\"evidence_reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"},\"model_identity\":null,\"next_checks\":[\"independent_legal_physical_evaluation\",\"matched_input_refinement\",\"paired_local_response_check\"],\"numerical_evidence_pointer\":\"\",\"operating_point\":{\"name\":\"standardized_initial_pretension\"},\"prospective_guarantee\":false,\"supported_inferences\":[\"local_diagnostic\"],\"task_identity\":\"52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8\",\"unresolved\":[\"Nonlinear realization and constraints outside declared model/sample coverage remain unresolved.\",\"Original independent physical task acceptance is unmeasured by this evidence.\"],\"unsupported_inferences\":[\"global_nonlinear_feasibility\",\"global_nonlinear_infeasibility\",\"structural_infeasibility\",\"whole_horizon_from_instantaneous_braking\",\"adapted_dynamic_improvement_from_static_sensitivity\",\"unvisited_simulation_descent_guarantee\",\"continuous_time_compliance\",\"hardware_performance\",\"robustness\",\"repeatability\",\"observed_task_pass\"],\"verification_status\":\"insufficient\",\"version\":\"evidence_policy_v1\"},\"identity\":{\"candidate\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"},\"canonical_task_identity\":\"26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e\",\"control_source\":null,\"design_identity\":\"f0837aacfde3c795e7b305f3e074866425e2b585eb0a152c3ea2c5f6dd6df1e4\",\"evaluation_identity\":null,\"evaluation_profile_identity\":\"260ae9953e5ce5f9b78017436f385fc6caf50a992d0bac9743ab50c4958aa6df\",\"fidelity\":null,\"implementation_identity\":null,\"model_identity\":null,\"operation\":\"mujoco_nonlinear_task_capability_v1\",\"physical_execution_identity\":null,\"result\":{\"pointer\":\"\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}},\"solver_configuration\":null,\"study\":\"m1-core-full-20261111\",\"task_identity\":\"52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8\"},\"main_violations\":[],\"mathematics\":{\"claim\":{\"binding\":{\"candidate\":{\"artifact_id\":\"11599e4ca21f69b4db451e74d91f37338cbabbc58863455ada74fedd59831c03\",\"media_type\":\"application/json\"},\"candidate_id\":\"core-2a35fdfe4e7df23db0241cbc4699ca6c2b5349c2bdcefd7bf3b465151872aa9e\",\"canonical_task_identity\":\"26015524df9081b048bc22765a086b7170a519fb9e7e6899ebd5c8a7c7bd260e\",\"configuration\":{\"artifact_id\":\"1e11763f25037264eb31a09f0c846dc0fed5f2236ec69f19193e80a7ff467c33\",\"media_type\":\"application/json\"},\"coordinate_order\":[\"segment_0_cell_0_y\",\"segment_0_cell_0_z\",\"segment_0_cell_1_y\",\"segment_0_cell_1_z\",\"segment_0_cell_2_y\",\"segment_0_cell_2_z\",\"segment_0_cell_3_y\",\"segment_0_cell_3_z\",\"segment_0_cell_4_y\",\"segment_0_cell_4_z\",\"segment_0_cell_5_y\",\"segment_0_cell_5_z\",\"segment_0_cell_6_y\",\"segment_0_cell_6_z\",\"segment_0_cell_7_y\",\"segment_0_cell_7_z\",\"segment_0_cell_8_y\",\"segment_0_cell_8_z\",\"segment_0_cell_9_y\",\"segment_0_cell_9_z\",\"segment_0_cell_10_y\",\"segment_0_cell_10_z\",\"segment_0_cell_11_y\",\"segment_0_cell_11_z\",\"segment_1_cell_0_y\",\"segment_1_cell_0_z\",\"segment_1_cell_1_y\",\"segment_1_cell_1_z\",\"segment_1_cell_2_y\",\"segment_1_cell_2_z\",\"segment_1_cell_3_y\",\"segment_1_cell_3_z\",\"segment_1_cell_4_y\",\"segment_1_cell_4_z\",\"segment_1_cell_5_y\",\"segment_1_cell_5_z\",\"segment_1_cell_6_y\",\"segment_1_cell_6_z\",\"segment_1_cell_7_y\",\"segment_1_cell_7_z\",\"segment_1_cell_8_y\",\"segment_1_cell_8_z\",\"segment_1_cell_9_y\",\"segment_1_cell_9_z\",\"segment_1_cell_10_y\",\"segment_1_cell_10_z\",\"segment_1_cell_11_y\",\"segment_1_cell_11_z\"],\"effective_configuration_identity\":\"1e11763f25037264eb31a09f0c846dc0fed5f2236ec69f19193e80a7ff467c33\",\"evaluation_profile_identity\":\"260ae9953e5ce5f9b78017436f385fc6caf50a992d0bac9743ab50c4958aa6df\",\"initialization_provenance\":{\"condition_id\":\"central_high\",\"effective\":{\"extension_id\":\"initialize.family\",\"parameters\":{\"contract\":\"family.initial\",\"data\":{\"qpos_rad\":{\"segment_0_cell_0_y\":0.0,\"segment_0_cell_0_z\":0.0,\"segment_0_cell_10_y\":0.0,\"segment_0_cell_10_z\":0.0,\"segment_0_cell_11_y\":0.0,\"segment_0_cell_11_z\":0.0,\"segment_0_cell_1_y\":0.0,\"segment_0_cell_1_z\":0.0,\"segment_0_cell_2_y\":0.0,\"segment_0_cell_2_z\":0.0,\"segment_0_cell_3_y\":0.0,\"segment_0_cell_3_z\":0.0,\"segment_0_cell_4_y\":0.0,\"segment_0_cell_4_z\":0.0,\"segment_0_cell_5_y\":0.0,\"segment_0_cell_5_z\":0.0,\"segment_0_cell_6_y\":0.0,\"segment_0_cell_6_z\":0.0,\"segment_0_cell_7_y\":0.0,\"segment_0_cell_7_z\":0.0,\"segment_0_cell_8_y\":0.0,\"segment_0_cell_8_z\":0.0,\"segment_0_cell_9_y\":0.0,\"segment_0_cell_9_z\":0.0,\"segment_1_cell_0_y\":0.0,\"segment_1_cell_0_z\":0.0,\"segment_1_cell_10_y\":0.0,\"segment_1_cell_10_z\":0.0,\"segment_1_cell_11_y\":0.0,\"segment_1_cell_11_z\":0.0,\"segment_1_cell_1_y\":0.0,\"segment_1_cell_1_z\":0.0,\"segment_1_cell_2_y\":0.0,\"segment_1_cell_2_z\":0.0,\"segment_1_cell_3_y\":0.0,\"segment_1_cell_3_z\":0.0,\"segment_1_cell_4_y\":0.0,\"segment_1_cell_4_z\":0.0,\"segment_1_cell_5_y\":0.0,\"segment_1_cell_5_z\":0.0,\"segment_1_cell_6_y\":0.0,\"segment_1_cell_6_z\":0.0,\"segment_1_cell_7_y\":0.0,\"segment_1_cell_7_z\":0.0,\"segment_1_cell_8_y\":0.0,\"segment_1_cell_8_z\":0.0,\"segment_1_cell_9_y\":0.0,\"segment_1_cell_9_z\":0.0},\"qvel_rad_s\":{\"segment_0_cell_0_y\":0.0,\"segment_0_cell_0_z\":0.0,\"segment_0_cell_10_y\":0.0,\"segment_0_cell_10_z\":0.0,\"segment_0_cell_11_y\":0.0,\"segment_0_cell_11_z\":0.0,\"segment_0_cell_1_y\":0.0,\"segment_0_cell_1_z\":0.0,\"segment_0_cell_2_y\":0.0,\"segment_0_cell_2_z\":0.0,\"segment_0_cell_3_y\":0.0,\"segment_0_cell_3_z\":0.0,\"segment_0_cell_4_y\":0.0,\"segment_0_cell_4_z\":0.0,\"segment_0_cell_5_y\":0.0,\"segment_0_cell_5_z\":0.0,\"segment_0_cell_6_y\":0.0,\"segment_0_cell_6_z\":0.0,\"segment_0_cell_7_y\":0.0,\"segment_0_cell_7_z\":0.0,\"segment_0_cell_8_y\":0.0,\"segment_0_cell_8_z\":0.0,\"segment_0_cell_9_y\":0.0,\"segment_0_cell_9_z\":0.0,\"segment_1_cell_0_y\":0.0,\"segment_1_cell_0_z\":0.0,\"segment_1_cell_10_y\":0.0,\"segment_1_cell_10_z\":0.0,\"segment_1_cell_11_y\":0.0,\"segment_1_cell_11_z\":0.0,\"segment_1_cell_1_y\":0.0,\"segment_1_cell_1_z\":0.0,\"segment_1_cell_2_y\":0.0,\"segment_1_cell_2_z\":0.0,\"segment_1_cell_3_y\":0.0,\"segment_1_cell_3_z\":0.0,\"segment_1_cell_4_y\":0.0,\"segment_1_cell_4_z\":0.0,\"segment_1_cell_5_y\":0.0,\"segment_1_cell_5_z\":0.0,\"segment_1_cell_6_y\":0.0,\"segment_1_cell_6_z\":0.0,\"segment_1_cell_7_y\":0.0,\"segment_1_cell_7_z\":0.0,\"segment_1_cell_8_y\":0.0,\"segment_1_cell_8_z\":0.0,\"segment_1_cell_9_y\":0.0,\"segment_1_cell_9_z\":0.0},\"unspecified\":\"zero\"},\"version\":\"1.0.0\"},\"version\":\"1.0.0\"},\"inherited_acceptance\":false},\"physical_design_identity\":\"f0837aacfde3c795e7b305f3e074866425e2b585eb0a152c3ea2c5f6dd6df1e4\",\"source_identity\":\"946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271\",\"target_m\":[0.295,0.0,0.215],\"task_id\":\"bf7-shared-reach-v1-central_high\",\"task_identity\":\"52e6c2bfb2502d80851eb2d5362a8b3c73dff515e46afcb2e189095694ce3ab8\",\"task_reference\":{\"contract\":\"reference.reach_goal\",\"data\":{\"target_m\":[0.295,0.0,0.215]},\"version\":\"1.0.0\"},\"task_version\":\"1.0.0\",\"tendon_order\":[\"tendon_0\",\"tendon_1\",\"tendon_2\",\"tendon_3\",\"tendon_4\",\"tendon_5\"],\"tension_bounds_n\":[[0.0,8.0],[0.0,8.0],[0.0,8.0],[0.0,8.0],[0.0,8.0],[0.0,8.0]],\"tension_limits_n\":[8.0,8.0,8.0,8.0,8.0,8.0]},\"computation_status\":\"execution_incomplete\",\"conclusion\":\"inconclusive\",\"constraint_coverage\":[{\"analyzed_indices\":[30],\"constraint_id\":\"terminal_error_m\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"},{\"analyzed_indices\":[27,28,29,30],\"constraint_id\":\"holding_max_error_m\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"},{\"analyzed_indices\":[27,28,29,30],\"constraint_id\":\"holding_max_speed_m_s\",\"expressible\":true,\"reason\":\"Sampled native control proxy; remaining acceptance components require full replay.\",\"status\":\"diagnostic\"}],\"contract\":\"scoped-mathematical-claim-v1\",\"horizon\":{\"analysis_window_s\":[0.0,0.6],\"covers_required_samples\":true,\"earliest_required_sample_s\":0.54,\"interpretation\":\"Every covered constraint sample, including checkpoint origin; no inherited prefix acceptance.\",\"legal_correction_window_s\":[0.0,0.6],\"origin\":0.0,\"period_s\":0.02,\"state_requirement\":\"Frozen standardized initialization is at 0 s. A later origin requires an exact owned native checkpoint or verified measured prefix; a correction window does not move the initial state.\",\"state_time_s\":0.0,\"task_deadline_s\":0.6,\"task_duration_s\":0.6},\"model_declaration\":{\"model_id\":\"model.mujoco_native\",\"model_version\":\"1.0.0\",\"relevant_assumptions\":[\"MuJoCo compiled family model; no GVS projection; ideal absolute tensions.\",\"Frozen world-frame constant force at named body COM on control-grid windows; refreshed every integration step.\",\"Contact-free, unconstrained hinges without activation dynamics; runtime checked.\",\"Native numerical responses; each method declares fixed or time-varying inputs. No optimal-value or KKT interpretation.\"],\"representation_id\":\"native_named_hinges_v1\"},\"model_identity\":null,\"numerical_result_pointer\":\"\",\"operating_point\":{\"name\":\"standardized_initial_pretension\"},\"physical_inputs\":{\"control_period_s\":0.02,\"frame\":\"tendon_path\",\"lower\":[0.0,0.0,0.0,0.0,0.0,0.0],\"phase\":\"pre_step\",\"provenance\":[\"/robot/structure/data/tendons\",\"/task/timing/control_period_s\"],\"signal\":\"tendon_tension\",\"tendon_order\":[\"tendon_0\",\"tendon_1\",\"tendon_2\",\"tendon_3\",\"tendon_4\",\"tendon_5\"],\"units\":\"N\",\"upper\":[8.0,8.0,8.0,8.0,8.0,8.0]},\"protocol_identity\":\"cda4de19de1bf4569317ee81a851a55c18d49d352ed0f4a93dc2e45de86b2f7f\",\"requirement_identity\":\"53adc2a3d342facbde2127ecb504c6317b142adb0c0e0570ff9bddb2eea438e0\",\"supported_interpretation\":\"No verified witness or certificate is available for this attempt.\",\"unsupported_conclusions\":[\"task acceptance\",\"whole holding-window compliance\",\"global nonlinear feasibility or infeasibility\",\"hardware performance\",\"robustness\",\"repeatability\",\"equilibrium validity at a non-equilibrium point\"],\"verification_status\":\"insufficient\"},\"claim_source\":{\"pointer\":\"/scoped_claim\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}},\"problem_definition\":null,\"quantities\":[],\"requirement_source\":{\"pointer\":\"/task_analysis\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}}},\"metrics\":[],\"recorded_context\":[],\"resources\":[{\"amount\":108831.0,\"name\":\"physics_steps_lower_bound\",\"source\":{\"pointer\":\"/physics_steps_lower_bound\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}},\"time_basis\":null,\"unit\":\"steps\"},{\"amount\":1.0,\"name\":\"charged_analysis_evaluations\",\"source\":{\"pointer\":\"/charged_analysis_evaluations\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}},\"time_basis\":null,\"unit\":\"analyses\"},{\"amount\":11.262170300004072,\"name\":\"charged_numerical_s\",\"source\":{\"pointer\":\"/charged_numerical_s\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}},\"time_basis\":\"recorded_elapsed_unspecified\",\"unit\":\"s\"},{\"amount\":11.262170300004072,\"name\":\"elapsed_s\",\"source\":{\"pointer\":\"/boundary/elapsed_s\",\"reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"}},\"time_basis\":\"worker_wall\",\"unit\":\"s\"},{\"amount\":null,\"name\":\"provider_cost\",\"source\":null,\"time_basis\":null,\"unit\":\"USD\"},{\"amount\":null,\"name\":\"parent_action_elapsed\",\"source\":null,\"time_basis\":\"parent_action_wall\",\"unit\":\"s\"},{\"amount\":null,\"name\":\"cpu_time\",\"source\":null,\"time_basis\":\"cpu\",\"unit\":\"s\"}],\"version\":\"scientific_result_card_v1\"}],\"raw_mathematical_result_reference\":{\"artifact_id\":\"14a55212f480c445879054205f08a38046068280dd808b0bd86c9e62ab288cf0\",\"media_type\":\"application/json\"},\"additional_raw_facts\":{},\"raw_read_policy\":\"Only referenced original evidence; no Reporter report reading, future results or historical final answer.\"}"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "evidence_read",
+        "description": "Read whitelisted immutable historical raw evidence only. No reports or scientific execution.",
+        "parameters": {
+          "$defs": {
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Exact evidence review and formal acceptance, also retained for saved callers.",
+          "properties": {
+            "reference": {
+              "$ref": "#/$defs/EvidenceRef"
+            },
+            "pointer": {
+              "default": "",
+              "description": "Absolute JSON Pointer; use summary to discover child keys. Permanent Store references survive session handoff; temporary SDK offload references do not.",
+              "title": "Pointer",
+              "type": "string"
+            },
+            "view": {
+              "default": "full",
+              "enum": [
+                "full",
+                "summary",
+                "fields",
+                "range",
+                "capabilities",
+                "mathematical_capabilities",
+                "working_set",
+                "acceptance_certificate"
+              ],
+              "title": "View",
+              "type": "string"
+            },
+            "fields": {
+              "description": "Immediate child keys at an object pointer, not dotted paths. Use with view=fields for raw JSON, or with view=working_set/mathematical_capabilities to select fields inside that derived view. For a working_set list select a row by /control_result_links/<index> first; do not switch to raw view=fields for derived paths.",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 32,
+              "title": "Fields",
+              "type": "array"
+            },
+            "start": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Start",
+              "type": "integer"
+            },
+            "count": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "reference"
+          ],
+          "title": "EvidenceQuery",
+          "type": "object",
+          "if": {},
+          "then": {
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "view": {
+                      "const": "fields"
+                    }
+                  },
+                  "required": [
+                    "view"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "fields": {
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "fields"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "research_plan",
+        "description": "Record exactly one next proposed research action using the existing Core Plan/ResearchDecision and end this replay. No worker is executed.",
+        "parameters": {
+          "$defs": {
+            "Attachment": {
+              "additionalProperties": false,
+              "properties": {
+                "part": {
+                  "default": "fixed_base",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                  "title": "Part",
+                  "type": "string"
+                },
+                "s": {
+                  "default": 0.0,
+                  "maximum": 1,
+                  "minimum": 0,
+                  "title": "S",
+                  "type": "number"
+                },
+                "position_m": {
+                  "default": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 3,
+                  "minItems": 3,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Position M",
+                  "type": "array"
+                },
+                "quaternion_wxyz": {
+                  "default": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "maxItems": 4,
+                  "minItems": 4,
+                  "prefixItems": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ],
+                  "title": "Quaternion Wxyz",
+                  "type": "array"
+                }
+              },
+              "title": "Attachment",
+              "type": "object"
+            },
+            "ControlSeedRequest": {
+              "additionalProperties": false,
+              "properties": {
+                "condition_id": {
+                  "anyOf": [
+                    {
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Optional frozen task condition. Returns a candidate bound to this condition on the identical structure; use the returned candidate for analysis, search and replay.",
+                  "title": "Condition Id"
+                },
+                "candidate": {
+                  "$ref": "#/$defs/EvidenceRef",
+                  "description": "Target candidate; decision.selected_candidate must equal control_seed.candidate."
+                },
+                "source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Explicit schedule or a registered complete NMPC execution / independent RL evaluation with a sealed actual-input trace. For Native T1/Direct use /control_schedule_reference, not the analysis result. Measured NMPC/RL conversion requires exact parent=candidate without channel_map; the new schedule inherits no acceptance. Use independent physical_replay for each frozen condition before joint SELECT."
+                },
+                "parent": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Required with source. For measured NMPC input, exact parent equals candidate; source is the complete execution result."
+                },
+                "channel_map": {
+                  "anyOf": [
+                    {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Channel Map"
+                },
+                "tensions_n": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "items": {
+                          "type": "number"
+                        },
+                        "type": "array"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Tensions N"
+                },
+                "method": {
+                  "default": "baseline",
+                  "description": "baseline with only candidate uses candidate pretensions over the full task grid, without task evaluation. Use the returned source as control_optimization.source, never candidate. An initialization Plan replaces the latest diagnose; submit diagnose again with your own candidate and method before research_analysis.",
+                  "enum": [
+                    "baseline",
+                    "mathematical_response",
+                    "physical_response",
+                    "capability_sequence"
+                  ],
+                  "title": "Method",
+                  "type": "string"
+                },
+                "response_evidence": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "capability_sequence requires a verified current-candidate Conic/SOCP task_capability result, never a Native T1/Direct result. mathematical_response requires verified input_sensitivity. A saved Native optimized schedule instead uses baseline source+parent or serves directly as Native control_optimization.source."
+                },
+                "channels": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Channels"
+                },
+                "difference_step_n": {
+                  "default": 0.02,
+                  "exclusiveMinimum": 0,
+                  "title": "Difference Step N",
+                  "type": "number"
+                },
+                "trust_radius_n": {
+                  "default": 0.2,
+                  "exclusiveMinimum": 0,
+                  "title": "Trust Radius N",
+                  "type": "number"
+                },
+                "regularization": {
+                  "default": 1e-06,
+                  "exclusiveMinimum": 0,
+                  "title": "Regularization",
+                  "type": "number"
+                },
+                "evaluation_requests": {
+                  "default": 8,
+                  "maximum": 64,
+                  "minimum": 1,
+                  "title": "Evaluation Requests",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "candidate"
+              ],
+              "title": "ControlSeedRequest",
+              "type": "object"
+            },
+            "EvidenceRef": {
+              "additionalProperties": false,
+              "properties": {
+                "artifact_id": {
+                  "pattern": "^[a-f0-9]{64}$",
+                  "title": "Artifact Id",
+                  "type": "string"
+                },
+                "media_type": {
+                  "default": "application/json",
+                  "title": "Media Type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "artifact_id"
+              ],
+              "title": "EvidenceRef",
+              "type": "object"
+            },
+            "GenerationRequest": {
+              "additionalProperties": false,
+              "properties": {
+                "version": {
+                  "const": "serial_family_generation_v1",
+                  "default": "serial_family_generation_v1",
+                  "title": "Version",
+                  "type": "string"
+                },
+                "family_space_identity": {
+                  "minLength": 1,
+                  "title": "Family Space Identity",
+                  "type": "string"
+                },
+                "segment_count": {
+                  "default": 2,
+                  "minimum": 1,
+                  "title": "Segment Count",
+                  "type": "integer"
+                },
+                "tendon_count": {
+                  "minimum": 1,
+                  "title": "Tendon Count",
+                  "type": "integer"
+                },
+                "strategy": {
+                  "const": "polar_consecutive_spans_v1",
+                  "default": "polar_consecutive_spans_v1",
+                  "title": "Strategy",
+                  "type": "string"
+                },
+                "spans": {
+                  "items": {
+                    "$ref": "#/$defs/Span"
+                  },
+                  "title": "Spans",
+                  "type": "array"
+                },
+                "segments": {
+                  "additionalProperties": {
+                    "$ref": "#/$defs/SegmentChoice"
+                  },
+                  "title": "Segments",
+                  "type": "object"
+                },
+                "tendon_parameters": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Tendon Parameters",
+                  "type": "object"
+                },
+                "control_weights": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Control Weights",
+                  "type": "object"
+                },
+                "route_overrides": {
+                  "additionalProperties": {
+                    "items": {
+                      "$ref": "#/$defs/RoutePoint"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Route Overrides",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "family_space_identity",
+                "tendon_count"
+              ],
+              "title": "GenerationRequest",
+              "type": "object"
+            },
+            "GenerationRequestV2": {
+              "additionalProperties": false,
+              "properties": {
+                "version": {
+                  "const": "serial_family_generation_v2",
+                  "default": "serial_family_generation_v2",
+                  "title": "Version",
+                  "type": "string"
+                },
+                "family_space_identity": {
+                  "minLength": 1,
+                  "title": "Family Space Identity",
+                  "type": "string"
+                },
+                "segment_count": {
+                  "default": 2,
+                  "minimum": 1,
+                  "title": "Segment Count",
+                  "type": "integer"
+                },
+                "tendon_count": {
+                  "minimum": 1,
+                  "title": "Tendon Count",
+                  "type": "integer"
+                },
+                "strategy": {
+                  "const": "polar_consecutive_spans_v1",
+                  "default": "polar_consecutive_spans_v1",
+                  "title": "Strategy",
+                  "type": "string"
+                },
+                "spans": {
+                  "items": {
+                    "$ref": "#/$defs/Span"
+                  },
+                  "title": "Spans",
+                  "type": "array"
+                },
+                "segments": {
+                  "additionalProperties": {
+                    "$ref": "#/$defs/SegmentChoiceV2"
+                  },
+                  "title": "Segments",
+                  "type": "object"
+                },
+                "tendon_parameters": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Tendon Parameters",
+                  "type": "object"
+                },
+                "control_weights": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Control Weights",
+                  "type": "object"
+                },
+                "route_overrides": {
+                  "additionalProperties": {
+                    "items": {
+                      "$ref": "#/$defs/RoutePoint"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Route Overrides",
+                  "type": "object"
+                },
+                "controller_recipe": {
+                  "additionalProperties": true,
+                  "title": "Controller Recipe",
+                  "type": "object"
+                },
+                "controller_solver": {
+                  "additionalProperties": true,
+                  "title": "Controller Solver",
+                  "type": "object"
+                },
+                "payout_lengths_m": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Payout Lengths M",
+                  "type": "object"
+                },
+                "payout_offsets_m": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Payout Offsets M",
+                  "type": "object"
+                },
+                "guide_hole_positions_m": {
+                  "additionalProperties": {
+                    "additionalProperties": {
+                      "maxItems": 3,
+                      "minItems": 3,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    "type": "object"
+                  },
+                  "title": "Guide Hole Positions M",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "family_space_identity",
+                "tendon_count"
+              ],
+              "title": "GenerationRequestV2",
+              "type": "object"
+            },
+            "LocalDiagnostic": {
+              "additionalProperties": false,
+              "properties": {
+                "execution": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "update_id": {
+                  "minimum": 0,
+                  "title": "Update Id",
+                  "type": "integer"
+                },
+                "repetitions": {
+                  "default": 2,
+                  "maximum": 2,
+                  "minimum": 1,
+                  "title": "Repetitions",
+                  "type": "integer"
+                },
+                "mode": {
+                  "default": "research_policy",
+                  "enum": [
+                    "research_policy",
+                    "research_current"
+                  ],
+                  "title": "Mode",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "execution",
+                "update_id"
+              ],
+              "title": "LocalDiagnostic",
+              "type": "object"
+            },
+            "MechanicsRequest": {
+              "additionalProperties": false,
+              "properties": {
+                "candidate": {
+                  "$ref": "#/$defs/EvidenceRef"
+                },
+                "substeps": {
+                  "default": 1,
+                  "maximum": 4,
+                  "minimum": 1,
+                  "title": "Substeps",
+                  "type": "integer"
+                },
+                "initialization": {
+                  "default": "constant_0_2",
+                  "enum": [
+                    "constant_0_2",
+                    "ramp_0_2_to_0_4",
+                    "saved_candidate_trajectory",
+                    "saved_candidate_controls"
+                  ],
+                  "title": "Initialization",
+                  "type": "string"
+                },
+                "warm_source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "objective_mode": {
+                  "default": "task_gap",
+                  "enum": [
+                    "task_gap",
+                    "task_gap_with_effort",
+                    "maximum_original_violation",
+                    "minimum_signed_task_excess",
+                    "task_capability",
+                    "task_feasible_effort"
+                  ],
+                  "title": "Objective Mode",
+                  "type": "string"
+                },
+                "check_only": {
+                  "default": false,
+                  "title": "Check Only",
+                  "type": "boolean"
+                },
+                "diagnostic_source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "diagnostic_mode": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "regularity",
+                        "lagrangian"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Diagnostic Mode"
+                },
+                "max_iterations": {
+                  "default": 120,
+                  "maximum": 120,
+                  "minimum": 1,
+                  "title": "Max Iterations",
+                  "type": "integer"
+                },
+                "position_weight": {
+                  "default": 1,
+                  "exclusiveMinimum": 0,
+                  "title": "Position Weight",
+                  "type": "number"
+                },
+                "speed_weight": {
+                  "default": 1,
+                  "exclusiveMinimum": 0,
+                  "title": "Speed Weight",
+                  "type": "number"
+                },
+                "secondary_coefficient": {
+                  "default": 0.001,
+                  "minimum": 0,
+                  "title": "Secondary Coefficient",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "candidate"
+              ],
+              "title": "MechanicsRequest",
+              "type": "object"
+            },
+            "PhysicalReplayRequest": {
+              "additionalProperties": false,
+              "properties": {
+                "candidate": {
+                  "$ref": "#/$defs/EvidenceRef",
+                  "description": "Replay candidate; decision.selected_candidate must equal this reference. Both candidate and source belong inside physical_replay."
+                },
+                "source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Active: exact complete control schedule. Registered passive task: omit to bind its frozen loading protocol."
+                },
+                "passive_ablation": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "maxItems": 64,
+                      "minItems": 1,
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "passive_response_v2 only: exact passive tendon entities; two fresh paired native executions, double episode budget.",
+                  "title": "Passive Ablation"
+                },
+                "initial_state_result": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "passive_response_v2 only: current owned completed physical result containing a qualified complete integration state."
+                },
+                "initial_state_episode": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Initial State Episode"
+                },
+                "validation_source": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Registered passive numerical confirmation only: current owned completed paired physical result. A fresh independent pair, constrained half-timestep and initial perturbation executions plus saved-CSV state checks form the complete frozen confirmation scope. No historical candidate transfer."
+                }
+              },
+              "required": [
+                "candidate"
+              ],
+              "title": "PhysicalReplayRequest",
+              "type": "object"
+            },
+            "ResearchDecision": {
+              "additionalProperties": false,
+              "properties": {
+                "version": {
+                  "const": "research_decision_v1",
+                  "default": "research_decision_v1",
+                  "title": "Version",
+                  "type": "string"
+                },
+                "hypothesis_id": {
+                  "minLength": 1,
+                  "title": "Hypothesis Id",
+                  "type": "string"
+                },
+                "claimed_inference": {
+                  "default": "empirical_search",
+                  "description": "Use empirical_search for a proposed experiment, including testing a prediction in physics. Unsupported stronger claims remain annotated hypotheses and do not veto an otherwise legal experiment. Formal conclusions and SELECT/CONFIRM/STOP still require registered scoped evidence; execution always requires valid identity, authorization, applicability and budget.",
+                  "minLength": 1,
+                  "title": "Claimed Inference",
+                  "type": "string"
+                },
+                "research_intent": {
+                  "enum": [
+                    "DIAGNOSE",
+                    "MATHEMATICAL_ANALYSIS",
+                    "CONTROL_SEARCH",
+                    "DESIGN_MODIFICATION",
+                    "NMPC_EXECUTION",
+                    "RL_TRAINING",
+                    "PHYSICAL_VALIDATION",
+                    "SELECT",
+                    "STOP"
+                  ],
+                  "title": "Research Intent",
+                  "type": "string"
+                },
+                "selected_method": {
+                  "description": "Intent label only; does not dispatch a worker or grant permission. Plan action and its payload determine execution. Native mathematical methods require research_analysis with the registered request_template. diagnose without diagnostic only reads existing evidence.",
+                  "minLength": 1,
+                  "title": "Selected Method",
+                  "type": "string"
+                },
+                "selected_variables": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Selected Variables",
+                  "type": "array"
+                },
+                "selected_candidate": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/EvidenceRef"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Required for execute/initialize_control/control_search/physical_replay. Match candidate, control_seed.candidate, control_search.candidate or physical_replay.candidate respectively; never substitute the control source."
+                },
+                "requested_budget": {
+                  "default": 0,
+                  "description": "Declared request cap, not actual cost or authorization. For Plan control_search match settings.evaluation_requests (physical replay callbacks); otherwise declared operation units. Zero independent physical evaluations does not imply zero Native integration. Missing formal scope and unknown costs remain unresolved until normal admission.",
+                  "minimum": 0,
+                  "title": "Requested Budget",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "hypothesis_id",
+                "research_intent",
+                "selected_method"
+              ],
+              "title": "ResearchDecision",
+              "type": "object"
+            },
+            "RoutePoint": {
+              "additionalProperties": false,
+              "properties": {
+                "attachment": {
+                  "$ref": "#/$defs/Attachment"
+                },
+                "hole": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Hole"
+                },
+                "role": {
+                  "enum": [
+                    "start",
+                    "guide",
+                    "anchor"
+                  ],
+                  "title": "Role",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "attachment",
+                "role"
+              ],
+              "title": "RoutePoint",
+              "type": "object"
+            },
+            "ScientificGeneration": {
+              "additionalProperties": false,
+              "description": "An explicit physical edit of the selected parent; no automatic experiment.",
+              "properties": {
+                "changes": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "description": "Registered physical parameter IDs mapped to absolute SI values. Copy all other parent fields exactly. Empty explicitly reconstructs the unchanged selected parent at the current implementation; old results and acceptance do not transfer. Parent is decision.selected_candidate.",
+                  "maxProperties": 8,
+                  "title": "Changes",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "changes"
+              ],
+              "title": "ScientificGeneration",
+              "type": "object"
+            },
+            "Section": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "circle",
+                    "tube",
+                    "ellipse",
+                    "rectangle",
+                    "polygon"
+                  ],
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "parameters": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Parameters",
+                  "type": "object"
+                },
+                "outer_yz_m": {
+                  "items": {
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "prefixItems": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "type": "array"
+                  },
+                  "title": "Outer Yz M",
+                  "type": "array"
+                },
+                "holes_yz_m": {
+                  "items": {
+                    "items": {
+                      "maxItems": 2,
+                      "minItems": 2,
+                      "prefixItems": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "type": "array"
+                    },
+                    "type": "array"
+                  },
+                  "title": "Holes Yz M",
+                  "type": "array"
+                },
+                "angle_rad": {
+                  "default": 0.0,
+                  "title": "Angle Rad",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "title": "Section",
+              "type": "object"
+            },
+            "SegmentChoice": {
+              "additionalProperties": false,
+              "properties": {
+                "length_m": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Length M"
+                },
+                "young_pa": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Young Pa"
+                },
+                "sections": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "$ref": "#/$defs/Section"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Sections"
+                }
+              },
+              "title": "SegmentChoice",
+              "type": "object"
+            },
+            "SegmentChoiceV2": {
+              "additionalProperties": false,
+              "properties": {
+                "length_m": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Length M"
+                },
+                "young_pa": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Young Pa"
+                },
+                "sections": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "$ref": "#/$defs/Section"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Sections"
+                },
+                "cells": {
+                  "anyOf": [
+                    {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Cells"
+                },
+                "physical_parameters": {
+                  "additionalProperties": {
+                    "type": "number"
+                  },
+                  "title": "Physical Parameters",
+                  "type": "object"
+                },
+                "interpolation": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "step",
+                        "linear"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Interpolation"
+                }
+              },
+              "title": "SegmentChoiceV2",
+              "type": "object"
+            },
+            "Span": {
+              "additionalProperties": false,
+              "properties": {
+                "first_segment": {
+                  "default": 0,
+                  "minimum": 0,
+                  "title": "First Segment",
+                  "type": "integer"
+                },
+                "last_segment": {
+                  "minimum": 0,
+                  "title": "Last Segment",
+                  "type": "integer"
+                },
+                "count": {
+                  "minimum": 1,
+                  "title": "Count",
+                  "type": "integer"
+                },
+                "phase_rad": {
+                  "default": 0.0,
+                  "title": "Phase Rad",
+                  "type": "number"
+                },
+                "angular_offsets_rad": {
+                  "description": "Extra offsets: theta_j = phase_rad + 2*pi*j/count + angular_offsets_rad[j]. Empty uses equal spacing. These are not absolute angles.",
+                  "items": {
+                    "type": "number"
+                  },
+                  "title": "Angular Offsets Rad",
+                  "type": "array"
+                },
+                "radius_m": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Radius M"
+                },
+                "guide_s": {
+                  "anyOf": [
+                    {
+                      "items": {
+                        "type": "number"
+                      },
+                      "type": "array"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Guide S"
+                },
+                "anchor_s": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Anchor S"
+                },
+                "guide_angle_offset_rad": {
+                  "default": 0.0,
+                  "title": "Guide Angle Offset Rad",
+                  "type": "number"
+                },
+                "anchor_angle_offset_rad": {
+                  "default": 0.0,
+                  "title": "Anchor Angle Offset Rad",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "last_segment",
+                "count"
+              ],
+              "title": "Span",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "type": "string",
+              "enum": [
+                "diagnose",
+                "generate",
+                "initialize_control",
+                "physical_replay",
+                "mechanics"
+              ]
+            },
+            "control_seed": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/ControlSeedRequest"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "decision": {
+              "$ref": "#/$defs/ResearchDecision"
+            },
+            "next_step": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "adjust_training",
+                    "revise_design",
+                    "diagnose",
+                    "stop"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Next Step"
+            },
+            "hypothesis": {
+              "minLength": 1,
+              "title": "Hypothesis",
+              "type": "string"
+            },
+            "supporting_evidence": {
+              "items": {
+                "$ref": "#/$defs/EvidenceRef"
+              },
+              "title": "Supporting Evidence",
+              "type": "array"
+            },
+            "expected_observation": {
+              "minLength": 1,
+              "title": "Expected Observation",
+              "type": "string"
+            },
+            "weakening_observation": {
+              "minLength": 1,
+              "title": "Weakening Observation",
+              "type": "string"
+            },
+            "fixed_conditions": {
+              "minLength": 1,
+              "title": "Fixed Conditions",
+              "type": "string"
+            },
+            "stopping_condition": {
+              "minLength": 1,
+              "title": "Stopping Condition",
+              "type": "string"
+            },
+            "interpretation": {
+              "minLength": 1,
+              "title": "Interpretation",
+              "type": "string"
+            },
+            "generation": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/GenerationRequest"
+                },
+                {
+                  "$ref": "#/$defs/GenerationRequestV2"
+                },
+                {
+                  "$ref": "#/$defs/ScientificGeneration"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Generation"
+            },
+            "revise_selection": {
+              "default": false,
+              "description": "Explicitly replace a failed selection with a scientifically changed, freshly passing development solution; retain all confirmation records and cumulative costs",
+              "title": "Revise Selection",
+              "type": "boolean"
+            },
+            "diagnostic": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LocalDiagnostic"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "mechanics": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/MechanicsRequest"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "physical_replay": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/PhysicalReplayRequest"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "experience_disposition": {
+              "additionalProperties": {
+                "enum": [
+                  "adopted",
+                  "rejected",
+                  "context_only"
+                ],
+                "type": "string"
+              },
+              "description": "Actual full-read receipt IDs / entry_id@revision, or a confirmed delivered summary:entry_id@revision. Summary citation does not imply full reading. Omit without a matching source.",
+              "title": "Experience Disposition",
+              "type": "object"
+            }
+          },
+          "required": [
+            "action",
+            "hypothesis",
+            "expected_observation",
+            "weakening_observation",
+            "fixed_conditions",
+            "stopping_condition",
+            "interpretation",
+            "decision"
+          ],
+          "title": "Plan",
+          "type": "object",
+          "if": {},
+          "then": {
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "diagnose"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "DIAGNOSE"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "generate"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "DESIGN_MODIFICATION"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "initialize_control"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "CONTROL_SEARCH"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "physical_replay"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "PHYSICAL_VALIDATION"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "mechanics"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "properties": {
+                        "research_intent": {
+                          "const": "MATHEMATICAL_ANALYSIS"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "initialize_control"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "control_seed"
+                  ],
+                  "properties": {
+                    "control_seed": {
+                      "not": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "control_seed": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "generate"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "generation"
+                  ],
+                  "properties": {
+                    "generation": {
+                      "not": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "generation": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "mechanics"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "mechanics"
+                  ],
+                  "properties": {
+                    "mechanics": {
+                      "not": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "mechanics": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "physical_replay"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "physical_replay"
+                  ],
+                  "properties": {
+                    "physical_replay": {
+                      "not": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "physical_replay": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "diagnose"
+                      ]
+                    }
+                  }
+                },
+                "then": {},
+                "else": {
+                  "properties": {
+                    "diagnostic": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "not": {
+                        "enum": [
+                          "select",
+                          "confirm"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "revise_selection": {
+                      "const": false
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "action": {
+                      "enum": [
+                        "initialize_control",
+                        "physical_replay"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "decision": {
+                      "required": [
+                        "selected_candidate"
+                      ],
+                      "properties": {
+                        "selected_candidate": {
+                          "$ref": "#/$defs/EvidenceRef"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "tool_choice": "auto"
+}

@@ -1,0 +1,349 @@
+[
+  {
+    "label": "A",
+    "decision": {
+      "action": "generate",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_method": "serial_family_generation_v1 polar_consecutive_spans_v1",
+        "selected_variables": [
+          "segment_count",
+          "tendon_count",
+          "full-span tendon routing",
+          "tendon phase",
+          "routing radius",
+          "segment lengths",
+          "segment stiffnesses",
+          "tendon pretension",
+          "tendon force limit"
+        ],
+        "selected_candidate": null,
+        "requested_budget": 1
+      },
+      "hypothesis": "The key research question is whether the frozen two-segment serial structure with four evenly spaced full-span tendons can provide the four independent channels and bidirectional transverse authority needed for the frozen figure-eight task while retaining a qualifiable native equilibrium. The next research route is to generate one simple candidate using the supplied segment prototypes and four symmetric tendons spanning both segments. This route is preferred because it directly matches the required independent-channel count, offers antagonistic actuation in both transverse directions, remains inside the executable topology scope, and avoids unsupported complexity. The concrete proposed scientific action is candidate generation only; it makes no claim of feasibility, equilibrium qualification, tracking performance, or acceptance.",
+      "supporting_evidence": [],
+      "expected_observation": "The immediate expected result is one candidate-owned configuration containing two serial segments and four distinct, evenly spaced tendons routed across both segments at 0.018 m radius, with 0.2 N pretension and 8 N force limits. If generation succeeds, future work should construct and independently qualify its native initial state before initializing any absolute-tension schedule. Later support for the hypothesis would require a qualified equilibrium, sufficient trajectory reach without invalid tension behavior, and a complete replay that passes every original acceptance requirement.",
+      "weakening_observation": "The hypothesis would be weakened by generation rejection, invalid routing or clearance, failure to create four distinct actuator channels, inability to construct and independently qualify equilibrium, inadequate reach in either transverse direction, persistent use of tension bounds incompatible with valid tracking, numerical failure, missing required signals, or a later complete replay that violates any tracking, lobe, drift, speed, tension, warning, contact, or static-balance requirement.",
+      "fixed_conditions": "Keep the canonical T04 task, gravity, mount, rigid tool, timing and evaluation grid, qualified-candidate-equilibrium initial-state semantics, original hard tension and tracking limits, serial_external_tendons_base_only_v1 family, straight frictionless tendon model, native collision policy, and supplied two-segment prototype geometry fixed. Only the explicitly requested candidate topology is generated. No historical state, control schedule, feasibility result, or acceptance status transfers.",
+      "stopping_condition": "Stop this proposed action after exactly one candidate is returned or the generation request fails. Do not execute physics or infer feasibility from successful generation. If generation succeeds, the next decision should address candidate-specific native equilibrium construction and qualification. If it fails or reports invalid topology, diagnose that result before another design change.",
+      "interpretation": "The decision addresses whether the minimum topology aligned with the task's four-channel requirement is worth advancing. It chooses one bounded generation rather than premature control search, simulation, or greater structural complexity. The delivered R4 is adopted for the planned post-generation route: use the registered native initial-state construction interface, inspect returned residuals and errors, independently qualify time zero, initialize compact absolute-tension knots, and only later request an independent complete replay. The delivered R3 is context only because it reinforces the separation between construction, qualification, and task acceptance. Neither resource provides historical measurements or current feasibility. No existing mathematical research method needs consultation before this generation because no scientific candidate yet exists; candidate-specific mathematical analysis remains optional afterward. The registered initial-state method will need to be consulted and used before any physical validation. Generation would establish candidate identity only. Generation failure, qualification failure, inadequate reach, invalid tensions, or failure of any complete-task acceptance criterion would weaken or refute the working hypothesis.",
+      "generation": {
+        "version": "serial_family_generation_v1",
+        "family_space_identity": "serial_external_tendons_base_only_v1",
+        "segment_count": 2,
+        "tendon_count": 4,
+        "strategy": "polar_consecutive_spans_v1",
+        "spans": [
+          {
+            "first_segment": 0,
+            "last_segment": 1,
+            "count": 4,
+            "phase_rad": 0.0,
+            "angular_offsets_rad": [],
+            "radius_m": 0.018,
+            "guide_s": null,
+            "anchor_s": 1.0,
+            "guide_angle_offset_rad": 0.0,
+            "anchor_angle_offset_rad": 0.0
+          }
+        ],
+        "segments": {
+          "0": {
+            "length_m": 0.16,
+            "young_pa": 7200000.0,
+            "sections": null
+          },
+          "1": {
+            "length_m": 0.11,
+            "young_pa": 5400000.0,
+            "sections": null
+          }
+        },
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.2,
+          "force_limit_n": 8.0
+        },
+        "control_weights": {
+          "holding_tip_speed_weight": 0.1,
+          "terminal_tip_speed_weight": 0.1
+        },
+        "route_overrides": {}
+      },
+      "next_step": "diagnose"
+    }
+  },
+  {
+    "label": "B",
+    "decision": {
+      "action": "generate",
+      "decision": {
+        "requested_budget": 0,
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_candidate": null,
+        "selected_method": "explicit_agent_choice"
+      },
+      "expected_observation": "A complete registered result with its original measurements and limitations.",
+      "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+      "generation": {
+        "control_weights": {
+          "holding_tip_speed_weight": 0.0,
+          "terminal_tip_speed_weight": 0.0
+        },
+        "controller_recipe": {
+          "basis": {
+            "strategy": "first_order"
+          },
+          "minimum_tension_n": 0.2
+        },
+        "family_space_identity": "e8497f039682fc480aea289ffdb582130670bb9db1450acd6a56d5798112a290",
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.14,
+            "sections": [
+              {
+                "kind": "circle",
+                "parameters": {
+                  "radius_m": 0.008
+                }
+              }
+            ],
+            "young_pa": 4000000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.118,
+            "sections": [
+              {
+                "kind": "circle",
+                "parameters": {
+                  "radius_m": 0.008
+                }
+              },
+              {
+                "kind": "circle",
+                "parameters": {
+                  "radius_m": 0.008
+                }
+              }
+            ],
+            "young_pa": 4000000.0
+          }
+        },
+        "spans": [
+          {
+            "count": 4,
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.0141
+          }
+        ],
+        "tendon_count": 4,
+        "tendon_parameters": {
+          "pretension_n": 0.2
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "hypothesis": "Use the same legal geometry as the current GVS trial to compare control routes without changing structure. Historical quasistatic success supports a native equilibrium continuation hypothesis, not current acceptance.",
+      "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+      "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+      "supporting_evidence": [],
+      "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization."
+    }
+  },
+  {
+    "label": "C",
+    "decision": {
+      "action": "generate",
+      "hypothesis": "The key research question is whether a simple two-segment candidate with four independently actuated, evenly distributed external tendons spanning both segments is a suitable first structure for later equilibrium, capability, and figure-eight tracking assessment. The next research route is to generate exactly this candidate because no current scientific candidate exists, the task requires four independent channels, and transverse figure-eight motion plausibly requires antagonistic actuation in both cross-sectional directions. No archived experience was supplied, so none is used. No registered mathematical method needs to be consulted before this construction step; such methods require a concrete candidate. The proposed scientific action is one serial-family generation request retaining the supplied baseline segment geometry and material properties while adding one four-tendon consecutive span across both segments.",
+      "supporting_evidence": [],
+      "expected_observation": "Generation is expected to return a candidate-owned two-segment structure with four distinct independently actuated tendons routed in one evenly spaced consecutive span across segments 0 and 1, with all requested values inside the frozen family bounds. This would provide a concrete candidate for later initial-state qualification and scoped capability diagnosis, but would not demonstrate equilibrium, feasibility, tracking performance, or acceptance.",
+      "weakening_observation": "The hypothesis would be weakened if generation rejects the requested topology, cannot create four distinct valid full-span routes, reports a family-bound or routing-clearance violation, or returns a structure without four independent candidate-owned actuation channels. Subsequent qualified evidence showing inadequate transverse authority or inability to remain within the frozen tension limits would also weaken the rationale, although this generation action will not produce such evidence.",
+      "fixed_conditions": "Keep the frozen T04 figure-eight task, environment, gravity, mount, rigid tool, timing, evaluator, initial-state semantics, tension limits, actuator semantics, and serial_external_tendons_base_only_v1 family unchanged. Retain two segments with the supplied baseline lengths, Young's moduli, section shapes, dimensions, and orientations. Use exactly four tendons with equal angular spacing in one consecutive span covering segments 0 and 1, the family-default routing radius and endpoint, and an interior pretension. Do not infer present executability, equilibrium, controller compatibility, numerical feasibility, or task acceptance from generation success.",
+      "stopping_condition": "Stop after one schema-valid generation request returns either a candidate artifact or a generation rejection. Do not launch mathematical analysis, initial-state construction, control search, NMPC execution, physical replay, or selection in this decision. If construction is rejected, a future decision should diagnose the reported issue rather than alter the frozen task or infer infeasibility.",
+      "interpretation": "This is a scoped first-candidate generation decision rather than a feasibility or tracking claim. The four-channel full-span arrangement is a low-complexity topology aligned with the frozen requirement for four independent channels and bidirectional transverse motion. Retaining baseline structural values avoids adding unsupported design complexity. No historical experience was delivered, and therefore none is cited or assigned an experience disposition. Existing registered mathematical methods need not be consulted for this step because there is no candidate to analyze; after successful generation, a future decision should determine whether qualified equilibrium and scoped capability evidence justify control search. A valid candidate would support that next diagnosis, while generation failure or later evidence of inadequate motion authority would motivate a scoped routing or structural revision.",
+      "generation": {
+        "version": "serial_family_generation_v1",
+        "family_space_identity": "serial_external_tendons_base_only_v1",
+        "segment_count": 2,
+        "tendon_count": 4,
+        "strategy": "polar_consecutive_spans_v1",
+        "spans": [
+          {
+            "first_segment": 0,
+            "last_segment": 1,
+            "count": 4,
+            "phase_rad": 0.0,
+            "angular_offsets_rad": [],
+            "radius_m": 0.018,
+            "guide_s": [
+              0.5
+            ],
+            "anchor_s": 1.0,
+            "guide_angle_offset_rad": 0.0,
+            "anchor_angle_offset_rad": 0.0
+          }
+        ],
+        "segments": {
+          "0": {
+            "length_m": 0.16,
+            "young_pa": 7200000.0,
+            "sections": [
+              {
+                "kind": "ellipse",
+                "parameters": {
+                  "semi_y_m": 0.0095,
+                  "semi_z_m": 0.0076
+                },
+                "outer_yz_m": [],
+                "holes_yz_m": [],
+                "angle_rad": 0.35
+              }
+            ]
+          },
+          "1": {
+            "length_m": 0.11,
+            "young_pa": 5400000.0,
+            "sections": [
+              {
+                "kind": "rectangle",
+                "parameters": {
+                  "height_z_m": 0.0095,
+                  "width_y_m": 0.0133
+                },
+                "outer_yz_m": [],
+                "holes_yz_m": [],
+                "angle_rad": -0.25
+              },
+              {
+                "kind": "rectangle",
+                "parameters": {
+                  "height_z_m": 0.008549999999999999,
+                  "width_y_m": 0.0114
+                },
+                "outer_yz_m": [],
+                "holes_yz_m": [],
+                "angle_rad": 0.15000000000000002
+              }
+            ]
+          }
+        },
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.6,
+          "force_limit_n": 8.0
+        },
+        "control_weights": {
+          "holding_tip_speed_weight": 0.1,
+          "terminal_tip_speed_weight": 0.1
+        },
+        "route_overrides": {}
+      },
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_method": "serial_family_generation_v1 polar consecutive full-span four-tendon generation without prior mathematical consultation",
+        "selected_variables": [
+          "segment_count",
+          "tendon_count",
+          "tendon_span",
+          "tendon_phase_rad",
+          "tendon_radius_m",
+          "tendon_pretension_n"
+        ],
+        "selected_candidate": null,
+        "requested_budget": 1
+      }
+    }
+  },
+  {
+    "label": "D",
+    "decision": {
+      "action": "generate",
+      "hypothesis": "The key research question is whether a legal two-segment structure with four independent, equally spaced tendons spanning both segments can provide a suitable current candidate for the frozen T04 figure-eight task. The next route is to generate that minimal antagonistic structure first, then, in future decisions, construct and separately qualify its native equilibrium before attempting equilibrium-continuation feedforward and complete physical replay. The supplied T04 historical experience supports this procedural route but supplies no current feasibility or acceptance credit.",
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "research_intent": "DESIGN_MODIFICATION",
+        "selected_method": "serial_family_generation_v2 polar_consecutive_spans_v1",
+        "selected_variables": [
+          "segment_count",
+          "tendon_count",
+          "tendon_span",
+          "routing_radius_m",
+          "segment_lengths_m",
+          "segment_young_pa"
+        ],
+        "selected_candidate": null,
+        "requested_budget": 1
+      },
+      "generation": {
+        "version": "serial_family_generation_v2",
+        "family_space_identity": "serial_external_tendons_base_only_v1",
+        "segment_count": 2,
+        "tendon_count": 4,
+        "strategy": "polar_consecutive_spans_v1",
+        "spans": [
+          {
+            "first_segment": 0,
+            "last_segment": 1,
+            "count": 4,
+            "phase_rad": 0.0,
+            "angular_offsets_rad": [],
+            "radius_m": 0.018,
+            "guide_s": [
+              0.5
+            ],
+            "anchor_s": 1.0,
+            "guide_angle_offset_rad": 0.0,
+            "anchor_angle_offset_rad": 0.0
+          }
+        ],
+        "segments": {
+          "0": {
+            "length_m": 0.16,
+            "young_pa": 7200000.0,
+            "sections": null,
+            "cells": 12,
+            "physical_parameters": {},
+            "interpolation": "step"
+          },
+          "1": {
+            "length_m": 0.11,
+            "young_pa": 5400000.0,
+            "sections": null,
+            "cells": 12,
+            "physical_parameters": {},
+            "interpolation": "linear"
+          }
+        },
+        "tendon_parameters": {
+          "diameter_m": 0.001,
+          "length_servo_gain_n_m": 900.0,
+          "pretension_n": 0.2,
+          "force_limit_n": 8.0
+        },
+        "control_weights": {
+          "holding_tip_speed_weight": 0.1,
+          "terminal_tip_speed_weight": 0.1
+        },
+        "route_overrides": {},
+        "controller_recipe": {},
+        "controller_solver": {},
+        "payout_lengths_m": {},
+        "payout_offsets_m": {},
+        "guide_hole_positions_m": {}
+      },
+      "supporting_evidence": [],
+      "expected_observation": "The concrete proposed action is generation of one candidate-owned, executable two-segment structure with exactly four independent tendon channels, consecutive full-length spans, and family-legal dimensions and routing. A successful generation should return a candidate that can later be subjected to native equilibrium construction and qualification; it would not establish equilibrium, controllability, tracking quality, or task acceptance.",
+      "weakening_observation": "The hypothesis is weakened immediately if generation rejects the topology, routing, clearances, channel independence, or any declared value. After generation, failure to construct and qualify a balanced initial state, inability to obtain interior bounded tension references along the path, or a complete replay violating tracking, cycle drift, lobe, speed, stroke, warning, contact, or tension requirements would further weaken or refute the proposed structure-and-feedforward route.",
+      "fixed_conditions": "Keep the supplied frozen T04 task, gravity, mount, payload and pointer, timing, reference path, initial-state semantics, evaluator thresholds, signal requirements, family identity, executable topology limits, and physical tension bounds unchanged. Historical outcomes are guidance only and will not be transferred. No current candidate or current scientific evidence exists. The existing native-equilibrium reference-bank method should be consulted before a later construction decision; the archived recommendation to consult it is adopted, but that method resource was not delivered here and is not claimed as read.",
+      "stopping_condition": "End this scoped action after one schema-valid generation attempt. If generation succeeds, retain that returned structure as the sole candidate for a future equilibrium-construction decision without claiming scientific success. If generation is rejected or produces an invalid structure, stop this route and diagnose the reported generation failure before proposing another design. Eventual pursuit of this route should stop upon fresh complete task acceptance or upon candidate-specific evidence showing that qualified initialization or bounded full-path tracking cannot be achieved within the remaining budgets.",
+      "interpretation": "This is a deliberately minimal generation decision rather than control execution. Four antagonistic channels match the task's independent-channel requirement, while two legal segments preserve approximately the historically useful overall reach without copying the historical out-of-domain single-segment hardware. The supplied expert history, method-selection guidance, and phase/preload guidance are used only to choose the sequence: legal structure first, then native equilibrium construction with interior tension search, independent initial qualification, schedule binding, and full replay. Those later steps are plans, not completed work. The registered initial-state interfaces will be used only after a candidate exists, and the recommended native-equilibrium reference-bank method needs consultation before selecting its concrete request. Current feasibility, executable admission, equilibrium quality, and acceptance remain unknown until fresh candidate-specific results are produced."
+    }
+  }
+]

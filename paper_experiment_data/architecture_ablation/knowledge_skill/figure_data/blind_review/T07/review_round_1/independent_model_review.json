@@ -1,0 +1,150 @@
+{
+  "review": {
+    "evaluations": [
+      {
+        "label": "A",
+        "scores": {
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 4,
+          "research_actionability": 4
+        },
+        "knowledge_observations": {
+          "historical_facts": "observed",
+          "historical_conclusions": "observed",
+          "reasonable_route": "observed",
+          "avoids_known_ineffective_attempts": "observed"
+        },
+        "skill_observations": {
+          "workflow": "observed",
+          "structure_consistency": "observed",
+          "initial_state_and_control_seed": "observed",
+          "critical_constraints": "observed"
+        },
+        "experience_integration": "Connects R1's specific split-span topology and 12 MPa, 8/7 mm, 0.16/0.11 m baseline to a fresh generation request, then applies R2's hardest-case-first and identical-structure validation workflow.",
+        "invalid_research_actions": [],
+        "strengths": [
+          "Explicit generation parameters lie within the supplied numerical domains and preserve four independent channels and zero pretension.",
+          "Separates generation, current-candidate diagnosis, and eventual fresh acceptance across all four cases.",
+          "Uses the known difficult M1_B case to prioritize diagnosis rather than claiming historical success."
+        ],
+        "weaknesses": [
+          "The selected baseline has a documented historical M1_B failure; generation alone cannot determine whether control changes can overcome that conflict.",
+          "Does not yet recover the saved M1_B schedule, so no control-seed transfer procedure is demonstrated."
+        ],
+        "evidence_specific_rationale": "Reconstructing a known baseline is informative here because the decision explicitly treats it as a diagnostic starting point, retains the dense actuator envelope, and requires new evidence before execution or selection. It does not repeat uniform root softening or import historical acceptance."
+      },
+      {
+        "label": "B",
+        "scores": {
+          "decision_quality": 3,
+          "evidence_consistency": 2,
+          "historical_experience_utilization": 0,
+          "research_actionability": 4
+        },
+        "knowledge_observations": {
+          "historical_facts": "not_observed",
+          "historical_conclusions": "not_observed",
+          "reasonable_route": "observed",
+          "avoids_known_ineffective_attempts": "not_observed"
+        },
+        "skill_observations": {
+          "workflow": "observed",
+          "structure_consistency": "observed",
+          "initial_state_and_control_seed": "observed",
+          "critical_constraints": "observed"
+        },
+        "experience_integration": "No identifiable reference facts or procedures are expressly used. The decision instead states that no archived experience was supplied, contrary to the supplied library.",
+        "invalid_research_actions": [],
+        "strengths": [
+          "Provides a concrete, bounded four-channel generation request using family prototypes.",
+          "Preserves zero initialization and actuator limits and does not confuse generation with feasibility.",
+          "Names useful generation rejection and subsequent authority checks."
+        ],
+        "weaknesses": [
+          "Incorrectly states that historical material is unavailable.",
+          "Does not explain why all-full-span routing is preferable to the library's proximal/distal authority separation.",
+          "The downstream plan is less explicit about fresh group validation on one unchanged structure."
+        ],
+        "evidence_specific_rationale": "A symmetric full-span baseline is a reasonable alternative hypothesis, not a proven invalid topology. Its current action is well specified, but the false description of available evidence and absence of reference utilization limit its grounding."
+      },
+      {
+        "label": "C",
+        "scores": {
+          "decision_quality": 2,
+          "evidence_consistency": 2,
+          "historical_experience_utilization": 2,
+          "research_actionability": 2
+        },
+        "knowledge_observations": {
+          "historical_facts": "observed",
+          "historical_conclusions": "observed",
+          "reasonable_route": "observed",
+          "avoids_known_ineffective_attempts": "not_observed"
+        },
+        "skill_observations": {
+          "workflow": "observed",
+          "structure_consistency": "observed",
+          "initial_state_and_control_seed": "not_observed",
+          "critical_constraints": "not_observed"
+        },
+        "experience_integration": "Uses R1's split-span architecture, M1_B priority, and warning against historical actuator-envelope acceptance, together with R2's same-structure group idea. The supplied references do not establish the exact geometry asserted to be a historical reconstruction.",
+        "invalid_research_actions": [],
+        "strengths": [
+          "Proposes fresh candidate generation rather than importing an accepted historical candidate.",
+          "Retains a four-tendon split-span design and plans hardest-case then same-structure group investigation.",
+          "Explicitly separates mathematical diagnostics from physical acceptance."
+        ],
+        "weaknesses": [
+          "The claimed historical lengths, sections, and routing angles are not substantiated by the supplied reference content.",
+          "The opaque family identity and generation-v2 request have unverified compatibility with the current interface.",
+          "Empty tendon parameters leave zero pretension unspecified despite the family default of 0.2 N.",
+          "Expected and refuting observations are generic rather than specific to generation and the known failure modes."
+        ],
+        "evidence_specific_rationale": "The overall route is plausible, but provenance and executable assumptions are insufficiently established. The unknown identity and schema version are not proven invalid actions; likewise, the relationship between default pretension and physical zero initial tension needs verification rather than an assumed violation."
+      },
+      {
+        "label": "D",
+        "scores": {
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 3,
+          "research_actionability": 4
+        },
+        "knowledge_observations": {
+          "historical_facts": "not_observed",
+          "historical_conclusions": "observed",
+          "reasonable_route": "observed",
+          "avoids_known_ineffective_attempts": "observed"
+        },
+        "skill_observations": {
+          "workflow": "observed",
+          "structure_consistency": "observed",
+          "initial_state_and_control_seed": "observed",
+          "critical_constraints": "observed"
+        },
+        "experience_integration": "Specifically adopts R2's shared hypothesis, current-owned generation, hardest-case diagnosis, and same-identity validation sequence. It also preserves R3's distinction between one controller failure and structural infeasibility, without claiming historical measurement use.",
+        "invalid_research_actions": [],
+        "strengths": [
+          "Provides explicit in-domain prototype geometry, four independent tendons, and zero pretension.",
+          "Requires one unchanged structure across all frozen tasks.",
+          "Clearly limits the immediate action to generation and reserves capability admission for a subsequent registered-method check.",
+          "Defines generation rejection and later authority or actuator-limit failures as distinct observations."
+        ],
+        "weaknesses": [
+          "Does not exploit R1's specific split-span geometry or documented M1_B failure measurements.",
+          "Full-span routing remains an untested authority hypothesis, particularly for the tool-axis task."
+        ],
+        "evidence_specific_rationale": "The alternative topology is justified as a simple current-owned baseline and is not contradicted by the frozen domain. Its explicit shared-structure and diagnostic safeguards support a strong next decision, while its historical utilization is procedural rather than geometry-specific."
+      }
+    ],
+    "comparative_rationale": "A and D are equally strong scoped generation decisions: A grounds its baseline in specific historical geometry and failure context, while D uses a justified alternative with a clear shared-structure workflow. B proposes a similarly executable baseline but incorrectly denies the supplied historical evidence and gives a less complete downstream group plan. C identifies the relevant historical route but leaves exact reconstruction provenance, interface compatibility, and zero-pretension handling unresolved. None establishes current acceptance, and no proposed action is conclusively shown to violate the available interface definitions."
+  },
+  "model": "gpt-6-astra",
+  "session_id": "5c7521c5-c560-442c-8283-6f2b3057b87a",
+  "usage": null,
+  "wall_s": 47.210504300004686,
+  "provider_requests": 1,
+  "blinded": true,
+  "human_verification": "pending"
+}

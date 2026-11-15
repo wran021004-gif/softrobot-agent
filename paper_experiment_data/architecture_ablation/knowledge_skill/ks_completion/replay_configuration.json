@@ -1,0 +1,61 @@
+{
+  "original_configuration": {
+    "provider": {
+      "adapter": "chatgpt_gateway",
+      "adapter_version": "8.0.0",
+      "base_url": "http://127.0.0.1:8789/v1",
+      "context_bytes": 1048576,
+      "context_guard": {
+        "context_limit_tokens": 1050000,
+        "framing_headroom_tokens": 8192
+      },
+      "investigation_max_tokens": 32768,
+      "max_no_progress": 3,
+      "max_repairs": 10,
+      "max_tokens": null,
+      "max_turns": 48,
+      "model": "gpt-5.6-sol",
+      "model_capabilities": {
+        "catalog_source": "2026-11-11 read-only authenticated /v1/models HTTP200 confirmed the existing primary gpt-5.6-sol at configured account3 Gateway. No model change. Historical same-model/transport live tool/handoff proof is checked separately.",
+        "max_request_bytes": 1048576,
+        "model": "gpt-5.6-sol",
+        "reasoning": [
+          "none",
+          "medium"
+        ],
+        "tools": true,
+        "verification": "account_verified"
+      },
+      "output_context_reserve_tokens": 32768,
+      "parameters": {},
+      "protocol_recovery": {
+        "max_consecutive": 0,
+        "max_total": 0
+      },
+      "reasoning": "medium",
+      "strategy": "strategy.tool",
+      "strategy_version": "1.0.0",
+      "supports_images": false,
+      "supports_text": true,
+      "supports_tools": true,
+      "thinking": null,
+      "timeout_s": 600.0
+    },
+    "credentials_reference": "~/.softrobot-agent/chatgpt-api-account3.json",
+    "effective_reasoning": "gateway_default_not_exposed",
+    "transport": "existing_text_only_gateway",
+    "provider_budget_per_session": 4,
+    "reporter": false,
+    "new_main_sessions": 6,
+    "historical_reference": "authored_surrogate_Core_Plan; formal_main_executed=false; provider_calls=0",
+    "historical_matching": "not a strictly matched four-cell LLM experiment",
+    "enabled_delivery": "Controlled delivery of exact previously read entries; optional reads restricted to the same permitted set.",
+    "tokenizer": "Reuse existing local o200k_base installation/cache; new estimates explicitly separated from actual usage."
+  },
+  "matching": "Same model, transport, unexposed default reasoning, snapshots, prompts, schema, optional reads, Reporter OFF and max four requests.",
+  "native_reasoning_parameter_sent": false,
+  "native_tools_parameter_sent": false,
+  "new_main_sessions": 2,
+  "old_other_cells_rerun": false,
+  "prior_materials_archive": "D:/softrobot-agent/paper_experiment_data/architecture_ablation/knowledge_skill/ks_completion/prior_figure_data"
+}
