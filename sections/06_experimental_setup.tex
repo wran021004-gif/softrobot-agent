@@ -3,7 +3,7 @@
 
 \subsection{Completed task portfolio}
 
-The completed evaluation portfolio contains T01--T10 and PHS-2D. The tasks span active and passive designs, single- and multi-condition requirements, and different physical regimes. The archived master summary contains 32 required/control condition records: all 30 required conditions passed, while two additional frozen control conditions in T10 did not satisfy the complete recovery criteria. The 30/30 count is a summary of these completed cases, not a multi-seed success-rate estimate.
+The evaluation portfolio comprises eleven task cases, T01--T10 and PHS-2D, spanning active and passive designs, single- and multi-condition requirements, and distinct physical regimes. Each task retains its own required-condition definition and independent physical evaluator.
 
 \begin{table*}[t]
 \centering
@@ -23,7 +23,7 @@ T06 & Loaded timed scan & Can the robot execute a time-indexed position--orienta
 T07 & Shared-structure multi-task design & Can one four-tendon morphology support four distinct task conditions with condition-specific controls? & 4 \\
 T08 & Passive progressive stiffness & Does one passive two-tendon structure exhibit the required bilateral progressive response? & 2 \\
 T09 & Contact manipulation & Can a tendon-driven structure press and hold a spring button under joint depth/force requirements? & 1 \\
-T10 & Impact recovery & Can one state-feedback control recipe recover from the three required impact conditions? Two frozen controls are evaluated separately. & 3 (+2 controls) \\
+T10 & Impact recovery & Can one state-feedback control recipe recover from the three required impact conditions? Two frozen controls are evaluated separately. & 3 \\
 PHS-2D & Passive tendon-constrained design & Can one nine-segment, four-tendon passive structure satisfy the prescribed loading conditions while limiting tip motion? & 10 \\
 \bottomrule
 \end{tabularx}
@@ -37,61 +37,46 @@ Each task retains its own frozen protocol, including initial state, target, load
 
 For active tasks, each condition may use its own control sequence while sharing the required robot structure. For passive tasks, the same morphology is evaluated under the prescribed loads and fixed-payout conditions. A condition-specific structure is not substituted for a shared-structure requirement.
 
-\subsection{Methods for the matched comparison}
+\subsection{Methods for the multi-task comparison}
 
-The first matched comparison contains three methods.
+The multi-task evaluation compares three research configurations across the eleven benchmark tasks. They share the task definitions and physical evaluation interface, while differing in how mathematical research is organized and accessed.
 
 \begin{table}[t]
 \centering
-\caption{Method definitions for the first A/B/C comparison.}
+\caption{Compared methods and their research capabilities.}
 \label{tab:methods-abc}
 \small
 \begin{tabularx}{\columnwidth}{@{}l Y@{}}
 \toprule
-Method & Available capabilities \\
+Method & Research capability \\
 \midrule
-A: LLM-only & The LLM proposes and revises structures and controls using task descriptions and physical-evaluation feedback. It can generate candidates, set control inputs, execute the robot, and read the evaluator. Optional mathematical diagnosis and automated mathematical optimization tools are not exposed. \\
-B: Direct mathematical tools & The LLM has the A capabilities and can directly call bottom-level mathematical tools (e.g., Jacobian, KKT/equilibrium, finite-difference, and supported optimization routines). It must formulate the mathematical question and construct the requests itself; the high-level research-intent projection and mathematical research orchestration are not exposed. \\
-C: \softrobotagent{} (historical FULL) & The completed FULL study, including research-intent organization, parameterized mathematical research, M0--M3 semantics, differentiation routing, validity checks, evidence feedback, and the existing knowledge/context mechanisms. C is not re-run. \\
+LLM-only & The language model proposes and revises robot structures and controls using task descriptions and physical-evaluation feedback. Mathematical analysis and optimization are not exposed as direct research capabilities. \\
+Direct Math (w/o PPRP) & The language model can directly invoke bottom-level mathematical tools, including Jacobian, equilibrium/KKT, finite-difference, and supported optimization routines. It formulates the mathematical requests without high-level PPRP structuring and research orchestration. \\
+Ours & The complete \softrobotagent{} method organizes research intent as a PPRP, connects task-conditioned physical observables with composable mathematical operations, routes applicable differentiation methods, and feeds validated evidence back into adaptive design and control decisions. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-The first batch comprises eight new A/B runs across four representative tasks. C is taken from the corresponding historical FULL record.
-
-\begin{table}[t]
-\centering
-\caption{First batch of matched A/B runs and historical C references.}
-\label{tab:first-batch}
-\small
-\begin{tabular}{@{}lccc@{}}
-\toprule
-Task & A & B & C \\
-\midrule
-PHS-2D & 1 new run & 1 new run & Historical FULL \\
-T01 & 1 new run & 1 new run & Historical FULL \\
-T04 & 1 new run & 1 new run & Historical FULL \\
-T07 & 1 new run & 1 new run & Historical FULL \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-A and B start from the task's original initial state and receive the same legal design space, structure generator, physics backend, independent evaluator, and task-specific resource ceilings. Neither method is restricted to the topology or parameter values of the historical FULL design. The two methods receive the same base model and equivalent task information and knowledge access. Within each task, A and B share the same limits for LLM tokens, candidate generation, physical evaluations, integration steps, and wall-clock time; mathematical calls are additionally recorded for B.
-
-C is a historical reference rather than a newly randomized run. Its actual model, knowledge snapshot, task protocol, and resource configuration are retained as recorded. Any mismatch with the new A/B configuration is reported at the task level; historical results are not described as a fully controlled intervention when the original configuration cannot be matched.
+The comparison covers T01--T10 and PHS-2D. The task portfolio includes active reach and hold, loaded response, fast reach, trajectory tracking, position and tool-axis control, timed scanning, shared-structure multi-task design, passive progressive stiffness, contact manipulation, impact recovery, and passive tendon-constrained design. The three methods are evaluated using the task-specific physical constraints and condition definitions associated with each benchmark.
 
 \subsection{Evaluation metrics}
 
-The comparison records:
-\begin{itemize}[leftmargin=*]
-  \item required-condition pass count and the original task-specific normalized violation measures;
-  \item best task violation versus cumulative physical-evaluation budget;
-  \item cost to first feasible candidate, when a feasible candidate is found;
-  \item number of generated candidates and physical evaluations;
-  \item mathematical calls, LLM tokens, integration steps, and wall-clock time;
-  \item whether a mathematical result was explicitly used in a subsequent structural or control decision, with the corresponding evidence trace.
-\end{itemize}
-Raw errors from different task families are not averaged directly. Each task is reported using its own frozen metrics and normalization. The first batch uses one new run per A/B condition; it is therefore interpreted as a set of matched case studies and budget traces, not as a multi-seed statistical comparison.
+The comparison uses task-conditioned constraint measures so that each result retains the physical meaning of its benchmark. For a task with evaluated required constraints $\mathcal I_{\tau,m}$, the constraint violation rate is
+\begin{equation}
+r_{\tau,m} =
+\frac{\sum_{i\in\mathcal I_{\tau,m}}\mathbb{I}[g_{\tau,m,i}>0]}
+{|\mathcal I_{\tau,m}|}\times 100\%,
+\label{eq:task-violation-rate}
+\end{equation}
+where $g_{\tau,m,i}$ is the signed normalized violation defined from the corresponding task threshold. The maximum normalized violation is
+\begin{equation}
+v_{\tau,m}^{\max} =
+\max_{i\in\mathcal I_{\tau,m}}\max(0,g_{\tau,m,i}),
+\label{eq:max-normalized-violation}
+\end{equation}
+which captures the most severe observed constraint excess within a task. The task-level summary reports both the rate and its numerator/denominator; the accompanying matrix visualizes maximum normalized violation across tasks and methods.
+
+The evaluation also records required-condition coverage, candidate and physical-evaluation counts, mathematical calls, LLM tokens, integration steps, wall-clock time, and explicit evidence links between mathematical findings and subsequent design/control actions. Raw physical errors from different task families are not averaged directly; task-specific normalized constraints provide the common comparison scale.
 
 \subsection{Evidence and reporting policy}
 
