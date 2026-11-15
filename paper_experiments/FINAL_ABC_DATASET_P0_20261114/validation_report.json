@@ -1,0 +1,345 @@
+{
+  "phase": "P0",
+  "overall": "PASS_WITH_DISCLOSED_LIMITATIONS",
+  "checks": {
+    "d1_exact_33_unique_combinations": true,
+    "d2_unique_selected_candidate_condition_metric": true,
+    "d3_unique_event_ids": true,
+    "one_selected_candidate_per_task_method_condition": true,
+    "multiple_C_condition_IDs_same_physical_structure": true,
+    "t03_B_PASS_dagger": true,
+    "t05_B_standard_PASS": true,
+    "replaced_old_B_excluded": true,
+    "t08_C_development_label_preserved": true,
+    "all_rows_traceable_to_manifest": true,
+    "all_read_artifacts_exist": true,
+    "no_unresolved_numeric_measurements": true,
+    "no_value_mismatches": true,
+    "no_empty_value_cells": true,
+    "all_source_SHA256_present": true,
+    "originals_unchanged_during_hash_read": true,
+    "all_used_sources_manifested": true,
+    "physical_csv_grid_checks": true,
+    "gradient_exact_byte_copy": true,
+    "gradient_not_mixed_into_ABC": true,
+    "no_inferred_evidence_edges": true
+  },
+  "rows": {
+    "D1": 33,
+    "D2": 3160,
+    "D3": 1927,
+    "RESOURCE_COSTS": 33,
+    "SOURCE_MANIFEST": 84394,
+    "PHS2D_9SEG": 18
+  },
+  "original_and_replacement_counts": {
+    "old_d1": 33,
+    "old_d2": 3679,
+    "old_d3": 597,
+    "d1": 33,
+    "d2": 3160,
+    "d3": 1927,
+    "removed_nonrequired_d2": 594,
+    "removed_replaced_d2": 30,
+    "added_new_b_d2": 28,
+    "added_prepared_qualification_rows": 17,
+    "added_unknown_constraint_template_rows": 60,
+    "removed_replaced_d3": 11,
+    "retained_original_trace_records": 1710,
+    "added_new_b_events": 217,
+    "old_reviewed_explicit_decision_rows": 133,
+    "explicit_evidence_action_links": 377
+  },
+  "replacement_checks": {
+    "T03": {
+      "status": "PASS†",
+      "protocol_deviation": "true",
+      "checks_passed": 9,
+      "checks_total": 9,
+      "provider_requests": "0",
+      "mathematical_calls": "50",
+      "physics_evaluations": "1",
+      "method_variant": "codex_direct_math_only",
+      "old_B_rows_or_refs_in_formal_data": 0,
+      "math_trace_complete": true
+    },
+    "T05": {
+      "status": "PASS",
+      "protocol_deviation": "false",
+      "checks_passed": 8,
+      "checks_total": 8,
+      "provider_requests": "0",
+      "mathematical_calls": "50",
+      "physics_evaluations": "1",
+      "method_variant": "codex_direct_math_only",
+      "old_B_rows_or_refs_in_formal_data": 0,
+      "math_trace_complete": true
+    }
+  },
+  "duplicates": {
+    "d1": [],
+    "d2": [],
+    "d3": [],
+    "resource": [],
+    "source_paths": []
+  },
+  "raw_original_event_duplicate_keys": [],
+  "candidate_identity_audit": {
+    "candidate_ids_restored_from_unique_same_condition_selected_candidate_this_pass": 0,
+    "conflicting_selected_candidate_ids": [],
+    "multi_condition_candidate_identity_audit": [
+      {
+        "task_id": "T01",
+        "method": "C",
+        "candidate_ids": 3,
+        "distinct_physical_structures": 1,
+        "witnesses": [
+          {
+            "candidate_id": "5ead7a3a4d720bca70edac24ec7fc7f175b2af44d2437a21d5871dd62c22ebb0",
+            "condition": "negative_low",
+            "source": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STORE_CORRECTED_PROTOCOL/platform.sqlite#artifacts/5ead7a3a4d720bca70edac24ec7fc7f175b2af44d2437a21d5871dd62c22ebb0"
+          },
+          {
+            "candidate_id": "a0313a7adbd1fe6657562aa2c2760d09c885baf79960fdfa4eaf0026bf2613fc",
+            "condition": "positive_high",
+            "source": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STORE_CORRECTED_PROTOCOL/platform.sqlite#artifacts/a0313a7adbd1fe6657562aa2c2760d09c885baf79960fdfa4eaf0026bf2613fc"
+          },
+          {
+            "candidate_id": "cc436f71da2963e55b84a80258ca3ee590049a83ea707dd2f253a2f10a689161",
+            "condition": "central_high",
+            "source": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STORE_CORRECTED_PROTOCOL/platform.sqlite#artifacts/cc436f71da2963e55b84a80258ca3ee590049a83ea707dd2f253a2f10a689161"
+          }
+        ],
+        "interpretation": "Condition-bound candidate/configuration IDs retained; original robot structure and discretization compared by exact JSON equality, without constructing models."
+      },
+      {
+        "task_id": "T02",
+        "method": "C",
+        "candidate_ids": 3,
+        "distinct_physical_structures": 1,
+        "witnesses": [
+          {
+            "candidate_id": "ebb144c06c9914db2ac14f70e03983cc9e46afca5e2ce5c91039461ca042738f",
+            "condition": "zero",
+            "source": "paper_experiments/ten_task_codex_solve_20261112/T02_M2_loaded_hold/STORE/platform.sqlite#artifacts/ebb144c06c9914db2ac14f70e03983cc9e46afca5e2ce5c91039461ca042738f"
+          },
+          {
+            "candidate_id": "6f75954bda64ef713ced9db0eff0139a19c71224ad60b21bb789464edf8ad647",
+            "condition": "positive",
+            "source": "paper_experiments/ten_task_codex_solve_20261112/T02_M2_loaded_hold/STORE/platform.sqlite#artifacts/6f75954bda64ef713ced9db0eff0139a19c71224ad60b21bb789464edf8ad647"
+          },
+          {
+            "candidate_id": "9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+            "condition": "negative",
+            "source": "paper_experiments/ten_task_codex_solve_20261112/T02_M2_loaded_hold/STORE/platform.sqlite#artifacts/9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969"
+          }
+        ],
+        "interpretation": "Condition-bound candidate/configuration IDs retained; original robot structure and discretization compared by exact JSON equality, without constructing models."
+      },
+      {
+        "task_id": "T07",
+        "method": "C",
+        "candidate_ids": 4,
+        "distinct_physical_structures": 1,
+        "witnesses": [
+          {
+            "candidate_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "condition": "M1_C",
+            "source": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STORE_RESEARCH/platform.sqlite#artifacts/93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380"
+          },
+          {
+            "candidate_id": "5b531f7c25e21d2146837681b4d0f95d505720cd2b94fe6b4f986a2cd40ee67e",
+            "condition": "M1_A",
+            "source": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STORE_RESEARCH/platform.sqlite#artifacts/5b531f7c25e21d2146837681b4d0f95d505720cd2b94fe6b4f986a2cd40ee67e"
+          },
+          {
+            "candidate_id": "6e00204c2921d63ce5220daaceaf3d528d26b59232b4421893493101bde76c53",
+            "condition": "M5",
+            "source": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STORE_RESEARCH/platform.sqlite#artifacts/6e00204c2921d63ce5220daaceaf3d528d26b59232b4421893493101bde76c53"
+          },
+          {
+            "candidate_id": "6334547068f3b0abee1266ddfe91c5f2fb3d5da97db0d9ae0183d84516a28379",
+            "condition": "M1_B",
+            "source": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STORE_RESEARCH/platform.sqlite#artifacts/6334547068f3b0abee1266ddfe91c5f2fb3d5da97db0d9ae0183d84516a28379"
+          }
+        ],
+        "interpretation": "Condition-bound candidate/configuration IDs retained; original robot structure and discretization compared by exact JSON equality, without constructing models."
+      },
+      {
+        "task_id": "T10",
+        "method": "C",
+        "candidate_ids": 3,
+        "distinct_physical_structures": 1,
+        "witnesses": [
+          {
+            "candidate_id": "ef31b5cdafd9d5e0295fa25a60c46dfbe2e6342eaf65815c6f91148e51e92496",
+            "condition": "no_impulse",
+            "source": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STORE_RESEARCH/platform.sqlite#artifacts/ef31b5cdafd9d5e0295fa25a60c46dfbe2e6342eaf65815c6f91148e51e92496"
+          },
+          {
+            "candidate_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+            "condition": "positive_y",
+            "source": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STORE_RESEARCH/platform.sqlite#artifacts/fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8"
+          },
+          {
+            "candidate_id": "256d46f0737110c3876098bf34e0f39c207709f93ffe8a9220ddf93994d14b1a",
+            "condition": "negative_y",
+            "source": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STORE_RESEARCH/platform.sqlite#artifacts/256d46f0737110c3876098bf34e0f39c207709f93ffe8a9220ddf93994d14b1a"
+          }
+        ],
+        "interpretation": "Condition-bound candidate/configuration IDs retained; original robot structure and discretization compared by exact JSON equality, without constructing models."
+      }
+    ],
+    "measurement_values_changed": 0
+  },
+  "source_snapshot": {
+    "files": 84394,
+    "bytes": 46238300835,
+    "additional_files": 17,
+    "changed_files": [],
+    "used_source_files_missing_from_manifest": [],
+    "originals_preserved_in_place": true
+  },
+  "source_artifacts_checked": 237,
+  "untraceable_rows": [],
+  "analysis_issues": [],
+  "scalar_audit": {
+    "counters": {
+      "candidate_configurations_read": 20,
+      "metric_values_directly_verified": 2859,
+      "metric_values_retained_with_explicit_source_only": 31
+    },
+    "value_mismatches": []
+  },
+  "numeric_unresolved": [],
+  "unknown_field_counts": {
+    "D1": {
+      "source_classification": 8,
+      "violated_constraints": 2,
+      "violation_fraction": 2,
+      "maximum_violation": 2,
+      "total_violation": 2,
+      "worst_conditions": 2,
+      "maximum_violation_known_lower_bound": 2,
+      "total_violation_known_lower_bound": 2
+    },
+    "D2": {
+      "source_execution_id": 3160,
+      "original_normalized_violation": 2898,
+      "original_normalization_source": 2886,
+      "threshold": 1216,
+      "bound_type": 1216,
+      "normalization_scale": 1228,
+      "signed_normalized_violation": 1386,
+      "positive_violation": 1377,
+      "is_violated": 1377,
+      "original_metric_pass": 1377,
+      "acceptance_tolerance": 2567,
+      "normalization_basis": 1216,
+      "metric_value": 225,
+      "source_artifact_id": 268
+    },
+    "RESOURCE": {
+      "math_cpu_s": 31,
+      "physics_cpu_s": 32,
+      "automatic_profile_attempts": 31,
+      "internal_objective_evaluations": 29,
+      "internal_jacobian_evaluations": 31,
+      "math_internal_physics_steps": 22,
+      "physical_steps": 21,
+      "source_classification": 8,
+      "provider_requests": 11,
+      "llm_tokens": 25,
+      "codex_llm_tokens": 13,
+      "integration_cost_status": 6,
+      "integration_steps": 1
+    }
+  },
+  "empty_cells": {
+    "D1": 0,
+    "D2": 0,
+    "D3": 0,
+    "RESOURCE": 0
+  },
+  "physical_csv": {
+    "files": 68,
+    "recorded_rows": 6336000,
+    "anomalous_files": [],
+    "details": "See _build/timestep_csv_audit.json"
+  },
+  "evidence_to_action": {
+    "explicit_edges": 377,
+    "linked_event_rows": 240,
+    "selected_run_edges": 317,
+    "precursor_edges": 60,
+    "old_reviewed_decision_rows": 133,
+    "no_temporal_causality_inference": true,
+    "action_semantics": "Declared action in the same event; not proof of action effect or successful execution"
+  },
+  "gradient_source": {
+    "path": ".audit-task-a/paper_experiments/paper_results_master_20261113/PHS2D_9SEG_GRADIENT_FIGURE_DATA.csv",
+    "sha256": "91e296f37f56750df3fc59fbbe01f2191da2b2482b0e6012e8740d861af0d6bc",
+    "rows": 18,
+    "branches": 6,
+    "scope": "Independent nine-segment four-tendon study; exact copied source; seven-segment C is only in D1-D3"
+  },
+  "safeguards": {
+    "new_provider_requests": 0,
+    "new_studies": 0,
+    "new_physics": 0,
+    "new_KKT_QP": 0,
+    "new_candidates": 0,
+    "original_files_modified": 0,
+    "plots_created": 0,
+    "paper_files_modified": 0
+  },
+  "limitations": [
+    "T03-B retains a documented automatic GVS metadata-projection attempt before physical integration: PASS†.",
+    "New T03-B/T05-B use a legal one-cell-per-segment, four-coordinate model; replaced runs used finer discretizations. No fine-grid transfer or causal superiority claim.",
+    "B combines Codex direct solving for two tasks with LLM direct-tools runs for the other tasks; method_variant is mandatory context.",
+    "Unknown costs, tokens and execution IDs remain UNKNOWN. Charged numerical wall and elapsed study wall have different scopes.",
+    "PHS C execution Core SHA is not separately stored in the extracted trace: recorded configuration base_commit is retained with an explicit basis.",
+    "Some zero dimensional bounds have no declared same-unit normalization scale. Signed violation stays UNKNOWN; a recorded satisfied bound has exactly zero positive violation.",
+    "Physical CSV row intervals are observations, not automatically equal to total cumulative physics integration cost."
+  ],
+  "publication_sanitization": {
+    "date": "2026-11-15",
+    "scope": "nine_P0_deliverables_only",
+    "source_path_format": "repository_root_relative_POSIX_with_original_locator_fragments",
+    "raw_evidence_uploaded": false,
+    "local_frozen_backup": "_build/local_frozen_before_publication_20261115/",
+    "scientific_values_statuses_thresholds_costs_and_event_links_unchanged": true,
+    "original_manifest_SHA256_bytes_and_mtime_unchanged": true,
+    "gradient_exact_bytes_unchanged": true,
+    "row_counts": {
+      "D1_ABC_STATUS_MATRIX.csv": 33,
+      "D2_ABC_CONDITION_METRICS.csv": 3160,
+      "D3_ABC_EVIDENCE_ACTIONS.csv": 1927,
+      "RESOURCE_COSTS.csv": 33,
+      "SOURCE_MANIFEST.csv": 84394
+    },
+    "changed_CSV_columns": {
+      "D1_ABC_STATUS_MATRIX.csv": [
+        "configuration_version",
+        "source_refs"
+      ],
+      "D2_ABC_CONDITION_METRICS.csv": [
+        "source_refs"
+      ],
+      "D3_ABC_EVIDENCE_ACTIONS.csv": [
+        "evidence_id",
+        "source_refs",
+        "source_version"
+      ],
+      "RESOURCE_COSTS.csv": [
+        "configuration_version",
+        "cost_source"
+      ],
+      "SOURCE_MANIFEST.csv": [
+        "path"
+      ]
+    },
+    "no_original_evidence_rehashed_or_recomputed": true,
+    "source_paths_are_offline_identifiers_not_public_download_guarantees": true
+  }
+}
