@@ -42,12 +42,12 @@
 % B: Direct Math
 \foreach \j/\col in {0/vb1,1/vgray,2/vzero,3/vgray,4/vzero,5/vb6,6/vb7,7/vgray,8/vb9,9/vb10,10/vgray}{
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)}
-  \path[fill=\col,draw=white,line width=1pt] (\xx,\ytop-2*\ch-0.20) rectangle ++(\cw,\ch);
+  \path[fill=\col,draw=white,line width=1pt] (\xx,\ytop-\ch-0.20) rectangle ++(\cw,\ch);
 }
 % C: Ours
 \foreach \j in {0,...,10}{
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)}
-  \path[fill=vzero,draw=white,line width=1pt] (\xx,\ytop-3*\ch-0.40) rectangle ++(\cw,\ch);
+  \path[fill=vzero,draw=white,line width=1pt] (\xx,\ytop-2*\ch-0.40) rectangle ++(\cw,\ch);
 }
 % Cell values
 \def\celltext#1#2#3#4{\node[font=\scriptsize,align=center,text=#4] at (#1,#2) {#3};}
@@ -61,8 +61,8 @@
 }
 \pgfmathsetmacro{\xEight}{\xzero+7*(\cw+\cg)+\cw/2}
 \pgfmathsetmacro{\xTen}{\xzero+10*(\cw+\cg)+\cw/2}
-\node[font=\small\bfseries,text=black!60] at (\x8,\ytop-\ch/2) {I};
-\node[font=\small\bfseries,text=black!60] at (\x10,\ytop-\ch/2) {Q};
+\node[font=\small\bfseries,text=black!60] at (\xEight,\ytop-\ch/2) {I};
+\node[font=\small\bfseries,text=black!60] at (\xTen,\ytop-\ch/2) {Q};
 
 \foreach \j/\val in {0/22.2,5/12.3,6/13.2,8/4.4,9/36.9}{
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)+\cw/2}
@@ -70,14 +70,14 @@
 }
 \foreach \j in {2,4}{
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)+\cw/2}
-  \node[font=\scriptsize] at (\xx,\ytop-2*\ch-0.20-\ch/2) {0};
+  \node[font=\scriptsize] at (\xx,\ytop-\ch-0.20-\ch/2) {0};
 }
 \foreach \j in {1,7,10}{
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)+\cw/2}
-  \node[font=\small\bfseries,text=black!60] at (\xx,\ytop-2*\ch-0.20-\ch/2) {I};
+  \node[font=\small\bfseries,text=black!60] at (\xx,\ytop-\ch-0.20-\ch/2) {I};
 }
 \pgfmathsetmacro{\xq}{\xzero+3*(\cw+\cg)+\cw/2}
-\node[font=\small\bfseries,text=black!60] at (\xq,\ytop-2*\ch-0.20-\ch/2) {Q};
+\node[font=\small\bfseries,text=black!60] at (\xq,\ytop-\ch-0.20-\ch/2) {Q};
 
 \foreach \j in {0,...,10}{
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)+\cw/2}
