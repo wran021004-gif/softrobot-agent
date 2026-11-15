@@ -72,12 +72,14 @@
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)+\cw/2}
   \node[font=\scriptsize] at (\xx,\ytop-\ch-0.20-\ch/2) {0};
 }
-\foreach \j in {1,7,10}{
+\foreach \j in {1}{
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)+\cw/2}
   \node[font=\small\bfseries,text=black!60] at (\xx,\ytop-\ch-0.20-\ch/2) {I};
 }
-\pgfmathsetmacro{\xq}{\xzero+3*(\cw+\cg)+\cw/2}
-\node[font=\small\bfseries,text=black!60] at (\xq,\ytop-\ch-0.20-\ch/2) {Q};
+\foreach \j in {3,7,10}{
+  \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)+\cw/2}
+  \node[font=\small\bfseries,text=black!60] at (\xx,\ytop-\ch-0.20-\ch/2) {Q};
+}
 
 \foreach \j in {0,...,10}{
   \pgfmathsetmacro{\xx}{\xzero+\j*(\cw+\cg)+\cw/2}
