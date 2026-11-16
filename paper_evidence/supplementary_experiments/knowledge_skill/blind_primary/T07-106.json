@@ -1,0 +1,388 @@
+{
+  "checkpoint_id": "T07-106",
+  "review": {
+    "evaluations": [
+      {
+        "label": "A",
+        "scores": {
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 4,
+          "research_actionability": 4
+        },
+        "knowledge_observations": {
+          "historical_facts": "not_observed",
+          "historical_conclusions": "observed",
+          "reasonable_route": "observed",
+          "avoids_known_ineffective_attempts": "not_observed"
+        },
+        "skill_observations": {
+          "workflow": "observed",
+          "structure_consistency": "observed",
+          "initial_state_and_control_seed": "observed",
+          "critical_constraints": "observed"
+        },
+        "experience_integration": "Applies the shared-structure workflow directly: it fixes the condition-bound candidate and best current schedule, requests fresh complete validation for the sole unresolved case, and explicitly prevents acceptance transfer from the three other same-design cases.",
+        "invalid_research_actions": [],
+        "strengths": [
+          "Uses the exact M1_C candidate and schedule from the current finite native diagnostic.",
+          "Correctly reports the measured residuals and distinguishes diagnostic evidence from independent acceptance.",
+          "Preserves the zero initialization, full 0–0.6 s horizon, holding window, four independent channels, and all dense actuator and task limits.",
+          "Provides clear passing, failing, invalid, and stopping outcomes without claiming structural infeasibility."
+        ],
+        "weaknesses": [],
+        "evidence_specific_rationale": "T07-092 binds the proposed candidate and schedule to M1_C and reports normalized excess 0.0411246204910618, including 0.0260281 m/s tendon speed, 0.0104112 m holding/terminal error, and 0.0306234 m/s holding speed, while withholding acceptance. Replaying that exact pair is the most direct next step and follows the library procedure of validating every required case freshly on one structure."
+      },
+      {
+        "label": "B",
+        "scores": {
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 4,
+          "research_actionability": 4
+        },
+        "knowledge_observations": {
+          "historical_facts": "not_observed",
+          "historical_conclusions": "observed",
+          "reasonable_route": "observed",
+          "avoids_known_ineffective_attempts": "not_observed"
+        },
+        "skill_observations": {
+          "workflow": "observed",
+          "structure_consistency": "observed",
+          "initial_state_and_control_seed": "observed",
+          "critical_constraints": "observed"
+        },
+        "experience_integration": "Connects the common-structure validation procedure to the current evidence by using the exact unresolved M1_C pair, treating the other three replays only as condition-specific results, and requiring complete dense M1_C acceptance before aggregation.",
+        "invalid_research_actions": [],
+        "strengths": [
+          "Specifies an executable candidate/source replay with one requested evaluation.",
+          "Accurately states the T07-092 residual measurements and its unmeasured-acceptance scope.",
+          "Enumerates all relevant frozen bounds and defines discriminating outcomes for both hypotheses.",
+          "Correctly limits any failure conclusion to the exact candidate-schedule pair."
+        ],
+        "weaknesses": [],
+        "evidence_specific_rationale": "The exact candidate and source are established by T07-092, and the cited A, B, and M5 records are independent passes on the same physical design identity but different conditions. The proposed replay fills the remaining condition-specific evidence gap without importing their acceptance."
+      },
+      {
+        "label": "C",
+        "scores": {
+          "decision_quality": 4,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 4,
+          "research_actionability": 4
+        },
+        "knowledge_observations": {
+          "historical_facts": "not_observed",
+          "historical_conclusions": "observed",
+          "reasonable_route": "observed",
+          "avoids_known_ineffective_attempts": "not_observed"
+        },
+        "skill_observations": {
+          "workflow": "observed",
+          "structure_consistency": "observed",
+          "initial_state_and_control_seed": "observed",
+          "critical_constraints": "observed"
+        },
+        "experience_integration": "Uses the shared-structure skill coherently: the exact best current M1_C schedule is replayed from the frozen initializer and full horizon, while selection is deferred until exact passing evidence exists for all four cases on the same design.",
+        "invalid_research_actions": [],
+        "strengths": [
+          "Selects the most direct unresolved acceptance test.",
+          "Preserves the original M1_C target, initializer, timing, holding semantics, channel independence, and actuator envelope.",
+          "States useful expected and refuting observations and handles incomplete execution as unresolved.",
+          "Does not overinterpret the existing A, B, and M5 passes."
+        ],
+        "weaknesses": [],
+        "evidence_specific_rationale": "T07-092 provides a complete M1_C-bound control source but only diagnostic sampled-native evidence, with small positive excesses in tendon speed, position, and holding speed. An independent full replay of that exact source is justified and directly actionable."
+      },
+      {
+        "label": "D",
+        "scores": {
+          "decision_quality": 3,
+          "evidence_consistency": 4,
+          "historical_experience_utilization": 3,
+          "research_actionability": 4
+        },
+        "knowledge_observations": {
+          "historical_facts": "not_observed",
+          "historical_conclusions": "observed",
+          "reasonable_route": "observed",
+          "avoids_known_ineffective_attempts": "not_observed"
+        },
+        "skill_observations": {
+          "workflow": "observed",
+          "structure_consistency": "observed",
+          "initial_state_and_control_seed": "observed",
+          "critical_constraints": "observed"
+        },
+        "experience_integration": "Correctly uses control transfer only as an M1_C-bound seed/schedule rather than importing the M1_A state or acceptance, then proposes fresh full-horizon evaluation on the unchanged shared design. This follows the transfer safeguard but is less directly connected to the best current M1_C result than A–C.",
+        "invalid_research_actions": [],
+        "strengths": [
+          "The transferred source was explicitly created as a complete M1_C-bound schedule and is paired with the correct candidate.",
+          "Maintains the frozen initialization, horizon, target, four channels, and all acceptance bounds.",
+          "Defines schedule-specific pass and failure interpretations and avoids structural-infeasibility claims.",
+          "Tests a concrete cross-condition control-transfer hypothesis."
+        ],
+        "weaknesses": [
+          "Replaying the unevaluated M1_A-derived transfer is a lower-priority route than independently replaying the already optimized best M1_C schedule.",
+          "Comparing this replay against T07-092 mixes an independently evaluated transferred schedule with a model-scoped optimized schedule, so any apparent improvement would require careful scope qualification."
+        ],
+        "evidence_specific_rationale": "T07-105 establishes source 33c49413... as an M1_C-bound transfer of same-design M1_A inputs with no inherited state or acceptance, so the replay is executable and not contradicted. It is informative, but it does not resolve acceptance of the strongest current M1_C schedule from T07-092 as directly as the other decisions."
+      }
+    ],
+    "comparative_rationale": "A, B, and C are substantively equivalent and deserve equal top scores: each replays the exact best current M1_C candidate/source pair, preserves full frozen semantics, and completes the sole missing same-structure condition check without importing acceptance. D is also valid and actionable because its transferred source is explicitly M1_C-bound, but it tests a secondary cross-condition-control hypothesis rather than the most direct acceptance question for the best current M1_C schedule."
+  },
+  "request_accounting": {
+    "usage": null,
+    "response_model": "gpt-5.6-sol",
+    "response_id": "chatcmpl-local-7079930d-361a-466b-b8b7-3679a2d2c74e",
+    "sent_at": "2026-11-16T12:46:02.044396+00:00",
+    "request_bytes": 769819
+  },
+  "raw_review_content": "{\"evaluations\":[{\"label\":\"A\",\"scores\":{\"decision_quality\":4,\"evidence_consistency\":4,\"historical_experience_utilization\":4,\"research_actionability\":4},\"knowledge_observations\":{\"historical_facts\":\"not_observed\",\"historical_conclusions\":\"observed\",\"reasonable_route\":\"observed\",\"avoids_known_ineffective_attempts\":\"not_observed\"},\"skill_observations\":{\"workflow\":\"observed\",\"structure_consistency\":\"observed\",\"initial_state_and_control_seed\":\"observed\",\"critical_constraints\":\"observed\"},\"experience_integration\":\"Applies the shared-structure workflow directly: it fixes the condition-bound candidate and best current schedule, requests fresh complete validation for the sole unresolved case, and explicitly prevents acceptance transfer from the three other same-design cases.\",\"invalid_research_actions\":[],\"strengths\":[\"Uses the exact M1_C candidate and schedule from the current finite native diagnostic.\",\"Correctly reports the measured residuals and distinguishes diagnostic evidence from independent acceptance.\",\"Preserves the zero initialization, full 0–0.6 s horizon, holding window, four independent channels, and all dense actuator and task limits.\",\"Provides clear passing, failing, invalid, and stopping outcomes without claiming structural infeasibility.\"],\"weaknesses\":[],\"evidence_specific_rationale\":\"T07-092 binds the proposed candidate and schedule to M1_C and reports normalized excess 0.0411246204910618, including 0.0260281 m/s tendon speed, 0.0104112 m holding/terminal error, and 0.0306234 m/s holding speed, while withholding acceptance. Replaying that exact pair is the most direct next step and follows the library procedure of validating every required case freshly on one structure.\"},{\"label\":\"B\",\"scores\":{\"decision_quality\":4,\"evidence_consistency\":4,\"historical_experience_utilization\":4,\"research_actionability\":4},\"knowledge_observations\":{\"historical_facts\":\"not_observed\",\"historical_conclusions\":\"observed\",\"reasonable_route\":\"observed\",\"avoids_known_ineffective_attempts\":\"not_observed\"},\"skill_observations\":{\"workflow\":\"observed\",\"structure_consistency\":\"observed\",\"initial_state_and_control_seed\":\"observed\",\"critical_constraints\":\"observed\"},\"experience_integration\":\"Connects the common-structure validation procedure to the current evidence by using the exact unresolved M1_C pair, treating the other three replays only as condition-specific results, and requiring complete dense M1_C acceptance before aggregation.\",\"invalid_research_actions\":[],\"strengths\":[\"Specifies an executable candidate/source replay with one requested evaluation.\",\"Accurately states the T07-092 residual measurements and its unmeasured-acceptance scope.\",\"Enumerates all relevant frozen bounds and defines discriminating outcomes for both hypotheses.\",\"Correctly limits any failure conclusion to the exact candidate-schedule pair.\"],\"weaknesses\":[],\"evidence_specific_rationale\":\"The exact candidate and source are established by T07-092, and the cited A, B, and M5 records are independent passes on the same physical design identity but different conditions. The proposed replay fills the remaining condition-specific evidence gap without importing their acceptance.\"},{\"label\":\"C\",\"scores\":{\"decision_quality\":4,\"evidence_consistency\":4,\"historical_experience_utilization\":4,\"research_actionability\":4},\"knowledge_observations\":{\"historical_facts\":\"not_observed\",\"historical_conclusions\":\"observed\",\"reasonable_route\":\"observed\",\"avoids_known_ineffective_attempts\":\"not_observed\"},\"skill_observations\":{\"workflow\":\"observed\",\"structure_consistency\":\"observed\",\"initial_state_and_control_seed\":\"observed\",\"critical_constraints\":\"observed\"},\"experience_integration\":\"Uses the shared-structure skill coherently: the exact best current M1_C schedule is replayed from the frozen initializer and full horizon, while selection is deferred until exact passing evidence exists for all four cases on the same design.\",\"invalid_research_actions\":[],\"strengths\":[\"Selects the most direct unresolved acceptance test.\",\"Preserves the original M1_C target, initializer, timing, holding semantics, channel independence, and actuator envelope.\",\"States useful expected and refuting observations and handles incomplete execution as unresolved.\",\"Does not overinterpret the existing A, B, and M5 passes.\"],\"weaknesses\":[],\"evidence_specific_rationale\":\"T07-092 provides a complete M1_C-bound control source but only diagnostic sampled-native evidence, with small positive excesses in tendon speed, position, and holding speed. An independent full replay of that exact source is justified and directly actionable.\"},{\"label\":\"D\",\"scores\":{\"decision_quality\":3,\"evidence_consistency\":4,\"historical_experience_utilization\":3,\"research_actionability\":4},\"knowledge_observations\":{\"historical_facts\":\"not_observed\",\"historical_conclusions\":\"observed\",\"reasonable_route\":\"observed\",\"avoids_known_ineffective_attempts\":\"not_observed\"},\"skill_observations\":{\"workflow\":\"observed\",\"structure_consistency\":\"observed\",\"initial_state_and_control_seed\":\"observed\",\"critical_constraints\":\"observed\"},\"experience_integration\":\"Correctly uses control transfer only as an M1_C-bound seed/schedule rather than importing the M1_A state or acceptance, then proposes fresh full-horizon evaluation on the unchanged shared design. This follows the transfer safeguard but is less directly connected to the best current M1_C result than A–C.\",\"invalid_research_actions\":[],\"strengths\":[\"The transferred source was explicitly created as a complete M1_C-bound schedule and is paired with the correct candidate.\",\"Maintains the frozen initialization, horizon, target, four channels, and all acceptance bounds.\",\"Defines schedule-specific pass and failure interpretations and avoids structural-infeasibility claims.\",\"Tests a concrete cross-condition control-transfer hypothesis.\"],\"weaknesses\":[\"Replaying the unevaluated M1_A-derived transfer is a lower-priority route than independently replaying the already optimized best M1_C schedule.\",\"Comparing this replay against T07-092 mixes an independently evaluated transferred schedule with a model-scoped optimized schedule, so any apparent improvement would require careful scope qualification.\"],\"evidence_specific_rationale\":\"T07-105 establishes source 33c49413... as an M1_C-bound transfer of same-design M1_A inputs with no inherited state or acceptance, so the replay is executable and not contradicted. It is informative, but it does not resolve acceptance of the strongest current M1_C schedule from T07-092 as directly as the other decisions.\"}],\"comparative_rationale\":\"A, B, and C are substantively equivalent and deserve equal top scores: each replays the exact best current M1_C candidate/source pair, preserves full frozen semantics, and completes the sole missing same-structure condition check without importing acceptance. D is also valid and actionable because its transferred source is explicitly M1_C-bound, but it tests a secondary cross-condition-control hypothesis rather than the most direct acceptance question for the best current M1_C schedule.\"}",
+  "private_label_key": {
+    "A": "T07-106-K-S+",
+    "B": "T07-106-K-S-",
+    "C": "T07-106-K+S+",
+    "D": "T07-106-K+S-"
+  },
+  "anonymous_decisions": [
+    {
+      "label": "A",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent full frozen-task replay of the best M1_C schedule",
+          "selected_variables": [
+            "M1_C complete native trajectory realization",
+            "geometric tendon speed",
+            "holding position error",
+            "holding tip speed",
+            "terminal position error"
+          ],
+          "selected_candidate": {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "f1eced90268d1f46d28201368a9dc34b374dda040bccf97bcaf9bd60fcec6e1d",
+            "media_type": "application/json"
+          }
+        },
+        "hypothesis": "The next physical uncertainty is whether the remaining M1_C conflict on the shared circular-root, 14 mm-routing design is realized in an independent complete frozen-task execution or is specific to the finite native optimization calculation. Competing hypotheses are H1: independent replay reproduces the predicted coupled violations in tendon speed, holding position, and holding speed, supporting a real trajectory-level bottleneck for this schedule; and H2: independent replay differs enough from the sampled optimization result to satisfy every frozen M1_C threshold. T07-092 reported a model-scoped best schedule with normalized excess 0.0411246204910618, peak tendon speed 0.026028115512276545 m/s, holding error 0.010411239613818941 m, holding speed 0.030623397796931465 m/s, and terminal error 0.010411239613818941 m, but explicitly left independent replay and original acceptance unresolved.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "1dd9bed8530107858397c6dae225e660033071caae66e5e07ca103b0bfdc1809",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f1eced90268d1f46d28201368a9dc34b374dda040bccf97bcaf9bd60fcec6e1d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "404a4d3c65e03452b1b9bdff3cdf9c28b2dd66153cc1d8a98eb340ae0deed874",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "edd0709167f7b6328ba2dbb0f1a5b16d89e3551584c8f14665f19356f3e5d11b",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "452305b42f5276af12c5ba34ba829cd836d9a4706e4a8b537ff705cf1893f1fe",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Under H1, the independent complete replay is valid but fails M1_C, with one or more observations near or above the frozen limits: tendon speed 0.025 m/s, holding position error 0.01 m, holding speed 0.03 m/s, or terminal position error 0.01 m. Reproduction of the predicted approximately 0.02603 m/s, 0.01041 m, and 0.03062 m/s conflict would show that further control or design work is needed rather than joint selection.",
+        "weakening_observation": "H1 is refuted for this schedule if the independent replay is complete and accepted with all tensions in [0,8] N, stroke in [-0.015,0.015] m, tendon speed at most 0.025 m/s, holding and terminal position error at most 0.01 m, holding speed at most 0.03 m/s, zero solver errors, and complete protocol sampling. Invalid or incomplete execution leaves the physical uncertainty UNKNOWN.",
+        "fixed_conditions": "Hold frozen task T07 condition M1_C fixed: target [0.285,0.035,0.185] m, zero initializer, gravity and payload, 0.6 s duration, 0.02 s control and sample periods, 0.001 s timestep, holding window [0.54,0.6] s, all original thresholds, and four independent channels. Hold candidate 93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380 and exact schedule f1eced90268d1f46d28201368a9dc34b374dda040bccf97bcaf9bd60fcec6e1d fixed; make no structural, control, task, or threshold change.",
+        "stopping_condition": "Stop after this one complete independent M1_C replay. Do not select the shared structure unless M1_C passes independently in addition to the existing same-design A, B, and M5 passes; if it fails, return to a separately justified control-search or design decision without relaxing any frozen threshold.",
+        "interpretation": "This action is proposed and has not run. T07-092 is a finite model-scoped native control diagnostic, whereas this replay would provide condition-specific complete task-acceptance evidence. A failure would reject only this exact schedule, not prove global control or structural infeasibility. Existing A, B, and M5 passing replays establish only their own frozen conditions despite sharing physical design identity; they do not establish M1_C or joint four-condition acceptance."
+      }
+    },
+    {
+      "label": "B",
+      "decision": {
+        "action": "physical_replay",
+        "hypothesis": "The next physical uncertainty is whether the small residual M1_C violation predicted for the current shared structure is reproduced by a complete independent frozen-task replay, or instead reflects the limited scope of the prior sampled native control diagnostic. The competing hypotheses are: H1, the M1_C schedule truly violates the frozen tendon-speed and reach/hold thresholds; H2, complete independent evaluation passes because the diagnostic approximation or coverage overstated the residual. T07-092-native-current-common-root-M1_C reported normalized excess 0.0411246204910618, peak tendon speed 0.026028115512276545 m/s, holding error 0.010411239613818941 m, holding speed 0.030623397796931465 m/s, and terminal error 0.010411239613818941 m, but explicitly withheld task acceptance. Meanwhile, the identical physical design independently passed M1_A, M1_B, and M5 in T07-078-read-independent-current-A-pass, T07-083-independent-current-common-root-M1_B, and T07-103-independent-current-common-root-M5. Therefore perform one independent M1_C physical replay using the exact complete schedule from T07-092, without changing the structure, controls, task, or thresholds.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f1eced90268d1f46d28201368a9dc34b374dda040bccf97bcaf9bd60fcec6e1d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "1dd9bed8530107858397c6dae225e660033071caae66e5e07ca103b0bfdc1809",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "404a4d3c65e03452b1b9bdff3cdf9c28b2dd66153cc1d8a98eb340ae0deed874",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "edd0709167f7b6328ba2dbb0f1a5b16d89e3551584c8f14665f19356f3e5d11b",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "452305b42f5276af12c5ba34ba829cd836d9a4706e4a8b537ff705cf1893f1fe",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Under H1, the independent complete M1_C replay is valid and complete but fails at least one unchanged threshold, most likely peak tendon speed above 0.025 m/s together with holding or terminal position error above 0.01 m and holding speed above 0.03 m/s, near the values reported in T07-092. Under H2, the independent replay passes every frozen M1_C requirement: tensions in [0,8] N, stroke from initial pose in [-0.015,0.015] m, peak tendon speed <=0.025 m/s, holding and terminal position error <=0.01 m, holding tip speed <=0.03 m/s, zero solver errors, complete execution, and valid protocol sampling.",
+        "weakening_observation": "A complete accepted M1_C replay refutes H1 and shows that the earlier sampled native diagnostic was insufficient to determine acceptance. A complete replay reproducing the reported excesses refutes H2 and establishes failure of this exact candidate-schedule pair, while still not proving structural infeasibility or global control infeasibility. An incomplete or invalid replay resolves neither hypothesis.",
+        "fixed_conditions": "Keep frozen task T07, condition M1_C, its zero initializer, target [0.285,0.035,0.185] m, gravity, payload, 0.6 s duration, 0.02 s control and sample periods, 0.001 s physics timestep, and all original acceptance thresholds fixed. Use condition-bound candidate 93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380 with physical design identity 2cc088d7947ba93ee7c0b76d4d154ba23091a8298304c02ce6ad7cf9fef4529e and exact schedule f1eced90268d1f46d28201368a9dc34b374dda040bccf97bcaf9bd60fcec6e1d. Do not transfer acceptance from M1_A, M1_B, or M5 and do not alter geometry, materials, routing, control values, or thresholds.",
+        "stopping_condition": "Stop after this single independent M1_C replay. If it passes, retain it as condition-specific acceptance evidence but do not select until all four independent same-structure results are assembled. If it fails, diagnose or revise control/design next; do not infer structural infeasibility from one failed schedule.",
+        "interpretation": "This decision obtains complete independent task-acceptance evidence for the only unresolved required condition on the current common physical design. The prior T07-092 result is sampled native numerical qualification, whereas this replay evaluates the complete frozen condition. Agreement would validate the predicted failure only for this exact schedule; disagreement would expose a scope difference. Neither outcome alone establishes hardware performance, robustness, global control optimality, or structural feasibility.",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent complete frozen-condition replay",
+          "selected_variables": [],
+          "selected_candidate": {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "f1eced90268d1f46d28201368a9dc34b374dda040bccf97bcaf9bd60fcec6e1d",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "label": "C",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent full frozen-task replay of the best current M1_C schedule",
+          "selected_variables": [],
+          "selected_candidate": {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "f1eced90268d1f46d28201368a9dc34b374dda040bccf97bcaf9bd60fcec6e1d",
+            "media_type": "application/json"
+          }
+        },
+        "hypothesis": "The next physical uncertainty is whether the best current M1_C schedule actually fails complete independent frozen-task acceptance, as the finite native search predicts, or whether that diagnostic's limited evidence scope misstates the full replay outcome. The competing hypotheses are: (H1) independent replay confirms a coupled reach/braking/tendon-motion failure on M1_C; (H2) the complete replay passes despite the diagnostic excess. T07-092 predicted holding error 0.010411 m, holding speed 0.030623 m/s, and peak tendon speed 0.026028 m/s, all slightly above their unchanged limits, but explicitly left independent acceptance unmeasured. The identical physical design already has independent passes for M1_A, M1_B, and M5 in T07-077/T07-078, T07-083, and T07-103, so M1_C is the sole unresolved required condition.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "1dd9bed8530107858397c6dae225e660033071caae66e5e07ca103b0bfdc1809",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "404a4d3c65e03452b1b9bdff3cdf9c28b2dd66153cc1d8a98eb340ae0deed874",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "edd0709167f7b6328ba2dbb0f1a5b16d89e3551584c8f14665f19356f3e5d11b",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "452305b42f5276af12c5ba34ba829cd836d9a4706e4a8b537ff705cf1893f1fe",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Under H1, the fresh complete M1_C replay is valid and complete but fails at least one unchanged acceptance threshold, most likely the 0.025 m/s geometric tendon-speed limit together with or near the 0.010 m holding-position and 0.030 m/s holding-speed limits, approximately reproducing the T07-092 observations. Under H2, every frozen M1_C component passes, including position, holding speed, tendon speed, stroke, tension, solver validity, and protocol sampling.",
+        "weakening_observation": "A complete accepted M1_C replay refutes H1 and supplies the missing condition-level acceptance evidence. Conversely, a valid replay reproducing the positive excesses refutes H2. An incomplete execution, solver error, identity mismatch, or missing required signal resolves neither hypothesis.",
+        "fixed_conditions": "Keep frozen task T07 and M1_C unchanged: target [0.285,0.035,0.185] m, zero initializer, gravity and payload, 0.6 s duration, 0.54–0.60 s holding window, four independent channels, 0–8 N tension bounds, ±0.015 m stroke, 0.025 m/s tendon-speed limit, 0.010 m position limit, and 0.030 m/s holding-speed limit. Keep physical design identity 2cc088d7947ba93ee7c0b76d4d154ba23091a8298304c02ce6ad7cf9fef4529e and the exact saved M1_C schedule fixed.",
+        "stopping_condition": "Stop after this one independent full replay. If it passes, the four required conditions may be considered for joint selection only using all exact public passing results. If it fails, retain the measured active constraints and choose a later control or structural revision without claiming global or structural infeasibility.",
+        "interpretation": "This replay is the smallest feasible action that converts the remaining M1_C result from a finite sampled native-control diagnostic into condition-level independent task evidence. It does not test hardware, robustness, repeatability, or continuous-time guarantees, and this plan does not claim the replay has run."
+      }
+    },
+    {
+      "label": "D",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent full replay of same-structure M1_A-derived control on frozen M1_C",
+          "selected_variables": [
+            "M1_C response to the complete M1_A-derived four-channel tension schedule"
+          ],
+          "selected_candidate": {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "93956f49a3d73900bad1af93665281b3f2043045951cb0ad5c3789b6ac220380",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "33c49413acb5394caa0f99a1142937b2c70ac676beeb4ae52a24644cc7860ee7",
+            "media_type": "application/json"
+          }
+        },
+        "hypothesis": "The next physical uncertainty is whether M1_C's residual coupled violation is specific to the previously explored M1_C control basin or reflects a broader dynamic limitation of the shared structure. Competing hypotheses are H1: the independently successful same-structure M1_A control trajectory lies in a physically useful basin for M1_C and its condition-bound transfer can satisfy or materially improve M1_C; H2: under the different M1_C target, that transferred schedule reproduces substantial position, holding-speed, or tendon-speed violations, indicating that cross-condition control transfer alone is insufficient. T07-092 found a finite native M1_C best with 10.411 mm holding error, 30.623 mm/s holding speed, and 26.028 mm/s peak tendon speed, while T07-077 established an independent M1_A pass on the identical physical design. T07-105 created the complete M1_C-bound transferred schedule but did not evaluate it.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "1dd9bed8530107858397c6dae225e660033071caae66e5e07ca103b0bfdc1809",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "404a4d3c65e03452b1b9bdff3cdf9c28b2dd66153cc1d8a98eb340ae0deed874",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "33c49413acb5394caa0f99a1142937b2c70ac676beeb4ae52a24644cc7860ee7",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "edd0709167f7b6328ba2dbb0f1a5b16d89e3551584c8f14665f19356f3e5d11b",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "452305b42f5276af12c5ba34ba829cd836d9a4706e4a8b537ff705cf1893f1fe",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Under H1, the fresh complete M1_C replay of source 33c49413... will pass all original sampled constraints, or at minimum reduce the coupled M1_C excess relative to T07-092: holding and terminal position error at or below 0.010 m, holding tip speed at or below 0.030 m/s, tendon speed at or below 0.025 m/s, stroke within [-0.015,0.015] m, tensions within [0,8] N, complete execution, and no solver errors. A complete pass would provide condition-specific M1_C acceptance only for this candidate and schedule.",
+        "weakening_observation": "H1 is refuted for this transferred schedule if the independent replay is complete and valid but violates any frozen M1_C threshold, especially if position, holding speed, and tendon speed remain jointly above their limits or are worse than the T07-092 native best. Such failure would support H2 only for cross-condition transfer; it would not prove structural infeasibility or exclude a different M1_C control search.",
+        "fixed_conditions": "Hold frozen task T07 condition M1_C and every threshold fixed: target [0.285,0.035,0.185] m, zero initial state, gravity and payload, duration 0.6 s, control period 0.02 s, timestep 0.001 s, holding window [0.54,0.6] s, position limit 0.010 m, holding-speed limit 0.030 m/s, tendon-speed limit 0.025 m/s, stroke bounds [-0.015,0.015] m, tension bounds [0,8] N, and four independent channels. Keep physical design identity 2cc088d7947ba93ee7c0b76d4d154ba23091a8298304c02ce6ad7cf9fef4529e and the complete source schedule unchanged.",
+        "stopping_condition": "Stop after this one independent complete M1_C replay. Do not transfer M1_A acceptance, infer continuous-time compliance, claim structural infeasibility from failure, or select the shared structure unless independent passing executions exist for all four frozen conditions on the identical physical design.",
+        "interpretation": "This is a fresh condition-specific physical replay, not a mathematical prediction or control optimization. It directly tests whether an unevaluated same-structure cross-condition control transfer resolves M1_C. T07-092 remains finite sampled native-search evidence; T07-077, T07-083, and T07-103 are independent acceptances only for M1_A, M1_B, and M5 respectively."
+      }
+    }
+  ],
+  "rubric_reference": "supplementary_experiments/knowledge_skill_primary_review_protocol.json",
+  "hidden": [
+    "condition",
+    "cost",
+    "read count",
+    "future outcomes",
+    "previous scores"
+  ],
+  "same_model_dependence": true
+}

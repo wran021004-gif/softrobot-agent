@@ -1,0 +1,493 @@
+{
+  "checkpoint_id": "T04-220",
+  "status": "completed",
+  "review": {
+    "evaluations": [
+      {
+        "label": "A",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 3,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T04-220-K1",
+            "covered": true,
+            "rationale": "Preserves the complete 22 s, two-cycle timed reference, ramps, gravity, payload and pointer geometry, timing, seed, required signals, evaluator windows, four channels, and all numerical acceptance thresholds.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-220-K2",
+            "covered": false,
+            "rationale": "Correctly uses the successful 89-point current-candidate bank, but does not acknowledge that it followed the failed all-4 N/global initialization attempt. That history is relevant to the boundary/interior-preload interpretation.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank"
+          },
+          {
+            "evidence_id": "T04-220-K3",
+            "covered": true,
+            "rationale": "Explicitly distinguishes sampled mathematical equilibria, time-zero qualification, and an unmeasured schedule from finite-time dynamic task performance.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          },
+          {
+            "evidence_id": "T04-220-K4",
+            "covered": true,
+            "rationale": "Selects the bound current candidate and its current generated control source, fixes four independent channels, and prohibits historical-state copying or geometry changes.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          },
+          {
+            "evidence_id": "T04-220-K5",
+            "covered": true,
+            "rationale": "Requires replay from the independently qualified T04-217 equilibrium and correctly limits that qualification to static time-zero evidence.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero"
+          },
+          {
+            "evidence_id": "T04-220-K6",
+            "covered": true,
+            "rationale": "Specifies a complete replay at the original 0.001 s physics and 0.01 s control/sample timing, with dense tension, stroke, speed, contact, warning, drift, and tracking checks.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          }
+        ],
+        "critical_omissions": [
+          "Does not mention that the successful local-interior bank was obtained only after the earlier native-bank construction failed with NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE."
+        ],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "The decision gives a physically sound discrimination between quasistatic sufficiency and dynamic/interpolation/actuator failure, preserves the frozen experiment, and proposes the directly missing full replay without treating it as completed evidence. Thresholds and diagnostic outcomes are unusually specific. It visibly applies the native-equilibrium-bank workflow, current-candidate qualification discipline, and the expert recommendation to test feedforward before redesign; historical evidence is appropriately denied current acceptance credit. Historical-experience utilization is strong but not fully explicit about the failed initial seed. No proposed action is invalid.",
+        "confidence": 0.98,
+        "uncertain_fields": []
+      },
+      {
+        "label": "B",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 3,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T04-220-K1",
+            "covered": true,
+            "rationale": "Keeps the full frozen figure-eight, duration, frequency, ramps, payload, gravity, seed, integration and sampling periods, four channels, and unchanged acceptance gates.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-220-K2",
+            "covered": false,
+            "rationale": "Accurately uses the completed 89-point bank and its quantitative diagnostics, but omits that construction succeeded after the preceding all-4 N/global-seed failure.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank"
+          },
+          {
+            "evidence_id": "T04-220-K3",
+            "covered": true,
+            "rationale": "Correctly states that pointwise static feasibility and the reported bank errors do not establish interpolation performance, dynamic tracking, or acceptance.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          },
+          {
+            "evidence_id": "T04-220-K4",
+            "covered": true,
+            "rationale": "Uses the named current legal candidate and its generated source schedule, retains the four tendon routes, and forbids copying historical states.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          },
+          {
+            "evidence_id": "T04-220-K5",
+            "covered": true,
+            "rationale": "Explicitly uses and correctly scopes the independent initial-state qualification before any trajectory interpretation.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero"
+          },
+          {
+            "evidence_id": "T04-220-K6",
+            "covered": true,
+            "rationale": "Calls for a complete 22 s replay producing all required signals, at the original timing, with tracking, cycle, actuator, contact, warning, and completion checks.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          }
+        ],
+        "critical_omissions": [
+          "Does not report the earlier failed native-bank initialization or explain that the successful bank depended on retrying from the local time-zero equilibrium with an inward 0.21 N seed."
+        ],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "The physical interpretation, limitations, and proposed replay are fully appropriate. The decision quantitatively reports the bank error and residual, explicitly notes that T04-219 remains unmeasured, and states that replay failure would not prove structural infeasibility. It also makes especially clear use of the historical method-selection knowledge while treating historical quasistatic success as context only, and follows the equilibrium-bank, qualification, binding, schedule, and replay skill sequence. Its sole material evidence gap is omission of the failed initial bank construction. No proposed action is invalid.",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "label": "C",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 3,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T04-220-K1",
+            "covered": true,
+            "rationale": "Fixes T04/default, the 22 s reference and timing, seed, gravity, load and pointer, collision policy, actuator semantics, four channels, and all original thresholds.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-220-K2",
+            "covered": false,
+            "rationale": "Correctly identifies the completed 89-point static bank and its maximum error and residual, but does not include the earlier failed global/boundary-seed construction attempt.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank"
+          },
+          {
+            "evidence_id": "T04-220-K3",
+            "covered": true,
+            "rationale": "Explicitly says that the bank and time-zero qualification cannot discriminate finite-time dynamic hypotheses and that the seeded source remains unmeasured.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          },
+          {
+            "evidence_id": "T04-220-K4",
+            "covered": true,
+            "rationale": "Names the bound current candidate and corresponding schedule and retains the current candidate equilibrium and four-channel semantics.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          },
+          {
+            "evidence_id": "T04-220-K5",
+            "covered": true,
+            "rationale": "Uses T04-217's independently qualified time-zero state and does not promote it to trajectory acceptance.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero"
+          },
+          {
+            "evidence_id": "T04-220-K6",
+            "covered": true,
+            "rationale": "Requests a complete replay with the original timing and dense tracking, cycle, tension, stroke, speed, contact, warning, and numerical checks, rejecting conclusions from partial rollouts.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          }
+        ],
+        "critical_omissions": [
+          "Omits the failed T04-211 construction and the evidence-driven inward-seed retry that produced the current bank."
+        ],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "The decision accurately separates static and dynamic evidence, preserves the full frozen task, selects a feasible one-solve replay, and supplies clear pass, failure, and stopping interpretations. Its event-output artifact references are accurate and particularly traceable. It applies the native-bank and independent-qualification procedural skills, although use of the historical method-selection and phase/preload knowledge is mostly implicit rather than discussed. The only significant checklist gap is omission of the earlier construction failure. No proposed action is invalid.",
+        "confidence": 0.98,
+        "uncertain_fields": []
+      },
+      {
+        "label": "D",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 3,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T04-220-K1",
+            "covered": true,
+            "rationale": "Preserves the complete frozen 22 s task, ramps, reference timing, gravity and payload, seed, collision policy, integration and control timing, evaluation grid, four-channel candidate, and original limits.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-220-K2",
+            "covered": false,
+            "rationale": "Uses the successful sampled equilibrium bank but does not state that the bank was obtained after the preceding failed all-4 N/global-seed attempt.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank"
+          },
+          {
+            "evidence_id": "T04-220-K3",
+            "covered": true,
+            "rationale": "Clearly distinguishes finite-time physical performance from sampled static feasibility, mathematical prediction, geometry validity, and qualification.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          },
+          {
+            "evidence_id": "T04-220-K4",
+            "covered": true,
+            "rationale": "Fixes the exact current candidate, its generated absolute-tension schedule, qualified bound state, geometry, and four-channel replay semantics.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          },
+          {
+            "evidence_id": "T04-220-K5",
+            "covered": true,
+            "rationale": "Requires the independently qualified candidate-bound initial state and correctly treats it as a prerequisite rather than acceptance evidence.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank"
+          },
+          {
+            "evidence_id": "T04-220-K6",
+            "covered": true,
+            "rationale": "Retains the 0.001 s integration and 0.01 s control/sample periods and requests complete dense trajectory, tension, stroke, speed, contact, warning, and numerical-completion evidence.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots"
+          }
+        ],
+        "critical_omissions": [
+          "Does not acknowledge the failed T04-211 construction or the local-interior retry that explains the present preload strategy."
+        ],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "The decision provides the strongest failure-localization plan: actuator binding near extrema or ramps, phase lag without binding, and second-cycle growth are separated into useful diagnostic signatures. The zero-order-hold description is supported by the native-reference-bank skill, and the full-pass interpretation remains properly scoped to this exact candidate and condition. It applies the bank/replay skill and expert feedforward method choice, though historical experience is not explicitly identified. The earlier failed bank attempt is the only material checklist omission. No proposed action is invalid.",
+        "confidence": 0.98,
+        "uncertain_fields": []
+      }
+    ]
+  },
+  "usage": {
+    "usage": "UNKNOWN",
+    "response_model": "gpt-5.6-sol",
+    "response_id": "chatcmpl-local-9dd87788-8675-4440-893c-0435c8945bab",
+    "sent_at": "2026-11-16T12:19:43.216457+00:00",
+    "request_bytes": 505812
+  },
+  "private_label_key": {
+    "A": "T04-220-K-S-",
+    "B": "T04-220-K+S-",
+    "C": "T04-220-K+S+",
+    "D": "T04-220-K-S+"
+  },
+  "blinding": {
+    "hidden": [
+      "condition",
+      "usage",
+      "retrieval count",
+      "rank",
+      "future outcomes"
+    ],
+    "same_model": true
+  },
+  "anonymous_decisions": [
+    {
+      "label": "A",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent full-task native replay of the fixed quasistatic tension schedule",
+          "selected_variables": [],
+          "selected_candidate": {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The unresolved physical uncertainty is whether the current candidate's statically feasible equilibrium path remains dynamically trackable when its fixed interpolated tension schedule is applied through the native actuator and flexible-body dynamics. Competing hypotheses are: (H1) the slow 0.1 Hz motion is sufficiently quasistatic that the schedule tracks the complete figure eight within every frozen acceptance threshold; or (H2) transient dynamics, interpolation between 0.25 s knots, actuator stroke/rate limits, or repeated operation near the 0.2 N unilateral tension floor produce tracking error, drift, or incomplete lobe traversal. T04-216 establishes only sampled mathematical equilibria, T04-217 only time-zero static qualification, and T04-219 only an unmeasured schedule; none establishes dynamic task performance.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "f7dff6a0bd5ef4bed36c20d2cb9172a915dfe1fa61c8d48e7a360264d8adcbc6",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Under H1, one independent complete native replay from the candidate-qualified equilibrium using source 826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2 completes 22 s without numerical failure, contact, or warnings and satisfies all original T04 limits: RMSE <= 0.003 m, maximum error <= 0.006 m, cycle drift <= 0.002 m, tension in [0.2,8] N, stroke <= 0.03 m, speed <= 0.03 m/s, both y lobes reaching at least -0.018 m and +0.018 m, z extrema spanning at least 0.163 to 0.177 m, and four independent channels.",
+        "weakening_observation": "H1 is refuted if the complete replay is invalid or violates any frozen threshold, especially phase-dependent error peaks between the 0.25 s equilibrium knots, cycle-two drift above 0.002 m, failure to reach a required lobe extremum, tension clipping/slack at 0.2 N, or actuator stroke/rate violations. Such an outcome supports H2 and distinguishes dynamic/control limitations from the already demonstrated sampled static balance; an incomplete or numerically failed replay leaves the physical cause UNKNOWN.",
+        "fixed_conditions": "Hold fixed TASK/T04 default exactly: the bound candidate a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f, qualified initial state from T04-217, fixed source schedule from T04-219, gravity, payload and pointer geometry, 22 s timed reference with 2 s start/stop ramps, 0.1 Hz and two cycles, 0.001 s physics timestep, 0.01 s control/sample period, seed 17, native collision policy, evaluator windows, required signals, and every original acceptance threshold. Do not reoptimize control, alter geometry, copy historical qpos, or relax thresholds.",
+        "stopping_condition": "Stop after this single complete replay is recorded. If every original check passes, the result may support later independent task selection; if any check fails, do not claim acceptance and use the recorded failure mode to choose a later control or design diagnosis. Incomplete evidence remains UNKNOWN.",
+        "interpretation": "This replay is the smallest feasible experiment that directly discriminates quasistatic sufficiency from dynamic/control failure while using one of the 18 available backend solves. The generated candidate's compilation in T04-210, the equilibrium bank in T04-216, and static qualification in T04-217 establish geometry/materialization and mathematical/static scopes only. The proposed replay has not run; only a complete independent task evaluation can establish physical acceptance for T04.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "label": "B",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent_full_native_replay_of_quasistatic_tension_schedule",
+          "selected_variables": [
+            "complete 22 s native trajectory response",
+            "tracking RMSE and maximum error",
+            "cycle drift",
+            "tendon tension",
+            "actuator stroke",
+            "actuator speed",
+            "contacts",
+            "warnings",
+            "numerical completion"
+          ],
+          "selected_candidate": {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The unresolved physical uncertainty is whether the statically constructed 0.25 s tension-knot continuation remains dynamically trackable after interpolation and native integration, rather than accumulating lag, cycle drift, or actuator/tension violations. Competing hypotheses are: (H1) the slow 0.1 Hz motion is sufficiently quasistatic that the bound legal two-segment robot follows the figure-eight within every frozen acceptance threshold; (H2) static pointwise feasibility does not transfer to the finite-time trajectory because dynamics or interpolation cause tracking error, drift, saturation, stroke/speed violation, contact, warning, or numerical failure. T04-216 established only a mathematical equilibrium bank, T04-217 only qualified the supplied initial state, T04-218 only bound that state to the task, and T04-219 produced an unmeasured schedule; therefore a complete independent physical replay is the most direct discriminator.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f7dff6a0bd5ef4bed36c20d2cb9172a915dfe1fa61c8d48e7a360264d8adcbc6",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "A complete 22 s native replay from the candidate-qualified equilibrium produces all required signals and satisfies the unchanged T04 gates: tracking RMSE <= 0.003 m, tracking maximum <= 0.006 m, cycle drift <= 0.002 m, tensions within [0.2,8] N, stroke <= 0.03 m, speed <= 0.03 m/s, required lobe coverage, four independent channels, initial static balance <= 1e-7 Nm, and no disqualifying contact, warning, or numerical termination. This would support H1 only in the scope of this candidate, schedule, frozen condition, and complete physical replay.",
+        "weakening_observation": "Any incomplete replay or any frozen-gate failure refutes H1 for this schedule. Particularly informative support for H2 would be tracking error that grows between the 0.25 s equilibrium knots, second-cycle drift above 0.002 m, tension reaching a bound, actuator stroke or speed excess, contact, warning, or numerical failure despite the qualified initial equilibrium. Such a result would not prove structural infeasibility or invalidate the static equilibrium calculations.",
+        "fixed_conditions": "Keep TASK/T04 default condition unchanged: the figure-eight reference, 22 s duration, 0.1 Hz frequency, 2 s start/stop ramps, gravity, rigid pointer payload, 0.001 s physics timestep, 0.01 s control/sample periods, seed 17, qualified candidate equilibrium, geometry, material properties, four tendon routes, controller-independent supplied schedule, and every original acceptance threshold remain fixed. Replay exactly candidate a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f with source 826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2; do not copy historical states or alter interpolation, preload, task, or thresholds.",
+        "stopping_condition": "Stop this decision after one complete independent replay or an admissibility/budget failure. A passing replay can be considered later for formal selection; a failed replay requires diagnosis rather than repeated unchanged replay or a claim of structural infeasibility.",
+        "interpretation": "This proposed action has not run. The equilibrium bank in T04-216 had maximum pointwise position error 0.0006110494311492155 m and maximum static-balance residual 5.075230166684541e-12 Nm, while T04-217 independently qualified time zero, but neither is finite-time physical evidence. T04-219 explicitly reports task acceptance as unmeasured. One full physical replay is feasible within the recorded remaining allowance of 18 backend solves and directly tests the missing transfer from static continuation to dynamic task performance. Historical quasistatic success is context only and does not transfer acceptance.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "label": "C",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent complete frozen-task physical replay of the current quasistatic feedforward schedule",
+          "selected_variables": [
+            "complete 22 s dynamic tracking response",
+            "tracking RMSE and maximum error",
+            "cycle drift",
+            "tension bounds and saturation",
+            "actuator stroke and speed",
+            "contacts and numerical warnings"
+          ],
+          "selected_candidate": {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+            "media_type": "application/json"
+          }
+        },
+        "hypothesis": "The unresolved physical uncertainty is whether the current candidate's statically constructed equilibrium sequence remains accurate when interpolated and applied to the actual 22 s dynamics. Competing hypotheses are: (H1) the 0.1 Hz motion is sufficiently quasistatic that the feedforward schedule tracks within every frozen acceptance bound; or (H2) dynamic lag, interpolation error, unilateral tension behavior, actuator limits, drift, contact, or numerical instability causes failure despite the accurate static equilibria. The static bank and time-zero qualification cannot discriminate these hypotheses.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f7dff6a0bd5ef4bed36c20d2cb9172a915dfe1fa61c8d48e7a360264d8adcbc6",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "bca3ab77c3ae1f34f0f4ee4a6bce735689905410423db11964c44fb5b8c7da0f",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "fa45b8b8467aa3f8aef60ce9b7e01d2c6e86acd72eee9e87864ac69ddeb3838e",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Under H1, one complete independent replay finishes all 22 s without numerical failure, contact, or warnings and reports tracking RMSE at most 0.003 m, maximum error at most 0.006 m, cycle drift at most 0.002 m, the required lobe coverage, four independent channels, tensions within 0.2–8 N without forbidden saturation, stroke at most 0.03 m, speed at most 0.03 m/s, and the already qualified initial static balance at most 1e-7 Nm.",
+        "weakening_observation": "H1 is refuted for this schedule if the complete replay is invalid or incomplete, or if any unchanged acceptance check fails—especially phase-correlated tracking lag, RMSE above 0.003 m, maximum error above 0.006 m, cycle drift above 0.002 m, missed lobe coverage, tension saturation, excessive stroke or speed, contact, warnings, or numerical termination. Such a result supports H2 for this feedforward schedule but does not prove the structure or task globally infeasible.",
+        "fixed_conditions": "Keep frozen task T04/default, candidate a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f, source schedule 826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2, qualified candidate equilibrium, seed 17, 22 s reference and timing, gravity, payload and pointer geometry, collision policy, actuator semantics, four channels, and every original acceptance threshold unchanged.",
+        "stopping_condition": "Stop after this single complete replay is registered; accept no conclusion from a partial rollout. If it passes every original check, it is eligible as complete physical task evidence. If it fails, retain the full traces and diagnose the dominant dynamic or constraint failure before any control or design revision.",
+        "interpretation": "T04-216/f7dff6a0 establishes only sampled static mathematical equilibria, including maximum static position error about 0.611 mm and residual about 5.08e-12 Nm; T04-217/93df2cb6 establishes only time-zero static qualification; T04-218/bca3ab77 establishes task binding; and T04-219/fa45b8b with source 826caeba establishes an unmeasured schedule. Only the proposed complete independent physical replay can resolve the present dynamic physical uncertainty and test the unchanged task acceptance criteria."
+      }
+    },
+    {
+      "label": "D",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "complete independent frozen-task physical replay of the seeded absolute-tension schedule",
+          "selected_variables": [
+            "complete 22 s tip trajectory",
+            "tracking RMSE and maximum error",
+            "cycle drift",
+            "tendon tension, stroke, and speed",
+            "contacts, warnings, and numerical completion"
+          ],
+          "selected_candidate": {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The unresolved physical uncertainty is whether the statically feasible, low-frequency equilibrium-bank schedule remains dynamically valid under native 0.001 s integration and zero-order-held actuation. Competing hypotheses are: H1, the 0.1 Hz motion is sufficiently quasistatic that the seeded schedule tracks the full figure eight within every frozen limit; H2, transient dynamics, interpolation between 0.25 s knots, unilateral-tension binding, actuator limits, or cycle accumulation cause lag, saturation, drift, or numerical failure despite the static equilibria. T04-216 established only sampled static equilibria, T04-217 qualified only time zero, and T04-219 produced an unmeasured schedule; therefore a complete independent replay is the direct discriminating test.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "f7dff6a0bd5ef4bed36c20d2cb9172a915dfe1fa61c8d48e7a360264d8adcbc6",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Under H1, the replay completes all 22 s without contacts, warnings, or numerical termination and satisfies the unchanged acceptance limits: tracking RMSE at most 0.003 m, maximum error at most 0.006 m, cycle drift at most 0.002 m, tensions within 0.2–8 N, stroke at most 0.03 m, speed at most 0.03 m/s, required lobe coverage, four independent channels, and the already qualified initial static balance. Small bounded phase error without progressive second-cycle degradation would support quasistatic dynamic validity.",
+        "weakening_observation": "H1 is refuted by an incomplete replay or any original acceptance failure. Concentrated error near lobe extrema or ramps together with tension, stroke, or speed binding would support the actuation/interpolation-limited H2; persistent phase lag without binding would support dynamic-model lag; larger second-cycle error or cycle drift above 0.002 m would support accumulated dynamic mismatch. Missing required signals or incomplete evaluation leaves the uncertainty UNKNOWN.",
+        "fixed_conditions": "Hold fixed frozen task T04/default, seed 17, the 22 s timed figure-eight reference and ramps, gravity and payload, 0.01 s control/sample periods, 0.001 s physics timestep, native collision policy, qualified candidate-bound initial state, candidate a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f, exact schedule 826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2, geometry, controller-independent replay semantics, evaluation grid, and every original threshold. Do not retune controls, alter geometry, copy historical states, or relax limits.",
+        "stopping_condition": "Stop after this one complete independent replay result is registered. Do not select unless that result independently passes every frozen acceptance check; if it fails, retain the full traces and diagnose the observed failure mode before proposing any control or design change.",
+        "interpretation": "This action tests complete finite-time physical task performance, not merely sampled static feasibility, mathematical prediction, geometry validity, or numerical qualification. A full pass would establish acceptance only for this candidate, exact schedule, and frozen default condition; a failure would localize the next research question from the recorded temporal and constraint signatures without invalidating the earlier static evidence.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+            "media_type": "application/json"
+          }
+        }
+      }
+    }
+  ],
+  "raw_review_content": "{\"evaluations\":[{\"label\":\"A\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":3,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T04-220-K1\",\"covered\":true,\"rationale\":\"Preserves the complete 22 s, two-cycle timed reference, ramps, gravity, payload and pointer geometry, timing, seed, required signals, evaluator windows, four channels, and all numerical acceptance thresholds.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-220-K2\",\"covered\":false,\"rationale\":\"Correctly uses the successful 89-point current-candidate bank, but does not acknowledge that it followed the failed all-4 N/global initialization attempt. That history is relevant to the boundary/interior-preload interpretation.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank\"},{\"evidence_id\":\"T04-220-K3\",\"covered\":true,\"rationale\":\"Explicitly distinguishes sampled mathematical equilibria, time-zero qualification, and an unmeasured schedule from finite-time dynamic task performance.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"},{\"evidence_id\":\"T04-220-K4\",\"covered\":true,\"rationale\":\"Selects the bound current candidate and its current generated control source, fixes four independent channels, and prohibits historical-state copying or geometry changes.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"},{\"evidence_id\":\"T04-220-K5\",\"covered\":true,\"rationale\":\"Requires replay from the independently qualified T04-217 equilibrium and correctly limits that qualification to static time-zero evidence.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero\"},{\"evidence_id\":\"T04-220-K6\",\"covered\":true,\"rationale\":\"Specifies a complete replay at the original 0.001 s physics and 0.01 s control/sample timing, with dense tension, stroke, speed, contact, warning, drift, and tracking checks.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"}],\"critical_omissions\":[\"Does not mention that the successful local-interior bank was obtained only after the earlier native-bank construction failed with NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE.\"],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"The decision gives a physically sound discrimination between quasistatic sufficiency and dynamic/interpolation/actuator failure, preserves the frozen experiment, and proposes the directly missing full replay without treating it as completed evidence. Thresholds and diagnostic outcomes are unusually specific. It visibly applies the native-equilibrium-bank workflow, current-candidate qualification discipline, and the expert recommendation to test feedforward before redesign; historical evidence is appropriately denied current acceptance credit. Historical-experience utilization is strong but not fully explicit about the failed initial seed. No proposed action is invalid.\",\"confidence\":0.98,\"uncertain_fields\":[]},{\"label\":\"B\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":3,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T04-220-K1\",\"covered\":true,\"rationale\":\"Keeps the full frozen figure-eight, duration, frequency, ramps, payload, gravity, seed, integration and sampling periods, four channels, and unchanged acceptance gates.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-220-K2\",\"covered\":false,\"rationale\":\"Accurately uses the completed 89-point bank and its quantitative diagnostics, but omits that construction succeeded after the preceding all-4 N/global-seed failure.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank\"},{\"evidence_id\":\"T04-220-K3\",\"covered\":true,\"rationale\":\"Correctly states that pointwise static feasibility and the reported bank errors do not establish interpolation performance, dynamic tracking, or acceptance.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"},{\"evidence_id\":\"T04-220-K4\",\"covered\":true,\"rationale\":\"Uses the named current legal candidate and its generated source schedule, retains the four tendon routes, and forbids copying historical states.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"},{\"evidence_id\":\"T04-220-K5\",\"covered\":true,\"rationale\":\"Explicitly uses and correctly scopes the independent initial-state qualification before any trajectory interpretation.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero\"},{\"evidence_id\":\"T04-220-K6\",\"covered\":true,\"rationale\":\"Calls for a complete 22 s replay producing all required signals, at the original timing, with tracking, cycle, actuator, contact, warning, and completion checks.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"}],\"critical_omissions\":[\"Does not report the earlier failed native-bank initialization or explain that the successful bank depended on retrying from the local time-zero equilibrium with an inward 0.21 N seed.\"],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"The physical interpretation, limitations, and proposed replay are fully appropriate. The decision quantitatively reports the bank error and residual, explicitly notes that T04-219 remains unmeasured, and states that replay failure would not prove structural infeasibility. It also makes especially clear use of the historical method-selection knowledge while treating historical quasistatic success as context only, and follows the equilibrium-bank, qualification, binding, schedule, and replay skill sequence. Its sole material evidence gap is omission of the failed initial bank construction. No proposed action is invalid.\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"label\":\"C\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":3,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T04-220-K1\",\"covered\":true,\"rationale\":\"Fixes T04/default, the 22 s reference and timing, seed, gravity, load and pointer, collision policy, actuator semantics, four channels, and all original thresholds.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-220-K2\",\"covered\":false,\"rationale\":\"Correctly identifies the completed 89-point static bank and its maximum error and residual, but does not include the earlier failed global/boundary-seed construction attempt.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank\"},{\"evidence_id\":\"T04-220-K3\",\"covered\":true,\"rationale\":\"Explicitly says that the bank and time-zero qualification cannot discriminate finite-time dynamic hypotheses and that the seeded source remains unmeasured.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"},{\"evidence_id\":\"T04-220-K4\",\"covered\":true,\"rationale\":\"Names the bound current candidate and corresponding schedule and retains the current candidate equilibrium and four-channel semantics.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"},{\"evidence_id\":\"T04-220-K5\",\"covered\":true,\"rationale\":\"Uses T04-217's independently qualified time-zero state and does not promote it to trajectory acceptance.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero\"},{\"evidence_id\":\"T04-220-K6\",\"covered\":true,\"rationale\":\"Requests a complete replay with the original timing and dense tracking, cycle, tension, stroke, speed, contact, warning, and numerical checks, rejecting conclusions from partial rollouts.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"}],\"critical_omissions\":[\"Omits the failed T04-211 construction and the evidence-driven inward-seed retry that produced the current bank.\"],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"The decision accurately separates static and dynamic evidence, preserves the full frozen task, selects a feasible one-solve replay, and supplies clear pass, failure, and stopping interpretations. Its event-output artifact references are accurate and particularly traceable. It applies the native-bank and independent-qualification procedural skills, although use of the historical method-selection and phase/preload knowledge is mostly implicit rather than discussed. The only significant checklist gap is omission of the earlier construction failure. No proposed action is invalid.\",\"confidence\":0.98,\"uncertain_fields\":[]},{\"label\":\"D\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":3,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T04-220-K1\",\"covered\":true,\"rationale\":\"Preserves the complete frozen 22 s task, ramps, reference timing, gravity and payload, seed, collision policy, integration and control timing, evaluation grid, four-channel candidate, and original limits.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-220-K2\",\"covered\":false,\"rationale\":\"Uses the successful sampled equilibrium bank but does not state that the bank was obtained after the preceding failed all-4 N/global-seed attempt.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank\"},{\"evidence_id\":\"T04-220-K3\",\"covered\":true,\"rationale\":\"Clearly distinguishes finite-time physical performance from sampled static feasibility, mathematical prediction, geometry validity, and qualification.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-216-construct-local-interior-reference-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"},{\"evidence_id\":\"T04-220-K4\",\"covered\":true,\"rationale\":\"Fixes the exact current candidate, its generated absolute-tension schedule, qualified bound state, geometry, and four-channel replay semantics.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"},{\"evidence_id\":\"T04-220-K5\",\"covered\":true,\"rationale\":\"Requires the independently qualified candidate-bound initial state and correctly treats it as a prerequisite rather than acceptance evidence.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-217-qualify-local-interior-bank-time-zero;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-218-bind-local-interior-qualified-bank\"},{\"evidence_id\":\"T04-220-K6\",\"covered\":true,\"rationale\":\"Retains the 0.001 s integration and 0.01 s control/sample periods and requests complete dense trajectory, tension, stroke, speed, contact, warning, and numerical-completion evidence.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-219-seed-local-interior-formal-knots\"}],\"critical_omissions\":[\"Does not acknowledge the failed T04-211 construction or the local-interior retry that explains the present preload strategy.\"],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"The decision provides the strongest failure-localization plan: actuator binding near extrema or ramps, phase lag without binding, and second-cycle growth are separated into useful diagnostic signatures. The zero-order-hold description is supported by the native-reference-bank skill, and the full-pass interpretation remains properly scoped to this exact candidate and condition. It applies the bank/replay skill and expert feedforward method choice, though historical experience is not explicitly identified. The earlier failed bank attempt is the only material checklist omission. No proposed action is invalid.\",\"confidence\":0.98,\"uncertain_fields\":[]}]}"
+}

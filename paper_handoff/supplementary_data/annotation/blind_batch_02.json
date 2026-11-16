@@ -1,0 +1,241 @@
+{
+  "review": {
+    "annotations": [
+      {
+        "anonymous_node_id": "N05",
+        "dimension": "Hypothesis Testability",
+        "score": 2,
+        "rationale": "The 22 s task and frozen evaluator provide operational acceptance thresholds, but the stated expected observation is only a generic complete result and the weakening observation lists broad failure categories rather than specific measurements that would refute the hypothesis.",
+        "supporting_evidence_reference": "T04-218-bind-local-interior-qualified-bank:/data/configuration/task/acceptance; T04-219-seed-local-interior-formal-knots:original_input.expected_observation",
+        "confidence": 0.93,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N05",
+        "dimension": "Evidence Grounding",
+        "score": 4,
+        "rationale": "The record supplies exact git, trace-event, artifact, task-source-file, candidate, and qualified-initial-state locators, including hashes for the original task and solver files.",
+        "supporting_evidence_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/SELECTED_RESEARCH_EVENTS.json#stage_id=T04-220; T04-218-bind-local-interior-qualified-bank; artifact:93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N05",
+        "dimension": "Method Appropriateness",
+        "score": 4,
+        "rationale": "Binding the original timed figure-eight task to the current candidate and qualified equilibrium is appropriate for distinguishing static feasibility from dynamic acceptance; the model, controller, 22 s timing, physical grid, actuator constraints, and unsupported physics are explicitly declared.",
+        "supporting_evidence_reference": "T04-218-bind-local-interior-qualified-bank:/data/configuration; T04-218-bind-local-interior-qualified-bank:/data/configuration/task/timing; T04-218-bind-local-interior-qualified-bank:/data/configuration/robot/assumptions",
+        "confidence": 0.96,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N05",
+        "dimension": "Research Adaptation",
+        "score": 3,
+        "rationale": "The research route changes from relying on static feasibility to binding and initializing the complete timed dynamic task, explicitly refusing to import prior rollout acceptance. The adaptation is clear, though no completed physical evaluation is shown.",
+        "supporting_evidence_reference": "T04-218-bind-local-interior-qualified-bank; T04-219-seed-local-interior-formal-knots:original_input.hypothesis",
+        "confidence": 0.9,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N05",
+        "dimension": "Evidence-to-Action",
+        "score": 2,
+        "rationale": "The original task was bound and a concrete 89-knot tension schedule was registered, so preparation was executed. However, the bound record says execution_started=false and the dispatch result reports task_acceptance='unmeasured'; no independent evaluator result is present.",
+        "supporting_evidence_reference": "T04-218-bind-local-interior-qualified-bank:/data/execution_started; T04-219-seed-local-interior-formal-knots:/data/result/task_acceptance",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N05",
+        "dimension": "Rejection Quality",
+        "score": 2,
+        "rationale": "The record correctly rejects static optimization status as a substitute for dynamic acceptance, based on the mismatch between static evidence and a 22 s timed trajectory. It does not show a measured dynamic failure or evidence-based abandonment of a specific candidate.",
+        "supporting_evidence_reference": "N05 observation; T04-219-seed-local-interior-formal-knots:original_input.interpretation",
+        "confidence": 0.87,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N06",
+        "dimension": "Hypothesis Testability",
+        "score": 0,
+        "rationale": "Neither an expected measurement nor a weakening/refuting observation is specified; both fields are UNKNOWN, so the method claim lacks explicit prospective success and failure criteria.",
+        "supporting_evidence_reference": "N06 expected_observation; N06 weakening_observation",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N06",
+        "dimension": "Evidence Grounding",
+        "score": 4,
+        "rationale": "The route decision is tied to exact trace events and candidate/source artifact identifiers, and the mathematical applicability record identifies the affected position and directed-axis constraints.",
+        "supporting_evidence_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/SELECTED_RESEARCH_EVENTS.json#stage_id=T05-005; T05-003-fresh-position-static-trial-only; T05-004-cold-native-tension-sequence",
+        "confidence": 0.98,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N06",
+        "dimension": "Method Appropriateness",
+        "score": 3,
+        "rationale": "Switching to a native sequence response is logically appropriate after the GVS/static method reports that the directed-axis constraint is inexpressible and full-task support is false. The record does not show the claimed 2000-callback/40-iteration native run or its dense-limit checks, so implementation appropriateness is only partially demonstrated.",
+        "supporting_evidence_reference": "T05-003-fresh-position-static-trial-only:/data/analysis_applicability; T05-004-cold-native-tension-sequence:original_input.hypothesis",
+        "confidence": 0.91,
+        "uncertain_fields": [
+          "claimed_callback_and_iteration_cap_execution",
+          "native_pose_axis_computation_execution"
+        ]
+      },
+      {
+        "anonymous_node_id": "N06",
+        "dimension": "Research Adaptation",
+        "score": 4,
+        "rationale": "A real evidence-driven method change is documented: the static GVS route was found not applicable to the directed tool-axis requirement, after which the study selected the registered native direct-sequence route and a cold baseline.",
+        "supporting_evidence_reference": "T05-003-fresh-position-static-trial-only:/data/analysis_applicability/constraint_coverage; T05-004-cold-native-tension-sequence:original_input.control_seed",
+        "confidence": 0.96,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N06",
+        "dimension": "Evidence-to-Action",
+        "score": 2,
+        "rationale": "The candidate and native-control baseline were selected and a concrete plan artifact was registered. The resulting acceptance remains unmeasured and no physical response or independent evaluation is included.",
+        "supporting_evidence_reference": "T05-004-cold-native-tension-sequence:/data/plan; T05-004-cold-native-tension-sequence:/data/result/task_acceptance",
+        "confidence": 0.98,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N06",
+        "dimension": "Rejection Quality",
+        "score": 4,
+        "rationale": "The position-only static route is abandoned for a specific documented reason: the tool-axis constraint is inexpressible, the analysis is marked not_applicable, and full_task_supported=false. This directly supports moving to a native sequence method rather than treating position construction as acceptance.",
+        "supporting_evidence_reference": "T05-003-fresh-position-static-trial-only:/data/analysis_applicability/constraint_coverage; T05-003-fresh-position-static-trial-only:/data/analysis_applicability/full_task_supported",
+        "confidence": 0.97,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N07",
+        "dimension": "Hypothesis Testability",
+        "score": 0,
+        "rationale": "The expected and weakening observations are both UNKNOWN, so despite a precisely described task and method there are no explicit prospective observations designated to support or refute the hypothesis.",
+        "supporting_evidence_reference": "N07 expected_observation; N07 weakening_observation",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N07",
+        "dimension": "Evidence Grounding",
+        "score": 4,
+        "rationale": "The record includes an exact bound configuration, candidate and protocol hashes, original source-file hashes, and trace locators for both the task binding and control initialization.",
+        "supporting_evidence_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/SELECTED_RESEARCH_EVENTS.json#stage_id=T06-004; T06-002-bind-exact-loaded-position-and-axis-scan; T06-003-cold-timed-scan-control-source",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N07",
+        "dimension": "Method Appropriateness",
+        "score": 4,
+        "rationale": "The bound native task preserves the 0.6 s timed position and directed-axis sequence, 20 g payload with non-diagonal inertia, local-to-world axis signal, contact prohibition, six channels, and dense tendon stroke and speed limits. These are the relevant physical and acceptance features that a single static target would omit.",
+        "supporting_evidence_reference": "T06-002-bind-exact-loaded-position-and-axis-scan:/data/configuration/task/acceptance; T06-002-bind-exact-loaded-position-and-axis-scan:/data/configuration/task/goal; T06-002-bind-exact-loaded-position-and-axis-scan:/data/configuration/robot/structure",
+        "confidence": 0.97,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N07",
+        "dimension": "Research Adaptation",
+        "score": 3,
+        "rationale": "The plan explicitly avoids the unsupported affine/GVS static construction and selects a native direct timed sequence with the exact loaded task. The evidentiary reason is clear, but the supplied node does not include the earlier formal applicability diagnostic or a completed response run.",
+        "supporting_evidence_reference": "T06-003-cold-timed-scan-control-source:original_input.hypothesis; T06-002-bind-exact-loaded-position-and-axis-scan",
+        "confidence": 0.89,
+        "uncertain_fields": [
+          "prior_static_applicability_result"
+        ]
+      },
+      {
+        "anonymous_node_id": "N07",
+        "dimension": "Evidence-to-Action",
+        "score": 2,
+        "rationale": "The complete task was bound and a cold baseline control plan was registered, but execution_started=false and task_acceptance='unmeasured'. Thus selection and setup were executed, while the claimed search and independent evaluation are not observed.",
+        "supporting_evidence_reference": "T06-002-bind-exact-loaded-position-and-axis-scan:/data/execution_started; T06-003-cold-timed-scan-control-source:/data/result/task_acceptance",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N07",
+        "dimension": "Rejection Quality",
+        "score": 3,
+        "rationale": "The record rejects single-target static construction for the timed directed-axis task on a concrete scope mismatch and retains all omitted constraints in the native binding. However, the supplied evidence does not contain a separate failed static analysis for this exact T06 candidate.",
+        "supporting_evidence_reference": "T06-003-cold-timed-scan-control-source:original_input.hypothesis; T06-002-bind-exact-loaded-position-and-axis-scan:/data/configuration/task",
+        "confidence": 0.87,
+        "uncertain_fields": [
+          "exact_T06_static_rejection_measurement"
+        ]
+      },
+      {
+        "anonymous_node_id": "N08",
+        "dimension": "Hypothesis Testability",
+        "score": 1,
+        "rationale": "The intervention is concrete—an isotropic 8 mm circular root with other listed design features retained—but the expected observation is only a generic complete result and no quantitative direction or threshold is specified for mass, coupling, or A/B/C constraint performance.",
+        "supporting_evidence_reference": "N08 hypothesis; N08 expected_observation; N08 weakening_observation",
+        "confidence": 0.94,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N08",
+        "dimension": "Evidence Grounding",
+        "score": 4,
+        "rationale": "The record provides exact git and trace locators, candidate/control artifacts, a stored native-numerics evidence artifact, and detailed pointers to the full-horizon diagnostic quantities and control schedule.",
+        "supporting_evidence_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/SELECTED_RESEARCH_EVENTS.json#stage_id=T07-060; T07-42-native-common-structure-M1_C; artifact:5e901d56c2caa1edc567c1f7ed25cba8d96df61bee18ea454b88ef27cf66238d",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N08",
+        "dimension": "Method Appropriateness",
+        "score": 3,
+        "rationale": "Reintegrating and reoptimizing the changed structure with native MuJoCo nonlinear dynamics is appropriate because the section change jointly alters mass and stiffness. The search covers the 0–0.6 s M1_C horizon and dense actuator observations, but only condition C is shown and the result remains a diagnostic requiring independent replay, so it does not fully test the shared A/B/C claim.",
+        "supporting_evidence_reference": "T07-42-native-common-structure-M1_C:/data/analysis_applicability; T07-42-native-common-structure-M1_C:/data/native_analysis; T07-42-native-common-structure-M1_C:/data/task_acceptance",
+        "confidence": 0.94,
+        "uncertain_fields": [
+          "conditions_A_and_B_evaluation"
+        ]
+      },
+      {
+        "anonymous_node_id": "N08",
+        "dimension": "Research Adaptation",
+        "score": 4,
+        "rationale": "The study makes a substantive physical-design change motivated by the reported limitation of the historical common geometry, then explicitly reintegrates and reoptimizes rather than transplanting historical states or acceptance. This is a concrete evidence-driven adaptation affecting both mass and stiffness.",
+        "supporting_evidence_reference": "N08 hypothesis; T07-41-seed-M1_C-historical-inputs:original_input.hypothesis; T07-42-native-common-structure-M1_C",
+        "confidence": 0.94,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N08",
+        "dimension": "Evidence-to-Action",
+        "score": 3,
+        "rationale": "The altered candidate was seeded, a native nonlinear search was actually executed for 1156 rollouts and 693600 physics steps, and quantitative diagnostic improvement from J=2.3484 to J=0.00697 was recorded. Independent full replay and frozen task acceptance were explicitly still missing.",
+        "supporting_evidence_reference": "T07-42-native-common-structure-M1_C:/data/nonlinear_capability; T07-42-native-common-structure-M1_C:/data/control_handoff; T07-42-native-common-structure-M1_C:/data/task_acceptance",
+        "confidence": 0.99,
+        "uncertain_fields": []
+      },
+      {
+        "anonymous_node_id": "N08",
+        "dimension": "Rejection Quality",
+        "score": "UNKNOWN",
+        "rationale": "The record motivates testing an alternative to the historical geometry, but it does not document final abandonment of that geometry or rejection of the new circular-root candidate; the native result is explicitly diagnostic and unmeasured for task acceptance.",
+        "supporting_evidence_reference": "N08 observation; T07-42-native-common-structure-M1_C:/data/evidence_summary/unresolved; T07-42-native-common-structure-M1_C:/data/task_acceptance",
+        "confidence": 0.95,
+        "uncertain_fields": [
+          "final_candidate_or_route_disposition"
+        ]
+      }
+    ]
+  },
+  "request_accounting": {
+    "usage": null,
+    "response_model": "gpt-5.6-sol",
+    "response_id": "chatcmpl-local-acfadeeb-f672-4da3-b130-6a029e0727d9",
+    "sent_at": "2026-11-16T12:12:25.443558+00:00",
+    "request_bytes": 132318
+  },
+  "raw_review_content": "{\"annotations\":[{\"anonymous_node_id\":\"N05\",\"dimension\":\"Hypothesis Testability\",\"score\":2,\"rationale\":\"The 22 s task and frozen evaluator provide operational acceptance thresholds, but the stated expected observation is only a generic complete result and the weakening observation lists broad failure categories rather than specific measurements that would refute the hypothesis.\",\"supporting_evidence_reference\":\"T04-218-bind-local-interior-qualified-bank:/data/configuration/task/acceptance; T04-219-seed-local-interior-formal-knots:original_input.expected_observation\",\"confidence\":0.93,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N05\",\"dimension\":\"Evidence Grounding\",\"score\":4,\"rationale\":\"The record supplies exact git, trace-event, artifact, task-source-file, candidate, and qualified-initial-state locators, including hashes for the original task and solver files.\",\"supporting_evidence_reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/SELECTED_RESEARCH_EVENTS.json#stage_id=T04-220; T04-218-bind-local-interior-qualified-bank; artifact:93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N05\",\"dimension\":\"Method Appropriateness\",\"score\":4,\"rationale\":\"Binding the original timed figure-eight task to the current candidate and qualified equilibrium is appropriate for distinguishing static feasibility from dynamic acceptance; the model, controller, 22 s timing, physical grid, actuator constraints, and unsupported physics are explicitly declared.\",\"supporting_evidence_reference\":\"T04-218-bind-local-interior-qualified-bank:/data/configuration; T04-218-bind-local-interior-qualified-bank:/data/configuration/task/timing; T04-218-bind-local-interior-qualified-bank:/data/configuration/robot/assumptions\",\"confidence\":0.96,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N05\",\"dimension\":\"Research Adaptation\",\"score\":3,\"rationale\":\"The research route changes from relying on static feasibility to binding and initializing the complete timed dynamic task, explicitly refusing to import prior rollout acceptance. The adaptation is clear, though no completed physical evaluation is shown.\",\"supporting_evidence_reference\":\"T04-218-bind-local-interior-qualified-bank; T04-219-seed-local-interior-formal-knots:original_input.hypothesis\",\"confidence\":0.9,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N05\",\"dimension\":\"Evidence-to-Action\",\"score\":2,\"rationale\":\"The original task was bound and a concrete 89-knot tension schedule was registered, so preparation was executed. However, the bound record says execution_started=false and the dispatch result reports task_acceptance='unmeasured'; no independent evaluator result is present.\",\"supporting_evidence_reference\":\"T04-218-bind-local-interior-qualified-bank:/data/execution_started; T04-219-seed-local-interior-formal-knots:/data/result/task_acceptance\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N05\",\"dimension\":\"Rejection Quality\",\"score\":2,\"rationale\":\"The record correctly rejects static optimization status as a substitute for dynamic acceptance, based on the mismatch between static evidence and a 22 s timed trajectory. It does not show a measured dynamic failure or evidence-based abandonment of a specific candidate.\",\"supporting_evidence_reference\":\"N05 observation; T04-219-seed-local-interior-formal-knots:original_input.interpretation\",\"confidence\":0.87,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N06\",\"dimension\":\"Hypothesis Testability\",\"score\":0,\"rationale\":\"Neither an expected measurement nor a weakening/refuting observation is specified; both fields are UNKNOWN, so the method claim lacks explicit prospective success and failure criteria.\",\"supporting_evidence_reference\":\"N06 expected_observation; N06 weakening_observation\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N06\",\"dimension\":\"Evidence Grounding\",\"score\":4,\"rationale\":\"The route decision is tied to exact trace events and candidate/source artifact identifiers, and the mathematical applicability record identifies the affected position and directed-axis constraints.\",\"supporting_evidence_reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/SELECTED_RESEARCH_EVENTS.json#stage_id=T05-005; T05-003-fresh-position-static-trial-only; T05-004-cold-native-tension-sequence\",\"confidence\":0.98,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N06\",\"dimension\":\"Method Appropriateness\",\"score\":3,\"rationale\":\"Switching to a native sequence response is logically appropriate after the GVS/static method reports that the directed-axis constraint is inexpressible and full-task support is false. The record does not show the claimed 2000-callback/40-iteration native run or its dense-limit checks, so implementation appropriateness is only partially demonstrated.\",\"supporting_evidence_reference\":\"T05-003-fresh-position-static-trial-only:/data/analysis_applicability; T05-004-cold-native-tension-sequence:original_input.hypothesis\",\"confidence\":0.91,\"uncertain_fields\":[\"claimed_callback_and_iteration_cap_execution\",\"native_pose_axis_computation_execution\"]},{\"anonymous_node_id\":\"N06\",\"dimension\":\"Research Adaptation\",\"score\":4,\"rationale\":\"A real evidence-driven method change is documented: the static GVS route was found not applicable to the directed tool-axis requirement, after which the study selected the registered native direct-sequence route and a cold baseline.\",\"supporting_evidence_reference\":\"T05-003-fresh-position-static-trial-only:/data/analysis_applicability/constraint_coverage; T05-004-cold-native-tension-sequence:original_input.control_seed\",\"confidence\":0.96,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N06\",\"dimension\":\"Evidence-to-Action\",\"score\":2,\"rationale\":\"The candidate and native-control baseline were selected and a concrete plan artifact was registered. The resulting acceptance remains unmeasured and no physical response or independent evaluation is included.\",\"supporting_evidence_reference\":\"T05-004-cold-native-tension-sequence:/data/plan; T05-004-cold-native-tension-sequence:/data/result/task_acceptance\",\"confidence\":0.98,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N06\",\"dimension\":\"Rejection Quality\",\"score\":4,\"rationale\":\"The position-only static route is abandoned for a specific documented reason: the tool-axis constraint is inexpressible, the analysis is marked not_applicable, and full_task_supported=false. This directly supports moving to a native sequence method rather than treating position construction as acceptance.\",\"supporting_evidence_reference\":\"T05-003-fresh-position-static-trial-only:/data/analysis_applicability/constraint_coverage; T05-003-fresh-position-static-trial-only:/data/analysis_applicability/full_task_supported\",\"confidence\":0.97,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N07\",\"dimension\":\"Hypothesis Testability\",\"score\":0,\"rationale\":\"The expected and weakening observations are both UNKNOWN, so despite a precisely described task and method there are no explicit prospective observations designated to support or refute the hypothesis.\",\"supporting_evidence_reference\":\"N07 expected_observation; N07 weakening_observation\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N07\",\"dimension\":\"Evidence Grounding\",\"score\":4,\"rationale\":\"The record includes an exact bound configuration, candidate and protocol hashes, original source-file hashes, and trace locators for both the task binding and control initialization.\",\"supporting_evidence_reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/SELECTED_RESEARCH_EVENTS.json#stage_id=T06-004; T06-002-bind-exact-loaded-position-and-axis-scan; T06-003-cold-timed-scan-control-source\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N07\",\"dimension\":\"Method Appropriateness\",\"score\":4,\"rationale\":\"The bound native task preserves the 0.6 s timed position and directed-axis sequence, 20 g payload with non-diagonal inertia, local-to-world axis signal, contact prohibition, six channels, and dense tendon stroke and speed limits. These are the relevant physical and acceptance features that a single static target would omit.\",\"supporting_evidence_reference\":\"T06-002-bind-exact-loaded-position-and-axis-scan:/data/configuration/task/acceptance; T06-002-bind-exact-loaded-position-and-axis-scan:/data/configuration/task/goal; T06-002-bind-exact-loaded-position-and-axis-scan:/data/configuration/robot/structure\",\"confidence\":0.97,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N07\",\"dimension\":\"Research Adaptation\",\"score\":3,\"rationale\":\"The plan explicitly avoids the unsupported affine/GVS static construction and selects a native direct timed sequence with the exact loaded task. The evidentiary reason is clear, but the supplied node does not include the earlier formal applicability diagnostic or a completed response run.\",\"supporting_evidence_reference\":\"T06-003-cold-timed-scan-control-source:original_input.hypothesis; T06-002-bind-exact-loaded-position-and-axis-scan\",\"confidence\":0.89,\"uncertain_fields\":[\"prior_static_applicability_result\"]},{\"anonymous_node_id\":\"N07\",\"dimension\":\"Evidence-to-Action\",\"score\":2,\"rationale\":\"The complete task was bound and a cold baseline control plan was registered, but execution_started=false and task_acceptance='unmeasured'. Thus selection and setup were executed, while the claimed search and independent evaluation are not observed.\",\"supporting_evidence_reference\":\"T06-002-bind-exact-loaded-position-and-axis-scan:/data/execution_started; T06-003-cold-timed-scan-control-source:/data/result/task_acceptance\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N07\",\"dimension\":\"Rejection Quality\",\"score\":3,\"rationale\":\"The record rejects single-target static construction for the timed directed-axis task on a concrete scope mismatch and retains all omitted constraints in the native binding. However, the supplied evidence does not contain a separate failed static analysis for this exact T06 candidate.\",\"supporting_evidence_reference\":\"T06-003-cold-timed-scan-control-source:original_input.hypothesis; T06-002-bind-exact-loaded-position-and-axis-scan:/data/configuration/task\",\"confidence\":0.87,\"uncertain_fields\":[\"exact_T06_static_rejection_measurement\"]},{\"anonymous_node_id\":\"N08\",\"dimension\":\"Hypothesis Testability\",\"score\":1,\"rationale\":\"The intervention is concrete—an isotropic 8 mm circular root with other listed design features retained—but the expected observation is only a generic complete result and no quantitative direction or threshold is specified for mass, coupling, or A/B/C constraint performance.\",\"supporting_evidence_reference\":\"N08 hypothesis; N08 expected_observation; N08 weakening_observation\",\"confidence\":0.94,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N08\",\"dimension\":\"Evidence Grounding\",\"score\":4,\"rationale\":\"The record provides exact git and trace locators, candidate/control artifacts, a stored native-numerics evidence artifact, and detailed pointers to the full-horizon diagnostic quantities and control schedule.\",\"supporting_evidence_reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/SELECTED_RESEARCH_EVENTS.json#stage_id=T07-060; T07-42-native-common-structure-M1_C; artifact:5e901d56c2caa1edc567c1f7ed25cba8d96df61bee18ea454b88ef27cf66238d\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N08\",\"dimension\":\"Method Appropriateness\",\"score\":3,\"rationale\":\"Reintegrating and reoptimizing the changed structure with native MuJoCo nonlinear dynamics is appropriate because the section change jointly alters mass and stiffness. The search covers the 0–0.6 s M1_C horizon and dense actuator observations, but only condition C is shown and the result remains a diagnostic requiring independent replay, so it does not fully test the shared A/B/C claim.\",\"supporting_evidence_reference\":\"T07-42-native-common-structure-M1_C:/data/analysis_applicability; T07-42-native-common-structure-M1_C:/data/native_analysis; T07-42-native-common-structure-M1_C:/data/task_acceptance\",\"confidence\":0.94,\"uncertain_fields\":[\"conditions_A_and_B_evaluation\"]},{\"anonymous_node_id\":\"N08\",\"dimension\":\"Research Adaptation\",\"score\":4,\"rationale\":\"The study makes a substantive physical-design change motivated by the reported limitation of the historical common geometry, then explicitly reintegrates and reoptimizes rather than transplanting historical states or acceptance. This is a concrete evidence-driven adaptation affecting both mass and stiffness.\",\"supporting_evidence_reference\":\"N08 hypothesis; T07-41-seed-M1_C-historical-inputs:original_input.hypothesis; T07-42-native-common-structure-M1_C\",\"confidence\":0.94,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N08\",\"dimension\":\"Evidence-to-Action\",\"score\":3,\"rationale\":\"The altered candidate was seeded, a native nonlinear search was actually executed for 1156 rollouts and 693600 physics steps, and quantitative diagnostic improvement from J=2.3484 to J=0.00697 was recorded. Independent full replay and frozen task acceptance were explicitly still missing.\",\"supporting_evidence_reference\":\"T07-42-native-common-structure-M1_C:/data/nonlinear_capability; T07-42-native-common-structure-M1_C:/data/control_handoff; T07-42-native-common-structure-M1_C:/data/task_acceptance\",\"confidence\":0.99,\"uncertain_fields\":[]},{\"anonymous_node_id\":\"N08\",\"dimension\":\"Rejection Quality\",\"score\":\"UNKNOWN\",\"rationale\":\"The record motivates testing an alternative to the historical geometry, but it does not document final abandonment of that geometry or rejection of the new circular-root candidate; the native result is explicitly diagnostic and unmeasured for task acceptance.\",\"supporting_evidence_reference\":\"N08 observation; T07-42-native-common-structure-M1_C:/data/evidence_summary/unresolved; T07-42-native-common-structure-M1_C:/data/task_acceptance\",\"confidence\":0.95,\"uncertain_fields\":[\"final_candidate_or_route_disposition\"]}]}"
+}

@@ -1,0 +1,106 @@
+{
+  "session_id": "T04-220-K+S-",
+  "task_id": "T04",
+  "checkpoint_id": "T04-220",
+  "condition": "K+S-",
+  "experiment": "knowledge_skill",
+  "status": "completed",
+  "started_at": "2026-11-16T12:15:53.928439+00:00",
+  "requests": [
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-a764f4c7-64bf-485c-9d5f-8a339b6c5db6",
+      "sent_at": "2026-11-16T12:16:31.110802+00:00",
+      "request_bytes": 536755
+    }
+  ],
+  "reads": [],
+  "errors": [],
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "T04-H-dynamic-quasistatic-tracking",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "independent_full_native_replay_of_quasistatic_tension_schedule",
+      "selected_variables": [
+        "complete 22 s native trajectory response",
+        "tracking RMSE and maximum error",
+        "cycle drift",
+        "tendon tension",
+        "actuator stroke",
+        "actuator speed",
+        "contacts",
+        "warnings",
+        "numerical completion"
+      ],
+      "selected_candidate": {
+        "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+        "media_type": "application/json"
+      },
+      "requested_budget": 1
+    },
+    "hypothesis": "The unresolved physical uncertainty is whether the statically constructed 0.25 s tension-knot continuation remains dynamically trackable after interpolation and native integration, rather than accumulating lag, cycle drift, or actuator/tension violations. Competing hypotheses are: (H1) the slow 0.1 Hz motion is sufficiently quasistatic that the bound legal two-segment robot follows the figure-eight within every frozen acceptance threshold; (H2) static pointwise feasibility does not transfer to the finite-time trajectory because dynamics or interpolation cause tracking error, drift, saturation, stroke/speed violation, contact, warning, or numerical failure. T04-216 established only a mathematical equilibrium bank, T04-217 only qualified the supplied initial state, T04-218 only bound that state to the task, and T04-219 produced an unmeasured schedule; therefore a complete independent physical replay is the most direct discriminator.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "f7dff6a0bd5ef4bed36c20d2cb9172a915dfe1fa61c8d48e7a360264d8adcbc6",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "A complete 22 s native replay from the candidate-qualified equilibrium produces all required signals and satisfies the unchanged T04 gates: tracking RMSE <= 0.003 m, tracking maximum <= 0.006 m, cycle drift <= 0.002 m, tensions within [0.2,8] N, stroke <= 0.03 m, speed <= 0.03 m/s, required lobe coverage, four independent channels, initial static balance <= 1e-7 Nm, and no disqualifying contact, warning, or numerical termination. This would support H1 only in the scope of this candidate, schedule, frozen condition, and complete physical replay.",
+    "weakening_observation": "Any incomplete replay or any frozen-gate failure refutes H1 for this schedule. Particularly informative support for H2 would be tracking error that grows between the 0.25 s equilibrium knots, second-cycle drift above 0.002 m, tension reaching a bound, actuator stroke or speed excess, contact, warning, or numerical failure despite the qualified initial equilibrium. Such a result would not prove structural infeasibility or invalidate the static equilibrium calculations.",
+    "fixed_conditions": "Keep TASK/T04 default condition unchanged: the figure-eight reference, 22 s duration, 0.1 Hz frequency, 2 s start/stop ramps, gravity, rigid pointer payload, 0.001 s physics timestep, 0.01 s control/sample periods, seed 17, qualified candidate equilibrium, geometry, material properties, four tendon routes, controller-independent supplied schedule, and every original acceptance threshold remain fixed. Replay exactly candidate a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f with source 826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2; do not copy historical states or alter interpolation, preload, task, or thresholds.",
+    "stopping_condition": "Stop this decision after one complete independent replay or an admissibility/budget failure. A passing replay can be considered later for formal selection; a failed replay requires diagnosis rather than repeated unchanged replay or a claim of structural infeasibility.",
+    "interpretation": "This proposed action has not run. The equilibrium bank in T04-216 had maximum pointwise position error 0.0006110494311492155 m and maximum static-balance residual 5.075230166684541e-12 Nm, while T04-217 independently qualified time zero, but neither is finite-time physical evidence. T04-219 explicitly reports task acceptance as unmeasured. One full physical replay is feasible within the recorded remaining allowance of 18 backend solves and directly tests the missing transfer from static continuation to dynamic task performance. Historical quasistatic success is context only and does not transfer acceptance.",
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+        "media_type": "application/json"
+      }
+    },
+    "experience_disposition": {
+      "expert-t04-history@1": "context_only",
+      "expert-t04-method-selection@1": "adopted",
+      "expert-t04-phase-and-preload@1": "adopted"
+    }
+  },
+  "new_scientific_actions": 0,
+  "initial_state_reference": {
+    "task_id": "T04",
+    "checkpoint_id": "T04-220",
+    "trace_source": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl",
+    "cutoff_event": "T04-220-independent-full-local-interior-feedforward-decision",
+    "cutoff_timestamp": "2026-11-13T05:38:08.700849+00:00",
+    "record_ids": [
+      "TASK",
+      "T04-210-generate-legal-quasistatic-tracking",
+      "T04-211-construct-native-frozen-reference-bank",
+      "T04-216-construct-local-interior-reference-bank",
+      "T04-217-qualify-local-interior-bank-time-zero",
+      "T04-218-bind-local-interior-qualified-bank",
+      "T04-219-seed-local-interior-formal-knots"
+    ],
+    "original_task_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+  },
+  "provider_requested_model": "gpt-5.6-sol",
+  "reasoning": "gateway_default_not_exposed",
+  "finished_at": "2026-11-16T12:16:31.112838+00:00"
+}

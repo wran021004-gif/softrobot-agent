@@ -1,0 +1,17 @@
+{
+  "frozen_at": "2026-11-16T12:35:32.280797+00:00",
+  "user_requested": true,
+  "rubric": "You are an independent blinded scientific-decision reviewer in a new stateless\nsession. Compare anonymous decisions using the same frozen pre-decision corpus and\npredeclared key-evidence checklist. No condition, usage, retrieval count, eventual\noutcome or final candidate status is supplied. Do not infer group labels. Score each\ndecision on physical_interpretation, evidence_consistency, limitation_recognition,\nresearch_actionability, evidence_reference_accuracy: integers 0–4. 0 absent/wrong,\n1 major gaps, 2 partial/material gaps, 3 sound with limited gaps, 4 specific and fully\nsupported. Score use of evidence rather than prose length or number of citations.\nFor each predeclared evidence item state covered (correctly used substance), rationale,\nand reference. List critical omissions, unsupported claims and inaccurate references.\nA proposed read is not fabricated evidence, and an alternative justified next action\nmay be equally good. Return only JSON with evaluations:[{label,scores:{the five named\nscores},evidence_items:[{evidence_id,covered,rationale,reference}],critical_omissions:[],\nunsupported_claims:[],incorrect_references:[],rationale,confidence,uncertain_fields:[]}].\nDo not award a score for future physical success. Same-model judging remains a limitation.",
+  "five_metrics": [
+    "physical_interpretation",
+    "evidence_consistency",
+    "limitation_recognition",
+    "research_actionability",
+    "evidence_reference_accuracy"
+  ],
+  "original_scores_unchanged": true,
+  "historical_utilization": "retain as a separate original E1 metric; not in the Context five dimensions",
+  "pairing": "original four decisions per task; no Main reruns",
+  "blinding": "original anonymous four-LLM material; conditions/costs/previous scores hidden",
+  "interpretation": "new descriptive assessment, separate from original E1 four-dimensional score set; saturation retained"
+}

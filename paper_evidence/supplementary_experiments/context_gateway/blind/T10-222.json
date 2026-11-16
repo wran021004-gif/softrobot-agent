@@ -1,0 +1,254 @@
+{
+  "checkpoint_id": "T10-222",
+  "status": "completed",
+  "review": {
+    "evaluations": [
+      {
+        "label": "A",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T10-222-K1",
+            "covered": true,
+            "rationale": "The decision distinguishes the three required conditions by limiting the proposed replay to positive_y, retaining no_impulse only as prior evidence, and explicitly stating that negative_y remains untested. It also treats the frozen-input cases as separate controls and rejects joint T10 acceptance from one replay.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T10"
+          },
+          {
+            "evidence_id": "T10-222-K2",
+            "covered": true,
+            "rationale": "It correctly interprets the accepted no_impulse execution as nominal tracking evidence rather than an impact-recovery test and identifies the +y impact replay as the unresolved physical discriminator.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-221-verify-native-feedback-original-positive_y"
+          },
+          {
+            "evidence_id": "T10-222-K3",
+            "covered": true,
+            "rationale": "The action targets positive_y and selects the bound positive_y configuration artifact produced by the latest verification, fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-220-bind-native-feedback-positive_y"
+          },
+          {
+            "evidence_id": "T10-222-K4",
+            "covered": true,
+            "rationale": "The fixed conditions preserve the common native-state-feedback recipe and prohibit controller changes, matching the requirement for one common recipe across the original conditions.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-210-generate-original-M2-native-feedback"
+          },
+          {
+            "evidence_id": "T10-222-K5",
+            "covered": true,
+            "rationale": "The decision explicitly says positive_y construction and binding do not constitute completed physical recovery and proposes a new complete execution rather than treating verification as acceptance.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-221-verify-native-feedback-original-positive_y"
+          },
+          {
+            "evidence_id": "T10-222-K6",
+            "covered": true,
+            "rationale": "It preserves the complete one-second timing, control and physics periods, all windows, required recovery and final-hold logic, actuator limits, contacts, warnings, and required-condition scope while keeping frozen controls analytically separate.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-220-bind-native-feedback-positive_y"
+          }
+        ],
+        "critical_omissions": [],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "This is a well-supported and executable next decision. It correctly identifies that no_impulse acceptance does not demonstrate disturbance rejection, uses the verified bound positive_y configuration rather than the unbound generated design, preserves the shared controller and complete frozen protocol, and states condition-specific expected and weakening observations. It also carefully limits any future inference to positive_y and recognizes that negative_y, frozen controls, causal active-versus-passive interpretation, joint acceptance, and continuous-time guarantees remain unresolved. No score is based on whether the proposed replay will physically succeed.",
+        "confidence": 0.98,
+        "uncertain_fields": [
+          "Artifact semantics are inferred from the supplied trace rather than independently opening the referenced artifacts.",
+          "Same-model judging remains a limitation."
+        ]
+      },
+      {
+        "label": "B",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 2,
+          "limitation_recognition": 4,
+          "research_actionability": 2,
+          "evidence_reference_accuracy": 2
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T10-222-K1",
+            "covered": true,
+            "rationale": "The decision names positive_y, negative_y, and no_impulse as the required set and correctly refuses candidate selection or joint acceptance until all three have passing physical evidence. Its discussion does not rely on the frozen controls as required conditions.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T10"
+          },
+          {
+            "evidence_id": "T10-222-K2",
+            "covered": true,
+            "rationale": "It correctly states that no_impulse evidence cannot transfer acceptance to an impacted condition and frames the positive_y execution as a test of finite-time disturbance rejection rather than nominal tracking.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-221-verify-native-feedback-original-positive_y"
+          },
+          {
+            "evidence_id": "T10-222-K3",
+            "covered": false,
+            "rationale": "Although the prose correctly identifies the latest work as positive_y binding and verification, the executable selection uses generated candidate artifact 030ec52c... and source d138afd3... rather than the verified bound positive_y configuration artifact fff9adb4... emitted by T10-221. Thus the substance is not consistently carried into the proposed replay.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-220-bind-native-feedback-positive_y"
+          },
+          {
+            "evidence_id": "T10-222-K4",
+            "covered": true,
+            "rationale": "The decision freezes the controller and schedule and prohibits modifications, consistently preserving the common native-feedback recipe.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-210-generate-original-M2-native-feedback"
+          },
+          {
+            "evidence_id": "T10-222-K5",
+            "covered": true,
+            "rationale": "It correctly notes that binding had task_acceptance unmeasured and that verification had execution_started=false, so neither establishes positive_y recovery.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-221-verify-native-feedback-original-positive_y"
+          },
+          {
+            "evidence_id": "T10-222-K6",
+            "covered": true,
+            "rationale": "The decision preserves the original duration, control and sample periods, physics timestep, pulse, evaluator, required signals, failure policy, actuator constraints, and all required-condition acceptance scope. It also avoids counting controls as required conditions.",
+            "reference": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-220-bind-native-feedback-positive_y"
+          }
+        ],
+        "critical_omissions": [
+          "The replay action does not select the verified bound positive_y configuration artifact fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8, despite relying on T10-221 to establish exact binding.",
+          "The decision does not explain how replaying the raw generated candidate plus initialization source would preserve the verified bound task/controller configuration at execution."
+        ],
+        "unsupported_claims": [
+          "The phrases \"existing bound native-feedback schedule,\" \"current candidate and exact bound source,\" and \"one independent positive_y physical replay of the existing bound candidate\" are not supported by the artifacts actually supplied to selected_candidate and physical_replay. Artifact 030ec52c... is the generated design, while the verified bound positive_y configuration is fff9adb4...."
+        ],
+        "incorrect_references": [
+          "The executable selected_candidate and physical_replay candidate are set to 030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824, but T10-221 outputs fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8 as the bound positive_y configuration suitable for subsequent execution.",
+          "The physical_replay source d138afd341ffb1e7ef8cf79fbad0818c0b27049e41f7b17ba9250ee522214eb7 is associated with the initialize_control result in T10-220; the decision does not establish that candidate 030ec52c... plus this source is equivalent to executing the verified bound configuration from T10-221."
+        ],
+        "rationale": "The scientific interpretation is strong: the decision correctly separates nominal no-impulse tracking from impact recovery, specifies the positive_y pulse and complete acceptance criteria, and limits future inference to the tested required condition. The principal material flaw is executable artifact selection. The trace pattern shows that execution should consume the bound configuration produced by task.protocol.bind, as the no_impulse execution consumed its bound artifact. Here the decision instead supplies the earlier generated design and initialization source while describing them as the verified bound candidate. That mismatch lowers consistency, actionability, and reference accuracy, even though the proposed scientific experiment would otherwise be appropriate. No score is based on eventual physical success.",
+        "confidence": 0.96,
+        "uncertain_fields": [
+          "Whether the replay interface can internally reconstruct the exact bound configuration from candidate 030ec52c... and source d138afd3... is not demonstrated in the frozen corpus; if it can, the actionability penalty would be smaller.",
+          "Same-model judging remains a limitation."
+        ]
+      }
+    ]
+  },
+  "usage": {
+    "usage": "UNKNOWN",
+    "response_model": "gpt-5.6-sol",
+    "response_id": "chatcmpl-local-2096b9fb-0dfa-473b-b38b-ea18b0269ed4",
+    "sent_at": "2026-11-16T12:22:28.705138+00:00",
+    "request_bytes": 183986
+  },
+  "private_label_key": {
+    "A": "T10-222-Flat",
+    "B": "T10-222-Hierarchical"
+  },
+  "blinding": {
+    "hidden": [
+      "condition",
+      "usage",
+      "retrieval count",
+      "rank",
+      "future outcomes"
+    ],
+    "same_model": true
+  },
+  "anonymous_decisions": [
+    {
+      "label": "A",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent full-task native-state-feedback replay for positive_y",
+          "selected_variables": [
+            "condition_id=positive_y"
+          ],
+          "selected_candidate": {
+            "artifact_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The unresolved physical uncertainty is whether the common native measured-state feedback that passed the no_impulse condition remains dynamically effective under the frozen +y payload impulse, rather than its apparent success being only nominal tracking that fails through tension or tendon-speed saturation, excessive displacement, or insufficient post-impact damping. Competing hypotheses are: H1, feedback rejects the +0.04 N half-sine impulse and restores the required hold; H2, the impulse drives the asymmetric structure/controller into a constraint-limited or slowly decaying response that violates recovery or final-hold requirements.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "8f6927468e7560f4703ed17fbf7ac780ce7cd3cd9da49927607c788438e1b21f",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "In a newly executed complete positive_y replay, the candidate remains valid and finite, tolerates the +0.04 N half-sine payload wrench from 0.50 to 0.55 s, recovers by 0.90 s with a continuous 0.10 s hold, and satisfies the unchanged limits: position error <=0.01 m, tip speed <=0.02 m/s, tendon tension in [0,8] N, stroke <=0.015 m, actual tendon speed <=0.025 m/s, zero unexpected contacts, and zero warnings. This would support H1 for positive_y only.",
+        "weakening_observation": "Any complete positive_y execution showing failure to obtain the required 0.10 s recovery hold by 0.90 s, final-hold position or speed violation, tension/stroke/tendon-speed saturation, unexpected contact, warning, numerical invalidity, or incomplete execution would refute or weaken H1 and support H2. A nominal no_impulse pass alone does not resolve this uncertainty.",
+        "fixed_conditions": "Hold the frozen T10 positive_y task, target [0.29,-0.035,0.19] m, +0.04 N world-y half-sine payload wrench over [0.50,0.55] s, zero initial qpos/qvel, 0.20 N initial tension, 1.0 s duration, 0.01 s control period, 0.0005 s physics timestep, original M2 structure and 12+12-cell discretization, six independent channels, common native-state-feedback recipe, evaluator, sampling grid, all windows, and every original acceptance threshold fixed exactly as specified in TASK. Historical no_impulse acceptance is evidence T10-213-execute-native-feedback-no_impulse; positive_y construction and binding are evidenced by T10-220-bind-native-feedback-positive_y and T10-221-verify-native-feedback-original-positive_y.",
+        "stopping_condition": "Stop after this one complete independent positive_y physical evaluation is recorded, or immediately on numerical invalidity or inability to execute the exact bound candidate; do not infer negative_y performance or joint T10 acceptance from this result.",
+        "interpretation": "This is the next feasible one-condition physical test because positive_y is already bound to the exact frozen hardware and controller, while the corpus contains complete physical acceptance only for no_impulse. A passing replay would establish independent complete-task evidence only for positive_y; it would not establish negative_y, the frozen-input control cases, a causal active-versus-passive mechanism, geometry validity beyond the bound candidate, continuous-time guarantees, or joint task acceptance. Those scopes remain UNKNOWN.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "label": "B",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent positive_y physical replay of the existing bound native-feedback schedule",
+          "selected_variables": [
+            "condition_id=positive_y"
+          ],
+          "selected_candidate": {
+            "artifact_id": "030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The physical uncertainty is whether the current six-channel native-feedback controller has sufficient finite-time closed-loop authority to reject the positive-y impact while respecting tendon constraints, rather than merely tracking without an impulse. Competing hypotheses are H1: feedback recovers from the +0.04 N world-y half-sine pulse and satisfies every frozen threshold; H0: inadequate disturbance-rejection authority, saturation, or excessive tendon motion causes at least one recovery or safety failure. Resolve this with one independent positive_y physical replay of the existing bound candidate and schedule. This tests complete nonlinear closed-loop performance for one frozen condition; binding, configuration verification, nominal execution, and mathematical prediction cannot establish that scope.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "501ac714289b2f4c1c8e181d2b0881bb2667eae9b5d54185034b1abf4acb31f5",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "d138afd341ffb1e7ef8cf79fbad0818c0b27049e41f7b17ba9250ee522214eb7",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "The positive_y replay completes without numerical failure, warnings, or unexpected contacts. Following the 0.50-0.55 s impact, tip position error returns to at most 0.01 m and tip speed to at most 0.02 m/s by 0.90 s and remains within both limits continuously through 1.00 s; tensions remain within [0,8] N, geometric tendon stroke remains at most 0.015 m, and actual tendon speed remains at most 0.025 m/s.",
+        "weakening_observation": "Failure to regain both tip limits by 0.90 s and maintain them for the required continuous 0.10 s final hold, or any tension, stroke, tendon-speed, contact, warning, or numerical violation, refutes H1 for positive_y. Passing positive_y would not establish negative_y or joint required-condition acceptance.",
+        "fixed_conditions": "Keep frozen TASK T10 and all thresholds unchanged: current candidate and exact bound source; original design identity f0837aacfde3c795e7b305f3e074866425e2b585eb0a152c3ea2c5f6dd6df1e4; discretization identity 80569ca1c3c599e09fea0af343a770e5df15f3b5b1cc2b3e6ce406c282bb9768; six independent channels; zero qpos/qvel and 0.20 N initial input; target [0.29,-0.035,0.19] m; gravity [0,0,-9.81] m/s^2; +0.04 N world-y payload-COM half-sine pulse from 0.50 to 0.55 s; 1.00 s duration; 0.01 s control and sample periods; 0.0005 s timestep; original windows, evaluator, required signals, and failure policy. Do not modify controller, structure, geometry, task, or acceptance criteria.",
+        "stopping_condition": "Stop after this one replay and inspect the complete evaluator result. Do not select or confirm the candidate unless independent passing physical replays exist for all required conditions positive_y, negative_y, and no_impulse on the identical structure.",
+        "interpretation": "Original evidence T10-220-bind-native-feedback-positive_y records the candidate/source binding with task_acceptance unmeasured, while T10-221-verify-native-feedback-original-positive_y records execution_started=false. Thus positive_y performance is UNKNOWN. T10-210 through T10-213 provide original-candidate and no_impulse context but cannot transfer acceptance to the impacted condition. The proposed replay has not run; it is the most direct feasible discriminator of disturbance rejection versus nominal-only tracking.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "d138afd341ffb1e7ef8cf79fbad0818c0b27049e41f7b17ba9250ee522214eb7",
+            "media_type": "application/json"
+          }
+        }
+      }
+    }
+  ],
+  "raw_review_content": "{\"evaluations\":[{\"label\":\"A\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T10-222-K1\",\"covered\":true,\"rationale\":\"The decision distinguishes the three required conditions by limiting the proposed replay to positive_y, retaining no_impulse only as prior evidence, and explicitly stating that negative_y remains untested. It also treats the frozen-input cases as separate controls and rejects joint T10 acceptance from one replay.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T10\"},{\"evidence_id\":\"T10-222-K2\",\"covered\":true,\"rationale\":\"It correctly interprets the accepted no_impulse execution as nominal tracking evidence rather than an impact-recovery test and identifies the +y impact replay as the unresolved physical discriminator.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-221-verify-native-feedback-original-positive_y\"},{\"evidence_id\":\"T10-222-K3\",\"covered\":true,\"rationale\":\"The action targets positive_y and selects the bound positive_y configuration artifact produced by the latest verification, fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-220-bind-native-feedback-positive_y\"},{\"evidence_id\":\"T10-222-K4\",\"covered\":true,\"rationale\":\"The fixed conditions preserve the common native-state-feedback recipe and prohibit controller changes, matching the requirement for one common recipe across the original conditions.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-210-generate-original-M2-native-feedback\"},{\"evidence_id\":\"T10-222-K5\",\"covered\":true,\"rationale\":\"The decision explicitly says positive_y construction and binding do not constitute completed physical recovery and proposes a new complete execution rather than treating verification as acceptance.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-221-verify-native-feedback-original-positive_y\"},{\"evidence_id\":\"T10-222-K6\",\"covered\":true,\"rationale\":\"It preserves the complete one-second timing, control and physics periods, all windows, required recovery and final-hold logic, actuator limits, contacts, warnings, and required-condition scope while keeping frozen controls analytically separate.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-220-bind-native-feedback-positive_y\"}],\"critical_omissions\":[],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"This is a well-supported and executable next decision. It correctly identifies that no_impulse acceptance does not demonstrate disturbance rejection, uses the verified bound positive_y configuration rather than the unbound generated design, preserves the shared controller and complete frozen protocol, and states condition-specific expected and weakening observations. It also carefully limits any future inference to positive_y and recognizes that negative_y, frozen controls, causal active-versus-passive interpretation, joint acceptance, and continuous-time guarantees remain unresolved. No score is based on whether the proposed replay will physically succeed.\",\"confidence\":0.98,\"uncertain_fields\":[\"Artifact semantics are inferred from the supplied trace rather than independently opening the referenced artifacts.\",\"Same-model judging remains a limitation.\"]},{\"label\":\"B\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":2,\"limitation_recognition\":4,\"research_actionability\":2,\"evidence_reference_accuracy\":2},\"evidence_items\":[{\"evidence_id\":\"T10-222-K1\",\"covered\":true,\"rationale\":\"The decision names positive_y, negative_y, and no_impulse as the required set and correctly refuses candidate selection or joint acceptance until all three have passing physical evidence. Its discussion does not rely on the frozen controls as required conditions.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T10\"},{\"evidence_id\":\"T10-222-K2\",\"covered\":true,\"rationale\":\"It correctly states that no_impulse evidence cannot transfer acceptance to an impacted condition and frames the positive_y execution as a test of finite-time disturbance rejection rather than nominal tracking.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-221-verify-native-feedback-original-positive_y\"},{\"evidence_id\":\"T10-222-K3\",\"covered\":false,\"rationale\":\"Although the prose correctly identifies the latest work as positive_y binding and verification, the executable selection uses generated candidate artifact 030ec52c... and source d138afd3... rather than the verified bound positive_y configuration artifact fff9adb4... emitted by T10-221. Thus the substance is not consistently carried into the proposed replay.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-220-bind-native-feedback-positive_y\"},{\"evidence_id\":\"T10-222-K4\",\"covered\":true,\"rationale\":\"The decision freezes the controller and schedule and prohibits modifications, consistently preserving the common native-feedback recipe.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-210-generate-original-M2-native-feedback\"},{\"evidence_id\":\"T10-222-K5\",\"covered\":true,\"rationale\":\"It correctly notes that binding had task_acceptance unmeasured and that verification had execution_started=false, so neither establishes positive_y recovery.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-221-verify-native-feedback-original-positive_y\"},{\"evidence_id\":\"T10-222-K6\",\"covered\":true,\"rationale\":\"The decision preserves the original duration, control and sample periods, physics timestep, pulse, evaluator, required signals, failure policy, actuator constraints, and all required-condition acceptance scope. It also avoids counting controls as required conditions.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl#T10-220-bind-native-feedback-positive_y\"}],\"critical_omissions\":[\"The replay action does not select the verified bound positive_y configuration artifact fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8, despite relying on T10-221 to establish exact binding.\",\"The decision does not explain how replaying the raw generated candidate plus initialization source would preserve the verified bound task/controller configuration at execution.\"],\"unsupported_claims\":[\"The phrases /\"existing bound native-feedback schedule,/\" /\"current candidate and exact bound source,/\" and /\"one independent positive_y physical replay of the existing bound candidate/\" are not supported by the artifacts actually supplied to selected_candidate and physical_replay. Artifact 030ec52c... is the generated design, while the verified bound positive_y configuration is fff9adb4....\"],\"incorrect_references\":[\"The executable selected_candidate and physical_replay candidate are set to 030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824, but T10-221 outputs fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8 as the bound positive_y configuration suitable for subsequent execution.\",\"The physical_replay source d138afd341ffb1e7ef8cf79fbad0818c0b27049e41f7b17ba9250ee522214eb7 is associated with the initialize_control result in T10-220; the decision does not establish that candidate 030ec52c... plus this source is equivalent to executing the verified bound configuration from T10-221.\"],\"rationale\":\"The scientific interpretation is strong: the decision correctly separates nominal no-impulse tracking from impact recovery, specifies the positive_y pulse and complete acceptance criteria, and limits future inference to the tested required condition. The principal material flaw is executable artifact selection. The trace pattern shows that execution should consume the bound configuration produced by task.protocol.bind, as the no_impulse execution consumed its bound artifact. Here the decision instead supplies the earlier generated design and initialization source while describing them as the verified bound candidate. That mismatch lowers consistency, actionability, and reference accuracy, even though the proposed scientific experiment would otherwise be appropriate. No score is based on eventual physical success.\",\"confidence\":0.96,\"uncertain_fields\":[\"Whether the replay interface can internally reconstruct the exact bound configuration from candidate 030ec52c... and source d138afd3... is not demonstrated in the frozen corpus; if it can, the actionability penalty would be smaller.\",\"Same-model judging remains a limitation.\"]}]}"
+}

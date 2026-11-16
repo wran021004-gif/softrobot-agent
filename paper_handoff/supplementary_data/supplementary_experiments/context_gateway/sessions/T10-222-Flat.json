@@ -1,0 +1,85 @@
+{
+  "session_id": "T10-222-Flat",
+  "task_id": "T10",
+  "checkpoint_id": "T10-222",
+  "condition": "Flat",
+  "experiment": "context_gateway",
+  "status": "completed",
+  "started_at": "2026-11-16T12:20:56.410193+00:00",
+  "requests": [
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-802622a6-ff64-414c-817d-e3110e0d541e",
+      "sent_at": "2026-11-16T12:21:35.001384+00:00",
+      "request_bytes": 270052
+    }
+  ],
+  "reads": [],
+  "errors": [],
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "T10-positive-impact-feedback-transfer",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "independent full-task native-state-feedback replay for positive_y",
+      "selected_variables": [
+        "condition_id=positive_y"
+      ],
+      "selected_candidate": {
+        "artifact_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+        "media_type": "application/json"
+      },
+      "requested_budget": 1
+    },
+    "hypothesis": "The unresolved physical uncertainty is whether the common native measured-state feedback that passed the no_impulse condition remains dynamically effective under the frozen +y payload impulse, rather than its apparent success being only nominal tracking that fails through tension or tendon-speed saturation, excessive displacement, or insufficient post-impact damping. Competing hypotheses are: H1, feedback rejects the +0.04 N half-sine impulse and restores the required hold; H2, the impulse drives the asymmetric structure/controller into a constraint-limited or slowly decaying response that violates recovery or final-hold requirements.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "8f6927468e7560f4703ed17fbf7ac780ce7cd3cd9da49927607c788438e1b21f",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "In a newly executed complete positive_y replay, the candidate remains valid and finite, tolerates the +0.04 N half-sine payload wrench from 0.50 to 0.55 s, recovers by 0.90 s with a continuous 0.10 s hold, and satisfies the unchanged limits: position error <=0.01 m, tip speed <=0.02 m/s, tendon tension in [0,8] N, stroke <=0.015 m, actual tendon speed <=0.025 m/s, zero unexpected contacts, and zero warnings. This would support H1 for positive_y only.",
+    "weakening_observation": "Any complete positive_y execution showing failure to obtain the required 0.10 s recovery hold by 0.90 s, final-hold position or speed violation, tension/stroke/tendon-speed saturation, unexpected contact, warning, numerical invalidity, or incomplete execution would refute or weaken H1 and support H2. A nominal no_impulse pass alone does not resolve this uncertainty.",
+    "fixed_conditions": "Hold the frozen T10 positive_y task, target [0.29,-0.035,0.19] m, +0.04 N world-y half-sine payload wrench over [0.50,0.55] s, zero initial qpos/qvel, 0.20 N initial tension, 1.0 s duration, 0.01 s control period, 0.0005 s physics timestep, original M2 structure and 12+12-cell discretization, six independent channels, common native-state-feedback recipe, evaluator, sampling grid, all windows, and every original acceptance threshold fixed exactly as specified in TASK. Historical no_impulse acceptance is evidence T10-213-execute-native-feedback-no_impulse; positive_y construction and binding are evidenced by T10-220-bind-native-feedback-positive_y and T10-221-verify-native-feedback-original-positive_y.",
+    "stopping_condition": "Stop after this one complete independent positive_y physical evaluation is recorded, or immediately on numerical invalidity or inability to execute the exact bound candidate; do not infer negative_y performance or joint T10 acceptance from this result.",
+    "interpretation": "This is the next feasible one-condition physical test because positive_y is already bound to the exact frozen hardware and controller, while the corpus contains complete physical acceptance only for no_impulse. A passing replay would establish independent complete-task evidence only for positive_y; it would not establish negative_y, the frozen-input control cases, a causal active-versus-passive mechanism, geometry validity beyond the bound candidate, continuous-time guarantees, or joint task acceptance. Those scopes remain UNKNOWN.",
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "new_scientific_actions": 0,
+  "initial_state_reference": {
+    "task_id": "T10",
+    "checkpoint_id": "T10-222",
+    "trace_source": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl",
+    "cutoff_event": "T10-222-execute-native-feedback-positive_y-decision",
+    "cutoff_timestamp": "2026-11-13T06:52:41.845433+00:00",
+    "record_ids": [
+      "TASK",
+      "T10-210-generate-original-M2-native-feedback",
+      "T10-211-bind-native-feedback-no_impulse",
+      "T10-212-verify-native-feedback-original-no_impulse",
+      "T10-213-execute-native-feedback-no_impulse",
+      "T10-220-bind-native-feedback-positive_y",
+      "T10-221-verify-native-feedback-original-positive_y"
+    ],
+    "original_task_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T10"
+  },
+  "provider_requested_model": "gpt-5.6-sol",
+  "reasoning": "gateway_default_not_exposed",
+  "finished_at": "2026-11-16T12:21:35.003406+00:00"
+}

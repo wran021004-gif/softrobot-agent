@@ -1,0 +1,253 @@
+{
+  "checkpoint_id": "T01-127",
+  "status": "completed",
+  "review": {
+    "evaluations": [
+      {
+        "label": "A",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T01-127-K1",
+            "covered": true,
+            "rationale": "The decision explicitly preserves the shared candidate structure, states that central_high alone is being tested, and requires separate passing evidence for all three frozen conditions before selection.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T01"
+          },
+          {
+            "evidence_id": "T01-127-K2",
+            "covered": true,
+            "rationale": "It accurately identifies the near-threshold holding-position and holding-speed values together with the remaining channel-3 tendon-speed excess, framing these as competing schedule-level constraints rather than acceptance.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-126-refine-minimum-radius-central"
+          },
+          {
+            "evidence_id": "T01-127-K3",
+            "covered": false,
+            "rationale": "The action keeps the current geometry fixed, but the decision never explicitly notes that the 0.014 m routing radius is already at the legal lower boundary or that any further reduction would require domain checking.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-125-adapt-near-feasible-central-controls"
+          },
+          {
+            "evidence_id": "T01-127-K4",
+            "covered": true,
+            "rationale": "The decision correctly treats T01-126 as a diagnostic numerical search and selects the explicitly required independent complete replay rather than treating the proposed replay as already-observed evidence.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-010-generate-history-informed-baseline"
+          },
+          {
+            "evidence_id": "T01-127-K5",
+            "covered": true,
+            "rationale": "It treats the transferred schedule as a lineage and starting point, limits any failure inference to this schedule and condition, and explicitly rejects a structural-infeasibility conclusion.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-126-refine-minimum-radius-central"
+          },
+          {
+            "evidence_id": "T01-127-K6",
+            "covered": true,
+            "rationale": "It states that the central_high replay cannot establish joint acceptance and that separate independent passing replays are required for negative_low and positive_high before selecting the shared structure.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-125-adapt-near-feasible-central-controls"
+          }
+        ],
+        "critical_omissions": [
+          "The decision does not explicitly state that routing radius is already at the legal 0.014 m lower bound, although this does not undermine the chosen fixed-geometry replay."
+        ],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "The selected replay is a narrow, feasible, and highly discriminating next action. The decision accurately reports T01-126 values, binds the exact candidate and saved schedule, distinguishes schedule-level failure from structural infeasibility, specifies all relevant frozen thresholds, and recognizes that the other two required conditions remain unevaluated. Its only material checklist gap is failure to state explicitly that routing radius is already at its legal boundary.",
+        "confidence": 0.98,
+        "uncertain_fields": [
+          "Whether candidate identity alone should count as implicit coverage of the legal minimum-radius boundary.",
+          "Same-model judging remains a limitation."
+        ]
+      },
+      {
+        "label": "B",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T01-127-K1",
+            "covered": true,
+            "rationale": "The decision fixes the shared candidate and original actuator limits, identifies central_high as the sole replayed condition, and explicitly leaves negative_low and positive_high unknown pending separate evaluations.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T01"
+          },
+          {
+            "evidence_id": "T01-127-K2",
+            "covered": true,
+            "rationale": "It correctly reports the residual channel-3 geometric tendon-speed violation and the simultaneously near-boundary holding-position and holding-speed results from T01-126.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-126-refine-minimum-radius-central"
+          },
+          {
+            "evidence_id": "T01-127-K3",
+            "covered": false,
+            "rationale": "Although the replay leaves morphology unchanged, the decision does not explicitly recognize that the routing radius is already at the legal minimum and cannot simply be reduced further within the current domain.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-125-adapt-near-feasible-central-controls"
+          },
+          {
+            "evidence_id": "T01-127-K4",
+            "covered": true,
+            "rationale": "It explicitly labels T01-126 as a numerical diagnostic with independent replay and acceptance unresolved, then proposes the corresponding complete replay without claiming that the proposed result already exists.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-010-generate-history-informed-baseline"
+          },
+          {
+            "evidence_id": "T01-127-K5",
+            "covered": true,
+            "rationale": "The schedule is used as a replay source rather than proof of impossibility, and the interpretation expressly disclaims global infeasibility and broader physical conclusions.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-126-refine-minimum-radius-central"
+          },
+          {
+            "evidence_id": "T01-127-K6",
+            "covered": true,
+            "rationale": "The decision states that the shared structure cannot be selected until all three frozen conditions have separate independent passing replays, correctly preventing extrapolation from central_high.",
+            "reference": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-125-adapt-near-feasible-central-controls"
+          }
+        ],
+        "critical_omissions": [
+          "The legal lower boundary on routing radius is not explicitly acknowledged, although no further radius change is proposed in this decision."
+        ],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "This is a sound and executable discriminator using the exact candidate and saved schedule identified by T01-126. It accurately separates the residual tendon-speed hypothesis from reach/hold compliance, defines alternative outcomes and redirections, preserves the frozen evaluator conditions, and limits conclusions to one schedule and one condition. As with A, the only notable checklist omission is the lack of an explicit statement that the routing radius is already at its legal minimum.",
+        "confidence": 0.98,
+        "uncertain_fields": [
+          "Whether the bound minimum-radius candidate reference should be treated as implicit recognition of the legal routing boundary.",
+          "Same-model judging remains a limitation."
+        ]
+      }
+    ]
+  },
+  "usage": {
+    "usage": "UNKNOWN",
+    "response_model": "gpt-5.6-sol",
+    "response_id": "chatcmpl-local-51a1316f-ff70-4d2a-9f42-13529207fc81",
+    "sent_at": "2026-11-16T12:04:33.627762+00:00",
+    "request_bytes": 619337
+  },
+  "private_label_key": {
+    "A": "T01-127-Hierarchical",
+    "B": "T01-127-Flat"
+  },
+  "blinding": {
+    "hidden": [
+      "condition",
+      "usage",
+      "retrieval count",
+      "rank",
+      "future outcomes"
+    ],
+    "same_model": true
+  },
+  "anonymous_decisions": [
+    {
+      "label": "A",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent full native replay of the saved central_high schedule",
+          "selected_variables": [
+            "central_high saved tension schedule",
+            "dense geometric tendon speed",
+            "dense tendon stroke",
+            "holding-window tip position error",
+            "holding-window tip speed"
+          ],
+          "selected_candidate": {
+            "artifact_id": "d6dacabfc3549e5362b2df1b253c0cff2735e1f0f5e83453739c15b40f8da323",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The immediate physical uncertainty is whether the near-feasible sampled native prediction for central_high survives an independent complete replay with dense original checks. Competing hypotheses are: H1, the small predicted channel-3 tendon-speed excess is a search/sampling artifact and the saved schedule satisfies every frozen central_high constraint; H2, the excess is physically realized, so the schedule fails the unchanged 0.025 m/s tendon-speed limit despite meeting the reach/hold bounds. T01-126 reports best sampled J=0.001987557745892543, holding error 0.009992326387509454 m, holding tip speed 0.02996585727332516 m/s, and channel 3 geometric tendon speed as the limiting constraint; T01-125 supplies the current-candidate control lineage but no acceptance measurement.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "16229a2f8bb9e7d20f9f24a5062055f12f79cb35c9f63a6e22d5b2b082c0fb02",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "d59b641a15bbcd23d324fd96ef2582e36efee24b664674a6cfa68313be4e4694",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Under H2, independent full replay of the exact T01-126 schedule will reproduce a small dense-grid geometric tendon-speed violation, most likely on channel 3 near 0.025 m/s, while holding position error remains at or below 0.01 m and holding tip speed remains at or below 0.03 m/s. This would establish failure only for this schedule and central_high, not structural infeasibility.",
+        "weakening_observation": "H2 is refuted, and H1 supported for central_high, if the independent replay completes without numerical failure and every physics-state check passes: all tensions remain within 0–8 N, every tendon stays within ±0.015 m stroke from its complete initial length, every tendon speed is at most 0.025 m/s, and holding-window position error and tip speed are at most 0.01 m and 0.03 m/s respectively. A materially different failing constraint would also weaken the specific channel-3 hypothesis and redirect diagnosis.",
+        "fixed_conditions": "Hold the frozen T01 task, central_high target [0.295,0,0.215] m, zero initializer, shared candidate structure, gravity, rigid payload, 0.001 s physics timestep, 0.02 s control/sample period, 0.6 s duration, holding window [0.54,0.6] s, exact saved schedule, six independent channels, and all original acceptance thresholds fixed. This decision does not evaluate negative_low or positive_high and cannot establish joint three-condition acceptance.",
+        "stopping_condition": "Stop after one independent complete central_high replay and inspect its exact registered result. Do not select the candidate unless separate independent passing replays subsequently exist for all three required frozen conditions.",
+        "interpretation": "This is the narrowest feasible discriminator because T01-126 is only a sampled native numerical diagnostic and explicitly requires independent full replay; it is not complete task acceptance, geometry validation, or a global feasibility result. A pass resolves schedule-level central_high uncertainty only. A failure motivates control revision rather than a structural-infeasibility claim.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "d6dacabfc3549e5362b2df1b253c0cff2735e1f0f5e83453739c15b40f8da323",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "7809412565e9e7aeaca849b3838408122526c32d5a081aa09e1159052a90af77",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "label": "B",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent_full_dense_physical_replay",
+          "selected_variables": [
+            "saved control schedule",
+            "dense geometric tendon speed",
+            "holding position error",
+            "holding tip speed"
+          ],
+          "selected_candidate": {
+            "artifact_id": "d6dacabfc3549e5362b2df1b253c0cff2735e1f0f5e83453739c15b40f8da323",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "d6dacabfc3549e5362b2df1b253c0cff2735e1f0f5e83453739c15b40f8da323",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "7809412565e9e7aeaca849b3838408122526c32d5a081aa09e1159052a90af77",
+            "media_type": "application/json"
+          }
+        },
+        "hypothesis": "The next physical uncertainty is whether the residual central_high violation is a genuine dense geometric tendon-speed limit or merely a finite-search/sample-scope discrepancy. H1 predicts that independent full replay will confirm tendon_3 exceeds 0.025 m/s despite position and holding-speed compliance; H2 predicts that the complete evaluator will pass all limits. T01-126 found only a numerical diagnostic: maximum tendon speed about 0.0250497 m/s, holding position error 0.0099923 m, holding tip speed 0.0299659 m/s, and positive normalized excess 0.0019876, while explicitly leaving independent replay and acceptance unresolved.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "16229a2f8bb9e7d20f9f24a5062055f12f79cb35c9f63a6e22d5b2b082c0fb02",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "7809412565e9e7aeaca849b3838408122526c32d5a081aa09e1159052a90af77",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "d6dacabfc3549e5362b2df1b253c0cff2735e1f0f5e83453739c15b40f8da323",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "A complete independent 0.0–0.6 s replay reports channel-3 geometric tendon speed slightly above 0.025 m/s while retaining holding position error at or below 0.01 m, holding tip speed at or below 0.03 m/s, stroke within ±0.015 m, tensions within 0–8 N, and no numerical failure. This would support a real routing/control tradeoff rather than treating the finite optimization result as acceptance evidence.",
+        "weakening_observation": "A complete replay passes every frozen central_high threshold, or the dominant failure changes materially to position, holding speed, stroke, tension, contact, or numerical integration. A pass would refute the predicted residual speed violation; a different failure would refute its identification as the active physical limitation.",
+        "fixed_conditions": "Keep the T01 central_high target [0.295,0,0.215] m, zero initializer, gravity, payload, 0.6 s duration, 0.02 s control/sample period, 0.001 s physics timestep, holding window [0.54,0.6] s, position limit 0.01 m, tip-speed limit 0.03 m/s, tendon-speed limit 0.025 m/s, stroke bounds ±0.015 m, tension bounds 0–8 N, six channels, candidate d6dacabf..., and saved schedule 78094125... unchanged. The negative_low and positive_high conditions remain UNKNOWN and are not inferred from this replay.",
+        "stopping_condition": "Stop after one complete independent central_high replay and inspect its registered dense acceptance result; do not select the shared structure unless separate independent passing replays are later obtained for all three required conditions.",
+        "interpretation": "This action tests complete independent task acceptance for one frozen condition. It does not rerun control optimization, establish global infeasibility, validate the other two conditions, or convert the local sampled native diagnostics in T01-126 into broader physical evidence."
+      }
+    }
+  ],
+  "raw_review_content": "{\"evaluations\":[{\"label\":\"A\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T01-127-K1\",\"covered\":true,\"rationale\":\"The decision explicitly preserves the shared candidate structure, states that central_high alone is being tested, and requires separate passing evidence for all three frozen conditions before selection.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T01\"},{\"evidence_id\":\"T01-127-K2\",\"covered\":true,\"rationale\":\"It accurately identifies the near-threshold holding-position and holding-speed values together with the remaining channel-3 tendon-speed excess, framing these as competing schedule-level constraints rather than acceptance.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-126-refine-minimum-radius-central\"},{\"evidence_id\":\"T01-127-K3\",\"covered\":false,\"rationale\":\"The action keeps the current geometry fixed, but the decision never explicitly notes that the 0.014 m routing radius is already at the legal lower boundary or that any further reduction would require domain checking.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-125-adapt-near-feasible-central-controls\"},{\"evidence_id\":\"T01-127-K4\",\"covered\":true,\"rationale\":\"The decision correctly treats T01-126 as a diagnostic numerical search and selects the explicitly required independent complete replay rather than treating the proposed replay as already-observed evidence.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-010-generate-history-informed-baseline\"},{\"evidence_id\":\"T01-127-K5\",\"covered\":true,\"rationale\":\"It treats the transferred schedule as a lineage and starting point, limits any failure inference to this schedule and condition, and explicitly rejects a structural-infeasibility conclusion.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-126-refine-minimum-radius-central\"},{\"evidence_id\":\"T01-127-K6\",\"covered\":true,\"rationale\":\"It states that the central_high replay cannot establish joint acceptance and that separate independent passing replays are required for negative_low and positive_high before selecting the shared structure.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-125-adapt-near-feasible-central-controls\"}],\"critical_omissions\":[\"The decision does not explicitly state that routing radius is already at the legal 0.014 m lower bound, although this does not undermine the chosen fixed-geometry replay.\"],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"The selected replay is a narrow, feasible, and highly discriminating next action. The decision accurately reports T01-126 values, binds the exact candidate and saved schedule, distinguishes schedule-level failure from structural infeasibility, specifies all relevant frozen thresholds, and recognizes that the other two required conditions remain unevaluated. Its only material checklist gap is failure to state explicitly that routing radius is already at its legal boundary.\",\"confidence\":0.98,\"uncertain_fields\":[\"Whether candidate identity alone should count as implicit coverage of the legal minimum-radius boundary.\",\"Same-model judging remains a limitation.\"]},{\"label\":\"B\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T01-127-K1\",\"covered\":true,\"rationale\":\"The decision fixes the shared candidate and original actuator limits, identifies central_high as the sole replayed condition, and explicitly leaves negative_low and positive_high unknown pending separate evaluations.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T01\"},{\"evidence_id\":\"T01-127-K2\",\"covered\":true,\"rationale\":\"It correctly reports the residual channel-3 geometric tendon-speed violation and the simultaneously near-boundary holding-position and holding-speed results from T01-126.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-126-refine-minimum-radius-central\"},{\"evidence_id\":\"T01-127-K3\",\"covered\":false,\"rationale\":\"Although the replay leaves morphology unchanged, the decision does not explicitly recognize that the routing radius is already at the legal minimum and cannot simply be reduced further within the current domain.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-125-adapt-near-feasible-central-controls\"},{\"evidence_id\":\"T01-127-K4\",\"covered\":true,\"rationale\":\"It explicitly labels T01-126 as a numerical diagnostic with independent replay and acceptance unresolved, then proposes the corresponding complete replay without claiming that the proposed result already exists.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-010-generate-history-informed-baseline\"},{\"evidence_id\":\"T01-127-K5\",\"covered\":true,\"rationale\":\"The schedule is used as a replay source rather than proof of impossibility, and the interpretation expressly disclaims global infeasibility and broader physical conclusions.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-126-refine-minimum-radius-central\"},{\"evidence_id\":\"T01-127-K6\",\"covered\":true,\"rationale\":\"The decision states that the shared structure cannot be selected until all three frozen conditions have separate independent passing replays, correctly preventing extrapolation from central_high.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl#T01-125-adapt-near-feasible-central-controls\"}],\"critical_omissions\":[\"The legal lower boundary on routing radius is not explicitly acknowledged, although no further radius change is proposed in this decision.\"],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"This is a sound and executable discriminator using the exact candidate and saved schedule identified by T01-126. It accurately separates the residual tendon-speed hypothesis from reach/hold compliance, defines alternative outcomes and redirections, preserves the frozen evaluator conditions, and limits conclusions to one schedule and one condition. As with A, the only notable checklist omission is the lack of an explicit statement that the routing radius is already at its legal minimum.\",\"confidence\":0.98,\"uncertain_fields\":[\"Whether the bound minimum-radius candidate reference should be treated as implicit recognition of the legal routing boundary.\",\"Same-model judging remains a limitation.\"]}]}"
+}

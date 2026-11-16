@@ -1,0 +1,252 @@
+{
+  "checkpoint_id": "T07-074",
+  "status": "completed",
+  "review": {
+    "evaluations": [
+      {
+        "label": "A",
+        "scores": {
+          "physical_interpretation": 3,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T07-074-K1",
+            "covered": true,
+            "rationale": "The decision explicitly states that a passing M1_A replay would establish only M1_A acceptance and that M1_B, M1_C, M5, and joint T07 acceptance remain separate. It preserves four independent channels and blocks selection pending the other conditions, correctly reflecting the shared-morphology requirement.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T07"
+          },
+          {
+            "evidence_id": "T07-074-K2",
+            "covered": true,
+            "rationale": "The decision correctly uses the distributed-length native result: holding speed 0.030581490475219554 m/s exceeds 0.03 m/s, the normalized geometric-tendon-speed excess is 0.04396835416276468, and the result remains diagnostic rather than accepted. It therefore proposes the required independent replay rather than claiming improvement or success.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-072-native-distributed-reach-A"
+          },
+          {
+            "evidence_id": "T07-074-K3",
+            "covered": true,
+            "rationale": "The decision identifies the tested object specifically as the distributed root-tail candidate ef5eaf36... with schedule 8e005857..., rather than treating it as the earlier shorter 14.1 mm-radius design. The exact candidate and source binding makes the distinction operationally unambiguous, although an explicit textual comparison to the earlier candidate would have been clearer.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-071-adapt-current-A-to-distributed-length"
+          },
+          {
+            "evidence_id": "T07-074-K4",
+            "covered": true,
+            "rationale": "The decision explicitly says T07-071 transfers no acceptance and that T07-072 is a finite native-search diagnostic rather than independent task acceptance. It correctly treats the proposed replay as validation of the exact candidate-schedule pair.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-010-generate-history-informed-baseline"
+          },
+          {
+            "evidence_id": "T07-074-K5",
+            "covered": true,
+            "rationale": "It states that a failed replay would establish failure only for the exact candidate-schedule pair, not structural infeasibility or global control infeasibility. This correctly limits inference from the finite local optimization and replay.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-072-native-distributed-reach-A"
+          },
+          {
+            "evidence_id": "T07-074-K6",
+            "covered": true,
+            "rationale": "The action binds the replay to the exact owned candidate and saved source, preserves the four channels and frozen task, prohibits reoptimization or control alteration, and states that the other three conditions still require validation on one structure.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-071-adapt-current-A-to-distributed-length"
+          }
+        ],
+        "critical_omissions": [
+          "The earlier shorter-root candidate is not named explicitly when distinguishing it from the distributed-length candidate, though the exact latest candidate and schedule identities make the intended distinction clear.",
+          "The decision could state more directly that the optimization already recorded dense native physics-state observations; the independent replay is principally required for registered frozen-task acceptance, not because the prior calculation lacked nonlinear integration."
+        ],
+        "unsupported_claims": [
+          "The suggested dichotomy between a 'real dynamic-limit failure' and violations that are 'artifacts of the finite sampled optimization' is somewhat overstated because T07-072 already reintegrated the same native MuJoCo dynamics and reported 601 physics states. A same-model replay is expected to test registered acceptance and execution binding, but it is not an independent physical model or hardware check.",
+          "The expected localization of the holding-speed excess near the 0.54 s boundary is plausible from the evidence but is not directly documented in the supplied T07-072 summary; channel 2 is directly supported only for the worst geometric tendon-speed excess."
+        ],
+        "incorrect_references": [],
+        "rationale": "This is a highly specific, admissible next action using the exact latest distributed candidate and its candidate-owned schedule. It correctly reports the near-threshold violations, preserves all frozen conditions, requests only one replay, and sharply limits the resulting inference. Its main weakness is interpretive wording: the prior diagnostic already used dense nonlinear native integration, so the replay is more accurately framed as independent registered acceptance of the saved schedule than as a strong discriminator of optimization artifacts versus physical dynamics. No future replay success is credited in the scores.",
+        "confidence": 0.96,
+        "uncertain_fields": [
+          "Whether the proposed replay is operationally independent enough to reveal any discrepancy from the deterministic native integration used in T07-072 cannot be established from the frozen corpus.",
+          "Same-model judging remains a limitation."
+        ]
+      },
+      {
+        "label": "B",
+        "scores": {
+          "physical_interpretation": 3,
+          "evidence_consistency": 2,
+          "limitation_recognition": 4,
+          "research_actionability": 2,
+          "evidence_reference_accuracy": 3
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T07-074-K1",
+            "covered": true,
+            "rationale": "The decision recognizes all four required conditions and states that final selection is blocked until M1_A, M1_B, M1_C, and M5 pass independently on one identical structure. It also preserves the four independent channels.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T07"
+          },
+          {
+            "evidence_id": "T07-074-K2",
+            "covered": false,
+            "rationale": "The decision does not discuss the latest distributed-length test or its failure to establish the desired improvement. It instead reverts attention to the earlier 14.1 mm-radius structure without interpreting T07-072.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-072-native-distributed-reach-A"
+          },
+          {
+            "evidence_id": "T07-074-K3",
+            "covered": false,
+            "rationale": "The selected candidate is the earlier 14.1 mm-radius structure, but the decision does not explicitly distinguish it from the later distributed-length candidate or explain why the later candidate is being abandoned. This omission leaves the candidate lineage and evidence comparison incomplete.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-071-adapt-current-A-to-distributed-length"
+          },
+          {
+            "evidence_id": "T07-074-K4",
+            "covered": true,
+            "rationale": "The decision correctly states that the M1_A and M1_C native searches are sampled diagnostics rather than acceptance and that the proposed diagnosis itself performs no scientific computation. It does not treat control adaptation or a proposed read as physical evidence.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-010-generate-history-informed-baseline"
+          },
+          {
+            "evidence_id": "T07-074-K5",
+            "covered": true,
+            "rationale": "The decision explicitly says that interface unavailability or an unqualified local calculation leaves the question unknown rather than proving structural infeasibility, and it treats rank or output-authority findings as diagnostic evidence rather than a definitive physical cause.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-072-native-distributed-reach-A"
+          },
+          {
+            "evidence_id": "T07-074-K6",
+            "covered": true,
+            "rationale": "It requires condition-specific control, preserves channel identities and frozen limits, and states that complete independent evaluations of all four conditions on one identical structure are required before selection. However, it does not provide an exact candidate-owned M5 control source because its immediate action is only interface discovery.",
+            "reference": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-071-adapt-current-A-to-distributed-length"
+          }
+        ],
+        "critical_omissions": [
+          "No interpretation of T07-072, despite the checklist identifying the distributed-length native result as critical current evidence.",
+          "No explicit comparison between the selected earlier candidate 0a8368b... and the later distributed candidate ef5eaf36..., nor a reason for reverting to the earlier morphology.",
+          "No concrete registered M5 study request is supplied. The catalogue already documents native direct-control support for task.position_tool_axis, so the decision could have proposed binding M5, initializing a candidate-owned source, running the registered native control diagnostic, and then independently replaying it.",
+          "The proposed interface discovery does not itself measure M5 position, tool-axis error, or actuator compliance, so it only indirectly advances the stated physical uncertainty."
+        ],
+        "unsupported_claims": [
+          "An existing action or interface named 'mechanism_research' is not established by the frozen capability catalogue. The catalogue identifies methods such as mujoco_direct_control_v1, which supports task.position_tool_axis, but not the named mechanism_research action.",
+          "The claim that exposing a new mechanism-research interface is necessary before an M5 study is weakly supported because T07-012 already exposes a registered native sequence-control route applicable to position/tool-axis tasks."
+        ],
+        "incorrect_references": [],
+        "rationale": "The M5 priority is scientifically defensible: M5 is required, has no current-candidate performance evidence, and a position/tool-axis tradeoff is a meaningful uncertainty. The decision also gives strong limitation language and does not convert a local failure into structural infeasibility. However, it omits the latest distributed-candidate evidence and does not explain why it selects the earlier morphology. More importantly, the proposed 'mechanism_research' interface is not shown to exist, while the frozen catalogue already provides a more concrete M5-capable native-control route. Thus the direction is plausible but only partially evidence-consistent and less actionable than a registered binding/control-search/replay sequence.",
+        "confidence": 0.94,
+        "uncertain_fields": [
+          "It is unclear whether 'mechanism_research' denotes an available external interface omitted from the frozen corpus or merely a proposed label; the supplied catalogue does not establish it.",
+          "The relative priority of M5 versus resolving M1_A on the latest candidate is a scientific judgment rather than a fact fixed by the evidence.",
+          "Same-model judging remains a limitation."
+        ]
+      }
+    ]
+  },
+  "usage": {
+    "usage": "UNKNOWN",
+    "response_model": "gpt-5.6-sol",
+    "response_id": "chatcmpl-local-b37ad982-fda8-469f-8cda-a7b16718d418",
+    "sent_at": "2026-11-16T12:12:50.285824+00:00",
+    "request_bytes": 844353
+  },
+  "private_label_key": {
+    "A": "T07-074-Hierarchical",
+    "B": "T07-074-Flat"
+  },
+  "blinding": {
+    "hidden": [
+      "condition",
+      "usage",
+      "retrieval count",
+      "rank",
+      "future outcomes"
+    ],
+    "same_model": true
+  },
+  "anonymous_decisions": [
+    {
+      "label": "A",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent full-task native replay of the saved distributed-structure M1_A schedule",
+          "selected_variables": [],
+          "selected_candidate": {
+            "artifact_id": "ef5eaf36c890d8157a59de97c5231384915767120dcc714badbee6537cbdd58c",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The unresolved physical uncertainty is whether the distributed root-tail structure and its saved M1_A control schedule are genuinely limited by tendon/holding velocity under the complete frozen dynamics, or whether the small violations are artifacts of the finite sampled optimization. Competing hypotheses are: H1, dense independent replay confirms a real dynamic-limit failure near the start of holding, especially tendon channel 2 speed; H2, complete replay remains within all original limits and the sampled diagnostic was conservatively inaccurate. T07-072 found near-threshold position performance but predicted holding speed 0.030581490475219554 m/s against 0.03 m/s and geometric tendon-speed normalized excess 0.04396835416276468, while explicitly leaving independent replay and original acceptance unresolved; T07-071 supplies the current candidate and adapted source lineage.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "05ecbf2c9b1c47915cd040387f6b55ba506533e6d605948c8d725b8310df0047",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "416f75cbf1d86a0fa322bc5788ddf757f3627b9d445ade8a0de1e03033ac06da",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "An independent full 0.0–0.6 s replay from the frozen zero state records every physics state and confirms the diagnostic pattern: position error remains within 0.01 m, but either holding tip speed exceeds 0.03 m/s or at least one tendon speed exceeds 0.025 m/s, with the strongest excess near the 0.54 s holding boundary and likely on channel 2. This would support a real velocity-limited failure and motivate control or damping/routing revision rather than claiming task acceptance.",
+        "weakening_observation": "The replay completes numerically and satisfies, over the complete physics grid, the original M1_A position and holding-speed thresholds, all four 0–8 N tension bounds, ±0.015 m stroke bounds, and 0.025 m/s tendon-speed bounds. A materially different violation location or failure mode would also weaken the proposed channel-2/holding-transition mechanism and redirect diagnosis.",
+        "fixed_conditions": "Keep the frozen T07 M1_A task unchanged: target [0.295,0.0,0.215] m, zero qpos/qvel initializer, gravity and payload, 0.6 s duration, 0.001 s timestep, 0.02 s control period, holding window [0.54,0.6] s, position limit 0.01 m, tip-speed limit 0.03 m/s, four independent ideal-tension channels bounded [0,8] N, stroke bounds [-0.015,0.015] m, and tendon-speed limit 0.025 m/s. Use exactly candidate ef5eaf36c890d8157a59de97c5231384915767120dcc714badbee6537cbdd58c and saved schedule 8e005857ed449fe013f0fb469934a19c1f4f7f4f3abc82fb04e25d53d7dfbf9b; do not reoptimize or alter structure, controls, task, or thresholds.",
+        "stopping_condition": "Stop after this one independent replay is recorded and its complete original acceptance result is available; do not select the candidate unless the exact replay is publicly read and passes. If it fails, retain the failure and return to control/mechanism revision rather than repeating the same replay.",
+        "interpretation": "This action tests nonlinear full-grid realization only. T07-072 is a finite sampled native-search diagnostic, not independent task acceptance; T07-071 transfers no acceptance. A passing replay would establish M1_A acceptance only, not acceptance of M1_B, M1_C, M5, or the joint T07 task. A failing replay would establish failure of this exact candidate-schedule pair, not structural infeasibility or global control infeasibility.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "ef5eaf36c890d8157a59de97c5231384915767120dcc714badbee6537cbdd58c",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "8e005857ed449fe013f0fb469934a19c1f4f7f4f3abc82fb04e25d53d7dfbf9b",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "label": "B",
+      "decision": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "mechanism_research interface discovery for current shared structure under M5",
+          "selected_variables": [
+            "M5 position/tool-axis capability",
+            "tip position versus directed-axis authority",
+            "geometric tendon-speed compliance"
+          ],
+          "selected_candidate": {
+            "artifact_id": "0a8368b21bd33a1902f18765b7afbd505b53583812697087e8e225c400a402a3",
+            "media_type": "application/json"
+          },
+          "requested_budget": 0
+        },
+        "next_research_action": "mechanism_research",
+        "hypothesis": "The highest-priority physical uncertainty is whether the current common 14.1 mm-radius four-tendon structure has enough coupled position-and-directed-tool-axis authority for frozen condition M5 while respecting the actuator geometry limits, or whether satisfying the tool-axis target conflicts structurally with position and tendon-speed limits. Competing hypotheses are: condition-specific control can exploit the four independent channels to satisfy both outputs; or the routing and two-segment bending mechanics lack sufficient independent output authority, requiring a structural change. This uncertainty precedes further tuning of M1_A because M5 has no current-candidate control search or acceptance evidence, whereas M1_B already passed independent replay and M1_A/M1_C have finite native near-feasibility evidence.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "504c18c3117e806c132b82aa011ffae29acd8728fbcb4d8e4bc47121f49c35c9",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "9d9986e8e0072d822732a687f670eb8283306bc69b8d46d30af87e3c48ec86a2",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "5e901d56c2caa1edc567c1f7ed25cba8d96df61bee18ea454b88ef27cf66238d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "3e725479d9f1a064e2b156e042b93aa69e4a9d46298144b3e50e0004d020476b",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "The discovered mechanism-research interface should permit a current-candidate M5 analysis or matched native control study that separately reports terminal position error, tool-axis angle error, and dense actuator-limit observations. Evidence supporting the control-feasible hypothesis would show a bounded schedule or local output authority capable of reducing both M5 errors toward 0.008 m and 0.0523598776 rad without approaching the 0.025 m/s tendon-speed or ±0.015 m stroke limits.",
+        "weakening_observation": "The control-feasible hypothesis would be weakened by a qualified M5 study showing persistent antagonism between position and tool-axis errors under reoptimized bounded control, rank-deficient or poorly directed output authority at relevant states, or dense tendon-speed/stroke violation before both frozen thresholds are reached. Interface unavailability or an unqualified local calculation leaves the physical uncertainty UNKNOWN rather than establishing structural infeasibility.",
+        "fixed_conditions": "Keep the frozen T07 task and all four required conditions, the current 14.1 mm-radius common structure, four independent channels, zero initializer, gravity, payload, 0.6 s deadline, 0.02 s control period, 0–8 N tensions, ±0.015 m stroke, 0.025 m/s tendon-speed limit, M5 target position [0.29,-0.025,0.12] m, target tool axis [0.9656541190600237,-0.17381774143080425,-0.19313082381200475], 0.008 m position threshold, 0.05235987755982988 rad angle threshold, and all source meanings unchanged.",
+        "stopping_condition": "This read-only diagnosis ends after loading the existing mechanism-research schema. The subsequent concrete study must retain M5 and all thresholds exactly, stop on invalid geometry, inapplicability or its finite authorized effort, and must not claim task acceptance without a separate complete independent M5 physical replay. Final selection remains blocked until independent passing evaluations exist for M1_A, M1_B, M1_C and M5 on one identical structure.",
+        "interpretation": "T07-024 is complete independent acceptance evidence only for M1_B on the 14.1 mm-radius design. T07-35 and T07-42 are sampled native diagnostics, not acceptance, and M5 performance for the current candidate is UNKNOWN. The next decision is therefore to expose the existing mechanism-research interface needed to discriminate M5 control authority from a structural position/tool-axis conflict; this diagnosis itself performs no scientific computation."
+      }
+    }
+  ],
+  "raw_review_content": "{\"evaluations\":[{\"label\":\"A\",\"scores\":{\"physical_interpretation\":3,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T07-074-K1\",\"covered\":true,\"rationale\":\"The decision explicitly states that a passing M1_A replay would establish only M1_A acceptance and that M1_B, M1_C, M5, and joint T07 acceptance remain separate. It preserves four independent channels and blocks selection pending the other conditions, correctly reflecting the shared-morphology requirement.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T07\"},{\"evidence_id\":\"T07-074-K2\",\"covered\":true,\"rationale\":\"The decision correctly uses the distributed-length native result: holding speed 0.030581490475219554 m/s exceeds 0.03 m/s, the normalized geometric-tendon-speed excess is 0.04396835416276468, and the result remains diagnostic rather than accepted. It therefore proposes the required independent replay rather than claiming improvement or success.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-072-native-distributed-reach-A\"},{\"evidence_id\":\"T07-074-K3\",\"covered\":true,\"rationale\":\"The decision identifies the tested object specifically as the distributed root-tail candidate ef5eaf36... with schedule 8e005857..., rather than treating it as the earlier shorter 14.1 mm-radius design. The exact candidate and source binding makes the distinction operationally unambiguous, although an explicit textual comparison to the earlier candidate would have been clearer.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-071-adapt-current-A-to-distributed-length\"},{\"evidence_id\":\"T07-074-K4\",\"covered\":true,\"rationale\":\"The decision explicitly says T07-071 transfers no acceptance and that T07-072 is a finite native-search diagnostic rather than independent task acceptance. It correctly treats the proposed replay as validation of the exact candidate-schedule pair.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-010-generate-history-informed-baseline\"},{\"evidence_id\":\"T07-074-K5\",\"covered\":true,\"rationale\":\"It states that a failed replay would establish failure only for the exact candidate-schedule pair, not structural infeasibility or global control infeasibility. This correctly limits inference from the finite local optimization and replay.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-072-native-distributed-reach-A\"},{\"evidence_id\":\"T07-074-K6\",\"covered\":true,\"rationale\":\"The action binds the replay to the exact owned candidate and saved source, preserves the four channels and frozen task, prohibits reoptimization or control alteration, and states that the other three conditions still require validation on one structure.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-071-adapt-current-A-to-distributed-length\"}],\"critical_omissions\":[\"The earlier shorter-root candidate is not named explicitly when distinguishing it from the distributed-length candidate, though the exact latest candidate and schedule identities make the intended distinction clear.\",\"The decision could state more directly that the optimization already recorded dense native physics-state observations; the independent replay is principally required for registered frozen-task acceptance, not because the prior calculation lacked nonlinear integration.\"],\"unsupported_claims\":[\"The suggested dichotomy between a 'real dynamic-limit failure' and violations that are 'artifacts of the finite sampled optimization' is somewhat overstated because T07-072 already reintegrated the same native MuJoCo dynamics and reported 601 physics states. A same-model replay is expected to test registered acceptance and execution binding, but it is not an independent physical model or hardware check.\",\"The expected localization of the holding-speed excess near the 0.54 s boundary is plausible from the evidence but is not directly documented in the supplied T07-072 summary; channel 2 is directly supported only for the worst geometric tendon-speed excess.\"],\"incorrect_references\":[],\"rationale\":\"This is a highly specific, admissible next action using the exact latest distributed candidate and its candidate-owned schedule. It correctly reports the near-threshold violations, preserves all frozen conditions, requests only one replay, and sharply limits the resulting inference. Its main weakness is interpretive wording: the prior diagnostic already used dense nonlinear native integration, so the replay is more accurately framed as independent registered acceptance of the saved schedule than as a strong discriminator of optimization artifacts versus physical dynamics. No future replay success is credited in the scores.\",\"confidence\":0.96,\"uncertain_fields\":[\"Whether the proposed replay is operationally independent enough to reveal any discrepancy from the deterministic native integration used in T07-072 cannot be established from the frozen corpus.\",\"Same-model judging remains a limitation.\"]},{\"label\":\"B\",\"scores\":{\"physical_interpretation\":3,\"evidence_consistency\":2,\"limitation_recognition\":4,\"research_actionability\":2,\"evidence_reference_accuracy\":3},\"evidence_items\":[{\"evidence_id\":\"T07-074-K1\",\"covered\":true,\"rationale\":\"The decision recognizes all four required conditions and states that final selection is blocked until M1_A, M1_B, M1_C, and M5 pass independently on one identical structure. It also preserves the four independent channels.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T07\"},{\"evidence_id\":\"T07-074-K2\",\"covered\":false,\"rationale\":\"The decision does not discuss the latest distributed-length test or its failure to establish the desired improvement. It instead reverts attention to the earlier 14.1 mm-radius structure without interpreting T07-072.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-072-native-distributed-reach-A\"},{\"evidence_id\":\"T07-074-K3\",\"covered\":false,\"rationale\":\"The selected candidate is the earlier 14.1 mm-radius structure, but the decision does not explicitly distinguish it from the later distributed-length candidate or explain why the later candidate is being abandoned. This omission leaves the candidate lineage and evidence comparison incomplete.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-071-adapt-current-A-to-distributed-length\"},{\"evidence_id\":\"T07-074-K4\",\"covered\":true,\"rationale\":\"The decision correctly states that the M1_A and M1_C native searches are sampled diagnostics rather than acceptance and that the proposed diagnosis itself performs no scientific computation. It does not treat control adaptation or a proposed read as physical evidence.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-010-generate-history-informed-baseline\"},{\"evidence_id\":\"T07-074-K5\",\"covered\":true,\"rationale\":\"The decision explicitly says that interface unavailability or an unqualified local calculation leaves the question unknown rather than proving structural infeasibility, and it treats rank or output-authority findings as diagnostic evidence rather than a definitive physical cause.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-072-native-distributed-reach-A\"},{\"evidence_id\":\"T07-074-K6\",\"covered\":true,\"rationale\":\"It requires condition-specific control, preserves channel identities and frozen limits, and states that complete independent evaluations of all four conditions on one identical structure are required before selection. However, it does not provide an exact candidate-owned M5 control source because its immediate action is only interface discovery.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl#T07-071-adapt-current-A-to-distributed-length\"}],\"critical_omissions\":[\"No interpretation of T07-072, despite the checklist identifying the distributed-length native result as critical current evidence.\",\"No explicit comparison between the selected earlier candidate 0a8368b... and the later distributed candidate ef5eaf36..., nor a reason for reverting to the earlier morphology.\",\"No concrete registered M5 study request is supplied. The catalogue already documents native direct-control support for task.position_tool_axis, so the decision could have proposed binding M5, initializing a candidate-owned source, running the registered native control diagnostic, and then independently replaying it.\",\"The proposed interface discovery does not itself measure M5 position, tool-axis error, or actuator compliance, so it only indirectly advances the stated physical uncertainty.\"],\"unsupported_claims\":[\"An existing action or interface named 'mechanism_research' is not established by the frozen capability catalogue. The catalogue identifies methods such as mujoco_direct_control_v1, which supports task.position_tool_axis, but not the named mechanism_research action.\",\"The claim that exposing a new mechanism-research interface is necessary before an M5 study is weakly supported because T07-012 already exposes a registered native sequence-control route applicable to position/tool-axis tasks.\"],\"incorrect_references\":[],\"rationale\":\"The M5 priority is scientifically defensible: M5 is required, has no current-candidate performance evidence, and a position/tool-axis tradeoff is a meaningful uncertainty. The decision also gives strong limitation language and does not convert a local failure into structural infeasibility. However, it omits the latest distributed-candidate evidence and does not explain why it selects the earlier morphology. More importantly, the proposed 'mechanism_research' interface is not shown to exist, while the frozen catalogue already provides a more concrete M5-capable native-control route. Thus the direction is plausible but only partially evidence-consistent and less actionable than a registered binding/control-search/replay sequence.\",\"confidence\":0.94,\"uncertain_fields\":[\"It is unclear whether 'mechanism_research' denotes an available external interface omitted from the frozen corpus or merely a proposed label; the supplied catalogue does not establish it.\",\"The relative priority of M5 versus resolving M1_A on the latest candidate is a scientific judgment rather than a fact fixed by the evidence.\",\"Same-model judging remains a limitation.\"]}]}"
+}

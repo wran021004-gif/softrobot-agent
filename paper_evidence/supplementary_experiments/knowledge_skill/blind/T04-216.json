@@ -1,0 +1,462 @@
+{
+  "checkpoint_id": "T04-216",
+  "status": "completed",
+  "review": {
+    "evaluations": [
+      {
+        "label": "A",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4,
+          "historical_experience_utilization": 3
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T04-216-K1",
+            "covered": true,
+            "rationale": "Preserves the complete 22 s, two-cycle reference, gravity, rigid payload, four channels, actuator limits, timing, and all original acceptance thresholds.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-216-K2",
+            "covered": true,
+            "rationale": "Correctly states that the bank construction failed with NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE and produced no equilibrium observations.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          },
+          {
+            "evidence_id": "T04-216-K3",
+            "covered": true,
+            "rationale": "Explicitly distinguishes admission/nonconvergence failure from evidence of physical infeasibility and leaves the physical question unknown after another unqualified failure.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          },
+          {
+            "evidence_id": "T04-216-K4",
+            "covered": true,
+            "rationale": "Keeps the cited legal two-segment, four-tendon candidate fixed and proposes candidate-native state construction rather than importing another structure.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking"
+          },
+          {
+            "evidence_id": "T04-216-K5",
+            "covered": true,
+            "rationale": "Clearly separates initial equilibrium and path-level mathematical feasibility from later closed-loop search and complete independent physical acceptance.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking"
+          },
+          {
+            "evidence_id": "T04-216-K6",
+            "covered": true,
+            "rationale": "Recognizes seed locality by prohibiting reuse of the supplied qpos and proposes a candidate-native equilibrium first. It does not explicitly prescribe inspection of boundary trials, so coverage is not complete.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          }
+        ],
+        "critical_omissions": [
+          "Does not explicitly inspect or request the prior boundary-trial behavior before the next feasibility analysis."
+        ],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "This decision gives the most complete evidence-scoped diagnosis: compilation is not dynamics or task evidence, the failed constructor did not establish physical infeasibility, and the next study should first obtain a candidate-native qualified equilibrium and assess actuator/path feasibility under unchanged conditions. Its sequence is consistent with the historical native-equilibrium skills and appropriately preserves independent qualification and full replay as later gates. The historical knowledge/skill use is identifiable in the candidate-native construction, no-historical-qpos rule, and separation of equilibrium, qualification, path feasibility, and replay, although the library entries are not explicitly cited.",
+        "confidence": 0.96,
+        "uncertain_fields": [
+          "Whether the qpos supplied to T04-211 was literally historical is asserted by the decision but is not independently identified as historical in the frozen event record.",
+          "The exact registered interface intended by 'control-feasibility analysis' is not named."
+        ]
+      },
+      {
+        "label": "B",
+        "scores": {
+          "physical_interpretation": 3,
+          "evidence_consistency": 3,
+          "limitation_recognition": 4,
+          "research_actionability": 2,
+          "evidence_reference_accuracy": 3,
+          "historical_experience_utilization": 1
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T04-216-K1",
+            "covered": true,
+            "rationale": "The fixed conditions retain the full 22 s reference, gravity, tool, four channels, actuator limits, initialization rule, and original thresholds.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-216-K2",
+            "covered": true,
+            "rationale": "Correctly reports that the latest bank construction failed before producing scientific results and therefore did not establish a usable bank.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          },
+          {
+            "evidence_id": "T04-216-K3",
+            "covered": true,
+            "rationale": "Correctly states that constructor admission failure leaves task capability and the stiffness effect unknown rather than proving physical infeasibility.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          },
+          {
+            "evidence_id": "T04-216-K4",
+            "covered": true,
+            "rationale": "Uses the current candidate as the parent and preserves the two-segment/four-channel architecture, but proposes a new candidate-owned material variant rather than diagnosing the unchanged candidate.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking"
+          },
+          {
+            "evidence_id": "T04-216-K5",
+            "covered": true,
+            "rationale": "Explicitly requires materialization, geometry validity, numerical qualification, and complete independent replay before making physical or acceptance claims.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-216-K6",
+            "covered": false,
+            "rationale": "It does not inspect boundary behavior or seed locality before changing stiffness. Avoiding historical qpos is stated, but the required diagnostic inspection is replaced by an unsupported structural perturbation.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          }
+        ],
+        "critical_omissions": [
+          "No current evidence identifies distal stiffness as the limiting variable.",
+          "Does not first inspect seed locality, boundary trials, or the native-state admission predicate that blocked the prior bank construction.",
+          "The proposed matched comparison still requires a qualified equilibrium and usable evaluation route, neither of which is currently established."
+        ],
+        "unsupported_claims": [
+          "The selection of an exact 10% distal Young's-modulus reduction as the next discriminating intervention is not supported by the frozen evidence.",
+          "The framing of stiffness-limited workspace versus gravity-support loss is physically plausible but not motivated by any measured current-candidate workspace, sag, balance, or saturation result."
+        ],
+        "incorrect_references": [],
+        "rationale": "The proposal is controlled and appropriately limited: it changes one parameter, preserves the frozen task, and does not claim that generation or local prediction establishes acceptance. However, it skips the immediate evidence-defined blocker. The only current failure is an initialized-state admission failure, while no workspace or stiffness measurement supports choosing distal modulus. Consequently, the edit is a weakly motivated and potentially non-executable comparison until initialization and qualification are resolved. Historical-experience use is limited to generic no-transfer and replay cautions; it does not meaningfully use the available native-equilibrium or method-selection guidance.",
+        "confidence": 0.94,
+        "uncertain_fields": [
+          "Artifact 705c4d... is listed as an output artifact of T04-210, but its specific contents are not reproduced in the frozen corpus.",
+          "Whether the design-modification interface would accept this exact nested parameter representation is not established."
+        ]
+      },
+      {
+        "label": "C",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4,
+          "historical_experience_utilization": 3
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T04-216-K1",
+            "covered": true,
+            "rationale": "Keeps the original figure-eight, load, environment, channels, timing, actuator limits, and every original acceptance threshold unchanged.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-216-K2",
+            "covered": true,
+            "rationale": "Accurately states that T04-211 returned no bank and failed on the finite contact-free unconstrained-state precondition.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          },
+          {
+            "evidence_id": "T04-216-K3",
+            "covered": true,
+            "rationale": "Explicitly says the failure does not discriminate physical infeasibility from a construction precondition failure and treats another interface or numerical failure as unknown.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          },
+          {
+            "evidence_id": "T04-216-K4",
+            "covered": true,
+            "rationale": "Selects the exact current two-segment/four-tendon candidate and requires it to remain unchanged.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking"
+          },
+          {
+            "evidence_id": "T04-216-K5",
+            "covered": true,
+            "rationale": "Treats initial-equilibrium feasibility as a prerequisite and clearly distinguishes a future local mathematical result, formal initial-state qualification, complete task acceptance, and physical validation.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-216-K6",
+            "covered": true,
+            "rationale": "Addresses seed locality by forbidding historical qpos and chooses an initial-equilibrium interface instead of immediately repeating the full 89-point bank. It does not explicitly call for boundary-trial inspection.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          }
+        ],
+        "critical_omissions": [
+          "Does not explicitly request inspection of prior boundary trials or characterize which supplied-state component violated the admission predicate.",
+          "A finite search that fails to find a state generally cannot establish nonexistence without a qualified infeasibility certificate."
+        ],
+        "unsupported_claims": [
+          "The statement that failure to find any satisfying state would support H2 is too strong unless the future interface produces a qualified positive infeasibility result rather than ordinary nonconvergence or search exhaustion."
+        ],
+        "incorrect_references": [],
+        "rationale": "This is a focused, evidence-driven next action. It tests the unchanged candidate's time-zero equilibrium before controller development, preserves the frozen task, and correctly limits the scope of any future successful result. It also follows the identifiable historical skill sequence of candidate-native construction followed by separate qualification and eventual full replay. The main qualification is that ordinary failure to find an equilibrium is not itself proof that none exists. The requested budget of one is also somewhat inconsistent with a stopping condition that says no action is executed in this decision, though the proposal itself remains clear.",
+        "confidence": 0.95,
+        "uncertain_fields": [
+          "The exact semantics and availability of a registered 'control_feasibility' interface are not shown in the frozen evidence.",
+          "The meaning of requested_budget=1 is unclear because the stopping condition says only to specify the interface and not run it."
+        ]
+      },
+      {
+        "label": "D",
+        "scores": {
+          "physical_interpretation": 3,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 3,
+          "historical_experience_utilization": 2
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T04-216-K1",
+            "covered": true,
+            "rationale": "Preserves the complete timed task, gravity, mount, payload and pointer, channels, actuator bounds, lobe requirements, timing, and all acceptance thresholds.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-216-K2",
+            "covered": true,
+            "rationale": "Correctly reports that the attempted bank returned no bank and failed on the native initialized-state admission requirement.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          },
+          {
+            "evidence_id": "T04-216-K3",
+            "covered": true,
+            "rationale": "Does not equate the failed construction with tracking infeasibility and limits a future state probe to geometry/state validity and numerical qualification.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          },
+          {
+            "evidence_id": "T04-216-K4",
+            "covered": true,
+            "rationale": "Diagnoses exactly the current legal two-segment/four-channel candidate without altering routing, structure, controls, or thresholds.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking"
+          },
+          {
+            "evidence_id": "T04-216-K5",
+            "covered": true,
+            "rationale": "Explicitly distinguishes initialized-state admissibility from equilibrium qualification, trajectory performance, and complete independent acceptance.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+          },
+          {
+            "evidence_id": "T04-216-K6",
+            "covered": true,
+            "rationale": "Selects a state-admissibility probe before repeating bank construction and prohibits historical qpos, directly addressing seed/admission locality. It does not explicitly inspect equilibrium boundary trials.",
+            "reference": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank"
+          }
+        ],
+        "critical_omissions": [
+          "Does not explicitly inspect prior boundary trials or test alternate candidate-native seeds as distinct factors.",
+          "The probe should distinguish candidate geometry/mechanics failures from interface, model-applicability, and numerical implementation failures."
+        ],
+        "unsupported_claims": [
+          "A failed native-state probe would not necessarily localize the problem to candidate routing, geometry, or mechanics; it could still reflect model applicability, interface semantics, or numerical implementation.",
+          "Calling native initialized-state admissibility itself a 'physical uncertainty' is imprecise because the proposed probe primarily tests a model/interface predicate rather than physical tracking behavior."
+        ],
+        "incorrect_references": [
+          "The supporting artifact a52684f... is the plan artifact reported by T04-210, not the failed T04-211 record or a state-admissibility result; it does not directly substantiate the claimed blocker."
+        ],
+        "rationale": "The proposed mechanism probe is a strong immediate response to the exact failure predicate and avoids blindly repeating the 89-point construction. It carefully preserves the candidate and task and limits future conclusions. Its main weakness is physical interpretation: a finite/contact-free/unconstrained native-state predicate combines geometry, model, interface, and numerical concerns, so failure cannot automatically be attributed to intrinsic candidate mechanics. Historical-skill utilization is recognizable in the sequencing and no-historical-state rule, but the available equilibrium-construction procedures are not explicitly invoked or referenced.",
+        "confidence": 0.93,
+        "uncertain_fields": [
+          "The existence and exact contract of the proposed 'mechanism_research' state-admissibility interface are not established in the frozen corpus.",
+          "The abbreviated candidate reference '5bb82059...' is unambiguous in context but is not a complete artifact identifier in several fields."
+        ]
+      }
+    ]
+  },
+  "usage": {
+    "usage": "UNKNOWN",
+    "response_model": "gpt-5.6-sol",
+    "response_id": "chatcmpl-local-4c6730e3-7bac-4c75-b455-c579bcb63203",
+    "sent_at": "2026-11-16T12:15:15.363176+00:00",
+    "request_bytes": 71151
+  },
+  "private_label_key": {
+    "A": "T04-216-K-S-",
+    "B": "T04-216-K+S-",
+    "C": "T04-216-K-S+",
+    "D": "T04-216-K+S+"
+  },
+  "blinding": {
+    "hidden": [
+      "condition",
+      "usage",
+      "retrieval count",
+      "rank",
+      "future outcomes"
+    ],
+    "same_model": true
+  },
+  "anonymous_decisions": [
+    {
+      "label": "A",
+      "decision": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "existing_evidence_scope_diagnosis",
+          "selected_variables": [
+            "candidate-native initial equilibrium admission",
+            "payload-loaded static balance",
+            "reference-path actuator feasibility"
+          ],
+          "selected_candidate": "UNKNOWN",
+          "requested_budget": 0
+        },
+        "hypothesis": "The key unresolved physical uncertainty is whether the current four-tendon candidate can establish the qualified payload-loaded equilibrium and actuator authority needed for the frozen figure-eight. Competing hypotheses are H1: the failure in T04-211-construct-native-frozen-reference-bank was an initialization/admission failure caused by its supplied historical state, while the current structure is physically feasible; and H2: the current structure has genuine equilibrium, reach, or actuator-limit insufficiency. The next discriminating scientific action should be one candidate-native control-feasibility analysis starting from the candidate's own qualified equilibrium construction, without the historical qpos seed, before any controller optimization or structural change.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "Evidence favoring H1 would be a numerically qualified candidate-native initial equilibrium with static-balance residual at or below 1e-7 N·m, followed by feasible reference-path actuation within 0.2–8 N tension, 0.03 m stroke, 0.03 m/s speed, and ±0.3 rad hinge limits. This would justify a later closed-loop control search, but would remain mathematical feasibility evidence rather than complete physical tracking acceptance.",
+        "weakening_observation": "A numerically qualified feasibility result with unavoidable positive original violation—especially initial static-balance residual above 1e-7 N·m, unreachable lobe extrema, or unavoidable tension, stroke, speed, or hinge violation—would refute H1 and favor H2. Nonconvergence, invalid geometry, admission failure, or failed numerical qualification would leave the physical question UNKNOWN.",
+        "fixed_conditions": "Keep candidate 5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed and the complete TASK/T04 default condition fixed: gravity and rigid payload, qualified-candidate-equilibrium initialization, four independent channels, the original 22 s figure-eight and timing, tension range 0.2–8 N, stroke limit 0.03 m, speed limit 0.03 m/s, hinge range ±0.3 rad, RMSE threshold 0.003 m, maximum-error threshold 0.006 m, cycle-drift threshold 0.002 m, and initial static-balance threshold 1e-7 N·m. Do not reuse the historical qpos seed supplied in T04-211-construct-native-frozen-reference-bank.",
+        "stopping_condition": "Stop this diagnosis with equilibrium and path feasibility classified as UNKNOWN. In the next executable study, stop after one numerically qualified feasibility determination: proceed to closed-loop control research if feasible, revise structure only after qualified positive physical-constraint violation, and diagnose geometry or numerics separately if qualification fails.",
+        "interpretation": "T04-210-generate-legal-quasistatic-tracking established only materialization and physical compilation of the cited candidate; it explicitly reports that GVS dynamics and the complete task were not evaluated. T04-211-construct-native-frozen-reference-bank failed with NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE and produced no equilibrium observations. Thus neither physical infeasibility nor task feasibility is established. Candidate-native mathematical feasibility, sampled simulation, geometry validity, numerical qualification, and complete independent physical T04 acceptance are distinct evidence scopes."
+      }
+    },
+    {
+      "label": "B",
+      "decision": {
+        "action": "propose",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DESIGN_MODIFICATION",
+          "selected_method": "single_parameter_distal_stiffness_perturbation",
+          "selected_variables": [
+            "segments.segment_1.young_pa"
+          ],
+          "selected_candidate": {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          "requested_budget": 0
+        },
+        "hypothesis": "The next physical uncertainty is whether the current candidate's distal bending stiffness, rather than the failed equilibrium-constructor admission, limits figure-eight workspace under gravity and the rigid tool. Competing hypotheses are: H1, a modest reduction of distal Young's modulus increases attainable lateral and vertical motion enough to improve task capability while preserving static support; H2, reduced distal stiffness mainly increases gravitational sag and worsens balance or control authority. Propose one isolated 10% distal-stiffness reduction, from 4.0 MPa to 3.6 MPa, while copying the rest of the current design unchanged.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "705c4d085f3cc104590b9431e34a9ab5c7ff93533ff6a73727e303bcd7770bcb",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "If H1 is correct, subsequent matched analysis of the generated variant should show lower complete-horizon original task violation, with improved coverage of the required y and z lobes and no loss of qualified initial equilibrium, tension margin, stroke, speed, or joint-range feasibility relative to the unchanged parent. Any later physical claim would still require complete independent replay.",
+        "weakening_observation": "H1 would be weakened if a numerically qualified matched comparison shows unchanged or larger original task violation, especially increased gravity-induced z error, loss of initial static balance, tendon-limit approach, or joint-limit approach. Generation failure, invalid geometry, incomplete analysis, or numerical nonqualification would leave the physical effect UNKNOWN rather than support H2.",
+        "fixed_conditions": "Keep TASK/T04/default, its 22 s figure-eight reference, gravity, rigid tool, environment, four independent tendon channels, tendon routing, pretension, force limits, actuator limits, segment lengths, cross-sections, cell counts, proximal material, controller weights, initialization rule, and every original acceptance threshold fixed. Change only segment_1 Young's modulus from 4000000 Pa to 3600000 Pa. Historical evidence is context only and historical qpos must not be transferred.",
+        "stopping_condition": "Stop after proposing this single variant. Before any comparison, require successful materialization, geometry validity, and numerical qualification; do not infer tracking success from construction or local mathematical prediction, and do not claim acceptance without a complete independent physical replay under the frozen task.",
+        "interpretation": "T04-210-generate-legal-quasistatic-tracking shows that the parent is physically compiled but explicitly unevaluated. T04-211-construct-native-frozen-reference-bank failed before producing scientific results because the constructor required a finite contact-free unconstrained state. Therefore task capability and the effect of distal stiffness are UNKNOWN. This isolated edit is intended to distinguish stiffness-limited workspace from gravity-support loss; it does not resolve constructor admission by itself.",
+        "parameters": {
+          "segments": {
+            "segment_0": {
+              "length_m": 0.14,
+              "young_pa": 4000000.0,
+              "material_scenario": "UNKNOWN",
+              "sections": {
+                "section_0": {
+                  "radius_m": 0.008
+                }
+              }
+            },
+            "segment_1": {
+              "length_m": 0.118,
+              "young_pa": 3600000.0,
+              "material_scenario": "UNKNOWN",
+              "sections": {
+                "section_0": {
+                  "radius_m": 0.008
+                },
+                "section_1": {
+                  "radius_m": 0.008
+                }
+              }
+            }
+          },
+          "holding_tip_speed_weight": 0.0,
+          "terminal_tip_speed_weight": 0.0
+        }
+      }
+    },
+    {
+      "label": "C",
+      "decision": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "control_feasibility_interface_for_qualified_initial_equilibrium",
+          "selected_variables": [
+            "initial equilibrium qpos",
+            "tendon tensions"
+          ],
+          "selected_candidate": {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "next_research_action": "control_feasibility",
+        "hypothesis": "The physical uncertainty to resolve next is whether the unchanged current four-tendon structure has an admissible static equilibrium at the frozen figure-eight initial target under gravity and the rigid pointer payload. Competing hypotheses are H1: such an equilibrium exists and the T04-211 failure arose only from the constructor's finite contact-free unconstrained-state precondition; and H2: no state can simultaneously meet the target, static-balance, hinge, and tendon constraints, so controller development is premature.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "705c4d085f3cc104590b9431e34a9ab5c7ff93533ff6a73727e303bcd7770bcb",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "The next control-feasibility action should test the current candidate for a finite initial equilibrium at the frozen initial reference. Finding one with static balance residual no greater than 1e-7 N m, all hinge coordinates within [-0.3,0.3] rad, and every tendon tension within [0.2,8] N would support H1 and justify a separate formal initial-state qualification.",
+        "weakening_observation": "Failure to find any finite state satisfying the frozen initial target, the 1e-7 N m balance threshold, hinge limits, and tendon bounds would support H2 and favor structural revision over control tuning. Another interface, applicability, or numerical failure would leave equilibrium existence UNKNOWN rather than refute H1.",
+        "fixed_conditions": "Keep TASK T04/default unchanged, including the figure-eight reference, gravity, mount, rigid pointer payload, qualified-candidate-equilibrium initialization, four independent channels, 22 s duration, timing grids, geometry, materials, routing, actuator limits, and every original acceptance threshold. Keep candidate 5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed unchanged and never copy historical qpos.",
+        "stopping_condition": "Stop after identifying and specifying the control-feasibility interface; do not run equilibrium construction, optimization, integration, qualification, control search, or physical replay in this decision.",
+        "interpretation": "Original evidence T04-210-generate-legal-quasistatic-tracking establishes materialization and physical compilation only; it explicitly reports no complete-task evaluation and no dynamics evaluation. Original evidence T04-211-construct-native-frozen-reference-bank produced no result and failed with NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE, which does not discriminate physical infeasibility from a construction precondition failure. Therefore initial equilibrium feasibility is UNKNOWN and is the prerequisite uncertainty to test next. Even a successful future feasibility result would be local mathematical and numerical evidence only, distinct from geometry validity, sampled simulation, complete independent task acceptance, and physical validation."
+      }
+    },
+    {
+      "label": "D",
+      "decision": {
+        "action": "diagnose",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "DIAGNOSE",
+          "selected_method": "mechanism_research for native initialized-state admissibility",
+          "selected_variables": [
+            "initialized native state finiteness",
+            "contact-free status",
+            "constraint-free status",
+            "routing and body geometry compatibility"
+          ],
+          "selected_candidate": {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          "requested_budget": 0
+        },
+        "next_research_action": "mechanism_research",
+        "hypothesis": "The next physical uncertainty is whether the current legal two-segment candidate itself admits a finite, contact-free, unconstrained native initialized state under the frozen gravity, payload, and pointer assembly. Competing hypotheses are: H1, the assembly is physically and numerically admissible and the failure in T04-211-construct-native-frozen-reference-bank was specific to that construction path; H2, the candidate's routing, body geometry, or initialized mechanics intrinsically violates the native admissibility predicate. The next concrete decision is to open mechanism research for a matched current-candidate state-admissibility probe before repeating equilibrium construction or attempting tracking control.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "a52684f03cc687c88c97575eb8c546195918e35a4384f7e9acaa1019284a158e",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "A subsequent mechanism probe on exactly candidate 5bb82059... should report a finite initialized state with no contact or disallowed constraints and valid native mechanics. That observation would favor H1 and justify a fresh candidate-bound equilibrium-construction attempt. Its scope would be geometry/state validity and numerical qualification only, not equilibrium qualification, sampled trajectory performance, or complete task acceptance.",
+        "weakening_observation": "A subsequent matched probe reports a nonfinite state, contact, a constrained state, routing/body incompatibility, or native model failure for the same candidate. That would favor H2 and refute repeating the unchanged equilibrium-bank construction; the structure or routing would need revision. A merely successful compile without the explicit state checks would leave the uncertainty UNKNOWN.",
+        "fixed_conditions": "Keep frozen TASK/T04 and every original threshold fixed: the 22 s timed figure-eight; gravity, mount, rigid payload, and pointer geometries; four independent channels; 0.2–8 N tension bounds; 0.03 m stroke; 0.03 m/s speed; 0.003 m tracking RMSE; 0.006 m maximum error; 0.002 m cycle drift; 1e-7 Nm initial static-balance limit; lobe bounds; original grids and timing; and qualified-candidate-equilibrium initialization. Diagnose exactly candidate 5bb82059... generated in T04-210-generate-legal-quasistatic-tracking. Do not import historical qpos, alter controls, relax thresholds, or infer acceptance from historical quasistatic results.",
+        "stopping_condition": "Stop this decision after selecting the mechanism-research interface. The later probe, once separately planned and executed, must stop after its explicit state-admissibility result; do not continue automatically to equilibrium construction, control search, physical replay, SELECT, or acceptance.",
+        "interpretation": "Original evidence T04-210-generate-legal-quasistatic-tracking establishes materialization and physical compilation but explicitly leaves the GVS model, dynamics, controller update, and complete task unevaluated. Original evidence T04-211-construct-native-frozen-reference-bank returned no bank and failed with NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE. Therefore candidate state admissibility is the unresolved physical blocker and is more informative to test than another unchanged bank attempt. This plan does not claim that a probe has run. A future pass would only localize the prior failure to the construction route; a future failure would localize it to candidate geometry or mechanics. Neither result alone can establish the frozen tracking thresholds or complete independent task acceptance."
+      }
+    }
+  ],
+  "raw_review_content": "{\"evaluations\":[{\"label\":\"A\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4,\"historical_experience_utilization\":3},\"evidence_items\":[{\"evidence_id\":\"T04-216-K1\",\"covered\":true,\"rationale\":\"Preserves the complete 22 s, two-cycle reference, gravity, rigid payload, four channels, actuator limits, timing, and all original acceptance thresholds.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-216-K2\",\"covered\":true,\"rationale\":\"Correctly states that the bank construction failed with NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE and produced no equilibrium observations.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"},{\"evidence_id\":\"T04-216-K3\",\"covered\":true,\"rationale\":\"Explicitly distinguishes admission/nonconvergence failure from evidence of physical infeasibility and leaves the physical question unknown after another unqualified failure.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"},{\"evidence_id\":\"T04-216-K4\",\"covered\":true,\"rationale\":\"Keeps the cited legal two-segment, four-tendon candidate fixed and proposes candidate-native state construction rather than importing another structure.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking\"},{\"evidence_id\":\"T04-216-K5\",\"covered\":true,\"rationale\":\"Clearly separates initial equilibrium and path-level mathematical feasibility from later closed-loop search and complete independent physical acceptance.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking\"},{\"evidence_id\":\"T04-216-K6\",\"covered\":true,\"rationale\":\"Recognizes seed locality by prohibiting reuse of the supplied qpos and proposes a candidate-native equilibrium first. It does not explicitly prescribe inspection of boundary trials, so coverage is not complete.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"}],\"critical_omissions\":[\"Does not explicitly inspect or request the prior boundary-trial behavior before the next feasibility analysis.\"],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"This decision gives the most complete evidence-scoped diagnosis: compilation is not dynamics or task evidence, the failed constructor did not establish physical infeasibility, and the next study should first obtain a candidate-native qualified equilibrium and assess actuator/path feasibility under unchanged conditions. Its sequence is consistent with the historical native-equilibrium skills and appropriately preserves independent qualification and full replay as later gates. The historical knowledge/skill use is identifiable in the candidate-native construction, no-historical-qpos rule, and separation of equilibrium, qualification, path feasibility, and replay, although the library entries are not explicitly cited.\",\"confidence\":0.96,\"uncertain_fields\":[\"Whether the qpos supplied to T04-211 was literally historical is asserted by the decision but is not independently identified as historical in the frozen event record.\",\"The exact registered interface intended by 'control-feasibility analysis' is not named.\"]},{\"label\":\"B\",\"scores\":{\"physical_interpretation\":3,\"evidence_consistency\":3,\"limitation_recognition\":4,\"research_actionability\":2,\"evidence_reference_accuracy\":3,\"historical_experience_utilization\":1},\"evidence_items\":[{\"evidence_id\":\"T04-216-K1\",\"covered\":true,\"rationale\":\"The fixed conditions retain the full 22 s reference, gravity, tool, four channels, actuator limits, initialization rule, and original thresholds.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-216-K2\",\"covered\":true,\"rationale\":\"Correctly reports that the latest bank construction failed before producing scientific results and therefore did not establish a usable bank.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"},{\"evidence_id\":\"T04-216-K3\",\"covered\":true,\"rationale\":\"Correctly states that constructor admission failure leaves task capability and the stiffness effect unknown rather than proving physical infeasibility.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"},{\"evidence_id\":\"T04-216-K4\",\"covered\":true,\"rationale\":\"Uses the current candidate as the parent and preserves the two-segment/four-channel architecture, but proposes a new candidate-owned material variant rather than diagnosing the unchanged candidate.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking\"},{\"evidence_id\":\"T04-216-K5\",\"covered\":true,\"rationale\":\"Explicitly requires materialization, geometry validity, numerical qualification, and complete independent replay before making physical or acceptance claims.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-216-K6\",\"covered\":false,\"rationale\":\"It does not inspect boundary behavior or seed locality before changing stiffness. Avoiding historical qpos is stated, but the required diagnostic inspection is replaced by an unsupported structural perturbation.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"}],\"critical_omissions\":[\"No current evidence identifies distal stiffness as the limiting variable.\",\"Does not first inspect seed locality, boundary trials, or the native-state admission predicate that blocked the prior bank construction.\",\"The proposed matched comparison still requires a qualified equilibrium and usable evaluation route, neither of which is currently established.\"],\"unsupported_claims\":[\"The selection of an exact 10% distal Young's-modulus reduction as the next discriminating intervention is not supported by the frozen evidence.\",\"The framing of stiffness-limited workspace versus gravity-support loss is physically plausible but not motivated by any measured current-candidate workspace, sag, balance, or saturation result.\"],\"incorrect_references\":[],\"rationale\":\"The proposal is controlled and appropriately limited: it changes one parameter, preserves the frozen task, and does not claim that generation or local prediction establishes acceptance. However, it skips the immediate evidence-defined blocker. The only current failure is an initialized-state admission failure, while no workspace or stiffness measurement supports choosing distal modulus. Consequently, the edit is a weakly motivated and potentially non-executable comparison until initialization and qualification are resolved. Historical-experience use is limited to generic no-transfer and replay cautions; it does not meaningfully use the available native-equilibrium or method-selection guidance.\",\"confidence\":0.94,\"uncertain_fields\":[\"Artifact 705c4d... is listed as an output artifact of T04-210, but its specific contents are not reproduced in the frozen corpus.\",\"Whether the design-modification interface would accept this exact nested parameter representation is not established.\"]},{\"label\":\"C\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4,\"historical_experience_utilization\":3},\"evidence_items\":[{\"evidence_id\":\"T04-216-K1\",\"covered\":true,\"rationale\":\"Keeps the original figure-eight, load, environment, channels, timing, actuator limits, and every original acceptance threshold unchanged.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-216-K2\",\"covered\":true,\"rationale\":\"Accurately states that T04-211 returned no bank and failed on the finite contact-free unconstrained-state precondition.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"},{\"evidence_id\":\"T04-216-K3\",\"covered\":true,\"rationale\":\"Explicitly says the failure does not discriminate physical infeasibility from a construction precondition failure and treats another interface or numerical failure as unknown.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"},{\"evidence_id\":\"T04-216-K4\",\"covered\":true,\"rationale\":\"Selects the exact current two-segment/four-tendon candidate and requires it to remain unchanged.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking\"},{\"evidence_id\":\"T04-216-K5\",\"covered\":true,\"rationale\":\"Treats initial-equilibrium feasibility as a prerequisite and clearly distinguishes a future local mathematical result, formal initial-state qualification, complete task acceptance, and physical validation.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-216-K6\",\"covered\":true,\"rationale\":\"Addresses seed locality by forbidding historical qpos and chooses an initial-equilibrium interface instead of immediately repeating the full 89-point bank. It does not explicitly call for boundary-trial inspection.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"}],\"critical_omissions\":[\"Does not explicitly request inspection of prior boundary trials or characterize which supplied-state component violated the admission predicate.\",\"A finite search that fails to find a state generally cannot establish nonexistence without a qualified infeasibility certificate.\"],\"unsupported_claims\":[\"The statement that failure to find any satisfying state would support H2 is too strong unless the future interface produces a qualified positive infeasibility result rather than ordinary nonconvergence or search exhaustion.\"],\"incorrect_references\":[],\"rationale\":\"This is a focused, evidence-driven next action. It tests the unchanged candidate's time-zero equilibrium before controller development, preserves the frozen task, and correctly limits the scope of any future successful result. It also follows the identifiable historical skill sequence of candidate-native construction followed by separate qualification and eventual full replay. The main qualification is that ordinary failure to find an equilibrium is not itself proof that none exists. The requested budget of one is also somewhat inconsistent with a stopping condition that says no action is executed in this decision, though the proposal itself remains clear.\",\"confidence\":0.95,\"uncertain_fields\":[\"The exact semantics and availability of a registered 'control_feasibility' interface are not shown in the frozen evidence.\",\"The meaning of requested_budget=1 is unclear because the stopping condition says only to specify the interface and not run it.\"]},{\"label\":\"D\",\"scores\":{\"physical_interpretation\":3,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":3,\"historical_experience_utilization\":2},\"evidence_items\":[{\"evidence_id\":\"T04-216-K1\",\"covered\":true,\"rationale\":\"Preserves the complete timed task, gravity, mount, payload and pointer, channels, actuator bounds, lobe requirements, timing, and all acceptance thresholds.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-216-K2\",\"covered\":true,\"rationale\":\"Correctly reports that the attempted bank returned no bank and failed on the native initialized-state admission requirement.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"},{\"evidence_id\":\"T04-216-K3\",\"covered\":true,\"rationale\":\"Does not equate the failed construction with tracking infeasibility and limits a future state probe to geometry/state validity and numerical qualification.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking;paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"},{\"evidence_id\":\"T04-216-K4\",\"covered\":true,\"rationale\":\"Diagnoses exactly the current legal two-segment/four-channel candidate without altering routing, structure, controls, or thresholds.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-210-generate-legal-quasistatic-tracking\"},{\"evidence_id\":\"T04-216-K5\",\"covered\":true,\"rationale\":\"Explicitly distinguishes initialized-state admissibility from equilibrium qualification, trajectory performance, and complete independent acceptance.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04\"},{\"evidence_id\":\"T04-216-K6\",\"covered\":true,\"rationale\":\"Selects a state-admissibility probe before repeating bank construction and prohibits historical qpos, directly addressing seed/admission locality. It does not explicitly inspect equilibrium boundary trials.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl#T04-211-construct-native-frozen-reference-bank\"}],\"critical_omissions\":[\"Does not explicitly inspect prior boundary trials or test alternate candidate-native seeds as distinct factors.\",\"The probe should distinguish candidate geometry/mechanics failures from interface, model-applicability, and numerical implementation failures.\"],\"unsupported_claims\":[\"A failed native-state probe would not necessarily localize the problem to candidate routing, geometry, or mechanics; it could still reflect model applicability, interface semantics, or numerical implementation.\",\"Calling native initialized-state admissibility itself a 'physical uncertainty' is imprecise because the proposed probe primarily tests a model/interface predicate rather than physical tracking behavior.\"],\"incorrect_references\":[\"The supporting artifact a52684f... is the plan artifact reported by T04-210, not the failed T04-211 record or a state-admissibility result; it does not directly substantiate the claimed blocker.\"],\"rationale\":\"The proposed mechanism probe is a strong immediate response to the exact failure predicate and avoids blindly repeating the 89-point construction. It carefully preserves the candidate and task and limits future conclusions. Its main weakness is physical interpretation: a finite/contact-free/unconstrained native-state predicate combines geometry, model, interface, and numerical concerns, so failure cannot automatically be attributed to intrinsic candidate mechanics. Historical-skill utilization is recognizable in the sequencing and no-historical-state rule, but the available equilibrium-construction procedures are not explicitly invoked or referenced.\",\"confidence\":0.93,\"uncertain_fields\":[\"The existence and exact contract of the proposed 'mechanism_research' state-admissibility interface are not established in the frozen corpus.\",\"The abbreviated candidate reference '5bb82059...' is unambiguous in context but is not a complete artifact identifier in several fields.\"]}]}"
+}

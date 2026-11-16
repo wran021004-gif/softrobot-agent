@@ -1,0 +1,91 @@
+{
+  "session_id": "T04-220-K-S-",
+  "task_id": "T04",
+  "checkpoint_id": "T04-220",
+  "condition": "K-S-",
+  "experiment": "knowledge_skill",
+  "status": "completed",
+  "started_at": "2026-11-16T12:15:15.382551+00:00",
+  "requests": [
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-3fdce263-404a-4358-9ee4-251ddfaf539e",
+      "sent_at": "2026-11-16T12:15:53.907632+00:00",
+      "request_bytes": 518133
+    }
+  ],
+  "reads": [],
+  "errors": [],
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "T04-dynamic-replay-of-quasistatic-bank",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "independent full-task native replay of the fixed quasistatic tension schedule",
+      "selected_variables": [],
+      "selected_candidate": {
+        "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+        "media_type": "application/json"
+      },
+      "requested_budget": 1
+    },
+    "hypothesis": "The unresolved physical uncertainty is whether the current candidate's statically feasible equilibrium path remains dynamically trackable when its fixed interpolated tension schedule is applied through the native actuator and flexible-body dynamics. Competing hypotheses are: (H1) the slow 0.1 Hz motion is sufficiently quasistatic that the schedule tracks the complete figure eight within every frozen acceptance threshold; or (H2) transient dynamics, interpolation between 0.25 s knots, actuator stroke/rate limits, or repeated operation near the 0.2 N unilateral tension floor produce tracking error, drift, or incomplete lobe traversal. T04-216 establishes only sampled mathematical equilibria, T04-217 only time-zero static qualification, and T04-219 only an unmeasured schedule; none establishes dynamic task performance.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "f7dff6a0bd5ef4bed36c20d2cb9172a915dfe1fa61c8d48e7a360264d8adcbc6",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "93df2cb6d29f1ed5a8b4a3db8ca9e4fc1e4727b926cf14d8cecee355e94ad0e0",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "Under H1, one independent complete native replay from the candidate-qualified equilibrium using source 826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2 completes 22 s without numerical failure, contact, or warnings and satisfies all original T04 limits: RMSE <= 0.003 m, maximum error <= 0.006 m, cycle drift <= 0.002 m, tension in [0.2,8] N, stroke <= 0.03 m, speed <= 0.03 m/s, both y lobes reaching at least -0.018 m and +0.018 m, z extrema spanning at least 0.163 to 0.177 m, and four independent channels.",
+    "weakening_observation": "H1 is refuted if the complete replay is invalid or violates any frozen threshold, especially phase-dependent error peaks between the 0.25 s equilibrium knots, cycle-two drift above 0.002 m, failure to reach a required lobe extremum, tension clipping/slack at 0.2 N, or actuator stroke/rate violations. Such an outcome supports H2 and distinguishes dynamic/control limitations from the already demonstrated sampled static balance; an incomplete or numerically failed replay leaves the physical cause UNKNOWN.",
+    "fixed_conditions": "Hold fixed TASK/T04 default exactly: the bound candidate a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f, qualified initial state from T04-217, fixed source schedule from T04-219, gravity, payload and pointer geometry, 22 s timed reference with 2 s start/stop ramps, 0.1 Hz and two cycles, 0.001 s physics timestep, 0.01 s control/sample period, seed 17, native collision policy, evaluator windows, required signals, and every original acceptance threshold. Do not reoptimize control, alter geometry, copy historical qpos, or relax thresholds.",
+    "stopping_condition": "Stop after this single complete replay is recorded. If every original check passes, the result may support later independent task selection; if any check fails, do not claim acceptance and use the recorded failure mode to choose a later control or design diagnosis. Incomplete evidence remains UNKNOWN.",
+    "interpretation": "This replay is the smallest feasible experiment that directly discriminates quasistatic sufficiency from dynamic/control failure while using one of the 18 available backend solves. The generated candidate's compilation in T04-210, the equilibrium bank in T04-216, and static qualification in T04-217 establish geometry/materialization and mathematical/static scopes only. The proposed replay has not run; only a complete independent task evaluation can establish physical acceptance for T04.",
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "826caeba0d084a7aa0062ffd14194112ea115f7cff615ad4c522837fbb9c14b2",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "new_scientific_actions": 0,
+  "initial_state_reference": {
+    "task_id": "T04",
+    "checkpoint_id": "T04-220",
+    "trace_source": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl",
+    "cutoff_event": "T04-220-independent-full-local-interior-feedforward-decision",
+    "cutoff_timestamp": "2026-11-13T05:38:08.700849+00:00",
+    "record_ids": [
+      "TASK",
+      "T04-210-generate-legal-quasistatic-tracking",
+      "T04-211-construct-native-frozen-reference-bank",
+      "T04-216-construct-local-interior-reference-bank",
+      "T04-217-qualify-local-interior-bank-time-zero",
+      "T04-218-bind-local-interior-qualified-bank",
+      "T04-219-seed-local-interior-formal-knots"
+    ],
+    "original_task_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+  },
+  "provider_requested_model": "gpt-5.6-sol",
+  "reasoning": "gateway_default_not_exposed",
+  "finished_at": "2026-11-16T12:15:53.910129+00:00"
+}

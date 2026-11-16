@@ -1,0 +1,86 @@
+{
+  "session_id": "T09-213-Flat",
+  "task_id": "T09",
+  "checkpoint_id": "T09-213",
+  "condition": "Flat",
+  "experiment": "context_gateway",
+  "status": "completed",
+  "started_at": "2026-11-16T12:17:08.264814+00:00",
+  "requests": [
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-0dd05b2e-5b92-4a34-95dd-5863f2445eed",
+      "sent_at": "2026-11-16T12:17:38.502126+00:00",
+      "request_bytes": 174135
+    }
+  ],
+  "reads": [],
+  "errors": [],
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "T09-H1-collision-repair-sufficiency",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "independent complete frozen-task replay of the saved schedule on the collision-faithful bound candidate",
+      "selected_variables": [
+        "complete 2.0 s physical task response under saved actuator schedule"
+      ],
+      "selected_candidate": {
+        "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+        "media_type": "application/json"
+      },
+      "requested_budget": 1
+    },
+    "hypothesis": "The unresolved physical uncertainty is whether unintended guide-eye/spoke collisions were the dominant cause of the earlier trial failure. H1: with those collisions disabled while retaining their masses and inertias, the saved schedule achieves the frozen Spring Button Press task. Competing H2: even with collision-faithful assembly, the saved schedule fails because contact dynamics, tracking, release behavior, or actuator limits remain inadequate.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "55d4282a0428f79ccf0811c49d5a3247a529195927c39c8dbc8e663c4d3de3a3",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "A complete replay shows no unintended guide or environment contact and satisfies every unchanged T09 hard check: timely probe-cap contact, at least 0.4 s continuous hold during 0.9-1.4 s with button depth 0.00175-0.00225 m and normal force 0.08-0.12 N, lateral error at most 0.002 m, tension/stroke/rope-speed limits, and release limits at 1.8 and 2.0 s. This would support H1 within the scope of one complete native task execution.",
+    "weakening_observation": "A complete replay with no unintended guide contact nevertheless violates hold depth or force, timing, lateral error, actuator, rope-speed, or release checks, supporting H2 and refuting collision repair as sufficient. Any remaining unexpected penetrating contact or incomplete/numerically invalid trace instead leaves the sufficiency question unresolved and points to assembly or numerical qualification rather than control inadequacy.",
+    "fixed_conditions": "Keep the T09 default condition, candidate structure and collision-faithful assembly from T09-210/T09-211, saved schedule from T09-212, zero robot and button initializer, gravity, timestep 0.001 s, control period 0.01 s, 2.0 s duration, seed 17, contact model, geometry, and every original acceptance threshold fixed.",
+    "stopping_condition": "Stop after this single complete replay and evaluate only the frozen acceptance checks; do not modify the schedule, candidate, task, thresholds, geometry, or solver settings within this decision.",
+    "interpretation": "T09-210 establishes generated geometry only, T09-211 establishes task binding without execution, and T09-212 establishes an unmeasured saved schedule; none demonstrates task acceptance. The proposed replay has not run. Its result would be complete native task evidence for this candidate and schedule, not a general proof of robustness or an independent physical-hardware experiment.",
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "new_scientific_actions": 0,
+  "initial_state_reference": {
+    "task_id": "T09",
+    "checkpoint_id": "T09-213",
+    "trace_source": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl",
+    "cutoff_event": "T09-213-replay-complete-collision-faithful-task-decision",
+    "cutoff_timestamp": "2026-11-13T04:32:05.275683+00:00",
+    "record_ids": [
+      "TASK",
+      "T09-210-generate-collision-faithful-hardware",
+      "T09-211-bind-original-repaired-hardware",
+      "T09-212-seed-saved-midpoint-inputs"
+    ],
+    "original_task_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T09"
+  },
+  "provider_requested_model": "gpt-5.6-sol",
+  "reasoning": "gateway_default_not_exposed",
+  "finished_at": "2026-11-16T12:17:38.503799+00:00"
+}

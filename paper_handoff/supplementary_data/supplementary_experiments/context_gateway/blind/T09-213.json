@@ -1,0 +1,252 @@
+{
+  "checkpoint_id": "T09-213",
+  "status": "completed",
+  "review": {
+    "evaluations": [
+      {
+        "label": "A",
+        "scores": {
+          "physical_interpretation": 3,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T09-213-K1",
+            "covered": true,
+            "rationale": "The decision correctly treats acceptance as a complete press-contact, sustained hold, and release test and enumerates the coupled depth, force, timing, lateral, actuator, collision, and release checks.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T09"
+          },
+          {
+            "evidence_id": "T09-213-K2",
+            "covered": true,
+            "rationale": "The exact collision-faithful bound candidate is held fixed, so the replay does not discard the repaired guide/support assembly or attachment fidelity. Recognition that the disabled collision geometries still retain their physical masses, COMs, and inertias is implicit rather than explicit.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware"
+          },
+          {
+            "evidence_id": "T09-213-K3",
+            "covered": true,
+            "rationale": "The decision explicitly states that the saved control source has task_acceptance=unmeasured and that physical performance remains unknown, correctly distinguishing initialization from acceptance evidence.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-212-seed-saved-midpoint-inputs"
+          },
+          {
+            "evidence_id": "T09-213-K4",
+            "covered": true,
+            "rationale": "The fixed conditions preserve the original default task, initializer, gravity, environment and collision settings, timestep, control/sample periods, duration, seed, required signals, candidate, and acceptance thresholds.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware"
+          },
+          {
+            "evidence_id": "T09-213-K5",
+            "covered": true,
+            "rationale": "The decision accurately notes that binding had not started execution and the seeded schedule remained unmeasured, making one complete independent replay the appropriate next evidentiary step.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-212-seed-saved-midpoint-inputs"
+          },
+          {
+            "evidence_id": "T09-213-K6",
+            "covered": true,
+            "rationale": "The proposed replay directly checks the reused schedule on the current candidate against tension, tendon stroke, tendon speed, collision, contact, force-balance, and release constraints without reoptimization.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware"
+          }
+        ],
+        "critical_omissions": [],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "This is a well-controlled and highly discriminating next action. It correctly identifies the current evidence as construction, binding, and control initialization rather than completed task evidence; freezes the candidate and saved schedule; specifies essentially every hard acceptance check; and limits any pass to the exact candidate-schedule pair and single condition. It also correctly avoids interpreting a failure as proof that no other controller could work. The only material interpretive gap is that the decision calls the candidate collision-faithful without explicitly explaining that guide/support collision geometry was disabled while the real masses, COMs, inertias, and attachments were retained. The fixed candidate nevertheless preserves that fidelity operationally.",
+        "confidence": 0.97,
+        "uncertain_fields": [
+          "The corpus establishes a native simulated physical replay, not a laboratory hardware experiment; the decision does not explicitly use the latter interpretation.",
+          "Same-model judging may introduce correlated evaluation bias."
+        ]
+      },
+      {
+        "label": "B",
+        "scores": {
+          "physical_interpretation": 4,
+          "evidence_consistency": 4,
+          "limitation_recognition": 4,
+          "research_actionability": 4,
+          "evidence_reference_accuracy": 4
+        },
+        "evidence_items": [
+          {
+            "evidence_id": "T09-213-K1",
+            "covered": true,
+            "rationale": "The decision correctly requires a complete frozen-task replay with timely contact, continuous hold under simultaneous depth and force bounds, lateral and actuator compliance, and release checks.",
+            "reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T09"
+          },
+          {
+            "evidence_id": "T09-213-K2",
+            "covered": true,
+            "rationale": "It explicitly identifies the repaired physical distinction: unintended guide-eye/spoke collisions are disabled while the guides' masses and inertias remain. It then keeps that collision-faithful assembly fixed for replay.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware"
+          },
+          {
+            "evidence_id": "T09-213-K3",
+            "covered": true,
+            "rationale": "The interpretation explicitly states that T09-212 supplies an unmeasured saved schedule and does not demonstrate task acceptance.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-212-seed-saved-midpoint-inputs"
+          },
+          {
+            "evidence_id": "T09-213-K4",
+            "covered": true,
+            "rationale": "The decision freezes the original task condition, candidate structure, collision-faithful assembly, initializer, gravity, numerical timing, seed, contact model, geometry, solver settings, and all original thresholds.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware"
+          },
+          {
+            "evidence_id": "T09-213-K5",
+            "covered": true,
+            "rationale": "It clearly states that generation, binding, and schedule initialization do not constitute execution and that the proposed replay has not yet run.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-212-seed-saved-midpoint-inputs"
+          },
+          {
+            "evidence_id": "T09-213-K6",
+            "covered": true,
+            "rationale": "The replay evaluates the saved schedule on the current bound candidate under actual collision, tension, stroke, rope-speed, contact, hold, and release checks. The weakening criteria also distinguish control failure from unresolved assembly or numerical failure.",
+            "reference": "paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware"
+          }
+        ],
+        "critical_omissions": [],
+        "unsupported_claims": [],
+        "incorrect_references": [],
+        "rationale": "The decision gives a sound physical comparison between the repaired collision semantics and the remaining possible failure mechanisms, while preserving the massive guide/support assembly rather than treating collision disabling as component removal. It correctly recognizes that the current schedule is unmeasured, proposes the decisive complete replay, keeps all relevant task and numerical conditions frozen, and separates substantive hard-check failures from incomplete or numerically invalid traces. Its interpretation is appropriately limited to one candidate-schedule pair and explicitly denies both general robustness and laboratory-hardware status. The claim about whether collision repair was the dominant cause is framed as a hypothesis; the proposed single replay can support or weaken sufficiency but should not be read as uniquely quantifying causal dominance.",
+        "confidence": 0.98,
+        "uncertain_fields": [
+          "A successful repaired replay would support collision repair as sufficient for this comparison but would not uniquely quantify how dominant that defect was among all prior error sources.",
+          "Same-model judging may introduce correlated evaluation bias."
+        ]
+      }
+    ]
+  },
+  "usage": {
+    "usage": "UNKNOWN",
+    "response_model": "gpt-5.6-sol",
+    "response_id": "chatcmpl-local-f4f7cb2d-7060-4dbe-be2a-31989ec092f7",
+    "sent_at": "2026-11-16T12:19:54.273857+00:00",
+    "request_bytes": 114058
+  },
+  "private_label_key": {
+    "A": "T09-213-Hierarchical",
+    "B": "T09-213-Flat"
+  },
+  "blinding": {
+    "hidden": [
+      "condition",
+      "usage",
+      "retrieval count",
+      "rank",
+      "future outcomes"
+    ],
+    "same_model": true
+  },
+  "anonymous_decisions": [
+    {
+      "label": "A",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent_native_physical_replay_of_saved_schedule",
+          "selected_variables": [
+            "button_q_m",
+            "contact_force_n",
+            "contact_pairs",
+            "lateral_error_m",
+            "tension_n",
+            "tendon_length_m",
+            "tendon_speed_m_s",
+            "tip_speed_m_s",
+            "unexpected_contact_count",
+            "warnings",
+            "external_force_max"
+          ],
+          "selected_candidate": {
+            "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The next uncertainty is physical: whether the exact saved midpoint-input schedule can make the collision-faithful repaired candidate achieve native probe-button contact, sustained force/depth regulation, and clean release while satisfying all actuator and collision constraints. H1 predicts complete task acceptance. The competing H0 predicts failure from contact timing or force dynamics, lateral misalignment, unexpected collision, actuator limits, or release transients. T09-210 records generation of the collision-faithful hardware; T09-211 binds candidate 52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9 and states execution_started=false; T09-212 records source 4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5 with task_acceptance=unmeasured. Thus physical performance remains UNKNOWN.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "One fresh complete native replay exhibits qualifying probe-button contact during 0.35-0.60 s; at least 0.4 s continuous hold within 0.90-1.40 s with button depth 0.00175-0.00225 m and normal force 0.08-0.12 N; lateral x-z error at most 0.002 m; button travel at most 0.003 m with negative travel no more than 1e-6 m; tensions within 0.2-8 N, tendon stroke within -0.015 to 0.015 m, tendon speed at most 0.025 m/s; no unexpected penetrating contact; valid contact-force and button mass-balance cross-checks; and, at both 1.8 and 2.0 s, residual travel at most 0.0001 m, normal force at most 0.01 N, and probe speed at most 0.01 m/s, with every other frozen hard check passing.",
+        "weakening_observation": "Any complete-replay hard-check failure refutes H1 for this exact candidate-schedule pair, including absent or late qualifying contact, interrupted hold, out-of-range hold depth or force, excessive lateral error, unexpected collision, tension/stroke/speed violation, button overtravel or negative travel, failed force cross-check, numerical failure, or excessive residual travel, contact force, or probe speed at either release time.",
+        "fixed_conditions": "Keep the T09 default condition, task definition, acceptance thresholds, zero robot and button initial state, 0.20 N initial tension, seed 17, gravity, geometry and environment extension, contact and collision settings, 0.001 s physics timestep, 0.01 s control and sample periods, 2.0 s duration, required signals, candidate 52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9, and exact source schedule 4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5 fixed. Do not reoptimize control, modify design, or alter any window or threshold.",
+        "stopping_condition": "Stop after one complete independent native replay and retain its full result. Select only if every frozen hard check passes; otherwise stop this test and use the recorded failure mode in a separate diagnosis.",
+        "interpretation": "A complete pass supplies independent physical-replay evidence for acceptance of only this exact candidate-schedule pair under the single frozen default condition; it does not establish broader robustness. A failure establishes that this schedule is not acceptable on this candidate and identifies whether contact/hold/release physics or a frozen constraint caused the failure, but does not prove that no other controller could make the hardware succeed.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+            "media_type": "application/json"
+          }
+        }
+      }
+    },
+    {
+      "label": "B",
+      "decision": {
+        "action": "physical_replay",
+        "decision": {
+          "version": "research_decision_v1",
+          "claimed_inference": "empirical_search",
+          "research_intent": "PHYSICAL_VALIDATION",
+          "selected_method": "independent complete frozen-task replay of the saved schedule on the collision-faithful bound candidate",
+          "selected_variables": [
+            "complete 2.0 s physical task response under saved actuator schedule"
+          ],
+          "selected_candidate": {
+            "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+            "media_type": "application/json"
+          },
+          "requested_budget": 1
+        },
+        "hypothesis": "The unresolved physical uncertainty is whether unintended guide-eye/spoke collisions were the dominant cause of the earlier trial failure. H1: with those collisions disabled while retaining their masses and inertias, the saved schedule achieves the frozen Spring Button Press task. Competing H2: even with collision-faithful assembly, the saved schedule fails because contact dynamics, tracking, release behavior, or actuator limits remain inadequate.",
+        "supporting_evidence": [
+          {
+            "artifact_id": "55d4282a0428f79ccf0811c49d5a3247a529195927c39c8dbc8e663c4d3de3a3",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+            "media_type": "application/json"
+          }
+        ],
+        "expected_observation": "A complete replay shows no unintended guide or environment contact and satisfies every unchanged T09 hard check: timely probe-cap contact, at least 0.4 s continuous hold during 0.9-1.4 s with button depth 0.00175-0.00225 m and normal force 0.08-0.12 N, lateral error at most 0.002 m, tension/stroke/rope-speed limits, and release limits at 1.8 and 2.0 s. This would support H1 within the scope of one complete native task execution.",
+        "weakening_observation": "A complete replay with no unintended guide contact nevertheless violates hold depth or force, timing, lateral error, actuator, rope-speed, or release checks, supporting H2 and refuting collision repair as sufficient. Any remaining unexpected penetrating contact or incomplete/numerically invalid trace instead leaves the sufficiency question unresolved and points to assembly or numerical qualification rather than control inadequacy.",
+        "fixed_conditions": "Keep the T09 default condition, candidate structure and collision-faithful assembly from T09-210/T09-211, saved schedule from T09-212, zero robot and button initializer, gravity, timestep 0.001 s, control period 0.01 s, 2.0 s duration, seed 17, contact model, geometry, and every original acceptance threshold fixed.",
+        "stopping_condition": "Stop after this single complete replay and evaluate only the frozen acceptance checks; do not modify the schedule, candidate, task, thresholds, geometry, or solver settings within this decision.",
+        "interpretation": "T09-210 establishes generated geometry only, T09-211 establishes task binding without execution, and T09-212 establishes an unmeasured saved schedule; none demonstrates task acceptance. The proposed replay has not run. Its result would be complete native task evidence for this candidate and schedule, not a general proof of robustness or an independent physical-hardware experiment.",
+        "physical_replay": {
+          "candidate": {
+            "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+            "media_type": "application/json"
+          },
+          "source": {
+            "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+            "media_type": "application/json"
+          }
+        }
+      }
+    }
+  ],
+  "raw_review_content": "{\"evaluations\":[{\"label\":\"A\",\"scores\":{\"physical_interpretation\":3,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T09-213-K1\",\"covered\":true,\"rationale\":\"The decision correctly treats acceptance as a complete press-contact, sustained hold, and release test and enumerates the coupled depth, force, timing, lateral, actuator, collision, and release checks.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T09\"},{\"evidence_id\":\"T09-213-K2\",\"covered\":true,\"rationale\":\"The exact collision-faithful bound candidate is held fixed, so the replay does not discard the repaired guide/support assembly or attachment fidelity. Recognition that the disabled collision geometries still retain their physical masses, COMs, and inertias is implicit rather than explicit.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware\"},{\"evidence_id\":\"T09-213-K3\",\"covered\":true,\"rationale\":\"The decision explicitly states that the saved control source has task_acceptance=unmeasured and that physical performance remains unknown, correctly distinguishing initialization from acceptance evidence.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-212-seed-saved-midpoint-inputs\"},{\"evidence_id\":\"T09-213-K4\",\"covered\":true,\"rationale\":\"The fixed conditions preserve the original default task, initializer, gravity, environment and collision settings, timestep, control/sample periods, duration, seed, required signals, candidate, and acceptance thresholds.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware\"},{\"evidence_id\":\"T09-213-K5\",\"covered\":true,\"rationale\":\"The decision accurately notes that binding had not started execution and the seeded schedule remained unmeasured, making one complete independent replay the appropriate next evidentiary step.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-212-seed-saved-midpoint-inputs\"},{\"evidence_id\":\"T09-213-K6\",\"covered\":true,\"rationale\":\"The proposed replay directly checks the reused schedule on the current candidate against tension, tendon stroke, tendon speed, collision, contact, force-balance, and release constraints without reoptimization.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware\"}],\"critical_omissions\":[],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"This is a well-controlled and highly discriminating next action. It correctly identifies the current evidence as construction, binding, and control initialization rather than completed task evidence; freezes the candidate and saved schedule; specifies essentially every hard acceptance check; and limits any pass to the exact candidate-schedule pair and single condition. It also correctly avoids interpreting a failure as proof that no other controller could work. The only material interpretive gap is that the decision calls the candidate collision-faithful without explicitly explaining that guide/support collision geometry was disabled while the real masses, COMs, inertias, and attachments were retained. The fixed candidate nevertheless preserves that fidelity operationally.\",\"confidence\":0.97,\"uncertain_fields\":[\"The corpus establishes a native simulated physical replay, not a laboratory hardware experiment; the decision does not explicitly use the latter interpretation.\",\"Same-model judging may introduce correlated evaluation bias.\"]},{\"label\":\"B\",\"scores\":{\"physical_interpretation\":4,\"evidence_consistency\":4,\"limitation_recognition\":4,\"research_actionability\":4,\"evidence_reference_accuracy\":4},\"evidence_items\":[{\"evidence_id\":\"T09-213-K1\",\"covered\":true,\"rationale\":\"The decision correctly requires a complete frozen-task replay with timely contact, continuous hold under simultaneous depth and force bounds, lateral and actuator compliance, and release checks.\",\"reference\":\"git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T09\"},{\"evidence_id\":\"T09-213-K2\",\"covered\":true,\"rationale\":\"It explicitly identifies the repaired physical distinction: unintended guide-eye/spoke collisions are disabled while the guides' masses and inertias remain. It then keeps that collision-faithful assembly fixed for replay.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware\"},{\"evidence_id\":\"T09-213-K3\",\"covered\":true,\"rationale\":\"The interpretation explicitly states that T09-212 supplies an unmeasured saved schedule and does not demonstrate task acceptance.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-212-seed-saved-midpoint-inputs\"},{\"evidence_id\":\"T09-213-K4\",\"covered\":true,\"rationale\":\"The decision freezes the original task condition, candidate structure, collision-faithful assembly, initializer, gravity, numerical timing, seed, contact model, geometry, solver settings, and all original thresholds.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware\"},{\"evidence_id\":\"T09-213-K5\",\"covered\":true,\"rationale\":\"It clearly states that generation, binding, and schedule initialization do not constitute execution and that the proposed replay has not yet run.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-212-seed-saved-midpoint-inputs\"},{\"evidence_id\":\"T09-213-K6\",\"covered\":true,\"rationale\":\"The replay evaluates the saved schedule on the current bound candidate under actual collision, tension, stroke, rope-speed, contact, hold, and release checks. The weakening criteria also distinguish control failure from unresolved assembly or numerical failure.\",\"reference\":\"paper_experiments/five_task_completion_20261113/T09_spring_button/T09_RUN_02/STUDY_TRACE.jsonl#T09-211-bind-original-repaired-hardware\"}],\"critical_omissions\":[],\"unsupported_claims\":[],\"incorrect_references\":[],\"rationale\":\"The decision gives a sound physical comparison between the repaired collision semantics and the remaining possible failure mechanisms, while preserving the massive guide/support assembly rather than treating collision disabling as component removal. It correctly recognizes that the current schedule is unmeasured, proposes the decisive complete replay, keeps all relevant task and numerical conditions frozen, and separates substantive hard-check failures from incomplete or numerically invalid traces. Its interpretation is appropriately limited to one candidate-schedule pair and explicitly denies both general robustness and laboratory-hardware status. The claim about whether collision repair was the dominant cause is framed as a hypothesis; the proposed single replay can support or weaken sufficiency but should not be read as uniquely quantifying causal dominance.\",\"confidence\":0.98,\"uncertain_fields\":[\"A successful repaired replay would support collision repair as sufficient for this comparison but would not uniquely quantify how dominant that defect was among all prior error sources.\",\"Same-model judging may introduce correlated evaluation bias.\"]}]}"
+}

@@ -1,0 +1,105 @@
+{
+  "session_id": "T01-127-Flat",
+  "task_id": "T01",
+  "checkpoint_id": "T01-127",
+  "condition": "Flat",
+  "experiment": "context_gateway",
+  "status": "completed",
+  "started_at": "2026-11-16T12:02:24.172174+00:00",
+  "requests": [
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-b48ff585-283f-4d1a-a938-5efe5be4ff39",
+      "sent_at": "2026-11-16T12:03:04.747343+00:00",
+      "request_bytes": 688395
+    }
+  ],
+  "reads": [],
+  "errors": [],
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "T01-central-residual-speed-replay",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "independent_full_dense_physical_replay",
+      "selected_variables": [
+        "saved control schedule",
+        "dense geometric tendon speed",
+        "holding position error",
+        "holding tip speed"
+      ],
+      "selected_candidate": {
+        "artifact_id": "d6dacabfc3549e5362b2df1b253c0cff2735e1f0f5e83453739c15b40f8da323",
+        "media_type": "application/json"
+      },
+      "requested_budget": 1
+    },
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "d6dacabfc3549e5362b2df1b253c0cff2735e1f0f5e83453739c15b40f8da323",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "7809412565e9e7aeaca849b3838408122526c32d5a081aa09e1159052a90af77",
+        "media_type": "application/json"
+      }
+    },
+    "hypothesis": "The next physical uncertainty is whether the residual central_high violation is a genuine dense geometric tendon-speed limit or merely a finite-search/sample-scope discrepancy. H1 predicts that independent full replay will confirm tendon_3 exceeds 0.025 m/s despite position and holding-speed compliance; H2 predicts that the complete evaluator will pass all limits. T01-126 found only a numerical diagnostic: maximum tendon speed about 0.0250497 m/s, holding position error 0.0099923 m, holding tip speed 0.0299659 m/s, and positive normalized excess 0.0019876, while explicitly leaving independent replay and acceptance unresolved.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "16229a2f8bb9e7d20f9f24a5062055f12f79cb35c9f63a6e22d5b2b082c0fb02",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "7809412565e9e7aeaca849b3838408122526c32d5a081aa09e1159052a90af77",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "d6dacabfc3549e5362b2df1b253c0cff2735e1f0f5e83453739c15b40f8da323",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "A complete independent 0.0–0.6 s replay reports channel-3 geometric tendon speed slightly above 0.025 m/s while retaining holding position error at or below 0.01 m, holding tip speed at or below 0.03 m/s, stroke within ±0.015 m, tensions within 0–8 N, and no numerical failure. This would support a real routing/control tradeoff rather than treating the finite optimization result as acceptance evidence.",
+    "weakening_observation": "A complete replay passes every frozen central_high threshold, or the dominant failure changes materially to position, holding speed, stroke, tension, contact, or numerical integration. A pass would refute the predicted residual speed violation; a different failure would refute its identification as the active physical limitation.",
+    "fixed_conditions": "Keep the T01 central_high target [0.295,0,0.215] m, zero initializer, gravity, payload, 0.6 s duration, 0.02 s control/sample period, 0.001 s physics timestep, holding window [0.54,0.6] s, position limit 0.01 m, tip-speed limit 0.03 m/s, tendon-speed limit 0.025 m/s, stroke bounds ±0.015 m, tension bounds 0–8 N, six channels, candidate d6dacabf..., and saved schedule 78094125... unchanged. The negative_low and positive_high conditions remain UNKNOWN and are not inferred from this replay.",
+    "stopping_condition": "Stop after one complete independent central_high replay and inspect its registered dense acceptance result; do not select the shared structure unless separate independent passing replays are later obtained for all three required conditions.",
+    "interpretation": "This action tests complete independent task acceptance for one frozen condition. It does not rerun control optimization, establish global infeasibility, validate the other two conditions, or convert the local sampled native diagnostics in T01-126 into broader physical evidence."
+  },
+  "new_scientific_actions": 0,
+  "initial_state_reference": {
+    "task_id": "T01",
+    "checkpoint_id": "T01-127",
+    "trace_source": "paper_experiments/five_task_completion_20261113/T01_M1_reach_hold/STUDY_TRACE.jsonl",
+    "cutoff_event": "T01-127-test-upward-reach-margin-geometry-decision",
+    "cutoff_timestamp": "2026-11-13T04:52:04.338631+00:00",
+    "record_ids": [
+      "TASK",
+      "T01-010-generate-history-informed-baseline",
+      "T01-011-diagnose-registered-capabilities",
+      "T01-012-read-registered-math-catalogue",
+      "T01-013-bind-central-high-baseline",
+      "T01-110-generate-current-original-protocol",
+      "T01-113-bind-central-high-baseline",
+      "T01-114-seed-historical-central-inputs",
+      "T01-115-native-central-dense-actuator-search",
+      "T01-116-generate-smaller-radius-hypothesis",
+      "T01-117-bind-smaller-radius-central",
+      "T01-118-adapt-owned-control-initialization",
+      "T01-119-native-smaller-radius-central",
+      "T01-120-refine-near-feasible-common-central",
+      "T01-121-read-original-near-feasible-measure",
+      "T01-122-full-control-grid-final-local-test",
+      "T01-123-test-original-minimum-routing-radius",
+      "T01-124-bind-minimum-radius-central",
+      "T01-125-adapt-near-feasible-central-controls",
+      "T01-126-refine-minimum-radius-central"
+    ],
+    "original_task_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T01"
+  },
+  "provider_requested_model": "gpt-5.6-sol",
+  "reasoning": "gateway_default_not_exposed",
+  "finished_at": "2026-11-16T12:03:04.757816+00:00"
+}
