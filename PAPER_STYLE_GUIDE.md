@@ -50,6 +50,9 @@ Use Physics-Grounded, not Physics-Guided, for the proposed framework. M0--M3 are
 | \(\sigma_k\) | Selected analysis semantics |
 | \(\mathcal B_k\) | Research budget |
 | \(z_{\mathrm{cl}}\) | Combined structure/controller vector \((d,\theta)\) for M3 |
+| \(\mathcal M_{\mathrm{hi}}\) | High-fidelity physical execution model in M3 |
+| \(N\) | Final sampled trajectory index |
+| \(J_{\tau}^{\mathrm{cl}}\) | Closed-loop performance functional in M3 |
 | \(w_{\mathcal A}\) | Passive-equilibrium primal/dual state \((q,\mu_{\mathcal A})\) |
 
 Evidence is written as \(\mathcal E_k=(\mathcal E_k^{\mathrm{math}},\mathcal E_k^{\mathrm{phys}})\). Use \(\mu_{\mathcal A}\) for passive-equilibrium multipliers and \(\lambda_i\) for M2 task-constraint multipliers. Do not reuse \(z\) for both the M3 design/controller vector and passive-equilibrium state.
@@ -59,7 +62,7 @@ Evidence is written as \(\mathcal E_k=(\mathcal E_k^{\mathrm{math}},\mathcal E_k
 - M0: mechanism sensitivity, \(\partial m(d)/\partial d_j\).
 - M1: fixed-input response, \(\partial g_{\tau,i}(d,U_0)/\partial d_j\).
 - M2: re-optimized task capability, \(\partial V_\tau(d)/\partial d_j\), under stated optimality/regularity conditions.
-- M3: closed-loop performance, \(\nabla_{z_{\mathrm{cl}}}J_{\tau,H}(d,\theta)\).
+- M3: closed-loop performance, \(\nabla_{z_{\mathrm{cl}}}J_{\tau}^{\mathrm{cl}}(d,\theta;\mathcal M_{\mathrm{hi}})\).
 
 Passive-equilibrium response sensitivity is calculated through the equilibrium/KKT system and is not mislabeled as M2 active-control capability.
 
