@@ -19,6 +19,20 @@ The audit concerns one common modulus direction across the nine segments. The 18
 
 A and B are new research runs; C is the corresponding historical FULL record. The first batch contains PHS-2D, T01, T04, and T07. The manuscript presents representative task-wise comparisons for T01, T04, and T07, while the nine-segment PHS-2D case remains the principal mathematical and passive-design study. Historical C configurations and source identifiers remain attached to their original records.
 
+\subsection{Architecture decision-replay provenance}
+
+The Reporter, Knowledge/Skill, and context materials are archived in the repository-relative directory \texttt{paper\_experiment\_data/architecture\_ablation} at source commit \texttt{b97bee811}. The plotting entry point is \texttt{PLOTTING\_INDEX.json}; the source package retains raw decision sessions, frozen snapshots/corpora, blind-review records, exact request/response records, and plotting tables.
+
+The Reporter study contains six matched historical decision pairs (M1-A/B/C and P3-A/B/C), twelve Main sessions, and six anonymous independent-model reviews. Six existing Reporter reports are reused; no new Reporter generation is included in the ON condition. The mean five-dimension score is 3.433 OFF and 3.733 ON; the paired mean difference is +0.300, median difference 0, with two wins, four ties, and no losses. Main Provider usage is unavailable. The reported 1,450.5-token mean increment is a generic visible-context proxy, not a model-matched token or billing measure.
+
+The Knowledge/Skill study contains eight real Main LLM decisions: a four-cell K/S design at each of T04 and T07. Each cell contains one decision, and each task has one joint blind review. Historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$, respectively. Decision quality, evidence consistency, and research actionability are 4 in every cell; no invalid proposed actions are identified. The K and S main effects on utilization are each +1.5, the interaction contrast is -3, and the joint condition equals the best single-resource condition. K$+$S$+$ was acquired later than the other six sessions; backend/default reasoning identity is unverified. Human scoring remains pending. No mathematical or physical follow-up was executed.
+
+E2 at PHS-C035 contains one Flat/hierarchical pair on a 66-record corpus. Accepted-inference Provider input is 675,802 versus 78,785 tokens, while blind mean scores are 4.0 and 3.8. No evidence reads occurred. The initial hierarchical HTTP 400 request has no usage; therefore its all-attempt actual input is unknown.
+
+E2-R2 is a preregistered follow-up. C037 was executed with 106 corpus records; C042 was omitted before inference by the capacity rule and was not replaced. At C037, Flat and hierarchical cumulative actual input are 877,197 and 174,298 tokens, respectively, with blind mean scores 3.4 and 3.6 and key-evidence coverage 5/5 and 3/5. The hierarchical trace contains three exact parallel L3 reads, no L1/L2 reads, and verified subsequent delivery. The two Main sessions contain no scientific action. The blind reviewer is independent; human verification remains pending.
+
+All decision-replay studies assess proposed research decisions and information use. They do not establish improved physical task success. The decision samples are small and are reported descriptively, without significance or population-level causal claims. Actual Provider usage, generic tokenizer proxies, and offline context-construction costs remain separate measurement categories.
+
 \subsection{Physical-robot demonstrations}
 
 Physical-robot demonstrations are maintained as a separate evidence source. Their platform configuration, protocol, trial count, and measured outcomes are reported from the corresponding hardware records. They are not inferred from MuJoCo trajectories and are not included in the simulation FULL condition count.
