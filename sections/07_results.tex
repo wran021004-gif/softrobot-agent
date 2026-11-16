@@ -92,19 +92,21 @@ The representative A/B/C records for T01, T04, and T07 are summarized in Table~\
 
 \begin{table}[t]
 \centering
-\caption{Representative task-wise A/B/C case comparison. C uses the archived FULL result.}
+\caption{Representative task-wise A/B/C comparison. Entries show status and the recorded normalized constraint-violation fraction; C is the historical FULL reference.}
 \label{tab:abc-cases}
 \small
 \begin{tabular}{@{}lccc@{}}
 \toprule
 Task & A: LLM-only & B: Direct tools & C: Ours FULL \\
 \midrule
-T01 & Not passed & Not passed & 3/3 passed \\
-T04 & Not passed & Not passed & 1/1 passed \\
-T07 & Not passed & Not passed & 4/4 passed \\
+T01 & Fail (0.444) & Fail (0.556) & Pass (0) \\
+T04 & Fail (0.167) & Qual. fail (0.333) & Pass (0) \\
+T07 & Fail (0.429) & Fail (0.400) & Pass (0) \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+For T04-B, qualification failed before the 22-s trajectory was executed; its fraction records the failed qualification constraints, not a trajectory-level violation. The comparison contains one new A and one new B run per task, with C taken from the archived FULL study.
 
 The comparison illustrates the distinction between direct candidate refinement and a research process that organizes mathematical questions, evidence, and subsequent design decisions. The FULL traces for these tasks contain explicit structural revisions, changes in physical or control formulation, and condition-specific control refinement. The comparison is presented at the task-case level, with the historical status of C retained.
 
@@ -119,7 +121,7 @@ The six existing Reporter reports were reused rather than regenerated during thi
 \begin{figure*}[t]
 \centering
 \fbox{\parbox[c][2.8cm][c]{0.94\linewidth}{\centering
-\todo{Panel (a): six paired Reporter OFF/ON mean scores (M1-A/B/C, P3-A/B/C), with thin per-pair connectors, the 3.433/3.733 means, median paired delta 0, and 2/4/0 win--tie--loss. Panel (b): side-by-side T04 and T07 2x2 heatmaps, horizontal Skill OFF/ON and vertical Knowledge OFF/ON; show historical-utilization scores 0/3/3/3 and separate compact strips for the three unchanged 4/4 dimensions. Annotate K and S utilization main effects (+1.5 each), interaction contrast (−3), and joint-minus-best-single (0). Do not add significance stars, confidence intervals, or robot-success labels. Use current four-Main-LLM scores only; exclude archived engineering Core Plans and superseded reviews.}
+\todo{Panel (a): six paired Reporter OFF/ON mean scores (M1-A/B/C, P3-A/B/C), with thin per-pair connectors, the 3.433/3.733 means, median paired delta 0, and 2/4/0 win--tie--loss. Panel (b): side-by-side T04 and T07 2x2 heatmaps, horizontal Skill OFF/ON and vertical Knowledge OFF/ON; show historical-utilization scores 0/3/3/3 and separate compact strips for the three unchanged 4/4 dimensions. Annotate K and S utilization main effects (+1.5 each), interaction contrast (−3), and joint-minus-best-single (0). Do not add significance stars, confidence intervals, or robot-success labels. Use current four-condition Main-LLM scores only; exclude archived engineering Core Plans and superseded reviews.}
 }}
 \caption{Architecture component decision replays. Panel (a) evaluates the read-only Reporter across six matched checkpoints; panel (b) evaluates Knowledge and Skill as independent experience-access factors at T04 and T07. Each Main decision is scored against frozen evidence; no physical execution follows these replays.}
 \label{fig:architecture-ablation}
