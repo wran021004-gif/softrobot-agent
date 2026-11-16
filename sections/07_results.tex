@@ -99,6 +99,57 @@ T07 & Not passed & Not passed & 4/4 passed \\
 
 The comparison illustrates the distinction between direct candidate refinement and a research process that organizes mathematical questions, evidence, and subsequent design decisions. The FULL traces for these tasks contain explicit structural revisions, changes in physical or control formulation, and condition-specific control refinement. The comparison is presented at the task-case level, with the historical status of C retained.
 
+\subsection{Reporter-guided decision quality}
+
+The Reporter study compares six matched historical checkpoints (M1-A/B/C and P3-A/B/C) with and without the corresponding read-only Reporter interpretation in the Main context. The six pairs comprise twelve independent Main decision sessions and six anonymous paired reviews. Across the five equally weighted blind-review dimensions, the mean score increases from 3.433/4 without Reporter context to 3.733/4 with it, a paired mean difference of +0.300. The paired median difference is zero; the ON condition wins two pairs, ties four, and loses none.
+
+The largest average dimension-level difference is evidence consistency (+0.500), followed by research actionability and Main decision quality (+0.333 each). The blind reviewer identifies two unsupported conclusions in OFF decisions and none in ON decisions. These observations indicate that the Reporter can improve the evidence-to-action interface at selected checkpoints, particularly by making evidence scope and missing comparisons explicit. They do not imply a universal improvement across research states.
+
+The six existing Reporter reports were reused rather than regenerated during this study. Main Provider usage was unavailable; the average additional visible-context cost is 1,450.5 tokens under a generic local tokenizer proxy, not a verified model-token or billing measure. The proposed follow-up actions were not executed. One independent model review was performed per pair, and human verification remains separate.
+
+\begin{figure*}[t]
+\centering
+\fbox{\parbox[c][2.5cm][c]{0.94\linewidth}{\centering
+\todo{Insert paired Reporter OFF/ON score plot for all six checkpoints, with mean/median and win--tie--loss summary. Add a dimension-level paired-difference panel and the two evidence-to-action examples P3-A and M1-C.}
+}}
+\caption{Reporter ON/OFF decision replay. Scores summarize five blind-review dimensions for six matched checkpoints; proposed actions are not physical execution outcomes.}
+\label{fig:reporter-ablation}
+\end{figure*}
+
+\subsection{Knowledge and Skill as complementary experience channels}
+
+The Knowledge/Skill experiment uses a complete $2\times2$ factorial replay at T04 and T07, with one Main decision in each of four cells per task. All eight decisions receive the maximum score (4/4) for decision quality, evidence consistency, and research actionability, and no invalid proposed research action is identified. The discriminating measure is historical-experience utilization: for both tasks, the K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$ cells score 0, 3, 3, and 3, respectively.
+
+The descriptive Knowledge and Skill main effects on historical-experience utilization are both +1.5 points. The difference-in-differences interaction contrast is -3, and the joint condition does not exceed the best single-resource condition. This pattern is consistent with overlapping but distinct routes for making prior research usable: Knowledge contributes historical observations and conclusions, whereas Skill contributes reusable procedures and operational constraints. The observed benefit is therefore access to prior experience, not an increase in the already ceiling-level decision-quality dimensions or a demonstrated synergistic effect.
+
+The factorial study contains one observation per cell and one joint blind review per task. The K$+$S$+$ sessions were acquired after the original six sessions; frozen inputs and requested settings match, but backend/default reasoning identity is not exposed. These contrasts are descriptive and do not establish population-level causal effects.
+
+\begin{figure*}[t]
+\centering
+\fbox{\parbox[c][2.5cm][c]{0.94\linewidth}{\centering
+\todo{Insert compact T04/T07 Knowledge--Skill 2x2 factorial plots. Show historical-experience utilization 0/3/3/3 and the three ceiling-level decision metrics separately. Keep the interaction contrast distinct from the +/-1 regression coefficient.}
+}}
+\caption{Knowledge and Skill factorial decision replay at T04 and T07. Each cell contains one Main LLM decision; values are ordinal blind-review scores.}
+\label{fig:knowledge-skill-ablation}
+\end{figure*}
+
+\subsection{Hierarchical context: input efficiency and evidence coverage}
+
+The first context study, E2 at PHS-C035, compares direct Flat delivery of a 66-record corpus with an L0--L3 condition that receives an automatically assembled L0 brief and a directory for optional retrieval. No additional evidence reads occurred in either condition. On the accepted-inference basis, Provider input falls from 675,802 tokens for Flat to 78,785 for the hierarchical condition, an 88.34\% reduction. The blind mean is 4.0/4 for Flat and 3.8/4 for the hierarchical condition; four of five dimensions are equal, with a one-point difference in research-decision quality. The hierarchical condition had one initial HTTP 400 request without usage, so an all-attempt actual-token total is unavailable. E2 therefore demonstrates a large input reduction with a small decision-score trade-off, not selective retrieval.
+
+E2-R2 is a preregistered follow-up at a new checkpoint, PHS-C037. Flat receives the complete included corpus; the hierarchical condition receives L0 and requests three parallel L3 records. No L1/L2 reads occur, and all three returned records are verified and delivered before the final Main decision. Actual cumulative Provider input falls from 877,197 tokens for Flat to 174,298 for the hierarchical condition, an 80.13\% reduction, despite two hierarchical requests versus one Flat request. The blind mean is 3.4/4 for Flat and 3.6/4 for the hierarchical condition. The higher score accompanies a lower key-evidence coverage score (3/5 versus 5/5): the hierarchical decision more narrowly scopes the causal conclusion but omits two useful evidence trends. C042 was excluded before inference by the preregistered capacity gate and is not an executed sample.
+
+Together, E2 and E2-R2 show how context organization can substantially reduce input while changing which evidence is explicitly brought into the decision. The result supports hierarchical context as a resource-allocation mechanism, with decision quality and evidence coverage reported as separate outcomes. It does not establish that context length alone caused a decision difference or that the three reads caused the final Plan.
+
+\begin{figure*}[t]
+\centering
+\fbox{\parbox[c][2.6cm][c]{0.94\linewidth}{\centering
+\todo{Insert E2/E2-R2 context figure: (a) accepted/cumulative actual Provider input with measurement bases explicit; (b) blind mean and key-evidence coverage; (c) E2-R2 L0 to three parallel L3 reads. Mark E2's no-read path and C042's pre-inference capacity exclusion.}
+}}
+\caption{Flat and hierarchical context studies. E2 reports accepted-inference usage; E2-R2 reports cumulative actual usage for every accepted Main request. Blind decision score and key-evidence coverage are shown separately.}
+\label{fig:context-ablation}
+\end{figure*}
+
 \subsection{Cross-task research continuity}
 
 The research traces show that intermediate knowledge and candidate information can inform later decisions while the current task contract remains authoritative. T04 reuses prior tracking experience to formulate a new route and constructs a task-valid equilibrium-point sequence. T07 transfers a control initialization between conditions and re-optimizes it for the receiving condition. T10 draws on prior feedback-control experience when investigating impact recovery. Knowledge and Skill reads are recorded separately from the physical evidence they help interpret.
