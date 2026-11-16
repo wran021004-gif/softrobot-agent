@@ -5,58 +5,58 @@
 \usepackage{graphicx}
 \usepackage{booktabs,tabularx,array,multirow}
 \usepackage{siunitx}
-\usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18}
 \usepackage{cite}
 \usepackage{url}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
-
-\hypersetup{
-  colorlinks=true,
-  linkcolor=blue,
-  citecolor=blue,
-  urlcolor=blue
-}
 \sisetup{detect-all,per-mode=symbol}
 
-\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TO BE UPDATED: #1]}}}
+% Consistent, low-saturation publication colors for Figures 2--9.
+\definecolor{sraNavy}{HTML}{26384B}
+\definecolor{sraMath}{HTML}{527F7B}
+\definecolor{sraPhysical}{HTML}{70849A}
+\definecolor{sraDesign}{HTML}{B08A59}
+\definecolor{sraPass}{HTML}{557663}
+\definecolor{sraFail}{HTML}{A35D55}
+\definecolor{sraGray}{HTML}{929BA4}
+\definecolor{sraLight}{HTML}{D9DEE2}
+
 \newcommand{\softrobotagent}{\textsc{Softrobot-Agent}}
-\newcommand{\MainAgent}{\textsc{Main}}
+\newcommand{\MainAgent}{\textsc{Main Agent}}
 \newcommand{\Reporter}{\textsc{Reporter}}
 \newcommand{\MuJoCo}{MuJoCo}
 \newcommand{\GVS}{GVS}
-\newcommand{\Vtask}{V_{\tau}}
-\newcommand{\Rset}{\mathcal{R}}
 \newcommand{\dd}{\mathrm{d}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 
 \title{Softrobot-Agent: Physics-Grounded Agentic Research for Soft-Robot Co-Design}
 
 \author{Anonymous Authors%
-\thanks{Working manuscript. Author information, affiliations, and target venue will be added after the technical content and experimental comparisons are finalized.}}
+\thanks{Working manuscript. Author information and affiliations will be added during submission preparation.}}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Soft-robot co-design requires more than searching morphology and controller parameters: an agent must formulate physical hypotheses, construct task-appropriate mathematical questions, and revise research actions from independent mathematical and physical evidence. This paper presents \softrobotagent{}, a physics-grounded agentic research framework for tendon-driven soft-robot co-design. Its parameterized physical research problem (PPRP) binds a frozen task, candidate, selected parameters, observables, inner physical model, analysis semantics, and budget. Four complementary views distinguish mechanism sensitivity (M0), fixed-input response (M1), re-optimized task capability (M2), and closed-loop performance (M3). Deterministic software compiles and validates mathematical requests, while the Main Agent retains scientific decision authority and a read-only Reporter interprets completed evidence. The framework is evaluated on eleven completed task cases with 30/30 required physical conditions passed, including a nine-segment, four-tendon passive-design study and a local sensitivity audit whose 18 task-metric derivative pairs have a maximum relative discrepancy of 0.1191\%. Decision-only architecture studies further examine Reporter, Knowledge/Skill, and hierarchical context. Six Reporter ON/OFF pairs show a mean blind-score increase of 0.30/4; an eight-decision Knowledge/Skill factorial replay shows that either resource independently increases historical-experience utilization; and a preregistered context pair reduces cumulative actual input by 80.1\%, with a 0.2-point blind-score advantage accompanied by lower key-evidence coverage. These component studies characterize research-decision behavior and context efficiency rather than robot task-success improvements.
+Soft-robot co-design requires decisions about the physical questions to investigate, not only numerical optimization of a prescribed morphology and controller. We present \softrobotagent{}, a physics-grounded agentic research framework that connects explicit physical hypotheses to task-conditioned mathematical analysis and independent physical evaluation. A parameterized physical research problem (PPRP) binds each investigation to the task, design, registered parameters, observables, solver, analysis semantics, and budget. Four complementary semantics distinguish mechanism sensitivity, fixed-input response, re-optimized task capability, and closed-loop performance. The Main Agent selects research actions using separate mathematical and physical evidence, while a read-only Reporter and evidence-linked resources support subsequent decisions. An eleven-case soft-robot research portfolio satisfies 30/30 required physical conditions. A separate nine-segment passive tendon study passes ten loading conditions while preserving local compliance and limiting tip motion; an 18-pair derivative audit shows a maximum relative discrepancy of 0.1191\% against finite-difference re-equilibration. Task-wise research-mode comparisons, decision replays, and hierarchical-context studies further characterize evidence-guided reasoning and information use. Together, these results establish a unified approach to agent-directed mathematical investigation and soft-robot structure--control research.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic research, scientific reasoning, sensitivity analysis, physical evidence.
+Soft robotics, continuum robots, tendon-driven robots, structure--control co-design, scientific agents, mathematical sensitivity, physical evaluation.
 \end{IEEEkeywords}
 
 \input{sections/01_introduction}
 \input{sections/02_related_work}
 \input{sections/03_problem_formulation}
 \input{sections/04_method}
-\input{sections/05_system_implementation}
 \input{sections/06_experimental_setup}
 \input{sections/07_results}
-\input{sections/08_real_world_validation}
 \input{sections/09_discussion}
 \input{sections/10_conclusion}
 
@@ -68,5 +68,4 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
-
 \end{document}
