@@ -150,6 +150,23 @@ Together, E2 and E2-R2 show how context organization can substantially reduce in
 \label{fig:context-ablation}
 \end{figure*}
 
+\begin{table*}[t]
+\centering
+\caption{Summary of decision-only architecture studies. Scores are independent-model ordinal assessments; token counts use the stated measurement basis.}
+\label{tab:architecture-ablation-summary}
+\small
+\begin{tabularx}{\textwidth}{@{}l c Y Y@{}}
+\toprule
+Study & Decision sample & Main observation & Measurement basis \\
+\midrule
+Reporter ON/OFF & 6 matched pairs; 12 Main sessions & Mean score 3.433$\rightarrow$3.733 (+0.300); 2 wins, 4 ties, 0 losses; unsupported conclusions 2$\rightarrow$0. & Five-dimension blind score; Main Provider usage unavailable. \\
+Knowledge/Skill & 2 tasks $\times$ 4 cells; 8 decisions & Historical-experience utilization 0/3/3/3; other three score dimensions remain 4 in every cell. & One decision per cell; descriptive factorial contrasts. \\
+E2, C035 & 1 paired checkpoint & Accepted input 675,802$\rightarrow$78,785 (−88.34\%); blind score 4.0$\rightarrow$3.8; no additional reads. & Actual Provider usage for accepted inference only. \\
+E2-R2, C037 & 1 preregistered paired checkpoint & Cumulative input 877,197$\rightarrow$174,298 (−80.13\%); blind score 3.4$\rightarrow$3.6; coverage 5/5$\rightarrow$3/5. & Actual Provider usage across all accepted Main requests; three verified parallel L3 reads. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
 \subsection{Cross-task research continuity}
 
 The research traces show that intermediate knowledge and candidate information can inform later decisions while the current task contract remains authoritative. T04 reuses prior tracking experience to formulate a new route and constructs a task-valid equilibrium-point sequence. T07 transfers a control initialization between conditions and re-optimizes it for the receiving condition. T10 draws on prior feedback-control experience when investigating impact recovery. Knowledge and Skill reads are recorded separately from the physical evidence they help interpret.
