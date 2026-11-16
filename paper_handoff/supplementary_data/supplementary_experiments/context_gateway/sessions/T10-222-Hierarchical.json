@@ -1,0 +1,104 @@
+{
+  "session_id": "T10-222-Hierarchical",
+  "task_id": "T10",
+  "checkpoint_id": "T10-222",
+  "condition": "Hierarchical",
+  "experiment": "context_gateway",
+  "status": "completed",
+  "started_at": "2026-11-16T12:19:54.341874+00:00",
+  "requests": [
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-79cd8670-269b-4aea-acc8-dc1ee9d2c603",
+      "sent_at": "2026-11-16T12:20:21.514445+00:00",
+      "request_bytes": 104239
+    },
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-fd5bd895-8067-4ff7-a916-39fb822edf8c",
+      "sent_at": "2026-11-16T12:20:56.384371+00:00",
+      "request_bytes": 109093
+    }
+  ],
+  "reads": [],
+  "errors": [
+    {
+      "error": "text_call_parse: Extra data: line 1 column 285 (char 284)"
+    }
+  ],
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "T10-H1-positive-y-feedback-recovery",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "independent positive_y physical replay of the existing bound native-feedback schedule",
+      "selected_variables": [
+        "condition_id=positive_y"
+      ],
+      "selected_candidate": {
+        "artifact_id": "030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824",
+        "media_type": "application/json"
+      },
+      "requested_budget": 1
+    },
+    "hypothesis": "The physical uncertainty is whether the current six-channel native-feedback controller has sufficient finite-time closed-loop authority to reject the positive-y impact while respecting tendon constraints, rather than merely tracking without an impulse. Competing hypotheses are H1: feedback recovers from the +0.04 N world-y half-sine pulse and satisfies every frozen threshold; H0: inadequate disturbance-rejection authority, saturation, or excessive tendon motion causes at least one recovery or safety failure. Resolve this with one independent positive_y physical replay of the existing bound candidate and schedule. This tests complete nonlinear closed-loop performance for one frozen condition; binding, configuration verification, nominal execution, and mathematical prediction cannot establish that scope.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "501ac714289b2f4c1c8e181d2b0881bb2667eae9b5d54185034b1abf4acb31f5",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "d138afd341ffb1e7ef8cf79fbad0818c0b27049e41f7b17ba9250ee522214eb7",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "fff9adb4826ccaf640b582071bd1938c82971daf4dcf59f78d8332406118c9f8",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "The positive_y replay completes without numerical failure, warnings, or unexpected contacts. Following the 0.50-0.55 s impact, tip position error returns to at most 0.01 m and tip speed to at most 0.02 m/s by 0.90 s and remains within both limits continuously through 1.00 s; tensions remain within [0,8] N, geometric tendon stroke remains at most 0.015 m, and actual tendon speed remains at most 0.025 m/s.",
+    "weakening_observation": "Failure to regain both tip limits by 0.90 s and maintain them for the required continuous 0.10 s final hold, or any tension, stroke, tendon-speed, contact, warning, or numerical violation, refutes H1 for positive_y. Passing positive_y would not establish negative_y or joint required-condition acceptance.",
+    "fixed_conditions": "Keep frozen TASK T10 and all thresholds unchanged: current candidate and exact bound source; original design identity f0837aacfde3c795e7b305f3e074866425e2b585eb0a152c3ea2c5f6dd6df1e4; discretization identity 80569ca1c3c599e09fea0af343a770e5df15f3b5b1cc2b3e6ce406c282bb9768; six independent channels; zero qpos/qvel and 0.20 N initial input; target [0.29,-0.035,0.19] m; gravity [0,0,-9.81] m/s^2; +0.04 N world-y payload-COM half-sine pulse from 0.50 to 0.55 s; 1.00 s duration; 0.01 s control and sample periods; 0.0005 s timestep; original windows, evaluator, required signals, and failure policy. Do not modify controller, structure, geometry, task, or acceptance criteria.",
+    "stopping_condition": "Stop after this one replay and inspect the complete evaluator result. Do not select or confirm the candidate unless independent passing physical replays exist for all required conditions positive_y, negative_y, and no_impulse on the identical structure.",
+    "interpretation": "Original evidence T10-220-bind-native-feedback-positive_y records the candidate/source binding with task_acceptance unmeasured, while T10-221-verify-native-feedback-original-positive_y records execution_started=false. Thus positive_y performance is UNKNOWN. T10-210 through T10-213 provide original-candidate and no_impulse context but cannot transfer acceptance to the impacted condition. The proposed replay has not run; it is the most direct feasible discriminator of disturbance rejection versus nominal-only tracking.",
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "030ec52c054eb0e92eec5dd0192785fa78beb58180f4a9e131d754fd61d54824",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "d138afd341ffb1e7ef8cf79fbad0818c0b27049e41f7b17ba9250ee522214eb7",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "new_scientific_actions": 0,
+  "initial_state_reference": {
+    "task_id": "T10",
+    "checkpoint_id": "T10-222",
+    "trace_source": "paper_experiments/five_task_completion_20261113/T10_M7_impact_recovery/T10_RUN_06/STUDY_TRACE.jsonl",
+    "cutoff_event": "T10-222-execute-native-feedback-positive_y-decision",
+    "cutoff_timestamp": "2026-11-13T06:52:41.845433+00:00",
+    "record_ids": [
+      "TASK",
+      "T10-210-generate-original-M2-native-feedback",
+      "T10-211-bind-native-feedback-no_impulse",
+      "T10-212-verify-native-feedback-original-no_impulse",
+      "T10-213-execute-native-feedback-no_impulse",
+      "T10-220-bind-native-feedback-positive_y",
+      "T10-221-verify-native-feedback-original-positive_y"
+    ],
+    "original_task_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T10"
+  },
+  "provider_requested_model": "gpt-5.6-sol",
+  "reasoning": "gateway_default_not_exposed",
+  "finished_at": "2026-11-16T12:20:56.387005+00:00"
+}

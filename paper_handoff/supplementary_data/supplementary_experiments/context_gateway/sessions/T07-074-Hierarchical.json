@@ -1,0 +1,110 @@
+{
+  "session_id": "T07-074-Hierarchical",
+  "task_id": "T07",
+  "checkpoint_id": "T07-074",
+  "condition": "Hierarchical",
+  "experiment": "context_gateway",
+  "status": "completed",
+  "started_at": "2026-11-16T12:11:09.167295+00:00",
+  "requests": [
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-6080391a-a2a7-42bb-9650-b1f12c3b4111",
+      "sent_at": "2026-11-16T12:11:41.531167+00:00",
+      "request_bytes": 128877
+    }
+  ],
+  "reads": [],
+  "errors": [],
+  "decision": {
+    "action": "physical_replay",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "H-T07-distributed-A-replay",
+      "claimed_inference": "empirical_search",
+      "research_intent": "PHYSICAL_VALIDATION",
+      "selected_method": "independent full-task native replay of the saved distributed-structure M1_A schedule",
+      "selected_variables": [],
+      "selected_candidate": {
+        "artifact_id": "ef5eaf36c890d8157a59de97c5231384915767120dcc714badbee6537cbdd58c",
+        "media_type": "application/json"
+      },
+      "requested_budget": 1
+    },
+    "hypothesis": "The unresolved physical uncertainty is whether the distributed root-tail structure and its saved M1_A control schedule are genuinely limited by tendon/holding velocity under the complete frozen dynamics, or whether the small violations are artifacts of the finite sampled optimization. Competing hypotheses are: H1, dense independent replay confirms a real dynamic-limit failure near the start of holding, especially tendon channel 2 speed; H2, complete replay remains within all original limits and the sampled diagnostic was conservatively inaccurate. T07-072 found near-threshold position performance but predicted holding speed 0.030581490475219554 m/s against 0.03 m/s and geometric tendon-speed normalized excess 0.04396835416276468, while explicitly leaving independent replay and original acceptance unresolved; T07-071 supplies the current candidate and adapted source lineage.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "05ecbf2c9b1c47915cd040387f6b55ba506533e6d605948c8d725b8310df0047",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "416f75cbf1d86a0fa322bc5788ddf757f3627b9d445ade8a0de1e03033ac06da",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "An independent full 0.0–0.6 s replay from the frozen zero state records every physics state and confirms the diagnostic pattern: position error remains within 0.01 m, but either holding tip speed exceeds 0.03 m/s or at least one tendon speed exceeds 0.025 m/s, with the strongest excess near the 0.54 s holding boundary and likely on channel 2. This would support a real velocity-limited failure and motivate control or damping/routing revision rather than claiming task acceptance.",
+    "weakening_observation": "The replay completes numerically and satisfies, over the complete physics grid, the original M1_A position and holding-speed thresholds, all four 0–8 N tension bounds, ±0.015 m stroke bounds, and 0.025 m/s tendon-speed bounds. A materially different violation location or failure mode would also weaken the proposed channel-2/holding-transition mechanism and redirect diagnosis.",
+    "fixed_conditions": "Keep the frozen T07 M1_A task unchanged: target [0.295,0.0,0.215] m, zero qpos/qvel initializer, gravity and payload, 0.6 s duration, 0.001 s timestep, 0.02 s control period, holding window [0.54,0.6] s, position limit 0.01 m, tip-speed limit 0.03 m/s, four independent ideal-tension channels bounded [0,8] N, stroke bounds [-0.015,0.015] m, and tendon-speed limit 0.025 m/s. Use exactly candidate ef5eaf36c890d8157a59de97c5231384915767120dcc714badbee6537cbdd58c and saved schedule 8e005857ed449fe013f0fb469934a19c1f4f7f4f3abc82fb04e25d53d7dfbf9b; do not reoptimize or alter structure, controls, task, or thresholds.",
+    "stopping_condition": "Stop after this one independent replay is recorded and its complete original acceptance result is available; do not select the candidate unless the exact replay is publicly read and passes. If it fails, retain the failure and return to control/mechanism revision rather than repeating the same replay.",
+    "interpretation": "This action tests nonlinear full-grid realization only. T07-072 is a finite sampled native-search diagnostic, not independent task acceptance; T07-071 transfers no acceptance. A passing replay would establish M1_A acceptance only, not acceptance of M1_B, M1_C, M5, or the joint T07 task. A failing replay would establish failure of this exact candidate-schedule pair, not structural infeasibility or global control infeasibility.",
+    "physical_replay": {
+      "candidate": {
+        "artifact_id": "ef5eaf36c890d8157a59de97c5231384915767120dcc714badbee6537cbdd58c",
+        "media_type": "application/json"
+      },
+      "source": {
+        "artifact_id": "8e005857ed449fe013f0fb469934a19c1f4f7f4f3abc82fb04e25d53d7dfbf9b",
+        "media_type": "application/json"
+      }
+    }
+  },
+  "new_scientific_actions": 0,
+  "initial_state_reference": {
+    "task_id": "T07",
+    "checkpoint_id": "T07-074",
+    "trace_source": "paper_experiments/five_task_completion_20261113/T07_C1_four_tendon/STUDY_TRACE.jsonl",
+    "cutoff_event": "T07-074-test-original-radius-boundary-on-best-root-decision",
+    "cutoff_timestamp": "2026-11-13T05:18:05.006002+00:00",
+    "record_ids": [
+      "TASK",
+      "T07-010-generate-history-informed-baseline",
+      "T07-011-diagnose-registered-capabilities",
+      "T07-012-read-registered-math-catalogue",
+      "T07-013-bind-hard-condition-M1-B",
+      "T07-014-seed-historical-hard-case-tensions",
+      "T07-015-native-hard-case-control-capability",
+      "T07-016-refine-native-hard-case-dense-limits",
+      "T07-017-refine-startup-and-hold-knot-resolution",
+      "T07-020-generate-smaller-radius-hypothesis",
+      "T07-021-bind-smaller-radius-hard-case",
+      "T07-022-adapt-owned-control-initialization",
+      "T07-023-native-smaller-radius-hard-case",
+      "T07-024-independent-hard-case-replay",
+      "T07-30-bind-common-structure-M1_A",
+      "T07-31-seed-M1_A-historical-inputs",
+      "T07-32-native-common-structure-M1_A",
+      "T07-34-read-M1-A-dense-measure",
+      "T07-35-refine-common-structure-M1-A",
+      "T07-40-bind-common-structure-M1_C",
+      "T07-41-seed-M1_C-historical-inputs",
+      "T07-42-native-common-structure-M1_C",
+      "T07-060-test-isotropic-root-mechanism",
+      "T07-061-adapt-current-A-control-to-root-trial",
+      "T07-062-native-isotropic-root-A",
+      "T07-063-add-one-mm-root-reach-margin",
+      "T07-064-adapt-current-isotropic-root-A-control",
+      "T07-065-native-one-mm-root-A",
+      "T07-066-read-current-root-A-conflict",
+      "T07-067-native-full-grid-root-A",
+      "T07-069-read-full-grid-root-conflict",
+      "T07-070-test-distributed-root-tail-reach-margin",
+      "T07-071-adapt-current-A-to-distributed-length",
+      "T07-072-native-distributed-reach-A"
+    ],
+    "original_task_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T07"
+  },
+  "provider_requested_model": "gpt-5.6-sol",
+  "reasoning": "gateway_default_not_exposed",
+  "finished_at": "2026-11-16T12:11:41.532860+00:00"
+}

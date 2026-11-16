@@ -1,0 +1,100 @@
+{
+  "session_id": "T04-216-Hierarchical",
+  "task_id": "T04",
+  "checkpoint_id": "T04-216",
+  "condition": "Hierarchical",
+  "experiment": "context_gateway",
+  "status": "completed",
+  "started_at": "2026-11-16T12:04:33.642180+00:00",
+  "requests": [
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-decd7c47-7d7d-4c16-9724-0209b1bb1716",
+      "sent_at": "2026-11-16T12:04:42.338289+00:00",
+      "request_bytes": 69005
+    },
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-c5917628-afcf-4ef1-b959-d24f5a9f51b4",
+      "sent_at": "2026-11-16T12:05:13.569192+00:00",
+      "request_bytes": 69440
+    },
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-7a41e3c6-e56e-4f24-bc53-45fbd438b7aa",
+      "sent_at": "2026-11-16T12:05:37.354159+00:00",
+      "request_bytes": 73850
+    },
+    {
+      "usage": "UNKNOWN",
+      "response_model": "gpt-5.6-sol",
+      "response_id": "chatcmpl-local-9e37bdfb-4da1-4365-8163-072afa1c877e",
+      "sent_at": "2026-11-16T12:06:01.060876+00:00",
+      "request_bytes": 78237
+    }
+  ],
+  "reads": [],
+  "errors": [
+    {
+      "error": "text_call_parse: Extra data: line 1 column 114 (char 113)"
+    },
+    {
+      "error": "ValidationError: 1 validation error for Plan\n  Value error, ACTION_REQUIRES_ONLY_diagnostic [type=value_error, input_value={'action': 'diagnose', 'd...ry_coefficient': 0.001}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error"
+    },
+    {
+      "error": "ValidationError: 1 validation error for Plan\n  Value error, ACTION_REQUIRES_ONLY_parameters [type=value_error, input_value={'action': 'propose', 'de...ry_coefficient': 0.001}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/value_error"
+    }
+  ],
+  "decision": {
+    "action": "diagnose",
+    "decision": {
+      "version": "research_decision_v1",
+      "hypothesis_id": "T04-H1-dynamic-control-authority",
+      "claimed_inference": "empirical_search",
+      "research_intent": "DIAGNOSE",
+      "selected_method": "control_feasibility",
+      "selected_variables": [
+        "four-channel actuator_commands"
+      ],
+      "selected_candidate": "UNKNOWN",
+      "requested_budget": 0
+    },
+    "next_research_action": "control_feasibility",
+    "hypothesis": "The next uncertainty to resolve is whether the generated current candidate has enough four-channel dynamic control authority to trace both lobes of the frozen figure-eight while satisfying unilateral tension, stroke, speed, hinge, gravity, payload, and equilibrium constraints. Competing hypotheses are H1: a compliant candidate-specific control trajectory exists and the failed reference-bank attempt was procedural or initialization-related; and H2: the structure is physically underactuated or constraint-limited for the required trajectory.",
+    "supporting_evidence": [
+      {
+        "artifact_id": "a52684f03cc687c88c97575eb8c546195918e35a4384f7e9acaa1019284a158e",
+        "media_type": "application/json"
+      },
+      {
+        "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+        "media_type": "application/json"
+      }
+    ],
+    "expected_observation": "The selected control-feasibility interface should next request one bounded candidate-specific native control search over the complete 22 s task. A complete, numerically qualified trajectory that covers both lobes, remains within 0.2–8 N tension, 0.03 m stroke, 0.03 m/s speed, and hinge limits, and predicts errors inside 0.003 m RMSE, 0.006 m maximum error, and 0.002 m cycle drift would support H1 and yield a schedule suitable for later independent physical replay; it would not itself establish physical acceptance.",
+    "weakening_observation": "A complete and numerically qualified bounded search whose best trajectory necessarily violates actuator or hinge constraints, misses a lobe, or remains outside the fixed tracking or drift thresholds would support H2. Failure to construct a trajectory, numerical failure, or incomplete qualification would leave the physical uncertainty UNKNOWN and would not distinguish physical incapability from solver or initialization failure.",
+    "fixed_conditions": "Keep TASK T04 unchanged: default condition; current generated candidate 5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed; candidate-qualified equilibrium without copied historical qpos; gravity and rigid payload; four independent channels; the exact 22 s figure-eight reference; 0.01 s control period; 0.001 s physics timestep; and every original geometry, collision, lobe, balance, tension, stroke, speed, tracking, drift, and required-signal threshold.",
+    "stopping_condition": "After the next bounded control-feasibility result, stop and inspect completeness and numerical qualification. Do not select the candidate or claim task acceptance unless a separate independent full physical replay passes every frozen requirement.",
+    "interpretation": "T04-210 establishes candidate generation only, not control feasibility or acceptance. T04-211 is recorded as failed and supplies no successful schedule; its failure is therefore not evidence of physical incapability. Candidate-specific control feasibility is the next discriminating study. Local control-search or native prediction evidence must remain distinct from geometry validity, numerical qualification, and complete independent physical task acceptance."
+  },
+  "new_scientific_actions": 0,
+  "initial_state_reference": {
+    "task_id": "T04",
+    "checkpoint_id": "T04-216",
+    "trace_source": "paper_experiments/five_task_completion_20261113/T04_figure_eight_tracking/T04_RUN_03/STUDY_TRACE.jsonl",
+    "cutoff_event": "T04-216-construct-local-interior-reference-bank-decision",
+    "cutoff_timestamp": "2026-11-13T05:35:22.769972+00:00",
+    "record_ids": [
+      "TASK",
+      "T04-210-generate-legal-quasistatic-tracking",
+      "T04-211-construct-native-frozen-reference-bank"
+    ],
+    "original_task_reference": "git:15d4667050351c1cbf84e6ade6f573286d6d8ed0:paper_experiments/paper_results_master_20261113/SOURCE_DATA/PROTOCOLS.json#/T04"
+  },
+  "provider_requested_model": "gpt-5.6-sol",
+  "reasoning": "gateway_default_not_exposed",
+  "finished_at": "2026-11-16T12:06:01.063373+00:00"
+}
