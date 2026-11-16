@@ -29,13 +29,11 @@ Keep the currently approved editable source and vector PDF unchanged.
 - Use exact model thumbnails only when the corresponding native render exists. The task matrix remains legible without thumbnails.
 
 ### Figure 3 — Mechanism-Guided PHS-2D-9S Design
-- This is an independent nine-segment study, not the seven-segment FULL PHS-2D case.
-- Panel (a): four actual Journal stages: diagonal stay, dense tendon guidance, physical guide plates, final nine-segment structure.
-- Render actual XML/models at a common camera, scale, orientation, lighting, and material.
-- Panel (b): ten signed-load cases, loaded-point and projected-tip displacement.
-- Panel (c): tip-to-point ratio and matched tendon tension/taut-state evidence.
-- Report 10/10 conditions, 11.155 mm minimum loaded-point displacement, 3.068 mm maximum projected tip displacement, and 0.1093 maximum ratio.
-- Do not substitute seven-segment candidate images or use conceptual drawings as if they were simulation renders.
+- This is an independent nine-segment mechanism study, not the seven-segment FULL PHS-2D case.
+- The **Phase-1 vector figure already present** at `figures/fig03_phs2d_mechanism.pdf` / `.svg` plots actual stored x-z centerlines under ten signed loads, together with the loaded-point displacements, projected tip motions, and tip-to-point ratios from the physical evaluation. The left panel is labeled as stored physical centerlines; it is **not** a MuJoCo 3D render.
+- Final visual-completion step: render original Journal candidates (diagonal stay, dense tendon guidance, physical guide plates, final nine-segment structure) from their actual robot models at a common camera, scale, orientation, lighting, and material. Add 2–4 compact model panels only once these verified renders exist; otherwise retain the measured centerline panel and do not substitute invented robots.
+- Keep the ten load cases and exact physical results: 10/10 conditions; 11.155 mm minimum loaded-point displacement; 3.068 mm maximum projected tip displacement; 0.1093 maximum ratio.
+- Preserve actual load-direction/tendon identity and avoid conflating 7S and 9S data.
 
 ### Figure 4 — Local Mathematical Sensitivity Consistency
 - Panel (a): implicit derivative versus finite-difference derivative, faceted by the three metrics and their units.
