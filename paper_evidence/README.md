@@ -14,7 +14,7 @@
 | 节点标注 | 全部节点初评；18 个关键节点独立匿名模型复核；保留理由、来源、置信度与不确定字段 |
 | Reporter | 六组配对完整；平均 +0.300，2 胜/4 平/0 负；两个重点案例及原始决策对照 |
 | Knowledge/Skill | 原八个四格决策完整；经验利用 0/3/3/3，其余评分饱和；补充 16/16 个会话，15 个有效决策；另按用户要求增加统一五维盲评，保留原四维 |
-| Context | E2 与 E2-R2 保留各自 usage 口径；新增 12/12 个跨任务会话，11 个有效决策，6/6 组盲评；新 Gateway usage 缺失时为 UNKNOWN |
+| Context | E2 与 E2-R2 保留各自 usage 口径；新增 12/12 个跨任务会话，11 个有效决策，6/6 组盲评；附本地文本 token 计数，服务端实际 usage 缺失时为 UNKNOWN |
 | M1/M2 | T07 两个真实结构、相同四通道契约已核对；逐条件三模式方案和原请求模板已准备；完整成对物理结果尚未执行 |
 
 ## 使用入口
@@ -22,6 +22,7 @@
 - `registry/`：正式任务名、Study、符号及指标。选定参数集合使用 I_k，合法设计空间使用 D；M0–M3 不是顺序流程。
 - `task_metrics/`：权威数值、候选结构、物理工况、数值复核和原始资源范围。`research_nodes/`：观察—假设—研究—证据—行动—结果及标注。
 - `architecture_metrics/`：完整 Reporter/K/S/Context 配对、逐请求 usage、实际检索路径和失败记录。
+- `architecture_metrics/gateway_token_summary.md`：28 个新增会话、62 次 Main 请求的本地文本 token 计数及统一方法；服务端实际 usage 单独保留。
 - `figure_data/` 和 `figure_manifest.md`：Fig. 2–8 绘图 CSV、Panel 坐标/单位、颜色、Caption、正文/补充定位及缺失数据。Fig. 4C 的 UNKNOWN 不能绘成结果。
 - 仓库根 `paper_handoff/`：供论文分支使用的自包含数据快照；不需要连接实验 Store 即可读取 CSV 和绘图数值。
 
@@ -37,6 +38,6 @@ K/S 统一五维评价为 Physical Interpretation、Evidence Consistency、Limit
 
 ## 复现与尚缺
 
-标准库离线流程：`python paper_evidence/tools/build_evidence.py` → `research_details.py` → `prepare_m1_m2.py` → `finalize_publication.py` → `validate_evidence.py`。原来源通过固定 Git 提交只读加载；原始局部 Trace/Store 只在所需节点细节提取时读取。决策补充脚本是显式单独入口，不会由离线构建或验证触发。
+标准库离线流程：`python paper_evidence/tools/build_evidence.py` → `research_details.py` → `prepare_m1_m2.py` → `finalize_publication.py` → `validate_evidence.py`。新增 token 计算单独运行 `estimate_gateway_tokens.py`，使用原有本地 tiktoken 运行时；完成后再生成交付快照。原来源通过固定 Git 提交只读加载；原始局部 Trace/Store 只在所需节点细节提取时读取。决策补充脚本是显式单独入口，不会由离线构建或验证触发。
 
 数据交付已覆盖全部 Fig. 2–8 入口，但匹配 M1/M2 物理实验、结构演化统一相机渲染和新 Gateway 实际 usage 仍不能宣称完成。完整状态见 `supplementary_experiments/RESULTS.md` 与 `validation_report.md`。未访问到附加设计文本/DOCX 时，以任务说明和正式仓库记录为准。

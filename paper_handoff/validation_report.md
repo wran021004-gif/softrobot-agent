@@ -4,7 +4,7 @@ Only requested publication checks were run. No source data, thresholds, manuscri
 
 | Check | Result | Evidence |
 |---|---|---|
-| 1 readable CSV/JSON | PASS | 55 CSV and 66 JSON parsed; [] |
+| 1 readable CSV/JSON | PASS | 60 CSV and 67 JSON parsed; [] |
 | 2 unique primary/natural keys | PASS | Validated 15 core tables; duplicate tables: [] |
 | 3 portfolio and required conditions | PASS | 11 FULL tasks; 30 required rows; 2 additional T10 controls; exact per-task counts checked. |
 | 4 independent PHS identities | PASS | 7S: ten nominal cases in FULL. 9S: own Journal and four separate ten-case check sets; 18 derivatives only 9S. |
@@ -17,5 +17,6 @@ Only requested publication checks were run. No source data, thresholds, manuscri
 | required node coverage | PASS | {'T01': 3, 'T02': 2, 'T03': 2, 'T04': 3, 'T05': 2, 'T06': 2, 'T07': 3, 'T08': 2, 'T09': 2, 'T10': 3, 'PHS-2D': 4}; four additional independent 9S nodes. |
 | supplement completion accounting | PASS | supplementary_data/architecture_metrics/context_cross_task.csv: 11/12 completed decisions; supplementary_data/architecture_metrics/knowledge_skill_supplement.csv: 15/16 completed decisions; M1/M2 is explicitly PREPARED_NOT_EXECUTED and is not an empirical comparison. |
 | requested common five-dimensional assessment | PASS | 120/120 dimension records: original 8 decisions plus 16 supplemental cells × five common dimensions. Original four-score tables retained. |
+| Gateway local text-token accounting | PASS | 28 byte-matched initial reconstructions; 62 returned Main requests; request/session sums and source byte counts agree; two failed last outputs explicitly imputed; actual-usage fields unchanged. |
 
 A PASS above validates the data representation/calculation. It does not turn missing experiments into completed science. Matched M1/M2 physical measurements and common-camera intermediate XML renders remain pending. Actual new Gateway usage remains UNKNOWN where not returned.

@@ -1,0 +1,17 @@
+{
+  "method_id": "gateway-text-tokens-v1",
+  "tokenizer_encoding": "o200k_base",
+  "tiktoken_version": "0.12.0",
+  "created_for": "post-hoc offline text-token estimation; no new inference",
+  "population": "28 Main decision sessions / 62 returned requests; reviewer calls and failed transport attempts excluded",
+  "initial_input": "Reconstruct complete messages with original source records and serializer; verify exact request byte count; tokenize message content only.",
+  "later_input": "initial_content_tokens * recorded_request_bytes / initial_request_bytes, rounded to nearest integer",
+  "earlier_output": "Token/escaped-byte ratio of retained canonical final decision times next-request byte growth minus recorded feedback; failed sessions use same-task median calibration.",
+  "final_output": "Canonical retained decision in text-tool wrapper; last reply of each of two failed sessions imputed from median of its earlier draft estimates.",
+  "limitations": "Text-token proxies only. Chat framing, backend processing, hidden reasoning, actual tokenizer, caching and billing are unavailable. Draft wording/formatting were not retained. No service-usage values are replaced.",
+  "initial_request_byte_matches": 28,
+  "source_tables": [
+    "architecture_metrics/gateway_token_requests.csv",
+    "architecture_metrics/gateway_token_sessions.csv"
+  ]
+}

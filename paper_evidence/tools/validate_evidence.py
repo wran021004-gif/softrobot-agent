@@ -118,6 +118,31 @@ def validate():
         keycounts=Counter((r['protocol_id'],r['checkpoint_id'],r['condition'],r['dimension']) for r in five)
         check('requested common five-dimensional assessment',len(five)==120 and all(n==1 for n in keycounts.values()) and all(r['score'] in ['0','1','2','3','4','UNKNOWN'] for r in five),
               f'{len(five)}/120 dimension records: original 8 decisions plus 16 supplemental cells × five common dimensions. Original four-score tables retained.')
+    if (OUT/'architecture_metrics/gateway_token_sessions.csv').exists():
+        sessions=rows('architecture_metrics/gateway_token_sessions.csv')
+        requests=rows('architecture_metrics/gateway_token_requests.csv')
+        token_ok=len(sessions)==28 and len(requests)==62
+        token_ok &= len({(r['experiment'],r['session_id'],r['request_index']) for r in requests})==62
+        for s in sessions:
+            own=sorted([r for r in requests if r['experiment']==s['experiment'] and r['session_id']==s['session_id']],key=lambda r:int(r['request_index']))
+            token_ok &= len(own)==int(s['main_request_count'])
+            for key in ['input_tokens_text_estimate','output_tokens_text_estimate']:
+                token_ok &= sum(int(r[key]) for r in own)==int(s[key]) and all(int(r[key])>0 for r in own)
+            first=own[0]
+            token_ok &= int(first['input_tokens_text_estimate'])==int(s['initial_input_text_tokens'])
+            token_ok &= all(int(r['input_tokens_text_estimate'])==round(int(s['initial_input_text_tokens'])*int(r['request_bytes'])/int(first['request_bytes'])) for r in own)
+            record=json.loads((ROOT/s['source_reference']).read_text('utf-8'))
+            token_ok &= all(int(r['request_bytes'])==record['requests'][i]['request_bytes'] for i,r in enumerate(own))
+            token_ok &= s['session_status']==record['status']
+        token_ok &= sum(r['output_method']=='unretained_last_reply_imputed_from_same_session_draft_median' for r in requests)==2
+        actual=rows('architecture_metrics/supplement_request_usage.csv')
+        token_ok &= len(actual)==62 and all(r['input_tokens_actual']=='UNKNOWN' and r['output_tokens_actual']=='UNKNOWN' for r in actual)
+        for p,experiment in [('architecture_metrics/context_cross_task.csv','context_gateway'),('architecture_metrics/knowledge_skill_supplement.csv','knowledge_skill')]:
+            for r in rows(p):
+                s=next(s for s in sessions if s['experiment']==experiment and s['session_id']==r['checkpoint_id']+'-'+r['condition'])
+                token_ok &= all(r[k]==s[k] for k in ['input_tokens_text_estimate','output_tokens_text_estimate','initial_input_text_tokens'])
+        check('Gateway local text-token accounting',token_ok,
+              '28 byte-matched initial reconstructions; 62 returned Main requests; request/session sums and source byte counts agree; two failed last outputs explicitly imputed; actual-usage fields unchanged.')
     report=['# Publication data validation','', 'Only requested publication checks were run. No source data, thresholds, manuscript text or Figure 1 were changed. No hashing, full repository audit, full software test suite or wholesale MuJoCo rerun was performed.','',
             '| Check | Result | Evidence |','|---|---|---|']
     report += ['| '+x['check']+' | '+x['status']+' | '+x['detail'].replace('|','/')+' |' for x in checks]
