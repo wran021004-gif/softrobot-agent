@@ -97,13 +97,13 @@ When actuator bounds are independent of the design, the last two terms vanish. T
 \paragraph{M3: Closed-loop performance.}
 M3 considers the complete controller--robot execution:
 \begin{equation}
-J_{\tau,H}(d,\theta)
-=\mathcal J\bigl(y_{0:H}(d,\theta)\bigr),
+J_{\tau}^{\mathrm{cl}}(d,\theta;\mathcal M_{\mathrm{hi}})
+=\mathcal J_{\tau}\bigl(y_{0:N}(d,\theta;\mathcal M_{\mathrm{hi}})\bigr),
 \qquad z_{\mathrm{cl}}=(d,\theta),
 \end{equation}
-where $H$ denotes the high-fidelity execution model and $y_{0:H}$ the resulting trajectory. A local closed-loop sensitivity is
+where $\mathcal M_{\mathrm{hi}}$ denotes the high-fidelity execution model and $N$ is the final sampled trajectory index. A local closed-loop sensitivity is
 \begin{equation}
-\nabla_{z_{\mathrm{cl}}}J_{\tau,H}(d,\theta).
+\nabla_{z_{\mathrm{cl}}}J_{\tau}^{\mathrm{cl}}(d,\theta;\mathcal M_{\mathrm{hi}}).
 \label{eq:m3}
 \end{equation}
 This view includes the controller and execution dynamics, rather than treating a prescribed input as fixed.
