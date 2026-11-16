@@ -1,0 +1,38 @@
+\begin{tikzpicture}
+\begin{groupplot}[
+group style={group size=3 by 1,horizontal sep=1.20cm},
+width=.30\textwidth,height=5.15cm,
+tick label style={font=\tiny,text=sraNavy},
+label style={font=\scriptsize,text=sraNavy},
+title style={font=\scriptsize\bfseries,text=sraNavy},
+axis line style={sraGray!75},ymajorgrids,grid style={sraLight!80},
+scaled ticks=false,legend style={font=\tiny,draw=none,fill=none,at={(.02,.98)},anchor=north west},
+]
+\nextgroupplot[
+title={(a) Provider input},
+ybar,bar width=7pt,
+symbolic x coords={C035,C037},xtick=data,
+ymin=0,ymax=960,ylabel={Input (\(10^3\) tokens)}
+]
+\addplot+[ybar,draw=none,fill=sraGray,bar shift=-4pt] coordinates {(C035,675.802) (C037,877.197)};
+\addplot+[ybar,draw=none,fill=sraNavy,bar shift=4pt] coordinates {(C035,78.785) (C037,174.298)};
+\legend{Flat,Hierarchical}
+\nextgroupplot[
+title={(b) Cross-task input},
+ybar,bar width=4.1pt,
+symbolic x coords={T01,T04,T07,T08,T09,T10},xtick=data,
+xticklabel style={rotate=48,anchor=east,font=\tiny},
+ymin=0,ymax=890,ylabel={Input (\(10^3\) tokens)}
+]
+\addplot+[ybar,draw=none,fill=sraGray,bar shift=-2.7pt] coordinates {(T01,195.629) (T04,69.485) (T07,803.543) (T08,344.452) (T09,52.977) (T10,80.256)};
+\addplot+[ybar,draw=none,fill=sraNavy,bar shift=2.7pt] coordinates {(T01,30.166) (T04,64.380) (T07,33.797) (T08,54.951) (T09,38.384) (T10,58.605)};
+\nextgroupplot[
+title={(c) Cross-task decision quality},
+symbolic x coords={T01,T04,T07,T08,T09,T10},xtick=data,
+xticklabel style={rotate=48,anchor=east,font=\tiny},
+ymin=0,ymax=4.3,ytick={0,1,2,3,4},ylabel={Blind score (0--4)}
+]
+\addplot+[mark=square*,mark size=1.65pt,line width=.75pt,color=sraGray] coordinates {(T01,4.000) (T04,3.800) (T07,2.800) (T09,4.000) (T10,4.000)};
+\addplot+[mark=*,mark size=1.65pt,line width=.75pt,color=sraNavy] coordinates {(T01,4.000) (T04,3.200) (T07,3.800) (T08,3.600) (T09,3.800) (T10,2.800)};
+\end{groupplot}
+\end{tikzpicture}
