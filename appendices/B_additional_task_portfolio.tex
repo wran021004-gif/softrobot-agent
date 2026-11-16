@@ -1,11 +1,11 @@
 \section{Task Portfolio and Reporting Conventions}
 \label{app:task-portfolio}
 
-The eleven task cases are T01--T10 and PHS-2D. Their required-condition counts sum to 30. T10 includes two additional frozen controls, which are reported separately and are not included in the required-condition count. The archived portfolio therefore contains 32 required/control records.
+The FULL portfolio contains T01--T10 and PHS-2D-7S. Their required-condition counts sum to 30. T10 includes two additional frozen controls, which are reported separately. PHS-2D-9S is a separate independent study and is not included in the eleven-task FULL denominator.
 
 \begin{table*}[t]
 \centering
-\caption{Task families and the physical quantities retained for reporting.}
+\caption{Task-specific physical quantities retained for reporting.}
 \label{tab:task-metrics-appendix}
 \small
 \begin{tabularx}{\textwidth}{@{}l Y Y@{}}
@@ -22,9 +22,16 @@ T07 & Per-condition task violation, tendon limits, and shared morphology. & Repo
 T08 & Low/high-load response, stiffness ratio, bilateral response, and equilibrium residual. & Report both loading directions for the same passive structure. \\
 T09 & Button travel, force, depth/force hold duration, contact state, and solver warnings. & Report the contact event and hold interval. \\
 T10 & Pre-impact hold, post-impact recovery time, final hold position/speed, tendon limits. & Report three required impact conditions and two frozen controls separately. \\
-PHS-2D & Loaded-point displacement, projected tip displacement, ratio, plane deviation, equilibrium residual, and stability checks. & Report the ten loading conditions for the nine-segment, four-tendon passive-design case. \\
+PHS-2D-7S & Loaded-point displacement, projected tip displacement, ratio, plane deviation, and equilibrium residual. & Report the ten conditions belonging to the seven-segment FULL case. \\
+PHS-2D-9S & Loaded-point displacement, projected tip displacement, ratio, plane deviation, tension, and taut-state checks. & Report the independent nine-segment mechanism study and its ten signed-load conditions. \\
 \bottomrule
 \end{tabularx}
 \end{table*}
 
 The task-specific metrics are not collapsed into a single cross-task raw-error average. A normalized violation may be used within a task when its normalization is defined by the frozen task contract. Condition-level values and the worst required condition remain available in the source data.
+
+\subsection{PHS-2D study identities}
+
+PHS-2D-7S is the seven-segment, four-tendon passive case included in the eleven-task FULL portfolio. Its ten required conditions pass; its minimum loaded-point displacement is 14.798 mm, maximum projected tip displacement is 4.347 mm, and maximum tip-to-point ratio is 0.15375.
+
+PHS-2D-9S is an independent nine-segment, four-tendon study with eight massive guide plates and no active actuators. Its ten prescribed signed-load evaluations pass; its minimum loaded-point displacement is 11.155 mm, maximum projected tip displacement is 3.068 mm, and maximum tip-to-point ratio is 0.1093. These two studies are reported separately and their structural parameters and evaluation records are not combined.

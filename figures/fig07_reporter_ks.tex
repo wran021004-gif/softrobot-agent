@@ -1,0 +1,46 @@
+\begin{tikzpicture}
+\begin{groupplot}[
+ group style={group size=2 by 2,horizontal sep=1.1cm,vertical sep=1.0cm},
+ width=7.4cm,height=4.4cm,
+ tick label style={font=\scriptsize},
+ label style={font=\scriptsize},
+ axis line style={PaperGray},tick style={PaperGray},
+ grid=major,grid style={PaperLight}
+]
+\nextgroupplot[
+ title={(a) Reporter paired scores},
+ xmin=-0.1,xmax=1.1,ymin=2.4,ymax=4.2,
+ xtick={0,1},xticklabels={OFF,ON},
+ ylabel={Five-dimensional score (0--4)}
+]
+\addplot[PaperGray,mark=*] coordinates {(0,4)(1,4)};
+\addplot[PaperGray,mark=*] coordinates {(0,4)(1,4)};
+\addplot[PaperNavy,mark=* ,thick] coordinates {(0,2.8)(1,3.6)};
+\addplot[PaperNavy,mark=* ,thick] coordinates {(0,3.0)(1,4.0)};
+\addplot[PaperGray,mark=*] coordinates {(0,3.8)(1,3.8)};
+\addplot[PaperGray,mark=*] coordinates {(0,3.0)(1,3.0)};
+\nextgroupplot[
+ title={(b) Historical-experience utilization},
+ xmin=-0.3,xmax=3.3,ymin=0,ymax=3.5,
+ xtick={0,1,2,3},
+ xticklabels={K$-$S$-$,K$+$S$-$,K$-$S$+$,K$+$S$+},
+ ylabel={Utilization score (0--4)},
+ x tick label style={rotate=25,anchor=east}
+]
+\addplot[PaperTeal,only marks,mark=square*] coordinates {(-0.06,0)(0.94,3)(1.94,3)(2.94,3)};
+\addplot[PaperSlate,only marks,mark=triangle*] coordinates {(0.06,0)(1.06,3)(2.06,3)(3.06,3)};
+\nextgroupplot[
+ title={(c) Common five-dimensional reassessment},
+ xmin=-0.3,xmax=3.3,ymin=0,ymax=4.3,
+ xtick={0,1,2,3},
+ xticklabels={K$-$S$-$,K$+$S$-$,K$-$S$+$,K$+$S$+},
+ ylabel={Mean score (0--4)},
+ x tick label style={rotate=25,anchor=east}
+]
+\addplot[PaperNavy,mark=* ,thick] coordinates {(0,3.43)(1,3.37)(2,3.67)(3,3.17)};
+\addplot[PaperGray,dashed,domain=-0.3:3.3] {3.0};
+\end{groupplot}
+\node[anchor=west,font=\scriptsize,text=PaperGray] at (0,-9.45) {Reporter: 2 wins / 4 ties / 0 losses; paired mean difference +0.30/4.};
+\node[anchor=west,font=\scriptsize,text=PaperGray] at (0,-9.75) {K/S: six checkpoint groups; K$+$S$+$ includes one budget-exhausted decision scored as 0.};
+\node[anchor=west,font=\scriptsize,text=PaperGray] at (0,-10.05) {Supplemental K/S: 16 sessions, 37 requests, 6.13M input and 40.9k output serialized text tokens.};
+\end{tikzpicture}

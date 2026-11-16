@@ -1,0 +1,57 @@
+\begin{tikzpicture}
+\begin{groupplot}[
+ group style={group size=2 by 2,horizontal sep=1.1cm,vertical sep=1.0cm},
+ width=7.4cm,height=4.4cm,
+ tick label style={font=\scriptsize},
+ label style={font=\scriptsize},
+ axis line style={PaperGray},tick style={PaperGray},
+ grid=major,grid style={PaperLight}
+]
+\nextgroupplot[
+ title={(a) Historical Provider-reported input},
+ ybar,bar width=8pt,
+ symbolic x coords={E2-C035,E2-R2-C037},xtick=data,
+ x tick label style={rotate=15,anchor=east},
+ ylabel={Input tokens ($10^3$)},ymin=0,ymax=1000,
+ legend style={font=\tiny,draw=none,at={(0.5,-0.28)},anchor=north,legend columns=2}
+]
+\addplot[fill=PaperGray,draw=PaperGray] coordinates {(E2-C035,675.802)(E2-R2-C037,877.197)};
+\addlegendentry{Flat}
+\addplot[fill=PaperNavy,draw=PaperNavy] coordinates {(E2-C035,78.785)(E2-R2-C037,174.298)};
+\addlegendentry{Hierarchical}
+\nextgroupplot[
+ title={(b) Six cross-task serialized request-text pairs},
+ ybar,bar width=4pt,
+ symbolic x coords={T01,T04,T07,T08,T09,T10},xtick=data,
+ ylabel={Input text tokens ($10^3$)},ymin=0,ymax=900,
+ legend style={font=\tiny,draw=none,at={(0.5,-0.28)},anchor=north,legend columns=2}
+]
+\addplot[fill=PaperGray,draw=PaperGray] coordinates {(T01,195.629)(T04,69.485)(T07,803.543)(T08,344.452)(T09,52.977)(T10,80.256)};
+\addlegendentry{Flat}
+\addplot[fill=PaperNavy,draw=PaperNavy] coordinates {(T01,30.166)(T04,64.380)(T07,33.797)(T08,54.951)(T09,38.384)(T10,58.605)};
+\addlegendentry{Hierarchical}
+\nextgroupplot[
+ title={(c) Blind decision quality},
+ xmin=-0.3,xmax=5.3,ymin=0,ymax=4.3,
+ xtick={0,1,2,3,4,5},
+ xticklabels={T01,T04,T07,T08,T09,T10},
+ ylabel={Score (0--4)}
+]
+\addplot[PaperGray,mark=*] coordinates {(0,4)(1,3.8)(2,2.8)(3,0)(4,4)(5,4)};
+\addlegendentry{Flat}
+\addplot[PaperNavy,mark=square*] coordinates {(0,4)(1,3.2)(2,3.8)(3,3.6)(4,3.8)(5,2.8)};
+\addlegendentry{Hierarchical}
+\nextgroupplot[
+ title={(d) Key-evidence recall},
+ xmin=-0.3,xmax=5.3,ymin=0,ymax=1.1,
+ xtick={0,1,2,3,4,5},
+ xticklabels={T01,T04,T07,T08,T09,T10},
+ ylabel={Recall}
+]
+\addplot[PaperGray,mark=*] coordinates {(0,0.833)(1,0.833)(2,0.667)(3,0)(4,1)(5,1)};
+\addplot[PaperNavy,mark=square*] coordinates {(0,0.833)(1,0.833)(2,1)(3,0.833)(4,1)(5,0.833)};
+\end{groupplot}
+\node[anchor=west,font=\scriptsize,text=PaperGray] at (0,-9.45) {Historical input reductions: 88.34\% (E2) and 80.13\% (E2-R2).};
+\node[anchor=west,font=\scriptsize,text=PaperGray] at (0,-9.75) {Cross-task serialized text volume: 1.546M Flat vs 0.280M Hierarchical (81.87\% lower).};
+\node[anchor=west,font=\scriptsize,text=PaperGray] at (0,-10.05) {T08 Flat exhausted its request budget; its zero recall/score denotes an unsuccessful submission.};
+\end{tikzpicture}

@@ -1,38 +1,42 @@
-\section{Evidence Provenance and Scope}
+\section{Evidence Scope and Reporting Conventions}
 \label{app:evidence-provenance}
 
-\subsection{FULL task portfolio}
+\subsection{FULL task portfolio and independent PHS-2D study}
 
-The paper-results package dated 2026-11-13 contains eleven task cases and 32 required/control records: 30 required conditions passed, while two additional T10 frozen controls are reported separately. The portfolio is a completed-case record. Each result remains linked to its task-specific protocol, candidate, physical evaluator, and original trace.
+The FULL portfolio contains eleven task cases and 30 required physical conditions; all 30 pass their task-specific evaluators. Two additional T10 frozen controls are reported separately. The PHS-2D case in this denominator is the seven-segment, four-tendon PHS-2D-7S study.
 
-\subsection{Nine-segment PHS-2D physical case}
+PHS-2D-9S is an independent nine-segment study. Its final passive design is evaluated over ten prescribed signed-load conditions, with half-time-step and initial-state perturbation checks. The minimum loaded-point displacement is 11.155 mm, maximum projected tip displacement is 3.068 mm, and maximum displacement ratio is 0.1093. These values are not combined with the seven-segment FULL result.
 
-The principal passive-design case uses the nine-segment, four-tendon Round-3 evidence package. The final structure was evaluated over ten prescribed loading conditions, with independent-process reproduction, half-time-step evaluation, and initial-state perturbation checks. The reported minimum loaded-point displacement is 14.7981 mm, maximum projected tip displacement is 4.3470 mm, and maximum displacement ratio is 0.153751. These values belong to the nine-segment Round-3 package and are not combined with older seven-segment snapshots.
+\subsection{Local sensitivity audit}
 
-\subsection{PHS-2D local sensitivity audit}
+The PHS-2D-9S audit compares KKT-based implicit derivatives with finite differences obtained by perturbing a common Young's-modulus direction and re-solving loaded and unloaded equilibria. Six loading branches and three task metrics (loaded-point displacement, projected tip displacement, and their ratio) produce 18 task-metric derivative pairs. The maximum relative discrepancy is 0.1191223\%.
 
-A separate fixed-topology audit compares KKT-based implicit derivatives with finite differences obtained by perturbing a common Young's-modulus direction and re-solving loaded and unloaded equilibria. Six loading branches and three task metrics—loaded-point displacement, horizontal tip displacement, and their ratio—produce 18 task-metric derivative pairs. The maximum relative discrepancy among these pairs is 0.1191223\%.
+The 18 pairs cover three observables along one common modulus perturbation direction across the nine segments. They are not 18 independent design-parameter gradients, and the discrepancy is not a global error bound. Active-set transitions and discrete topology changes remain outside this local consistency result.
 
-The audit concerns one common modulus direction across the nine segments. The 18 pairs are not 18 independent design-parameter gradients and the discrepancy is not a global error bound. The implicit calculation uses numerically estimated partial derivatives in the KKT system; the finite-difference values are obtained from the saved perturbed equilibria.
+\subsection{Research-mode comparison}
 
-\subsection{A/B/C comparison provenance}
+A and B are task-wise research runs; C is the corresponding historical FULL record. The 33 task--method records preserve PASS, qualified PASS, valid failure, incomplete execution, qualification failure, evaluated coverage, and task-specific normalized violation. The comparison is descriptive and is not a randomized multi-seed benchmark.
 
-A and B are new research runs; C is the corresponding historical FULL record. The first batch contains PHS-2D, T01, T04, and T07. The manuscript presents representative task-wise comparisons for T01, T04, and T07, while the nine-segment PHS-2D case remains the principal mathematical and passive-design study. Historical C configurations and source identifiers remain attached to their original records.
+\subsection{Reporter decision study}
 
-\subsection{Architecture decision-replay provenance}
+The Reporter study contains six matched decision pairs (M1-A/B/C and P3-A/B/C), twelve Main sessions, and six anonymous paired reviews. The mean five-dimensional score is 3.433 OFF and 3.733 ON; the paired mean difference is +0.300, the median difference is zero, and the win/tie/loss count is 2/4/0. The number of unsupported conclusions identified by the reviewer is two OFF and zero ON. M1-C illustrates recognition of a frozen iteration budget; P3-A illustrates a more discriminative paired passive-mechanism experiment.
 
-The Reporter, Knowledge/Skill, and context materials are archived in the repository-relative directory \texttt{paper\_experiment\_data/architecture\_ablation} at source commit \texttt{b97bee811}. The plotting entry point is \texttt{PLOTTING\_INDEX.json}; the source package retains raw decision sessions, frozen snapshots/corpora, blind-review records, exact request/response records, and plotting tables.
+\subsection{Knowledge/Skill decision studies}
 
-The Reporter study contains six matched historical decision pairs (M1-A/B/C and P3-A/B/C), twelve Main sessions, and six anonymous independent-model reviews. Six existing Reporter reports are reused; no new Reporter generation is included in the ON condition. The mean five-dimension score is 3.433 OFF and 3.733 ON; the paired mean difference is +0.300, median difference 0, with two wins, four ties, and no losses. Main Provider usage is unavailable. The reported 1,450.5-token mean increment is a generic visible-context proxy, not a model-matched token or billing measure.
+The original E1 study contains eight decisions in a two-task, four-condition K/S factorial design. Historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$, respectively. Decision quality, evidence consistency, and actionability are saturated at four in the original four-dimensional assessment.
 
-The Knowledge/Skill study contains eight real Main LLM decisions: a four-cell K/S design at each of T04 and T07. Each cell contains one decision, and each task has one joint blind review. Historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$, respectively. Decision quality, evidence consistency, and research actionability are 4 in every cell; no invalid proposed actions are identified. The K and S main effects on utilization are each +1.5, the interaction contrast is -3, and the joint condition equals the best single-resource condition. K$+$S$+$ was acquired later than the other six sessions; backend/default reasoning identity is unverified. Human scoring remains pending. No mathematical or physical follow-up was executed.
+The supplemental study adds sixteen sessions across four frozen checkpoints; fifteen return valid decisions and one K$+$S$+$ submission exhausts its request budget. The combined set contains 24 Main sessions and 23 valid decisions. A common five-dimensional anonymous reassessment covers all 24 decisions (120 dimension-level scores). The original four-dimensional scores and the historical-utilization measure remain separate from the five-dimensional reassessment. The decision replays do not launch mathematical or physical workers and do not establish downstream robot-performance improvements.
 
-E2 at PHS-C035 contains one Flat/hierarchical pair on a 66-record corpus. Accepted-inference Provider input is 675,802 versus 78,785 tokens, while blind mean scores are 4.0 and 3.8. No evidence reads occurred. The initial hierarchical HTTP 400 request has no usage; therefore its all-attempt actual input is unknown.
+The sixteen supplemental sessions contain 37 Main requests and 6,125,281 input and 40,932 output serialized request-text tokens.
 
-E2-R2 is a preregistered follow-up. C037 was executed with 106 corpus records; C042 was omitted before inference by the capacity rule and was not replaced. At C037, Flat and hierarchical cumulative actual input are 877,197 and 174,298 tokens, respectively, with blind mean scores 3.4 and 3.6 and key-evidence coverage 5/5 and 3/5. The hierarchical trace contains three exact parallel L3 reads, no L1/L2 reads, and verified subsequent delivery. The two Main sessions contain no scientific action. The blind reviewer is independent; human verification remains pending.
+\subsection{Context decision studies}
 
-All decision-replay studies assess proposed research decisions and information use. They do not establish improved physical task success. The decision samples are small and are reported descriptively, without significance or population-level causal claims. Actual Provider usage, generic tokenizer proxies, and offline context-construction costs remain separate measurement categories.
+E2 at PHS-C035 compares Flat and hierarchical context over a frozen corpus. Accepted-inference Provider input is 675,802 tokens for Flat and 78,785 for Hierarchical, an 88.34\% reduction. Blind scores are 4.0 and 3.8; no additional evidence reads occur. E2-R2 at C037 reports cumulative Provider input of 877,197 and 174,298 tokens, an 80.13\% reduction. Blind scores are 3.4 and 3.6, while key-evidence coverage is 5/5 and 3/5; the hierarchical trace contains three L3 reads. These are separate protocol stages and are not treated as repeated samples.
 
-\subsection{Physical-robot demonstrations}
+Six additional cross-task checkpoints (T01, T04, T07, T08, T09, and T10) produce twelve Main sessions, eleven valid decisions, and six anonymous paired reviews. One T08 Flat session exhausts its request budget and is retained. Across all recorded requests, serialized request-text volume is 1,546,342 tokens for Flat and 280,283 for Hierarchical delivery, an 81.87\% reduction. Blind decision quality and key-evidence recall are reported separately.
 
-Physical-robot demonstrations are maintained as a separate evidence source. Their platform configuration, protocol, trial count, and measured outcomes are reported from the corresponding hardware records. They are not inferred from MuJoCo trajectories and are not included in the simulation FULL condition count.
+\subsection{Serialized request-text counting}
+
+For the 16 supplemental K/S sessions and 12 cross-task context sessions, request and response text was reconstructed from the recorded session payloads and tokenized with the \texttt{o200k\_base} encoding. Subsequent request counts use the observed initial text-token/byte ratio for the corresponding serialized payload; output counts use retained response text, including final decisions and available intermediate replies. The resulting totals are 7,951,906 input and 66,264 output serialized request-text tokens across 28 sessions and 62 Main requests. These counts describe recorded text volume and exclude hidden service framing and internal reasoning. They are reported separately from Provider-reported usage and billing.
+
+The architecture decision studies use anonymous model-based reviews and small checkpoint counts. Their ordinal contrasts are descriptive; they do not establish statistical significance, population-level effects, or improved physical task success.

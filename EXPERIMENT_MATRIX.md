@@ -1,58 +1,35 @@
-# Experimental matrix — manuscript v1.2
+# Experimental Matrix
 
-## 1. Completed FULL physical portfolio
+## Physical portfolio
 
-Eleven completed task cases: T01–T10 and the nine-segment, four-tendon PHS-2D Round-3 case. The archived summary contains 30 passed required conditions among 30 required records. Two additional T10 frozen controls are reported separately. This is a completed-case portfolio, not a multi-seed success-rate estimate.
+| Group | Tasks | Required conditions | Main evaluation |
+|---|---|---:|---|
+| Active reach/load | T01--T03 | 7 | terminal/hold error, speed, load response |
+| Tracking/pose | T04--T06 | 3 | trajectory RMSE, position, tool-axis, timed scan |
+| Shared morphology | T07 | 4 | per-condition violation under one structure |
+| Passive response | T08 | 2 | bilateral stiffness and tendon engagement |
+| Contact/impact | T09--T10 | 4 | contact depth/force and impact recovery |
+| Passive FULL case | PHS-2D-7S | 10 | loaded-point and tip displacement |
+| Independent mechanism study | PHS-2D-9S | 10 | signed-load compliance, tip suppression, sensitivity |
 
-## 2. Research-mode comparison
+The FULL portfolio is T01--T10 plus PHS-2D-7S: eleven task cases and thirty required conditions. T10 has two additional frozen controls. PHS-2D-9S is a separate independent study.
 
-The first comparison batch contains PHS-2D, T01, T04, and T07, with one A and one B run per task; C is the corresponding historical FULL reference. A is LLM-only physical-feedback design. B adds direct bottom-level mathematical tools but not the high-level research-intent projection and mathematical orchestration. C is the complete FULL research process.
+## Research-mode comparison
 
-The representative A/B/C task-wise comparison focuses on T01, T04, and T07. PHS-2D is presented separately as the principal nine-segment mathematical and passive-design case.
+A/B/C contains 33 task--method records. A is LLM-only, B exposes direct mathematical tools, and C is the archived FULL process. C is historical; the comparison is task-wise and not a randomized multi-seed benchmark.
 
-## 3. Architecture decision-replay studies
+## Architecture decision studies
 
-### Reporter ON/OFF
-- Six matched historical checkpoints: M1-A/B/C and P3-A/B/C.
-- Twelve Main sessions and six anonymous paired reviews.
-- ON reuses six saved Reporter reports; no new Reporter generation is included.
-- Five-dimension blind mean: 3.433 OFF, 3.733 ON; paired mean difference +0.300; median 0; wins/ties/losses 2/4/0.
-- Unsupported conclusions: 2 OFF, 0 ON in the blind review.
-- Main Provider usage unavailable; mean additional visible context 1,450.5 tokens is a generic local tokenizer proxy.
+| Study | Sessions | Valid decisions | Reviews | Main measures |
+|---|---:|---:|---:|---|
+| Reporter ON/OFF | 12 | 12 | 6 paired | five-dimensional paired score, unsupported claims |
+| Original K/S E1 | 8 | 8 | 2 joint | historical-experience utilization, original four-dimensional score |
+| Supplemental K/S | 16 | 15 | 4 joint | common five-dimensional score, resource use |
+| Context E2/E2-R2 | 4 Main sessions across two historical pairs | 4 | 2 | Provider input, decision score, evidence coverage |
+| Cross-task context | 12 | 11 | 6 paired | serialized request-text volume, decision score, evidence recall |
 
-### E1: Knowledge/Skill 2×2
-- Two task checkpoints: T04 and T07.
-- Four cells per task: K−S−, K+S−, K−S+, K+S+.
-- Eight real Main LLM decisions; one observation per cell; one joint blind review per task.
-- Historical-experience utilization: 0/3/3/3 for the four cells.
-- Decision quality, evidence consistency, and actionability: 4 in every cell; invalid proposed actions: 0.
-- K and S main effects on utilization: +1.5 each; interaction contrast: −3; joint minus best single: 0.
-- K+S+ was acquired later; frozen inputs/settings match but backend/default reasoning identity is unverified.
-- No mathematical or physical follow-up was executed.
+The sixteen supplemental K/S sessions contain 37 requests and 6.13M input / 40.9k output serialized request-text tokens. The twelve cross-task context sessions contain 25 requests and 1.83M input / 25.3k output serialized request-text tokens. The 28 sessions together contain 62 requests and 7.95M input / 66.3k output serialized request-text tokens. These text-volume counts are distinct from Provider-reported usage in E2/E2-R2.
 
-### E2: Flat versus L0–L3 at PHS-C035
-- One paired decision checkpoint; 66-record corpus.
-- Flat receives the complete corpus; hierarchical receives automatic L0 plus a directory.
-- No additional evidence reads occurred.
-- Accepted-inference actual input: 675,802 Flat vs 78,785 hierarchical tokens (88.34% reduction).
-- Blind mean: 4.0 Flat vs 3.8 hierarchical.
-- Hierarchical has one initial HTTP 400 request with no usage; all-attempt actual input is unknown.
+## Ongoing experiment
 
-### E2-R2: preregistered context follow-up at PHS-C037
-- C037 admitted and executed with 106 records; C042 excluded before inference by the capacity gate and not replaced.
-- Flat receives the complete included corpus; hierarchical receives L0 and makes three parallel L3 reads.
-- No L1/L2 reads; exact raw returns and subsequent delivery verified.
-- Cumulative actual input: 877,197 Flat vs 174,298 hierarchical tokens (80.13% reduction); one vs two Main requests.
-- Blind mean: 3.4 Flat vs 3.6 hierarchical.
-- Key-evidence coverage: 5/5 Flat vs 3/5 hierarchical.
-- One paired checkpoint and one independent blind review; no physical action executed.
-
-## 4. Reporting rules
-
-- Use each physical task's frozen metrics and required-condition denominator.
-- Keep T10 frozen controls separate.
-- Do not average raw errors across task families.
-- Keep the nine-segment PHS-2D result and its 18-pair gradient audit separate from older topology snapshots.
-- Preserve the historical identity of C in all comparisons.
-- Treat Reporter, E1, E2, and E2-R2 as decision-only architecture studies. Report ordinal scores, sample counts, actual usage, generic proxies, and evidence coverage separately.
-- Do not infer robot-success improvement, statistical significance, or population-level synergy from these small decision samples.
+The separate full 11-task K/S research run is ongoing and is not included in the completed decision-replay results or current manuscript claims.

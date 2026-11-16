@@ -1,0 +1,41 @@
+\begin{tikzpicture}[x=1cm,y=1cm,font=\scriptsize]
+\foreach \y in {0,-1.75,-3.50,-5.25}
+  {\draw[PaperLight,line width=.45pt] (0,\y-0.72) -- (17.2,\y-0.72);}
+\node[anchor=west,font=\bfseries,text=PaperNavy] at (0.1,0.20) {PHS-2D-9S};
+\node[anchor=west,text=PaperGray] at (0.1,-0.08) {Passive mechanism};
+\draw[PaperGray,line width=1pt] (3.1,0) -- (16.7,0);
+\foreach \x in {3.4,7.7,12.0,16.2} {\fill[PaperNavy] (\x,0) circle (2pt);}
+\node[anchor=south,align=center,text width=3.2cm] at (3.4,0.10) {Diagonal stays\\Jacobian hypothesis};
+\node[anchor=north,align=center,text width=3.2cm] at (7.7,-0.10) {Dense guides\\finite-deformation slack};
+\node[anchor=south,align=center,text width=3.2cm] at (12.0,0.10) {Physical guide plates\\legal tendon routing};
+\node[anchor=north,align=center,text width=3.2cm] at (16.2,-0.10) {9 segments\\8 plates, 4 tendons};
+
+\node[anchor=west,font=\bfseries,text=PaperNavy] at (0.1,-1.55) {T04};
+\node[anchor=west,text=PaperGray] at (0.1,-1.83) {Trajectory tracking};
+\draw[PaperGray,line width=1pt] (3.1,-1.75) -- (16.7,-1.75);
+\foreach \x in {3.4,7.7,12.0,16.2} {\fill[PaperNavy] (\x,-1.75) circle (2pt);}
+\node[anchor=south,align=center,text width=3.2cm] at (3.4,-1.65) {Historical 1-segment\\outside legal domain};
+\node[anchor=north,align=center,text width=3.2cm] at (7.7,-1.85) {Legal 2-segment\\candidate};
+\node[anchor=south,align=center,text width=3.2cm] at (12.0,-1.65) {Initial equilibrium bank\\fails admission};
+\node[anchor=north,align=center,text width=3.2cm] at (16.2,-1.85) {Interior initialization\\22-s tracking passes};
+
+\node[anchor=west,font=\bfseries,text=PaperNavy] at (0.1,-3.30) {T07};
+\node[anchor=west,text=PaperGray] at (0.1,-3.58) {Shared morphology};
+\draw[PaperGray,line width=1pt] (3.1,-3.50) -- (16.7,-3.50);
+\foreach \x in {3.4,7.7,12.0,16.2} {\fill[PaperNavy] (\x,-3.50) circle (2pt);}
+\node[anchor=south,align=center,text width=3.2cm] at (3.4,-3.40) {A: 10.6\%\\native excess};
+\node[anchor=north,align=center,text width=3.2cm] at (7.7,-3.60) {Circular root\\0.875\% excess};
+\node[anchor=south,align=center,text width=3.2cm] at (12.0,-3.40) {Longer geometry\\4.40\%, rejected};
+\node[anchor=north,align=center,text width=3.2cm] at (16.2,-3.60) {Routing/control update\\4/4 required pass};
+
+\node[anchor=west,font=\bfseries,text=PaperNavy] at (0.1,-5.05) {T10};
+\node[anchor=west,text=PaperGray] at (0.1,-5.33) {Impact recovery};
+\draw[PaperGray,line width=1pt] (3.1,-5.25) -- (16.7,-5.25);
+\foreach \x in {3.4,7.7,12.0,16.2} {\fill[PaperNavy] (\x,-5.25) circle (2pt);}
+\node[anchor=south,align=center,text width=3.2cm] at (3.4,-5.15) {GVS/NMPC\\hold--actuator conflict};
+\node[anchor=north,align=center,text width=3.2cm] at (7.7,-5.35) {Native tangent\\model};
+\node[anchor=south,align=center,text width=3.2cm] at (12.0,-5.15) {State feedback\\discrete LQR};
+\node[anchor=north,align=center,text width=3.2cm] at (16.2,-5.35) {Common recipe\\3/3 required pass};
+
+\node[anchor=west,text=PaperGray] at (0.1,-6.35) {T07 intermediate percentages are finite-budget native capability diagnostics, not matched fixed-input effects.};
+\end{tikzpicture}

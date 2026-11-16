@@ -1,0 +1,51 @@
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=2 by 2,horizontal sep=1.25cm,vertical sep=1.0cm},
+  width=7.4cm,height=4.7cm,
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+  axis line style={PaperGray},tick style={PaperGray},
+  grid=major,grid style={PaperLight}
+]
+\nextgroupplot[
+ title={(a) Loaded-point displacement},
+ xlabel={Implicit derivative (mm/du)},
+ ylabel={Finite difference (mm/du)},
+ xmin=-20,xmax=0,ymin=-20,ymax=0
+]
+\addplot[PaperGray,dashed,domain=-20:0,samples=2,forget plot] {x};
+\addplot[PaperTeal,only marks,mark=*] coordinates {
+(-18.1252,-18.1362)(-6.2834,-6.2844)(-6.2500,-6.2426)
+(-10.1429,-10.1413)(-18.1013,-18.0934)(-10.1794,-10.1763)};
+\nextgroupplot[
+ title={(b) Projected tip displacement},
+ xlabel={Implicit derivative (mm/du)},
+ ylabel={Finite difference (mm/du)},
+ xmin=-5.4,xmax=0,ymin=-5.4,ymax=0
+]
+\addplot[PaperGray,dashed,domain=-5.4:0,samples=2,forget plot] {x};
+\addplot[PaperTeal,only marks,mark=square*] coordinates {
+(-4.8877,-4.8892)(-0.8252,-0.8253)(-0.8968,-0.8959)
+(-1.5364,-1.5365)(-4.4120,-4.4106)(-1.3821,-1.3818)};
+\nextgroupplot[
+ title={(c) Tip-to-point ratio},
+ xlabel={Implicit derivative (1/du)},
+ ylabel={Finite difference (1/du)},
+ xmin=-0.115,xmax=0,ymin=-0.115,ymax=0
+]
+\addplot[PaperGray,dashed,domain=-0.115:0,samples=2,forget plot] {x};
+\addplot[PaperTeal,only marks,mark=triangle*] coordinates {
+(-0.103654,-0.103665)(-0.040038,-0.040040)(-0.044413,-0.044375)
+(-0.038092,-0.038103)(-0.093436,-0.093413)(-0.033469,-0.033467)};
+\nextgroupplot[
+ title={(d) Relative discrepancy},
+ xlabel={Metric},ylabel={Relative error (\%)},
+ xmin=0.7,xmax=3.3,xtick={1,2,3},
+ xticklabels={Point,Tip,Ratio},ymin=0,ymax=0.14
+]
+\addplot[PaperOchre,only marks,mark=*] coordinates {
+(0.90,0.0608)(0.94,0.0158)(0.98,0.1191)(1.02,0.0153)(1.06,0.0438)(1.10,0.0298)
+(1.90,0.0314)(1.94,0.0099)(1.98,0.1005)(2.02,0.0092)(2.06,0.0320)(2.10,0.0178)
+(2.90,0.0111)(2.94,0.0049)(2.98,0.0854)(3.02,0.0278)(3.06,0.0241)(3.10,0.0083)};
+\end{groupplot}
+\end{tikzpicture}

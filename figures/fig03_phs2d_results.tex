@@ -1,0 +1,50 @@
+\begin{tikzpicture}
+\node[anchor=west,font=\bfseries] at (0,0.25) {(a) Final physical guide-and-tendon mechanism};
+\node[anchor=west,font=\bfseries] at (8.1,0.25) {(b) Loaded-point displacement};
+\node[anchor=west,font=\bfseries] at (13.0,0.25) {(c) Tip displacement and ratio};
+\node[anchor=north west] at (0,0) {\includesvg[width=7.6cm]{figures/fig03_phs2d_mechanism}};
+\begin{axis}[
+  at={(8.1cm,-0.2cm)},anchor=north west,
+  width=4.3cm,height=4.8cm,
+  xmin=0.28,xmax=0.72,ymin=0,ymax=32,
+  xlabel={Material position $s$},ylabel={Displacement (mm)},
+  tick label style={font=\scriptsize},label style={font=\scriptsize},
+  legend style={font=\tiny,draw=none,at={(0.5,-0.28)},anchor=north,legend columns=2},
+  axis line style={PaperGray},tick style={PaperGray},
+  grid=major,grid style={PaperLight}
+]
+\addplot[PaperNavy,mark=* ,thick] coordinates {(0.3,11.179)(0.4,17.384)(0.5,22.923)(0.6,26.897)(0.7,28.021)};
+\addlegendentry{$+0.1$ N}
+\addplot[PaperSlate,mark=triangle*,thick] coordinates {(0.3,11.155)(0.4,17.355)(0.5,22.896)(0.6,26.890)(0.7,28.080)};
+\addlegendentry{$-0.1$ N}
+\end{axis}
+\begin{axis}[
+  at={(12.9cm,-0.2cm)},anchor=north west,
+  width=4.1cm,height=4.8cm,
+  xmin=0.28,xmax=0.72,ymin=0,ymax=3.5,
+  xlabel={Material position $s$},ylabel={Tip displacement (mm)},
+  tick label style={font=\scriptsize},label style={font=\scriptsize},
+  legend style={font=\tiny,draw=none,at={(0.5,-0.28)},anchor=north,legend columns=2},
+  axis line style={PaperGray},tick style={PaperGray},
+  grid=major,grid style={PaperLight}
+]
+\addplot[PaperNavy,mark=*,thick] coordinates {(0.3,0.673)(0.4,0.985)(0.5,1.387)(0.6,1.984)(0.7,2.782)};
+\addlegendentry{$+0.1$ N}
+\addplot[PaperSlate,mark=triangle*,thick] coordinates {(0.3,0.718)(0.4,1.057)(0.5,1.502)(0.6,2.166)(0.7,3.068)};
+\addlegendentry{$-0.1$ N}
+\end{axis}
+\begin{axis}[
+  at={(8.1cm,-5.55cm)},anchor=north west,
+  width=8.9cm,height=3.2cm,
+  xmin=0.28,xmax=0.72,ymin=0,ymax=0.32,
+  xlabel={Material position $s$},ylabel={Tip-to-point ratio},
+  tick label style={font=\scriptsize},label style={font=\scriptsize},
+  axis line style={PaperGray},tick style={PaperGray},
+  grid=major,grid style={PaperLight}
+]
+\addplot[PaperBrick,dashed,thick,domain=0.28:0.72] {0.3};
+\addplot[PaperNavy,mark=*,thick] coordinates {(0.3,0.0602)(0.4,0.0566)(0.5,0.0605)(0.6,0.0737)(0.7,0.0993)};
+\addplot[PaperSlate,mark=triangle*,thick] coordinates {(0.3,0.0643)(0.4,0.0609)(0.5,0.0656)(0.6,0.0806)(0.7,0.1093)};
+\end{axis}
+\node[anchor=west,font=\scriptsize,text=PaperGray] at (8.1cm,-9.0cm) {Ten signed-load cases; all pass. Dashed line: original ratio limit 0.3.};
+\end{tikzpicture}

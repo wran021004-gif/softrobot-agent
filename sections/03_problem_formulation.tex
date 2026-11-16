@@ -1,7 +1,7 @@
 \section{Problem Formulation}
 \label{sec:formulation}
 
-We study tendon-driven soft-robot design under task-specific physical requirements. A design must satisfy a frozen task contract, while the agent may investigate and revise the morphology, parameters, and control strategy used to meet it.
+We study tendon-driven soft-robot design under task-specific physical requirements. A design must satisfy a frozen task contract, while the research process may revise morphology, parameters, and control strategy in response to mathematical and physical evidence.
 
 \subsection{Robot design and task specification}
 \label{subsec:design-space}
@@ -12,9 +12,9 @@ d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},
 d_{\mathrm{route}},d_{\mathrm{assembly}}),
 \label{eq:design}
 \end{equation}
-which collects topology, geometry, material properties, tendon routing, and assembly or payout settings. The admissible design space is $\mathcal D$. We distinguish structural variables $d$ from controller parameters $\theta$ and, for active robots, the actuation sequence $U=(u_0,\ldots,u_{N-1})$.
+which collects topology, geometry, material properties, tendon routing, and assembly or payout settings. The admissible design space is denoted by $\mathcal D$. Structural variables $d$ are distinguished from controller parameters $\theta$ and, for active robots, the actuation sequence $U=(u_0,\ldots,u_{N-1})$.
 
-Each task $\tau$ is a fixed contract specifying the initial condition, target or reference, loads, execution horizon, observables, tolerances, and evaluation procedure. Its active-task requirements are written as normalized constraints
+Each task $\tau$ is a fixed contract specifying the initial condition, target or reference, external loads, execution horizon, observables, tolerances, and evaluation procedure. Its active-task requirements are written as normalized constraints
 \begin{equation}
 g_{\tau,i}(d,U)\leq 0,\qquad i=1,\ldots,m_\tau,
 \label{eq:taskconstraints}
@@ -31,16 +31,16 @@ V_\tau(d)=
 \max_i g_{\tau,i}(d,U),
 \label{eq:capability}
 \end{equation}
-where $\mathcal U(d)$ contains the inputs allowed by the design-dependent actuator limits. This definition evaluates a structure after control re-optimization.
+where $\mathcal U(d)$ contains the inputs allowed by the design-dependent actuator limits. This definition evaluates a structure after control re-optimization and separates task capability from response under a prescribed input.
 
-For a passive fixed-payout robot, the response is determined by its structure, tendon constraints, and applied load. A quasi-static equilibrium $q^\star_\tau(d,f)$ satisfies the constrained equilibrium conditions
+For a passive fixed-payout robot, the response is determined by its structure, tendon constraints, and applied load. A quasi-static equilibrium $q^\star_\tau(d,f)$ satisfies
 \begin{equation}
 \begin{aligned}
 \nabla_q\Pi(q^\star_\tau;d,f)
 +\sum_j\lambda^\star_j\nabla_q c_j(q^\star_\tau,d)&=0,\\
 c_j(q^\star_\tau,d)\leq0,\quad
 \lambda^\star_j&\geq0,\quad
-\lambda^\star_jc_j(q^\star_\tau,d)=0,
+\lambda^\star_jc_j(q^\star_\tau,d)&=0,
 \end{aligned}
 \label{eq:passive-problem}
 \end{equation}
@@ -68,18 +68,4 @@ V_{\mathcal C}(d)=\max_{c\in\mathcal C}v_c(d).
 \end{equation}
 Thus, all required conditions must be satisfied by the same morphology; an average cannot conceal a failed condition.
 
-\subsection{Agentic research formulation}
-\label{subsec:research-state}
-
-We formulate design as an iterative research process. At iteration $k$, the state is
-\begin{equation}
-s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
-\label{eq:researchstate}
-\end{equation}
-where $\mathcal H_k$ denotes working physical hypotheses, $\mathcal E_k$ the accumulated mathematical and physical evidence, and $\mathcal B_k$ the remaining budget. The agent selects a research action $a_k$ and receives an observation $y_k$, producing
-\begin{equation}
-(\mathcal H_{k+1},\mathcal E_{k+1},d_{k+1})
-=\Phi(s_k,a_k,y_k).
-\label{eq:researchupdate}
-\end{equation}
-The task contract remains fixed, while the design, hypothesis, and research route may evolve in response to evidence.
+The design problem is therefore task-conditioned and evidence-dependent. The mathematical formulation specifies what constitutes a feasible design and how task capability is evaluated. The agentic research process that chooses which physical question to investigate, which mathematical object to analyze, and which candidate to evaluate is defined in Section~\ref{sec:method}.

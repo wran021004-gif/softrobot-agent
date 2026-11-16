@@ -4,22 +4,22 @@
 \subsection{Method permissions}
 
 \paragraph{A: LLM-only.}
-The LLM proposes and revises structures and controls using the frozen task information and physical-evaluation feedback. It may generate candidates, set control inputs through the unified execution interface, run the physical simulator, and read the independent evaluator. Optional mathematical diagnosis and automated mathematical optimization tools are not exposed.
+The agent proposes and revises structures and controls using the frozen task information and physical-evaluation feedback. It may generate candidates, set control inputs through the unified execution interface, run the physical simulator, and read the independent evaluator. Optional mathematical diagnosis and automated mathematical optimization tools are not exposed.
 
 \paragraph{B: Direct mathematical tools.}
-B has the A capabilities and may invoke supported bottom-level mathematical tools, including Jacobian, equilibrium/KKT, finite-difference, and supported optimization routines. The LLM constructs the mathematical question and requests itself; the high-level research-intent projection and mathematical research orchestration are not exposed.
+B has the A capabilities and may invoke supported bottom-level mathematical tools, including Jacobian, equilibrium/KKT, finite-difference, and supported optimization routines. The agent constructs the mathematical question and requests itself; the high-level research-intent projection and mathematical research orchestration are not exposed.
 
-\paragraph{C: \softrobotagent{} FULL.}
-C uses the archived FULL study and its original Store/Trace. It is not re-run. Its historical configuration is retained as recorded.
+\paragraph{C: FULL research process.}
+C uses the archived FULL study and its original research record. It includes research-intent projection, PPRP construction, M0--M3 semantics, differentiation routing, validity checks, evidence feedback, and context organization. It is not re-run.
 
 \subsection{Initial conditions and design-space access}
 
 A and B start from the original task initial condition rather than an intermediate FULL candidate or decision node. Both receive the complete legal design space and the same candidate-generation and physical-evaluation interfaces. Topology, segment count, tendon count, routing, geometry, and material choices remain open within the task generator's legal bounds. The task contract and acceptance criteria are unchanged.
 
-The first A/B batch comprises PHS-2D, T01, T04, and T07, with one A run and one B run per task. The representative A/B/C case comparison in Section~\ref{sec:results} focuses on T01, T04, and T07, where the task-wise A/B records are read alongside the corresponding historical FULL cases. The PHS-2D A/B runs are retained as separate research-mode records; the principal nine-segment PHS-2D design is reported from its dedicated Round-3 evidence package.
+The comparison contains eleven task cases and 33 task--method records. A and B are task-wise research runs; C is the corresponding historical FULL record. PHS-2D in this matrix is PHS-2D-7S. The independent PHS-2D-9S study is reported separately as the principal passive mechanism and sensitivity case.
 
-\subsection{Resource accounting and outputs}
+\subsection{Status and resource accounting}
 
-Within each task, A and B use the same configured ceilings for model tokens, candidate generation, physical evaluations, integration steps, and wall-clock time. Mathematical calls are recorded separately. The comparison reports task-specific completion and normalized violation, best violation against cumulative physical-evaluation budget where trace checkpoints are available, candidate count, physical evaluations, mathematical calls, tokens, integration steps, and recorded wall-clock cost.
+The status matrix distinguishes PASS, qualified PASS, valid failure, incomplete execution, and qualification failure. Evaluated coverage is reported separately from required-condition completion. A protocol qualification or discretization note is retained with the corresponding task record.
 
-The comparison is presented as task-wise research cases. Raw errors from different task families are not pooled into a cross-task average. Historical C remains identified as an archived FULL reference.
+Within each task, A and B use the configured ceilings for model requests, candidate generation, physical evaluations, integration steps, and wall-clock time. Mathematical calls are recorded separately. Resource comparisons are task-wise and retain their original measurement scope; incompatible cost populations are not pooled. The complete matrix and condition-level metrics are provided in the supplementary data.

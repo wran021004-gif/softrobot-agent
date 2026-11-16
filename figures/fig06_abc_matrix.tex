@@ -1,0 +1,44 @@
+\begin{tikzpicture}[x=1cm,y=1cm,font=\scriptsize]
+\node[anchor=west,font=\bfseries] at (0.2,0.45) {Task};
+\node[anchor=center,font=\bfseries] at (7.0,0.45) {A: LLM-only};
+\node[anchor=center,font=\bfseries] at (10.0,0.45) {B: Direct tools};
+\node[anchor=center,font=\bfseries] at (13.0,0.45) {C: FULL};
+\draw[PaperGray] (0.1,0.18) -- (15.2,0.18);
+\foreach \y in {0,-0.48,-0.96,-1.44,-1.92,-2.40,-2.88,-3.36,-3.84,-4.32,-4.80}
+  {\draw[PaperLight] (0.1,\y-0.22) -- (15.2,\y-0.22);}
+\foreach \x in {7.0,10.0,13.0}
+  {\draw[PaperLight] (\x-0.9,0.15) -- (\x-0.9,-5.05);}
+\foreach \i/\task in {0/PHS-2D-7S,1/T01,2/T02,3/T03,4/T04,5/T05,6/T06,7/T07,8/T08,9/T09,10/T10}
+  {\node[anchor=west,font=\bfseries] at (0.2,-0.48*\i-0.02) {\task};}
+% A column
+\node[draw=PaperOchre,fill=PaperOchre!15,minimum width=1.25cm,minimum height=.29cm] at (7,-0.02) {QUAL};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (7,-0.50) {FAIL};
+\node[draw=PaperGray,fill=PaperGray!12,minimum width=1.25cm,minimum height=.29cm] at (7,-0.98) {INCOMP};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (7,-1.46) {FAIL};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (7,-1.94) {FAIL};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (7,-2.42) {FAIL};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (7,-2.90) {FAIL};
+\node[draw=PaperGray,fill=PaperGray!12,minimum width=1.25cm,minimum height=.29cm] at (7,-3.38) {INCOMP};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (7,-3.86) {FAIL};
+\node[draw=PaperGray,fill=PaperGray!12,minimum width=1.25cm,minimum height=.29cm] at (7,-4.34) {INCOMP};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (7,-4.82) {FAIL};
+% B column
+\node[draw=PaperOchre,fill=PaperOchre!15,minimum width=1.25cm,minimum height=.29cm] at (10,-0.02) {QUAL};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (10,-0.50) {FAIL};
+\node[draw=PaperGray,fill=PaperGray!12,minimum width=1.25cm,minimum height=.29cm] at (10,-0.98) {INCOMP};
+\node[draw=PaperGreen,fill=PaperGreen!15,minimum width=1.25cm,minimum height=.29cm] at (10,-1.46) {PASS$^\dagger$};
+\node[draw=PaperOchre,fill=PaperOchre!15,minimum width=1.25cm,minimum height=.29cm] at (10,-1.94) {QUAL};
+\node[draw=PaperGreen,fill=PaperGreen!15,minimum width=1.25cm,minimum height=.29cm] at (10,-2.42) {PASS};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (10,-2.90) {FAIL};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (10,-3.38) {FAIL};
+\node[draw=PaperOchre,fill=PaperOchre!15,minimum width=1.25cm,minimum height=.29cm] at (10,-3.86) {QUAL};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (10,-4.34) {FAIL};
+\node[draw=PaperBrick,fill=PaperBrick!12,minimum width=1.25cm,minimum height=.29cm] at (10,-4.82) {FAIL};
+% C column
+\foreach \i in {0,...,10}
+  {\node[draw=PaperGreen,fill=PaperGreen!15,minimum width=1.25cm,minimum height=.29cm] at (13,-0.48*\i-0.02) {PASS};}
+\node[anchor=west,text=PaperBrick] at (0.2,-5.35) {A: 7 valid failures, 3 incomplete, 1 qualification failure};
+\node[anchor=west,text=PaperOchre] at (0.2,-5.65) {B: 5 valid failures, 3 qualification failures, 1 incomplete, 2 passes};
+\node[anchor=west,text=PaperGreen] at (0.2,-5.95) {C: 11/11 FULL task cases pass};
+\node[anchor=west,text=PaperGray] at (0.2,-6.35) {$^\dagger$ Recorded protocol qualification; see Appendix~\ref{app:abc-protocol}. C is the historical FULL reference.};
+\end{tikzpicture}

@@ -1,168 +1,104 @@
 \section{Results and Analysis}
 \label{sec:results}
 
-\subsection{Multi-task FULL portfolio}
+\subsection{Physical task portfolio}
 
-The completed FULL studies span eleven distinct research cases and thirty required physical conditions. All thirty required conditions passed their corresponding task evaluators. The two additional T10 frozen controls are reported separately. Table~\ref{tab:full-results} summarizes the task-specific outcomes.
+The FULL portfolio completes eleven task cases spanning active and passive soft-robot research. All 30 required physical conditions pass their task-specific evaluators. T10's two frozen control conditions are reported separately and do not contribute to the required-condition count. Figure~\ref{fig:task-portfolio} summarizes the task families, morphology, actuation, and condition coverage.
 
-\begin{table*}[t]
-\centering
-\caption{Completed FULL results. Metrics retain their task-specific definitions and units.}
-\label{tab:full-results}
-\small
-\begin{tabularx}{\textwidth}{@{}l c Y Y@{}}
-\toprule
-Task & Required & Principal result & Research contribution illustrated \\
-\midrule
-T01 & 3/3 & Maximum holding-position error 9.9059 mm. & Shared morphology refinement through routing and length changes, followed by condition-specific control refinement. \\
-T02 & 3/3 & Maximum loaded holding-position error 9.8971 mm. & Transition from static/GVS reasoning to native finite-horizon dynamic treatment under external loads. \\
-T03 & 1/1 & Terminal error 2.1099 mm; maximum hold-position error 2.6627 mm. & Fast reach with explicit terminal and post-arrival constraints. \\
-T04 & 1/1 & Full 22-s, two-cycle tracking; RMSE 0.68785 mm; maximum error 1.02066 mm. & Construction of an equilibrium-point sequence and periodic tension feedforward for complete trajectory execution. \\
-T05 & 1/1 & Tool-position error 7.4585 mm; directed-axis error 0.05182 rad. & Joint position and directed tool-axis design. \\
-T06 & 1/1 & 20-g timed scan; maximum position error 11.8198 mm; directed-axis error 0.11045 rad. & Time-indexed loaded position--orientation response. \\
-T07 & 4/4 & One four-tendon structure satisfies M1\_A, M1\_B, M1\_C, and M5. & Shared-structure multi-task refinement with condition-specific control initialization. \\
-T08 & 2/2 & Progressive-stiffness ratio 1.63145; low-load response 7.9281 mm; high-load response 22.5085 mm. & Passive bilateral stiffness shaping under opposite loading directions. \\
-T09 & 1/1 & Depth/force hold 0.5 s; depth error 0.05275 mm; force error 0.002465 N. & Contact manipulation with physically represented guide and support geometry. \\
-T10 & 3/3 & Maximum required-case final-hold position error 4.1314 mm. & Native state feedback using a static reference, full tangent model, discrete LQR, and bounded tension allocation. \\
-PHS-2D & 10/10 & Point displacement minimum 14.7981 mm; projected tip displacement maximum 4.3470 mm; ratio maximum 0.153751. & Nine-segment passive tendon-constrained design with guide-path refinement and ten-condition loading validation. \\
-\bottomrule
-\end{tabularx}
-\end{table*}
+The portfolio covers distinct physical requirements rather than repeated variants of a single reaching task. T01--T03 evaluate target acquisition and holding under different timing and load requirements; T04 evaluates a complete two-cycle figure-eight trajectory; T05 and T06 combine end-effector position with directed tool-axis or time-indexed pose requirements; T07 requires one shared morphology to satisfy four conditions; T08 evaluates passive progressive stiffness; T09 evaluates guided contact and spring-button holding; and T10 evaluates recovery under three required impact conditions. The seven-segment PHS-2D-7S case adds a passive tendon-constrained compliance task to the same FULL portfolio.
 
-The portfolio covers active reach and hold, loading, rapid motion, tracking, orientation, timed scanning, shared-structure multi-task design, passive stiffness, contact, impact recovery, and passive tendon-constrained design. The results are task-wise physical outcomes rather than repetitions of a single benchmark.
+The results are reported using task-specific physical quantities. For example, T04 completes the 22-s, two-cycle tracking task with a trajectory RMSE of 0.688 mm and a maximum tracking error of 1.021 mm. T08 reaches a bilateral progressive-stiffness ratio of 1.631 under its frozen loading protocol. These values illustrate different physical capabilities and are not combined into a cross-task raw-error average.
 
-\subsection{PHS-2D: mechanism-guided passive structure design}
+\subsection{Mechanism-guided passive design: PHS-2D-9S}
 
-The principal passive-design case uses a nine-segment, four-tendon structure with physical guide plates and fixed payout. The final Round-3 design passed ten prescribed loading conditions and the archived half-time-step confirmation. Its minimum loaded-point displacement is 14.7981 mm, maximum projected tip displacement is 4.3470 mm, and maximum displacement ratio is 0.153751.
+The independent PHS-2D-9S study illustrates how a physical hypothesis can guide successive changes in passive tendon routing and support geometry. The study progressed from diagonal tendon stays, through dense offset guides, to physically owned guide plates and a nine-segment structure with eight guide plates and four passive tendons. The final configuration retains a compliant loaded region while constraining the projected tip response.
 
-The research trace shows how the design question evolved. Local tendon-constraint and response analysis first motivated a motion-decoupling hypothesis. Finite-load evaluation then made the relevant physical behavior explicit: local response alone did not characterize the loaded settling response or the routing geometry over the full structure. The investigation consequently moved from local mechanism adjustment to finite-load response, guide-path inspection, structural clearance, and material distribution. The final candidate was frozen and evaluated over all ten conditions. This sequence connects mathematical diagnosis to concrete morphology changes and independent physical acceptance.
-
-\subsubsection{Implicit-gradient and finite-difference consistency}
-
-A fixed-topology sensitivity audit compares KKT-based implicit derivatives with finite differences obtained by perturbing the common Young's-modulus direction and re-solving loaded and unloaded equilibria. Six loading branches were evaluated for three task metrics: loaded-point displacement, horizontal tip displacement, and their ratio, producing 18 task-metric derivative pairs.
-
-The maximum relative discrepancy across the 18 pairs is 0.1191223\%. This result provides a quantitative consistency check for the reported local task-metric sensitivities under the tested branches and perturbation. The eighteen pairs are not eighteen independent design-parameter gradients: the perturbation follows one common modulus direction across the nine segments.
-
-\begin{figure}[t]
-\centering
-\fbox{\parbox[c][2.5cm][c]{0.94\linewidth}{\centering
-\todo{Insert the nine-segment, four-tendon Round-3 structure and representative ten-condition response panels.}
-}}
-\caption{Nine-segment PHS-2D passive-design case, showing the physical guide layout and representative loaded responses from the same Round-3 design.}
-\label{fig:phs2d-design}
-\end{figure}
-
-\begin{figure}[t]
-\centering
-\fbox{\parbox[c][2.3cm][c]{0.94\linewidth}{\centering
-\todo{Insert the 18-pair implicit-gradient versus re-equilibration finite-difference plot, grouped by six loading branches and three task metrics.}
-}}
-\caption{Local task-metric sensitivity consistency for the nine-segment passive model.}
-\label{fig:gradient-validation}
-\end{figure}
-
-\subsection{Active structure--control refinement}
-
-T01, T02, and T07 show complementary forms of active structure--control research. In T01, routing-radius changes addressed tendon-speed constraints, while a later length adjustment provided additional reach and braking margin at a boundary target. The final shared structure passed all three targets.
-
-T02 required a different inner physical problem. The research trace records that a static/GVS treatment did not represent the external-load task, motivating a native finite-horizon dynamic treatment. The resulting structure and control were evaluated under positive, negative, and zero loading.
-
-T07 demonstrates shared-morphology refinement across four task conditions. A longer structural candidate increased violation in one condition and was rejected. The investigation returned to a better-performing length and revised the tendon routing. A control sequence from one solved condition was used only as an initialization for another condition and was then re-optimized and independently evaluated. The final common four-tendon structure passed all four required conditions.
-
-Together, these cases distinguish fixed-input physical response from task capability after control re-optimization. A structural modification changes the physical response under an existing input; the final task result depends on the control that can be found for the modified structure.
-
-\subsection{Adaptive research and control-method selection}
-
-T04 and T10 illustrate how physical and mathematical evidence changes the research route. T04's final 22-s figure-eight result uses a continuously constructed equilibrium-point sequence and periodic tension feedforward. The final result is evaluated over the complete two-cycle reference. T10's final impact-recovery controller uses a static reference, a full tangent model, discrete LQR, and bounded tension allocation; the same recipe passed all three required impact conditions.
-
-T05 and T06 further show that task formulation determines the required physical observables. A directed tool-axis constraint and a time-indexed loaded position--orientation scan require more than endpoint position alone. The same research interface can therefore support different task-specific mathematical outputs and physical evaluations.
+Across the ten prescribed signed-load conditions, all ten evaluations pass. The minimum loaded-point displacement is 11.155 mm, the maximum projected tip displacement is 3.068 mm, and the maximum tip-to-point displacement ratio is 0.1093. The ten conditions include both loading directions at five material locations. Half-time-step and initial-state perturbation checks are retained as additional numerical robustness evidence. The seven-segment PHS-2D-7S FULL result is a separate study and is not merged with these nine-segment measurements.
 
 \begin{figure*}[t]
 \centering
-\fbox{\parbox[c][2.4cm][c]{0.94\linewidth}{\centering
-\todo{Build a four-row evidence-to-action timeline from original decision/trace records. PHS-2D: local tendon-coupling hypothesis → finite-load settling evidence → tendon-route/solid-intersection diagnosis → guide-path and modulus revisions → frozen F8 ten-condition acceptance. T04: historical tracking-method adaptation → legal two-segment reconstruction → failed global preload initialization → local equilibrium-bank/inner-point recovery → complete 22-s two-cycle tracking. T07: shared-structure violation → reject longer root segment → revise routing → transfer and re-optimize a control initialization → four-condition acceptance. T10: GVS/NMPC hold and actuator conflicts → native tangent model → discrete LQR and bounded tension allocation → common controller passes three required impact cases. Use candidate thumbnails and measured curves only where available; connect each transition to its source evidence ID.}
-}}
-\caption{Representative autonomous research trajectories showing evidence-driven changes in physical hypotheses, analysis routes, morphology, and control.}
+\input{figures/fig03_phs2d_results}
+\caption{Mechanism-guided passive design in the independent PHS-2D-9S study. (a) Final nine-segment, four-tendon structure with eight massive guide plates. (b) Loaded-point and projected tip displacements under positive and negative loads at five material locations. (c) Tip-to-point displacement ratio, with the original 0.3 acceptance threshold. The ten prescribed load cases pass; the plotted shapes and response metrics belong to the nine-segment study, not the seven-segment FULL case.}
+\label{fig:phs2d-mechanism}
+\end{figure*}
+
+\subsection{Local mathematical sensitivity validation}
+
+The PHS-2D-9S sensitivity audit compares KKT-based implicit derivatives with finite differences obtained by perturbing a common Young's-modulus direction and re-solving loaded and unloaded equilibria. Six signed-load branches and three task metrics (loaded-point displacement, projected tip displacement, and their ratio) produce eighteen derivative pairs. The maximum relative discrepancy is 0.1191\%. Figure~\ref{fig:gradient-validation} reports the parity comparisons separately by metric and the corresponding relative-error distribution.
+
+The eighteen pairs cover three observables over six loading branches along one shared modulus perturbation direction. They are not eighteen independent design-parameter directions, and the maximum discrepancy is a local numerical consistency measure rather than a global error bound. The result supports the use of the implicit sensitivity calculation for the tested equilibrium and parameter direction; it does not establish global differentiability across topology changes or tendon active-set transitions.
+
+\begin{figure*}[t]
+\centering
+\input{figures/fig04_gradient_validation}
+\caption{Local implicit-gradient validation for PHS-2D-9S. (a)--(c) Implicit derivatives against finite-difference derivatives for loaded-point displacement, projected tip displacement, and their ratio, respectively; each panel contains six signed-load branches. The identity line indicates exact agreement. (d) Relative discrepancies for all eighteen derivative pairs. The maximum discrepancy is 0.1191\% along one common Young's-modulus perturbation direction.}
+\label{fig:gradient-validation}
+\end{figure*}
+
+\subsection{Evidence-guided research trajectories}
+
+The research traces show how mathematical and physical observations inform changes to hypotheses, candidate geometry, and control strategy. Figure~\ref{fig:research-trajectories} summarizes representative trajectories from PHS-2D-9S, T04, T07, and T10.
+
+In PHS-2D-9S, the initial Jacobian-based diagonal-stay hypothesis was challenged by finite-deformation slack and routing limitations. Dense guide sites were then replaced by physically owned guide plates, leading to the final nine-segment routing. The final candidate was evaluated under the prescribed signed-load conditions rather than accepted solely from the local mechanism indicator.
+
+T04 illustrates the separation between static feasibility and dynamic acceptance. A historical single-segment geometry was outside the current task's legal design domain, so a legal two-segment candidate was constructed. An initial equilibrium-bank attempt failed its native admissibility check. A revised interior initialization produced a usable equilibrium set, after which the complete 22-s two-cycle trajectory was independently evaluated. Static feasibility was not treated as a substitute for the trajectory test.
+
+T07 provides a clear structure--control research trajectory. The initial shared geometry left condition A with approximately 10.6\% signed excess in a finite-budget native capability diagnostic. A circular root-section hypothesis reduced this diagnostic excess to approximately 0.875\%. A distributed-length candidate increased the excess to approximately 4.40\% and was rejected; the study returned to the shorter geometry and adjusted tendon routing at the legal boundary. The remaining condition C was then re-optimized from a current trajectory while retaining the common structure. The final shared design passes all four required conditions. The intermediate signed-excess values are native optimization diagnostics, not matched fixed-input physical effects.
+
+T10 illustrates a change in control research route. The initial GVS/NMPC route exposed a conflict between holding requirements and tendon speed/stroke constraints. The research then moved to a native state-feedback formulation with a common controller recipe and bounded tension allocation. The resulting controller passes the three required impact conditions; the two frozen controls remain separately reported.
+
+\begin{figure*}[t]
+\centering
+\input{figures/fig05_research_trajectories}
+\caption{Representative evidence-guided research trajectories. Each row shows the observation or limitation that motivated a change, the corresponding investigation, and the resulting candidate or control decision. The T07 intermediate values refer to finite-budget native capability diagnostics; the final 4/4 result refers to independent required-condition evaluation. The PHS-2D row is the independent nine-segment study.}
 \label{fig:research-trajectories}
 \end{figure*}
 
-\subsection{Task-wise comparison of research modes}
+\subsection{Research-mode comparison}
 
-The representative A/B/C records for T01, T04, and T07 are summarized in Table~\ref{tab:abc-cases}. C denotes the archived FULL result; A and B are separate runs from the corresponding task initial states. The table reports task completion rather than pooling heterogeneous raw errors.
+Figure~\ref{fig:abc-matrix} summarizes the 33 task--method records. The LLM-only mode A has seven valid failures, three incomplete runs, and one qualification failure. Direct mathematical tools mode B has two passes (one marked with its recorded protocol qualification), five valid failures, three qualification failures, and one incomplete run. The archived FULL mode C passes all eleven tasks and all thirty required conditions.
 
-\begin{table}[t]
-\centering
-\caption{Representative task-wise A/B/C comparison. Entries show status and the recorded normalized constraint-violation fraction; C is the historical FULL reference.}
-\label{tab:abc-cases}
-\small
-\begin{tabular}{@{}lccc@{}}
-\toprule
-Task & A: LLM-only & B: Direct tools & C: Ours FULL \\
-\midrule
-T01 & Fail (0.444) & Fail (0.556) & Pass (0) \\
-T04 & Fail (0.167) & Qual. fail (0.333) & Pass (0) \\
-T07 & Fail (0.429) & Fail (0.400) & Pass (0) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-For T04-B, qualification failed before the 22-s trajectory was executed; its fraction records the failed qualification constraints, not a trajectory-level violation. The comparison contains one new A and one new B run per task, with C taken from the archived FULL study.
-
-The comparison illustrates the distinction between direct candidate refinement and a research process that organizes mathematical questions, evidence, and subsequent design decisions. The FULL traces for these tasks contain explicit structural revisions, changes in physical or control formulation, and condition-specific control refinement. The comparison is presented at the task-case level, with the historical status of C retained.
-
-\subsection{Reporter-guided decision quality}
-
-The Reporter study compares six matched historical checkpoints (M1-A/B/C and P3-A/B/C) with and without the corresponding read-only Reporter interpretation in the Main context. The six pairs comprise twelve independent Main decision sessions and six anonymous paired reviews. Across the five equally weighted blind-review dimensions, the mean score increases from 3.433/4 without Reporter context to 3.733/4 with it, a paired mean difference of +0.300. The paired median difference is zero; the ON condition wins two pairs, ties four, and loses none.
-
-The largest average dimension-level difference is evidence consistency (+0.500), followed by research actionability and Main decision quality (+0.333 each). The blind reviewer identifies two unsupported conclusions in OFF decisions and none in ON decisions. These observations indicate that the Reporter can improve the evidence-to-action interface at selected checkpoints, particularly by making evidence scope and missing comparisons explicit. They do not imply a universal improvement across research states.
-
-The six existing Reporter reports were reused rather than regenerated during this study. Main Provider usage was unavailable; the average additional visible-context cost is 1,450.5 tokens under a generic local tokenizer proxy, not a verified model-token or billing measure. The proposed follow-up actions were not executed. One independent model review was performed per pair, and human verification remains separate.
+The comparison indicates that access to bottom-level mathematical tools alone does not reproduce the complete research process. In B, the agent must still formulate and coordinate mathematical requests without the high-level research-intent projection and evidence orchestration. The complete FULL records show the strongest task-level coverage across the portfolio. Because C is a historical FULL record and A/B are task-wise research runs rather than randomized multi-seed trials, the matrix is interpreted as a research-mode case comparison rather than a population-level causal estimate.
 
 \begin{figure*}[t]
 \centering
-\fbox{\parbox[c][2.8cm][c]{0.94\linewidth}{\centering
-\todo{Panel (a): six paired Reporter OFF/ON mean scores (M1-A/B/C, P3-A/B/C), with thin per-pair connectors, the 3.433/3.733 means, median paired delta 0, and 2/4/0 win--tie--loss. Panel (b): side-by-side T04 and T07 2x2 heatmaps, horizontal Skill OFF/ON and vertical Knowledge OFF/ON; show historical-utilization scores 0/3/3/3 and separate compact strips for the three unchanged 4/4 dimensions. Annotate K and S utilization main effects (+1.5 each), interaction contrast (−3), and joint-minus-best-single (0). Do not add significance stars, confidence intervals, or robot-success labels. Use current four-condition Main-LLM scores only; exclude archived engineering Core Plans and superseded reviews.}
-}}
-\caption{Architecture component decision replays. Panel (a) evaluates the read-only Reporter across six matched checkpoints; panel (b) evaluates Knowledge and Skill as independent experience-access factors at T04 and T07. Each Main decision is scored against frozen evidence; no physical execution follows these replays.}
-\label{fig:architecture-ablation}
+\input{figures/fig06_abc_matrix}
+\caption{Task-wise research-mode comparison across eleven task cases. A denotes LLM-only, B direct mathematical tools, and C the archived FULL research process. Cell status and evaluated coverage are kept distinct. C passes all eleven task cases; A and B retain failures, incomplete runs, and qualification failures. The dagger marks the recorded T03-B protocol qualification. C is a historical FULL reference rather than a newly randomized run.}
+\label{fig:abc-matrix}
 \end{figure*}
 
-\subsection{Hierarchical context: input efficiency and evidence coverage}
+\subsection{Reporter-guided research decisions}
 
-The first context study, E2 at PHS-C035, compares direct Flat delivery of a 66-record corpus with an L0--L3 condition that receives an automatically assembled L0 brief and a directory for optional retrieval. No additional evidence reads occurred in either condition. On the accepted-inference basis, Provider input falls from 675,802 tokens for Flat to 78,785 for the hierarchical condition, an 88.34\% reduction. The blind mean is 4.0/4 for Flat and 3.8/4 for the hierarchical condition; four of five dimensions are equal, with a one-point difference in research-decision quality. The hierarchical condition had one initial HTTP 400 request without usage, so an all-attempt actual-token total is unavailable. E2 therefore demonstrates a large input reduction with a small decision-score trade-off, not selective retrieval.
+Across six matched checkpoints, the Reporter ON condition has a mean five-dimensional blind score of 3.733, compared with 3.433 for OFF. The paired mean difference is +0.300/4, with a median difference of zero, two wins, four ties, and no losses. The number of unsupported conclusions identified by the reviewer decreases from two to zero. The effect is therefore concentrated in two positive cases rather than uniformly improving all six decisions.
 
-E2-R2 is a preregistered follow-up at a new checkpoint, PHS-C037. Flat receives the complete included corpus; the hierarchical condition receives L0 and requests three parallel L3 records. No L1/L2 reads occur, and all three returned records are verified and delivered before the final Main decision. Actual cumulative Provider input falls from 877,197 tokens for Flat to 174,298 for the hierarchical condition, an 80.13\% reduction, despite two hierarchical requests versus one Flat request. The blind mean is 3.4/4 for Flat and 3.6/4 for the hierarchical condition. The higher score accompanies a lower key-evidence coverage score (3/5 versus 5/5): the hierarchical decision more narrowly scopes the causal conclusion but omits two useful evidence trends. C042 was excluded before inference by the preregistered capacity gate and is not an executed sample.
+At M1-C, the OFF decision proposed 120 iterations despite a frozen budget of 100 and relied on an initialization option not supported by the available evidence. The ON decision recognized the budget boundary and removed the unsupported assumption; its score increased from 2.8 to 3.6. At P3-A, the OFF decision proposed a full passive-structure replay but did not specify a paired mechanism test. The ON decision proposed direction-specific passive-tendon ablations and explicit slack-to-taut checks, increasing the score from 3.0 to 4.0. These examples illustrate constraint-aware planning and discriminative experiment design, respectively.
 
-Together, E2 and E2-R2 show how context organization can substantially reduce input while changing which evidence is explicitly brought into the decision. The result supports hierarchical context as a resource-allocation mechanism, with decision quality and evidence coverage reported as separate outcomes. It does not establish that context length alone caused a decision difference or that the three reads caused the final Plan.
+\subsection{Knowledge and Skill in decision replays}
+
+The original E1 factorial replay contains two task checkpoints, T04 and T07, with one decision in each of the four K/S conditions. Historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$, respectively. In the original four-dimensional assessment, decision quality, evidence consistency, and research actionability are saturated at 4 in every cell. The descriptive Knowledge and Skill main effects on historical-experience utilization are each +1.5, while the difference-in-differences interaction is $-3$; the joint condition does not exceed the best single-resource condition.
+
+The supplemental replay adds four frozen checkpoints and sixteen sessions, fifteen of which return valid decisions. The original and supplemental decisions receive a common five-dimensional anonymous reassessment (120 dimension-level scores across 24 decisions). Across the six checkpoint groups, mean five-dimensional scores are 3.43 for K$-$S$-$, 3.37 for K$+$S$-$, 3.67 for K$-$S$+$, and 3.17 for K$+$S$+; the last mean includes the budget-exhausted K$+$S$+$ submission scored as an unsuccessful decision. These checkpoint-level results are descriptive and do not establish a general K/S synergy. The original four-dimensional scores and historical-utilization measure are retained separately.
+
+The sixteen supplemental K/S sessions contain 37 Main requests. Their serialized request-text volume is 6.13 million input tokens and 40.9 thousand output tokens. This cost is reported for the supplemental decision replays and is not combined with the original E1 sessions.
 
 \begin{figure*}[t]
 \centering
-\fbox{\parbox[c][2.6cm][c]{0.94\linewidth}{\centering
-\todo{Use three panels with checkpoint identity explicit. (a) E2 C035 and E2-R2 C037 paired actual Provider input bars: E2 accepted inference only (675,802 vs 78,785; −88.34\\%), E2-R2 cumulative accepted requests (877,197 vs 174,298; −80.13\\%); never merge the two cost bases. (b) Paired blind means and key-evidence coverage: E2 4.0 vs 3.8; E2-R2 3.4 vs 3.6 and 5/5 vs 3/5. (c) E2-R2 retrieval map L0 → three parallel L3 records (C031 qualifications, C034 qualifications, C036 route geometry) → final scoped diagnostic Plan; show no L1/L2 reads. Mark E2 as zero additional reads and C042 as omitted before inference by the preregistered capacity gate. Keep actual Provider usage separate from generic tokenizer proxies.}
-}}
-\caption{Flat and hierarchical context studies. E2 reports accepted-inference usage; E2-R2 reports cumulative actual usage for every accepted Main request. Blind decision score and key-evidence coverage are shown separately.}
-\label{fig:context-ablation}
+\input{figures/fig07_reporter_ks}
+\caption{Reporter and Knowledge/Skill decision studies. (a) Six matched Reporter OFF/ON pairs; two cases improve and four are unchanged. (b) Historical-experience utilization in the original T04/T07 K/S factorial replay. (c) Common five-dimensional reassessment across six frozen checkpoint groups, including the retained K$+$S$+$ budget-exhausted decision. K/S results are decision-level assessments; the supplemental sixteen-session set contains 37 requests and 6.13 million input and 40.9 thousand output serialized request-text tokens.}
+\label{fig:reporter-ks}
 \end{figure*}
 
-\begin{table*}[t]
+\subsection{Hierarchical context and evidence utilization}
+
+The two historical context studies report Provider-reported input usage. At C035, Flat and Hierarchical delivery use 675,802 and 78,785 input tokens, respectively, an 88.34\% reduction; blind scores are 4.0 and 3.8, and no additional evidence reads occur. At C037, cumulative input is 877,197 tokens for Flat and 174,298 for Hierarchical, an 80.13\% reduction. Blind scores are 3.4 and 3.6, while key-evidence coverage is 5/5 and 3/5; the hierarchical trace contains three L3 reads. The two historical pairs use different protocol stages and are not treated as repeated samples.
+
+The six additional cross-task checkpoints compare Flat and Hierarchical delivery at T01, T04, T07, T08, T09, and T10. Across all recorded requests, serialized request-text volume totals 1.546 million tokens for Flat and 0.280 million for Hierarchical delivery, an 81.87\% reduction. Eleven of the twelve sessions return valid decisions; the T08 Flat submission exhausts its request budget and is retained. Blind decision quality and key-evidence recall vary by checkpoint: Hierarchical delivery improves both at T07, is comparable at T01 and T09, and scores lower on at least one dimension at T04 and T10. Thus, lower request-text volume is not treated as equivalent to higher decision quality or complete evidence coverage.
+
+Across the sixteen supplemental K/S sessions and twelve cross-task context sessions, the recorded serialized request-text volume is 7.95 million input tokens and 66.3 thousand output tokens over 62 Main requests. These counts describe the serialized text exchanged in the recorded sessions; they are distinct from Provider-reported usage in E2 and E2-R2.
+
+\begin{figure*}[t]
 \centering
-\caption{Summary of decision-only architecture studies. Scores are independent-model ordinal assessments; token counts use the stated measurement basis.}
-\label{tab:architecture-ablation-summary}
-\small
-\begin{tabularx}{\textwidth}{@{}l c Y Y@{}}
-\toprule
-Study & Decision sample & Main observation & Measurement basis \\
-\midrule
-Reporter ON/OFF & 6 matched pairs; 12 Main sessions & Mean score 3.433$\rightarrow$3.733 (+0.300); 2 wins, 4 ties, 0 losses; unsupported conclusions 2$\rightarrow$0. & Five-dimension blind score; Main Provider usage unavailable. \\
-Knowledge/Skill & 2 tasks $\times$ 4 cells; 8 decisions & Historical-experience utilization 0/3/3/3; other three score dimensions remain 4 in every cell. & One decision per cell; descriptive factorial contrasts. \\
-E2, C035 & 1 paired checkpoint & Accepted input 675,802$\rightarrow$78,785 (−88.34\%); blind score 4.0$\rightarrow$3.8; no additional reads. & Actual Provider usage for accepted inference only. \\
-E2-R2, C037 & 1 preregistered paired checkpoint & Cumulative input 877,197$\rightarrow$174,298 (−80.13\%); blind score 3.4$\rightarrow$3.6; coverage 5/5$\rightarrow$3/5. & Actual Provider usage across all accepted Main requests; three verified parallel L3 reads. \\
-\bottomrule
-\end{tabularx}
-\end{table*}
-
-\subsection{Cross-task research continuity}
-
-The research traces show that intermediate knowledge and candidate information can inform later decisions while the current task contract remains authoritative. T04 reuses prior tracking experience to formulate a new route and constructs a task-valid equilibrium-point sequence. T07 transfers a control initialization between conditions and re-optimizes it for the receiving condition. T10 draws on prior feedback-control experience when investigating impact recovery. Knowledge and Skill reads are recorded separately from the physical evidence they help interpret.
-
-These examples position cross-task continuity as reuse of methods, hypotheses, and initializations—not transfer of an old acceptance result. Each current task is evaluated under its own frozen physical contract.
+\input{figures/fig08_context}
+\caption{Hierarchical context and evidence utilization. (a) Provider-reported input tokens for the historical E2 and E2-R2 pairs. (b) Serialized request-text volume for six additional cross-task Flat/Hierarchical pairs; the T08 Flat request-budget failure is retained. (c) Blind decision quality and key-evidence recall are shown separately to expose the efficiency--evidence trade-off. The new six-checkpoint text counts are reconstructed from recorded serialized requests and are not Provider billing or hidden-reasoning usage.}
+\label{fig:context}
+\end{figure*}

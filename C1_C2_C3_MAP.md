@@ -1,55 +1,38 @@
-# Claim–Theory–Evidence map — manuscript v1.2
+# Claim--Theory--Evidence Map
 
-## Central positioning
+## C1. Evidence-guided adaptive investigation
 
-**Physics-grounded agentic research for soft-robot co-design.**
+**Claim.** The Main Agent can revise physical hypotheses, candidate morphology, and control research routes in response to mathematical and physical evidence.
 
-Autonomous research is the organizing contribution. Structure–control decoupling, mathematical diagnosis, sensitivity analysis, optimization, and physical validation are the scientific capabilities and actions coordinated by the agent; they are not competing paper-level themes.
+**Method basis.** Main Agent research state and action selection; independent mathematical/physical evidence; candidate refinement and independent task evaluation.
 
-## C1 — Mechanism-guided adaptive research
+**Primary evidence.**
+- Figure 2: eleven FULL task cases and 30 required physical conditions.
+- Figure 5: PHS-2D-9S, T04, T07, and T10 research trajectories.
+- Figure 6: task-wise A/B/C research-mode comparison.
 
-**Claim.** The Main Agent forms physical hypotheses, selects discriminating mathematical or physical investigations, and revises the research route as evidence changes the interpretation of the design problem.
+**Interpretation boundary.** Intermediate T07 signed-excess values are finite-budget native capability diagnostics; final task acceptance is separately reported. A/B/C is a task-wise case comparison, with C taken from historical FULL records.
 
-- Main process evidence: PHS-2D, T01, T02, T04, T07, T10.
-- PHS-2D: local mechanism hypothesis → finite-load response → tendon-route/geometry inspection → clearance and material refinement → frozen ten-condition evaluation.
-- T04: task-specific initialization and tracking-route changes, culminating in a complete two-cycle execution.
-- T07: rejection of a longer shared morphology, routing revision, and condition-specific control initialization transfer.
-- T10: transition to a native state-feedback/LQR route for impact recovery.
+## C2. Task-conditioned composable mathematical research
 
-## C2 — Task-conditioned composable mathematical research
+**Claim.** The PPRP binds research intent to a frozen task, current candidate, selected parameters and observables, inner physical problem, analysis semantics, and budget. M0--M3 provide complementary analysis views.
 
-**Claim.** High-level research intent is compiled into a parameterized physical research problem and analyzed using complementary, task-conditioned mathematical semantics.
+**Method basis.** PPRP compilation, registry binding, M0 mechanism sensitivity, M1 fixed-input response, M2 re-optimized capability, and M3 closed-loop performance.
 
-- PPRP: frozen task + current candidate + selected parameters + observables + inner physical problem + analysis semantics + budget.
-- M0: mechanism sensitivity.
-- M1: fixed-input physical response.
-- M2: re-optimized task capability.
-- M3: closed-loop performance.
-- Mathematical basis: KKT and active-set analysis, implicit differentiation, envelope/dual sensitivity, analytic/automatic differentiation, finite differences, directional comparisons, and finite-scale interaction analysis.
-- Main evidence: nine-segment PHS-2D gradient audit; T01/T02/T07 structure–control cases; T04/T10 control-method changes.
-- PHS-2D sensitivity audit: six loading branches × three task metrics = 18 derivative pairs along one common Young's-modulus direction; maximum relative discrepancy 0.1191223%.
-- The contribution is the task-conditioned composition, validity-aware routing, and integration into agent-directed research—not a new KKT, IFT, envelope, or finite-difference theorem.
+**Primary evidence.**
+- Figure 3: independent PHS-2D-9S mechanism-design and signed-load evaluation.
+- Figure 4: eighteen implicit/finite-difference derivative pairs across three task metrics and six signed-load branches.
 
-## C3 — Evidence-grounded research continuity
+**Interpretation boundary.** The derivative pairs cover one common Young's-modulus perturbation direction. The local discrepancy is not a global error bound. The matched physical M1/M2 comparison is not reported as completed until fixed-input replays exist.
 
-**Claim.** Historical findings, methods, candidates, and physical evidence inform subsequent decisions through separate, auditable resources.
+## C3. Evidence-grounded research continuity
 
-- Architecture: independent Knowledge and Skill resources, L0–L3 context, immutable Store/Trace, fixed evidence extraction, and read-only Reporter.
-- Reporter ON/OFF: six matched historical decision pairs; five-dimension blind mean 3.433→3.733 (+0.300), two wins/four ties/no losses; unsupported conclusions 2→0 in the blind review.
-- Knowledge/Skill: two task checkpoints (T04/T07), complete 2×2 replay, eight Main decisions. Historical-experience utilization is 0/3/3/3 for K−S−, K+S−, K−S+, K+S+. Decision quality, evidence consistency, and actionability remain 4 in every cell. K and S main effects are each +1.5 on utilization; the interaction contrast is −3 and the joint condition equals the best single-resource condition.
-- Context E2: at C035, accepted-inference input falls 88.34% (675,802→78,785 tokens), with blind score 4.0→3.8 and no additional evidence reads.
-- Context E2-R2: at preregistered C037, cumulative actual input falls 80.13% (877,197→174,298 tokens), blind score 3.4→3.6, and key-evidence coverage is 5/5→3/5; the hierarchical path contains three parallel L3 reads.
-- These decision-only studies evaluate proposed research decisions and evidence access, not physical task-success improvement. They are descriptive samples, not inferential estimates.
+**Claim.** Reporter interpretation, reusable Knowledge/Skill, and hierarchical context support evidence-grounded research decisions and information use.
 
-## Supporting system contribution
+**Method basis.** Read-only Reporter, persistent evidence records, Knowledge and Skill resources, and L0--L3 context access.
 
-Executable soft-robot research harness and multi-task evaluation suite connecting frozen task contracts, parameter/observable registries, mathematical execution, active/passive physical backends, independent evaluation, and evidence storage.
+**Primary evidence.**
+- Figure 7: six Reporter pairs and the original/supplemental K/S decision studies.
+- Figure 8: historical Provider-usage context pairs and six cross-task Flat/Hierarchical decision pairs.
 
-## Completed physical evidence portfolio
-
-- Eleven FULL task cases, T01–T10 and nine-segment PHS-2D.
-- Thirty required conditions passed; two T10 frozen controls reported separately.
-- Nine-segment PHS-2D: ten loading conditions, independent-process reproduction, half-step check, and initial-state perturbation check.
-- Local sensitivity audit: 18 task-metric derivative pairs; maximum relative discrepancy 0.1191223%.
-- Representative A/B/C case comparison: T01, T04, and T07, with C identified as historical FULL.
-- Real-world demonstrations are maintained as a separate physical-evidence layer.
+**Interpretation boundary.** Reporter/K/S/context studies are decision-level evaluations, not physical task-success trials. Small ordinal samples are descriptive. Serialized request-text counts are distinct from Provider-reported input usage.
