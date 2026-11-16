@@ -1,28 +1,30 @@
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{From design search to research-driven refinement}
+\subsection{From candidate search to scientific research}
 
-The completed studies suggest that soft-robot design is not always well represented as optimization over a fixed objective and a fixed set of variables. T01 and T07 include structural changes and reversals; T02, T04, and T10 include changes in the mathematical or control treatment; and PHS-2D includes a shift from local mechanism analysis to finite-load and routing investigations. These processes motivate a research formulation in which the agent can revise the hypothesis and the mathematical question, not merely update a vector of parameters.
+The completed cases show that soft-robot co-design often requires more than repeatedly updating a fixed parameter vector. T01 and T07 include structural revisions and reversals; T02, T04, and T10 change the physical or control formulation in response to the task and observed behavior; and PHS-2D moves from local mechanism analysis to finite-load and guide-path investigations. These processes motivate a framework in which the agent can revise both the design and the question being investigated.
 
-The proposed method assigns different responsibilities to the agent and deterministic software. The agent interprets the physical situation, selects a scientific question, and decides what the evidence should change. The mathematical layer resolves the request into a supported physical problem and performs the numerical work. The reporter interprets, but does not alter, the numerical evidence. This separation is central to making the research loop both adaptive and auditable.
+The division of responsibility is central to this process. The Main Agent interprets the physical situation, selects the research intent, and decides what the evidence should change. Deterministic software binds the request to registered physical quantities, executes the numerical operation, and preserves its scope and provenance. The Reporter interprets completed evidence without taking over the research decision.
 
-\subsection{Why M0--M3 are distinct}
+\subsection{Complementary mathematical views}
 
-M0--M3 describe different functions and experimental treatments. They should not be interpreted as four optimizers or as a mandatory sequence. M0 can reveal a mechanism-level design direction; M1 isolates a structural effect under fixed input; M2 evaluates task capability after control re-optimization; and M3 evaluates the complete closed-loop execution. A result at one level does not automatically imply a result at another. In particular, improvement of a mechanism proxy does not prove task feasibility, and a local M2 derivative does not guarantee high-fidelity closed-loop improvement.
+M0--M3 represent different mathematical objects and physical treatments. M0 studies a mechanism indicator; M1 isolates a structural effect under fixed input; M2 evaluates task capability after control re-optimization; and M3 concerns the complete closed-loop execution. They are complementary views selected according to the research question, not four optimizers or mandatory sequential stages.
 
-The active and passive cases share the parameterized research interface but use different inner physical problems. Active designs may involve a constrained control sequence, while passive designs require re-equilibrating the structure under unilateral tendon constraints. The common abstraction is the research request and evidence contract, not a universal solver.
+This distinction is important for interpreting structure--control co-design. A favorable mechanism sensitivity can suggest a structural direction, but the original task must still be evaluated. A fixed-input response isolates structural influence, whereas re-optimized capability includes the control available after the design change. Closed-loop analysis further includes the controller and execution dynamics. The common research interface supports these questions while allowing active and passive robots to retain their appropriate inner physical models.
 
-\subsection{Interpretation of the current evidence}
+\subsection{Mathematical evidence as a design instrument}
 
-The eleven completed task cases demonstrate the range of tasks that the harness has executed and independently evaluated. The PHS-2D study provides a detailed passive structural-design example and a local numerical consistency check for task-metric sensitivities. The T01/T02/T07 cases connect structural changes to active task performance; T04/T10 show that the research route and control formulation can change in response to evidence.
+The PHS-2D study connects local mechanism reasoning, equilibrium sensitivity, physical routing, and multi-condition validation. Its implicit-gradient audit provides a numerical consistency check for the task metrics along the tested modulus direction. The active cases show how mathematical and physical observations can lead to parameter changes, control re-optimization, or a change in the research route.
 
-The matched A/B/C comparison is needed to quantify the incremental value of direct mathematical tools and the complete research architecture. Until those runs are complete, the FULL traces support process-level case analysis but do not by themselves isolate the causal contribution of each architectural component. Likewise, the first A/B batch uses one new run per method and task; it should be interpreted as a matched case comparison unless further repetitions are added.
+The broader methodological point is that mathematical evidence is used to inform an agent decision rather than to trigger an unconditional gradient update. The agent can select a continuous parameter optimization, a discrete morphology comparison, a control update, or a direct physical test. This makes the mathematical layer a composable research resource within a larger scientific process.
 
-\subsection{Scope and limitations}
+\subsection{Evidence continuity across tasks}
 
-The sensitivity results are local to their declared model, candidate, operating point, parameterization, and input treatment. The 18-pair PHS-2D audit concerns three task metrics along one common Young's-modulus direction on a fixed nine-segment topology; it is not a full design-space gradient, a global error bound, or a universal descent guarantee. KKT and envelope-based sensitivities require their corresponding regularity and numerical-optimality conditions. Active-set changes, contact, discrete topology changes, and non-converged inner solves require separate treatment.
+The context architecture separates the automatically supplied decision brief from on-demand method details and numerical provenance. Knowledge preserves prior findings and their evidence links; Skill preserves reusable procedures and applicability conditions. The T04, T07, and T10 traces illustrate reuse of prior methods or control initializations followed by task-specific reconstruction and evaluation.
 
-The completed FULL portfolio is an archived set of task cases rather than a randomized multi-seed benchmark study. The two T10 frozen controls are retained separately from the required conditions. Historical C results are not re-run, so any configuration differences relative to new A/B runs must remain visible in the comparison.
+This form of continuity is particularly relevant to soft robots because the same structural or control idea can behave differently under another load, task, or morphology. Reuse therefore concerns hypotheses, methods, and initializations, while current physical acceptance remains tied to the active task contract.
 
-Finally, the current research-decision interface uses explicit hypotheses, predicted observations, evidence, and cost. It does not claim calibrated probabilities for competing failure mechanisms or a numerically optimized mutual-information/value-of-information policy. These are potential future extensions once sufficient calibrated diagnostic data are available.
+\subsection{Implications for autonomous robot research}
+
+The framework provides a route from physical observation to mathematical problem construction and from mathematical evidence to candidate refinement. Its contribution lies in the coordination of research intent, task-conditioned mathematical analysis, and independent physical validation. The eleven-task portfolio and the PHS-2D case demonstrate how this organization can be applied across active, passive, multi-condition, tracking, orientation, contact, and disturbance-recovery problems.
