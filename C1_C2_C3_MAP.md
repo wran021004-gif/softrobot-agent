@@ -1,57 +1,47 @@
-# Paper claim map — research-oriented manuscript v1.0
+# Claim–Theory–Evidence map — manuscript v1.1
 
-The manuscript is organized around one scientific question: how can an LLM agent use mathematical and physical evidence to autonomously investigate and improve soft-robot structure and control?
+## Central research question
+
+How can an LLM agent use task-conditioned mathematical and physical evidence to autonomously investigate and improve soft-robot structure and control?
 
 ## C1 — Mechanism-guided adaptive research
 
-**Claim.** The agent can formulate testable physical hypotheses, choose a discriminating mathematical or physical investigation, and revise the research route when the evidence changes the interpretation of the current design problem.
+**Claim.** The agent formulates testable physical hypotheses, selects discriminating mathematical or physical investigations, and revises the research route as evidence changes the interpretation of the current design problem.
 
-- Main process evidence: PHS-2D, T04, T07, T10.
-- Supporting evidence: T02, T05, and T06.
-- Theoretical framing: abductive hypothesis formation, deduction of expected/weakening observations, empirical investigation, and sequential research-state updates.
-- Main comparison: complete research architecture (C) against LLM-only (A) and direct bottom-level mathematical-tool use (B).
-- Do not claim that the agent is a globally optimal experiment selector or that it computes calibrated mutual information/value of information.
+- Main process evidence: PHS-2D, T01, T02, T04, T07, T10.
+- Theoretical framing: hypothesis formation, expected and weakening observations, empirical investigation, and sequential research-state updates.
+- Representative cases: PHS-2D structural-route changes; T04 control-route selection; T07 structural rejection and control-initialization transfer; T10 feedback-control selection.
 
 ## C2 — Task-conditioned composable mathematical research
 
-**Claim.** High-level research intent can be mapped to a parameterized physical research problem, which is analyzed using task-conditioned mathematical semantics and applicable differentiation/optimization methods.
+**Claim.** High-level research intent is compiled into a parameterized physical research problem and analyzed using complementary, task-conditioned mathematical semantics.
 
-- Core interface: frozen task contract + candidate + registered parameter group + physical observables + inner physical problem + sensitivity semantics + budget.
-- Mathematical semantics: M0 mechanism sensitivity; M1 fixed-input physical sensitivity; M2 re-optimized task-capability sensitivity; M3 closed-loop sensitivity.
-- Reusable operations: inspect, differentiate, optimize, compare, and interact.
-- Mathematical basis: KKT and active-set analysis, implicit differentiation, parametric optimization/envelope sensitivity, finite differences, and finite-scale interaction analysis.
-- Main evidence: PHS-2D gradient audit; T01/T02/T07 active structure--control cases; T04/T10 control-method changes.
-- Main comparison: B (direct bottom-level math tools) against C (complete research-intent and mathematical-research organization).
-- KKT, implicit differentiation, envelope sensitivity, and finite differences are established mathematics; the contribution is their task-conditioned composition, validity-aware execution, and integration into agent-directed research.
+- PPRP: frozen task + current candidate + selected parameters + observables + inner physical problem + analysis semantics + budget.
+- M0: mechanism sensitivity.
+- M1: fixed-input physical response.
+- M2: re-optimized task capability.
+- M3: closed-loop performance.
+- Mathematical basis: KKT and active-set analysis, implicit differentiation, envelope/dual sensitivity, analytic/automatic differentiation, finite differences, directional comparisons, and finite-scale interaction analysis.
+- Main evidence: nine-segment PHS-2D gradient audit; T01/T02/T07 structure–control cases; T04/T10 control-method changes.
+- The contribution is the task-conditioned composition, validity-aware routing, and integration into agent-directed research—not a new KKT, IFT, envelope, or finite-difference theorem.
 
-## C3 — Cross-task evidence-grounded research continuity
+## C3 — Evidence-grounded research continuity
 
-**Claim.** Historical methods, intermediate solutions, and numerical evidence can be retained and adapted to later tasks or conditions while preserving task-specific physical validity.
+**Claim.** Historical findings, methods, candidates, and physical evidence can inform later research decisions while current task validity remains tied to the active task contract.
 
-- Main evidence: T04 reuse and adaptation of prior tracking experience; T07 transfer of a control initialization between conditions; T10 use of prior feedback-control experience; shared task and evidence interfaces across T01--T10 and PHS-2D.
-- Supporting architecture: Knowledge/Skill, immutable Store/Trace, fixed evidence extraction, Reporter summaries, and L0--L3 hierarchical context.
-- Knowledge/Skill and context ablations are extensions, not part of the first A/B/C batch.
+- Main evidence: Knowledge reads and Skill-guided procedures in T04, T07, T09, and T10; control-initialization transfer in T07; method adaptation in T04/T10.
+- Architecture: independent Knowledge and Skill resources, L0–L3 context, immutable Store/Trace, fixed evidence extraction, and read-only Reporter.
+- Trace-based usage is reported as component-use evidence; isolated component effects are reported only when controlled ablation outcomes exist.
 
 ## Supporting system contribution
 
-**Executable soft-robot research harness and multi-task evaluation suite.** The harness connects task contracts, design/parameter registries, mathematical analysis, physical backends, independent evaluators, and evidence storage. The eleven completed cases span active and passive tendon-driven design, multi-condition tasks, tracking, orientation, loading, contact, and impact recovery.
+Executable soft-robot research harness and multi-task evaluation suite connecting frozen task contracts, parameter/observable registries, mathematical execution, active/passive physical backends, independent evaluation, and evidence storage.
 
-## First controlled-comparison batch
+## Completed evidence portfolio
 
-| Task | A: LLM-only | B: Direct mathematical tools | C: Historical FULL |
-|---|---:|---:|---|
-| PHS-2D | 1 new run | 1 new run | Existing FULL |
-| T01 | 1 new run | 1 new run | Existing FULL |
-| T04 | 1 new run | 1 new run | Existing FULL |
-| T07 | 1 new run | 1 new run | Existing FULL |
-
-Eight new runs in total. No Fixed-Plan condition is included in this batch. A and B start from the original task initial state and the complete legal design space. C is not re-run; its historical configuration and comparability are reported as recorded.
-
-## Claim boundaries
-
-- M0--M3 are different sensitivity semantics, not four mandatory sequential stages or four independent optimizers.
-- A local sensitivity is scoped to its model, candidate, operating point, parameterization, and input treatment.
-- The PHS-2D 18-pair audit concerns three task metrics along one common Young's-modulus direction; it is not 18 independent parameter gradients or a global error bound.
-- The 30/30 required-condition count is a completed-case snapshot, not a multi-seed success rate. T10's two frozen controls are separate.
-- A/B/C outcome claims are added only after the eight new runs are complete.
-- Physical-robot validation is a separate evidence layer and must use the already archived hardware records.
+- Eleven FULL task cases, T01–T10 and nine-segment PHS-2D.
+- Thirty required conditions passed; two T10 frozen controls reported separately.
+- Nine-segment PHS-2D: ten loading conditions, independent-process reproduction, half-step check, and initial-state perturbation check.
+- PHS-2D local sensitivity audit: six loading branches × three task metrics = 18 derivative pairs along one common Young's-modulus direction; maximum relative discrepancy 0.1191223%.
+- Representative A/B/C case comparison: T01, T04, and T07, with C identified as historical FULL.
+- Real-world demonstrations are maintained as a separate physical-evidence layer.
