@@ -1,0 +1,42 @@
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[font=\sffamily\scriptsize\bfseries,text=sraNavy,anchor=west] at (0,1.45) {(a) Mechanism and routing hypotheses};
+\draw[sraLight,line width=.65pt] (0.3,.65)--(16.3,.65);
+\fill[sraGray] (.4,.65) circle (1.7pt);
+\fill[sraGray] (5.25,.65) circle (1.7pt);
+\fill[sraDesign] (10.3,.65) circle (1.7pt);
+\fill[sraPass] (15.65,.65) circle (2.1pt);
+\node[font=\sffamily\scriptsize,text width=3.4cm,align=center,anchor=south] at (.4,.78) {Diagonal stays\\single span, 2 tendons};
+\node[font=\sffamily\scriptsize,text width=3.7cm,align=center,anchor=south] at (5.25,.78) {Dense guiding\\local response vs.\ settling};
+\node[font=\sffamily\scriptsize,text width=3.8cm,align=center,anchor=south] at (10.3,.78) {Physical guide plates\\route legality and clearance};
+\node[font=\sffamily\scriptsize,text width=3.0cm,align=center,anchor=south] at (15.65,.78) {Final 9-segment, 4-tendon\\verified loading response};
+\end{tikzpicture}
+\vspace{2pt}
+
+\begin{tikzpicture}
+\begin{groupplot}[
+group style={group size=3 by 1,horizontal sep=1.05cm},
+width=0.31\textwidth,height=4.0cm,
+xmin=0.28,xmax=0.72,xtick={0.3,0.4,0.5,0.6,0.7},
+tick label style={font=\tiny,text=sraNavy},
+label style={font=\scriptsize,text=sraNavy},
+title style={font=\scriptsize\bfseries,text=sraNavy},
+axis line style={sraGray!70},grid=major,grid style={sraLight!75},
+scaled ticks=false,legend style={font=\tiny,draw=none,fill=none,at={(0.02,0.98)},anchor=north west}
+]
+\nextgroupplot[title={(b) Force-point displacement},ylabel={Displacement (mm)},xlabel={Normalized load position},ymin=0,ymax=32]
+\addplot+[color=sraPhysical,mark=*,mark size=1.35pt,thick] coordinates {(0.30,11.17887) (0.40,17.38384) (0.50,22.92277) (0.60,26.89729) (0.70,28.02097)};
+\addplot+[color=sraDesign,mark=square,mark size=1.35pt,thick] coordinates {(0.30,11.15511) (0.40,17.35459) (0.50,22.89566) (0.60,26.89029) (0.70,28.08020)};
+\legend{\(F=+0.10\) N,\(F=-0.10\) N}
+\addplot+[color=sraFail,dashed,line width=.55pt,mark=none,forget plot] coordinates {(0.3,10) (0.7,10)};
+
+\nextgroupplot[title={(c) Projected tip displacement},ylabel={Displacement (mm)},xlabel={Normalized load position},ymin=0,ymax=5.5]
+\addplot+[color=sraPhysical,mark=*,mark size=1.35pt,thick] coordinates {(0.30,0.67306) (0.40,0.98452) (0.50,1.38731) (0.60,1.98357) (0.70,2.78191)};
+\addplot+[color=sraDesign,mark=square,mark size=1.35pt,thick] coordinates {(0.30,0.71759) (0.40,1.05671) (0.50,1.50205) (0.60,2.16612) (0.70,3.06795)};
+\addplot+[color=sraFail,dashed,line width=.55pt,mark=none,forget plot] coordinates {(0.3,5) (0.7,5)};
+
+\nextgroupplot[title={(d) Tip / point ratio},ylabel={Dimensionless},xlabel={Normalized load position},ymin=0,ymax=0.32]
+\addplot+[color=sraPhysical,mark=*,mark size=1.35pt,thick] coordinates {(0.30,0.06021) (0.40,0.05663) (0.50,0.06052) (0.60,0.07375) (0.70,0.09928)};
+\addplot+[color=sraDesign,mark=square,mark size=1.35pt,thick] coordinates {(0.30,0.06433) (0.40,0.06089) (0.50,0.06560) (0.60,0.08055) (0.70,0.10926)};
+\addplot+[color=sraFail,dashed,line width=.55pt,mark=none,forget plot] coordinates {(0.3,0.3) (0.7,0.3)};
+\end{groupplot}
+\end{tikzpicture}

@@ -1,0 +1,72 @@
+\begin{tikzpicture}
+\begin{groupplot}[
+group style={group size=3 by 1,horizontal sep=1.12cm},
+width=0.30\textwidth,height=4.2cm,
+tick label style={font=\tiny,text=sraNavy},
+label style={font=\scriptsize,text=sraNavy},
+title style={font=\scriptsize\bfseries,text=sraNavy},
+axis line style={sraGray!75},
+grid=major,grid style={sraLight!80},
+scaled ticks=false
+]
+\nextgroupplot[title={Point displacement},xlabel={FD (mm/du)},ylabel={Implicit (mm/du)},xmin=-20.03922,xmax=-4.33956,ymin=-20.03922,ymax=-4.33956]
+\addplot+[color=sraGray,line width=.55pt,mark=none] coordinates {(-20.03922,-20.03922) (-4.33956,-4.33956)};
+\addplot+[only marks,mark=*,mark size=1.4pt,color=sraMath] coordinates {(-18.1362,-18.12520) (-6.2844,-6.28343) (-6.2426,-6.25000) (-10.1413,-10.14289) (-18.0934,-18.10133) (-10.1763,-10.17935)};
+\nextgroupplot[title={Tip displacement},xlabel={FD (mm/du)},ylabel={Implicit (mm/du)},xmin=-5.53944,xmax=-0.17495,ymin=-5.53944,ymax=-0.17495]
+\addplot+[color=sraGray,line width=.55pt,mark=none] coordinates {(-5.53944,-5.53944) (-0.17495,-0.17495)};
+\addplot+[only marks,mark=*,mark size=1.4pt,color=sraMath] coordinates {(-4.8892,-4.88767) (-0.8253,-0.82519) (-0.8959,-0.89679) (-1.5365,-1.53637) (-4.4106,-4.41197) (-1.3818,-1.38208)};
+\nextgroupplot[title={Tip / point ratio},xlabel={FD (1/du)},ylabel={Implicit (1/du)},xmin=-0.11490,xmax=-0.02223,ymin=-0.11490,ymax=-0.02223]
+\addplot+[color=sraGray,line width=.55pt,mark=none] coordinates {(-0.11490,-0.11490) (-0.02223,-0.02223)};
+\addplot+[only marks,mark=*,mark size=1.4pt,color=sraMath] coordinates {(-0.1037,-0.10365) (-0.0400,-0.04004) (-0.0444,-0.04441) (-0.0381,-0.03809) (-0.0934,-0.09344) (-0.0335,-0.03347)};
+\end{groupplot}
+\end{tikzpicture}
+\vspace{2pt}
+
+\begin{tikzpicture}[x=1cm,y=.5cm]
+\node[font=\sffamily\scriptsize\bfseries,text=sraNavy,anchor=west] at (0,6.6) {(b) Relative discrepancy by signed loading branch (\%)};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.1,5.90) {$s=0.3$, $F=+0.1$ N};
+\fill[sraMath!22] (6.20,5.58) rectangle (9.28,6.22);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (7.74,5.90) {0.0158};
+\fill[sraMath!20] (9.52,5.58) rectangle (12.60,6.22);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (11.06,5.90) {0.0099};
+\fill[sraMath!17] (12.84,5.58) rectangle (15.92,6.22);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (14.38,5.90) {0.0049};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.1,4.98) {$s=0.3$, $F=-0.1$ N};
+\fill[sraMath!70] (6.20,4.66) rectangle (9.28,5.30);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (7.74,4.98) {0.1191};
+\fill[sraMath!61] (9.52,4.66) rectangle (12.60,5.30);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (11.06,4.98) {0.1005};
+\fill[sraMath!54] (12.84,4.66) rectangle (15.92,5.30);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (14.38,4.98) {0.0854};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.1,4.06) {$s=0.5$, $F=+0.1$ N};
+\fill[sraMath!29] (6.20,3.74) rectangle (9.28,4.38);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (7.74,4.06) {0.0298};
+\fill[sraMath!23] (9.52,3.74) rectangle (12.60,4.38);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (11.06,4.06) {0.0178};
+\fill[sraMath!19] (12.84,3.74) rectangle (15.92,4.38);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (14.38,4.06) {0.0083};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.1,3.14) {$s=0.5$, $F=-0.1$ N};
+\fill[sraMath!22] (6.20,2.82) rectangle (9.28,3.46);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (7.74,3.14) {0.0153};
+\fill[sraMath!19] (9.52,2.82) rectangle (12.60,3.46);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (11.06,3.14) {0.0092};
+\fill[sraMath!28] (12.84,2.82) rectangle (15.92,3.46);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (14.38,3.14) {0.0278};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.1,2.22) {$s=0.7$, $F=+0.1$ N};
+\fill[sraMath!35] (6.20,1.90) rectangle (9.28,2.54);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (7.74,2.22) {0.0438};
+\fill[sraMath!30] (9.52,1.90) rectangle (12.60,2.54);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (11.06,2.22) {0.0320};
+\fill[sraMath!26] (12.84,1.90) rectangle (15.92,2.54);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (14.38,2.22) {0.0241};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.1,1.30) {$s=0.7$, $F=-0.1$ N};
+\fill[sraMath!43] (6.20,0.98) rectangle (9.28,1.62);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (7.74,1.30) {0.0608};
+\fill[sraMath!29] (9.52,0.98) rectangle (12.60,1.62);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (11.06,1.30) {0.0314};
+\fill[sraMath!20] (12.84,0.98) rectangle (15.92,1.62);
+\node[font=\sffamily\scriptsize,text=sraNavy] at (14.38,1.30) {0.0111};
+\node[font=\sffamily\scriptsize\bfseries,anchor=south,text=sraNavy] at (7.74,6.33) {Point displacement};
+\node[font=\sffamily\scriptsize\bfseries,anchor=south,text=sraNavy] at (11.06,6.33) {Tip displacement};
+\node[font=\sffamily\scriptsize\bfseries,anchor=south,text=sraNavy] at (14.38,6.33) {Tip / point ratio};
+\end{tikzpicture}
