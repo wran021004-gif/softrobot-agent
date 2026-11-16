@@ -1,16 +1,20 @@
-# Claim–Theory–Evidence map — manuscript v1.1
+# Claim–Theory–Evidence map — manuscript v1.2
 
-## Central research question
+## Central positioning
 
-How can an LLM agent use task-conditioned mathematical and physical evidence to autonomously investigate and improve soft-robot structure and control?
+**Physics-grounded agentic research for soft-robot co-design.**
+
+Autonomous research is the organizing contribution. Structure–control decoupling, mathematical diagnosis, sensitivity analysis, optimization, and physical validation are the scientific capabilities and actions coordinated by the agent; they are not competing paper-level themes.
 
 ## C1 — Mechanism-guided adaptive research
 
-**Claim.** The agent formulates testable physical hypotheses, selects discriminating mathematical or physical investigations, and revises the research route as evidence changes the interpretation of the current design problem.
+**Claim.** The Main Agent forms physical hypotheses, selects discriminating mathematical or physical investigations, and revises the research route as evidence changes the interpretation of the design problem.
 
 - Main process evidence: PHS-2D, T01, T02, T04, T07, T10.
-- Theoretical framing: hypothesis formation, expected and weakening observations, empirical investigation, and sequential research-state updates.
-- Representative cases: PHS-2D structural-route changes; T04 control-route selection; T07 structural rejection and control-initialization transfer; T10 feedback-control selection.
+- PHS-2D: local mechanism hypothesis → finite-load response → tendon-route/geometry inspection → clearance and material refinement → frozen ten-condition evaluation.
+- T04: task-specific initialization and tracking-route changes, culminating in a complete two-cycle execution.
+- T07: rejection of a longer shared morphology, routing revision, and condition-specific control initialization transfer.
+- T10: transition to a native state-feedback/LQR route for impact recovery.
 
 ## C2 — Task-conditioned composable mathematical research
 
@@ -23,25 +27,29 @@ How can an LLM agent use task-conditioned mathematical and physical evidence to 
 - M3: closed-loop performance.
 - Mathematical basis: KKT and active-set analysis, implicit differentiation, envelope/dual sensitivity, analytic/automatic differentiation, finite differences, directional comparisons, and finite-scale interaction analysis.
 - Main evidence: nine-segment PHS-2D gradient audit; T01/T02/T07 structure–control cases; T04/T10 control-method changes.
+- PHS-2D sensitivity audit: six loading branches × three task metrics = 18 derivative pairs along one common Young's-modulus direction; maximum relative discrepancy 0.1191223%.
 - The contribution is the task-conditioned composition, validity-aware routing, and integration into agent-directed research—not a new KKT, IFT, envelope, or finite-difference theorem.
 
 ## C3 — Evidence-grounded research continuity
 
-**Claim.** Historical findings, methods, candidates, and physical evidence can inform later research decisions while current task validity remains tied to the active task contract.
+**Claim.** Historical findings, methods, candidates, and physical evidence inform subsequent decisions through separate, auditable resources.
 
-- Main evidence: Knowledge reads and Skill-guided procedures in T04, T07, T09, and T10; control-initialization transfer in T07; method adaptation in T04/T10.
 - Architecture: independent Knowledge and Skill resources, L0–L3 context, immutable Store/Trace, fixed evidence extraction, and read-only Reporter.
-- Trace-based usage is reported as component-use evidence; isolated component effects are reported only when controlled ablation outcomes exist.
+- Reporter ON/OFF: six matched historical decision pairs; five-dimension blind mean 3.433→3.733 (+0.300), two wins/four ties/no losses; unsupported conclusions 2→0 in the blind review.
+- Knowledge/Skill: two task checkpoints (T04/T07), complete 2×2 replay, eight Main decisions. Historical-experience utilization is 0/3/3/3 for K−S−, K+S−, K−S+, K+S+. Decision quality, evidence consistency, and actionability remain 4 in every cell. K and S main effects are each +1.5 on utilization; the interaction contrast is −3 and the joint condition equals the best single-resource condition.
+- Context E2: at C035, accepted-inference input falls 88.34% (675,802→78,785 tokens), with blind score 4.0→3.8 and no additional evidence reads.
+- Context E2-R2: at preregistered C037, cumulative actual input falls 80.13% (877,197→174,298 tokens), blind score 3.4→3.6, and key-evidence coverage is 5/5→3/5; the hierarchical path contains three parallel L3 reads.
+- These decision-only studies evaluate proposed research decisions and evidence access, not physical task-success improvement. They are descriptive samples, not inferential estimates.
 
 ## Supporting system contribution
 
 Executable soft-robot research harness and multi-task evaluation suite connecting frozen task contracts, parameter/observable registries, mathematical execution, active/passive physical backends, independent evaluation, and evidence storage.
 
-## Completed evidence portfolio
+## Completed physical evidence portfolio
 
 - Eleven FULL task cases, T01–T10 and nine-segment PHS-2D.
 - Thirty required conditions passed; two T10 frozen controls reported separately.
 - Nine-segment PHS-2D: ten loading conditions, independent-process reproduction, half-step check, and initial-state perturbation check.
-- PHS-2D local sensitivity audit: six loading branches × three task metrics = 18 derivative pairs along one common Young's-modulus direction; maximum relative discrepancy 0.1191223%.
+- Local sensitivity audit: 18 task-metric derivative pairs; maximum relative discrepancy 0.1191223%.
 - Representative A/B/C case comparison: T01, T04, and T07, with C identified as historical FULL.
 - Real-world demonstrations are maintained as a separate physical-evidence layer.
