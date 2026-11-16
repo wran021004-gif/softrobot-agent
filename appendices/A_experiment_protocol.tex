@@ -1,26 +1,25 @@
-\section{First-Batch A/B/C Comparison Protocol}
+\section{Research-Mode Comparison Protocol}
 \label{app:abc-protocol}
 
 \subsection{Method permissions}
 
 \paragraph{A: LLM-only.}
-The LLM may read the frozen task description and complete legal design space; generate or modify robot structures; propose control strategies; set control inputs through the unified execution interface; run the physical simulator; and read the independent task-evaluation results. It is not provided optional mathematical diagnosis tools, Jacobian/KKT/finite-difference interfaces, or automated mathematical optimization tools. The restriction concerns external mathematical capabilities, not the LLM's own language-based reasoning.
+The LLM proposes and revises structures and controls using the frozen task information and physical-evaluation feedback. It may generate candidates, set control inputs through the unified execution interface, run the physical simulator, and read the independent evaluator. Optional mathematical diagnosis and automated mathematical optimization tools are not exposed.
 
 \paragraph{B: Direct mathematical tools.}
-B has the A capabilities and may call supported bottom-level mathematical tools, including Jacobian evaluation, equilibrium/KKT routines, finite differences, and supported optimization routines. The LLM must decide what mathematical question to ask and construct the requests. It is not given the high-level research-intent projection, parameterized-research-problem compiler, differentiation router, or the complete mathematical research orchestration used by C.
+B has the A capabilities and may invoke supported bottom-level mathematical tools, including Jacobian, equilibrium/KKT, finite-difference, and supported optimization routines. The LLM constructs the mathematical question and requests itself; the high-level research-intent projection and mathematical research orchestration are not exposed.
 
-\paragraph{C: Historical FULL.}
-C uses the already completed FULL result and its original Store/Trace. It is not re-run or rewritten. The actual model, knowledge snapshot, task protocol, and resource configuration are reported as recorded.
+\paragraph{C: \softrobotagent{} FULL.}
+C uses the archived FULL study and its original Store/Trace. It is not re-run. Its historical configuration is retained as recorded.
 
 \subsection{Initial conditions and design-space access}
 
-A and B begin from the original task initial condition, not from an intermediate FULL candidate or decision node. Both receive the same complete legal design space and structure-generation interface. Topology, segment count, tendon count, routing, geometry, and material variables are not fixed in advance beyond the legal bounds of the task's generator. The task contract, physical model, evaluator, and within-task resource ceilings are identical for A and B.
+A and B start from the original task initial condition rather than an intermediate FULL candidate or decision node. Both receive the complete legal design space and the same candidate-generation and physical-evaluation interfaces. Topology, segment count, tendon count, routing, geometry, and material choices remain open within the task generator's legal bounds. The task contract and acceptance criteria are unchanged.
 
-The first batch contains PHS-2D, T01, T04, and T07, with one A run and one B run per task (eight new runs total). C is the historical FULL reference for each task. The first batch does not include a fixed-plan condition.
+The first comparison batch comprises PHS-2D, T01, T04, and T07, with one A run and one B run per task. The corresponding C records are historical FULL references. The task-wise results are reported in Section~\ref{sec:results}; the PHS-2D nine-segment mechanism-design case is also reported independently with its dedicated Round-3 evidence package.
 
-\subsection{Budget and reporting}
+\subsection{Resource accounting and outputs}
 
-Within each task, A and B share limits for LLM tokens, candidate generation, physical evaluations, integration steps, and wall-clock time. Mathematical calls are recorded separately because A has no optional mathematical-tool access. Budget ceilings are frozen before each A/B pair using the corresponding task's historical resource record as the reference. No single raw-error average is computed across heterogeneous tasks.
+Within each task, A and B use the same configured ceilings for model tokens, candidate generation, physical evaluations, integration steps, and wall-clock time. Mathematical calls are recorded separately. The comparison reports task-specific completion and normalized violation, best violation against cumulative physical-evaluation budget where trace checkpoints are available, candidate count, physical evaluations, mathematical calls, tokens, integration steps, and recorded wall-clock cost.
 
-The primary outputs are required-condition pass count, task-specific normalized violation, best violation versus cumulative physical-evaluation budget, cost to first feasible candidate, candidate count, physical evaluations, mathematical calls, LLM tokens, integration steps, wall-clock time, and an evidence trace linking mathematical findings to subsequent design/control actions. One run per condition supports a case comparison and budget trace, not a statistical-significance claim.
-
+The comparison is presented as task-wise research cases. Raw errors from different task families are not pooled into a cross-task average. Historical C remains identified as an archived FULL reference.
