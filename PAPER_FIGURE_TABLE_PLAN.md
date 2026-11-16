@@ -76,9 +76,9 @@ Not included in the current compiled manuscript. Add only when a complete hardwa
 
 ## Main tables
 
-Table I — Task Portfolio. Canonical task names, regime, morphology, and required-condition count. It is the only main-text data table in Phase 1.
+The completed Phase-1 main text uses **no duplicate 11-task summary table**. Figure 2 provides task identities, morphology, condition counts, and principal physical metrics in one integrated view. Detailed per-task metrics and protocol conventions remain in Appendix B. Full condition-level data, A/B/C matrix, and architecture review tables remain in the supplement.
 
-Do not retain separate main-text tables that repeat the FULL outcomes, A/B/C matrix, or architecture summary. Their information is represented by Figs. 2, 6, 7, and 8. Full condition-level data and protocols belong in the appendix/supplement.
+Do not add a main table that repeats Figure 2 or the Figures 6–8 results. A future compact comparison table is acceptable only if it introduces a distinct, necessary scientific comparison not already visible in the figures.
 
 ## Supplementary material
 
