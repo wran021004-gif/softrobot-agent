@@ -3,22 +3,22 @@
 
 \subsection{FULL task portfolio}
 
-The task summary and condition-level records are archived in the paper-results package dated 2026-11-13. The summary reports eleven task cases, 32 required/control records, 30 passed required conditions, and two non-passing T10 frozen controls. The result set is a snapshot of completed studies, not a repeated-seed statistical evaluation. The original task-specific evaluator and source trace remain the authoritative references for every row.
+The paper-results package dated 2026-11-13 contains eleven task cases and 32 required/control records: 30 required conditions passed, while two additional T10 frozen controls are reported separately. The portfolio is a completed-case record. Each result remains linked to its task-specific protocol, candidate, physical evaluator, and original trace.
 
 \subsection{Nine-segment PHS-2D physical case}
 
-The principal PHS-2D mechanism-design case uses the nine-segment, four-tendon Round-3 evidence package. The final structure was checked across ten loading conditions, with independent-process reproduction, half-time-step evaluation, and initial-state perturbation checks. The reported summary values are a minimum loaded-point displacement of 11.155 mm, a maximum projected tip displacement of 3.068 mm, and a maximum displacement ratio of 0.1093. These values must remain attached to the nine-segment evidence package; older seven-segment snapshots are not combined with them.
+The principal passive-design case uses the nine-segment, four-tendon Round-3 evidence package. The final structure was evaluated over ten prescribed loading conditions, with independent-process reproduction, half-time-step evaluation, and initial-state perturbation checks. The reported minimum loaded-point displacement is 14.7981 mm, maximum projected tip displacement is 4.3470 mm, and maximum displacement ratio is 0.153751. These values belong to the nine-segment Round-3 package and are not combined with older seven-segment snapshots.
 
 \subsection{PHS-2D local sensitivity audit}
 
-The gradient audit is a separate fixed-topology local sensitivity record for a nine-segment, four-tendon passive model. It uses one common Young's-modulus direction applied across the nine segments, with normalized perturbation $h=0.001$. Six loading branches and three task metrics (loaded-point displacement, horizontal tip displacement, and their ratio) yield 18 task-metric derivative pairs. The maximum relative discrepancy between the KKT-based implicit task-metric derivatives and finite differences obtained by re-equilibrating the perturbed designs is 0.1191223\%.
+A separate fixed-topology audit compares KKT-based implicit derivatives with finite differences obtained by perturbing a common Young's-modulus direction and re-solving loaded and unloaded equilibria. Six loading branches and three task metrics—loaded-point displacement, horizontal tip displacement, and their ratio—produce 18 task-metric derivative pairs. The maximum relative discrepancy among these pairs is 0.1191223\%.
 
-The 0.1191223\% figure applies to those 18 task-metric derivative pairs only. It is not the maximum error over every internal generalized-coordinate derivative, not 18 independent design-parameter gradients, and not a global error bound. The implicit calculation uses numerically estimated partial derivatives in the KKT system; the finite-difference values are derived from actual saved positive/negative perturbed equilibria. The audit does not establish a universal descent guarantee or high-fidelity closed-loop improvement.
+The audit concerns one common modulus direction across the nine segments. The 18 pairs are not 18 independent design-parameter gradients and the discrepancy is not a global error bound. The implicit calculation uses numerically estimated partial derivatives in the KKT system; the finite-difference values are obtained from the saved perturbed equilibria.
 
-\subsection{Historical C and new A/B provenance}
+\subsection{A/B/C comparison provenance}
 
-C is the historical FULL record. A and B are new runs. The manuscript retains the historical configuration and source identifiers for C and does not label the comparison as a fully controlled randomized experiment when model, context, budget, or protocol versions differ. The first batch is four tasks and eight new A/B runs. Results are inserted only after the corresponding runs and configuration review are complete.
+A and B are new research runs; C is the corresponding historical FULL record. The first batch contains PHS-2D, T01, T04, and T07. The manuscript presents representative task-wise comparisons for T01, T04, and T07, while the nine-segment PHS-2D case remains the principal mathematical and passive-design study. Historical C configurations and source identifiers remain attached to their original records.
 
 \subsection{Physical-robot demonstrations}
 
-Real-world robot results are maintained as a separate evidence source. They are not inferred from MuJoCo trajectories and are not included in the simulation FULL counts. The final physical-validation section will cite the existing hardware records and selected demonstration videos/frames.
+Physical-robot demonstrations are maintained as a separate evidence source. Their platform configuration, protocol, trial count, and measured outcomes are reported from the corresponding hardware records. They are not inferred from MuJoCo trajectories and are not included in the simulation FULL condition count.
