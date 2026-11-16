@@ -1,85 +1,65 @@
 \section{Problem Formulation}
 \label{sec:formulation}
 
-We study tendon-driven soft-robot design under task-specific physical requirements. A design must satisfy a frozen task contract, while the agent may investigate and revise the morphology, parameters, and control strategy used to meet it.
+We consider task-conditioned structure--control co-design for tendon-driven soft robots. Each study specifies a frozen physical task and an admissible design space; the research process may modify the design and control, but not the acceptance criteria.
 
-\subsection{Robot design and task specification}
+\subsection{Design Variables and Task Contracts}
 \label{subsec:design-space}
 
-A robot design is represented by
+A robot design is denoted by
 \begin{equation}
 d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},
-d_{\mathrm{route}},d_{\mathrm{assembly}}),
+d_{\mathrm{route}},d_{\mathrm{assembly}})\in\mathcal D,
 \label{eq:design}
 \end{equation}
-which collects topology, geometry, material properties, tendon routing, and assembly or payout settings. The admissible design space is $\mathcal D$. We distinguish structural variables $d$ from controller parameters $\theta$ and, for active robots, the actuation sequence $U=(u_0,\ldots,u_{N-1})$.
+where the components specify topology, geometry, material, tendon routing, and assembly or passive payout. We distinguish the morphology \(d\) from the controller parameters \(\theta\) and, for active tasks, the applied input sequence \(U=(u_0,\ldots,u_{N-1})\).
 
-Each task $\tau$ is a fixed contract specifying the initial condition, target or reference, loads, execution horizon, observables, tolerances, and evaluation procedure. Its active-task requirements are written as normalized constraints
+A task \(\tau\) fixes its initial state, targets or references, loads, observation horizon, observables, constraints, and evaluation procedure. Its normalized requirements are expressed as
 \begin{equation}
-g_{\tau,i}(d,U)\leq 0,\qquad i=1,\ldots,m_\tau,
+g_{\tau,i}(d,U)\leq0,\qquad i=1,\ldots,m_\tau,
 \label{eq:taskconstraints}
 \end{equation}
-where non-positive values satisfy the corresponding requirement. The task contract and acceptance criteria remain fixed during research.
+where negative values indicate satisfied constraints. The evaluator preserves the original physical quantities and units used to construct these normalized expressions.
 
-\subsection{Active, passive, and multi-condition design}
+\subsection{Active and Passive Physical Problems}
 \label{subsec:physical-problems}
 
-For an active robot, the best achievable task violation for a fixed design is
+For an active robot, the attainable worst-constraint value after optimizing admissible control is
 \begin{equation}
-V_\tau(d)=
-\inf_{U\in\mathcal U(d)}
+V_\tau(d)=\inf_{U\in\mathcal U_\tau(d)}
 \max_i g_{\tau,i}(d,U),
 \label{eq:capability}
 \end{equation}
-where $\mathcal U(d)$ contains the inputs allowed by the design-dependent actuator limits. This definition evaluates a structure after control re-optimization.
+where \(\mathcal U_\tau(d)\) includes the design-dependent actuation limits. This quantity concerns the capability of a morphology \emph{after} control re-optimization, not its response to one fixed input.
 
-For a passive fixed-payout robot, the response is determined by its structure, tendon constraints, and applied load. A quasi-static equilibrium $q^\star_\tau(d,f)$ satisfies the constrained equilibrium conditions
+For a passive, fixed-payout tendon design, let \(q^\star_\tau(d,f)\) denote a quasi-static equilibrium under load \(f\). With potential energy \(\Pi\), unilateral tendon constraints \(c_j\), and nonnegative multipliers \(\lambda_j\), a regular equilibrium branch satisfies
 \begin{equation}
 \begin{aligned}
 \nabla_q\Pi(q^\star_\tau;d,f)
 +\sum_j\lambda^\star_j\nabla_q c_j(q^\star_\tau,d)&=0,\\
-c_j(q^\star_\tau,d)\leq0,\quad
-\lambda^\star_j&\geq0,\quad
-\lambda^\star_jc_j(q^\star_\tau,d)=0,
+c_j(q^\star_\tau,d)&\leq0,\quad \lambda^\star_j\geq0,\\
+\lambda^\star_jc_j(q^\star_\tau,d)&=0.
 \end{aligned}
 \label{eq:passive-problem}
 \end{equation}
-and is evaluated against the passive task requirements
-\begin{equation}
-g^{\mathrm{pass}}_{\tau,i}
-\bigl(d,q^\star_\tau(d,f)\bigr)\leq0.
-\label{eq:passive-constraints}
-\end{equation}
+The passive task evaluator applies the specified loaded and unloaded response requirements to this physical design. The equilibrium calculation alone does not establish dynamical settling or full task acceptance.
 
-For multiple required conditions $\mathcal C$, one morphology is shared while each active condition may use its own control sequence. The condition-wise violation and shared-design capability are
+\subsection{Multi-Condition Shared-Morphology Design}
+
+For a set of required conditions \(\mathcal C_\tau\), one design \(d\) must satisfy all conditions; active conditions may have distinct admissible control inputs. Define
 \begin{equation}
 v_c(d)=
 \begin{cases}
 \displaystyle\inf_{U_c\in\mathcal U_c(d)}
-\max_i g_{c,i}(d,U_c), & c\in\mathcal C_{\mathrm{act}},\\[0.8em]
+\max_i g_{c,i}(d,U_c), & c\in\mathcal C_{\mathrm{act}},\\[0.65em]
 \displaystyle\max_i g^{\mathrm{pass}}_{c,i}
 \bigl(d,q^\star_c(d,f_c)\bigr), & c\in\mathcal C_{\mathrm{pass}},
 \end{cases}
 \label{eq:condition-violation}
 \end{equation}
+and the shared-design worst-condition value
 \begin{equation}
-V_{\mathcal C}(d)=\max_{c\in\mathcal C}v_c(d).
+V_{\mathcal C_\tau}(d)=\max_{c\in\mathcal C_\tau}v_c(d).
 \label{eq:multi-capability}
 \end{equation}
-Thus, all required conditions must be satisfied by the same morphology; an average cannot conceal a failed condition.
-
-\subsection{Agentic research formulation}
-\label{subsec:research-state}
-
-We formulate design as an iterative research process. At iteration $k$, the state is
-\begin{equation}
-s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
-\label{eq:researchstate}
-\end{equation}
-where $\mathcal H_k$ denotes working physical hypotheses, $\mathcal E_k$ the accumulated mathematical and physical evidence, and $\mathcal B_k$ the remaining budget. The agent selects a research action $a_k$ and receives an observation $y_k$, producing
-\begin{equation}
-(\mathcal H_{k+1},\mathcal E_{k+1},d_{k+1})
-=\Phi(s_k,a_k,y_k).
-\label{eq:researchupdate}
-\end{equation}
-The task contract remains fixed, while the design, hypothesis, and research route may evolve in response to evidence.
+The maximum prevents good performance in one condition from concealing a violation in another. The agentic research process that selects subsequent investigations is defined in Sec.~\ref{sec:method}.
