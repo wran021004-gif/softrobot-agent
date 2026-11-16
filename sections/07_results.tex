@@ -109,28 +109,11 @@ The six existing Reporter reports were reused rather than regenerated during thi
 
 \begin{figure*}[t]
 \centering
-\fbox{\parbox[c][2.5cm][c]{0.94\linewidth}{\centering
-\todo{Insert paired Reporter OFF/ON score plot for all six checkpoints, with mean/median and win--tie--loss summary. Add a dimension-level paired-difference panel and the two evidence-to-action examples P3-A and M1-C.}
+\fbox{\parbox[c][2.8cm][c]{0.94\linewidth}{\centering
+\todo{Insert a composite architecture-ablation figure: (a) Reporter OFF/ON paired scores across all six checkpoints, with mean, median, and win--tie--loss summary; (b) T04 and T07 Knowledge--Skill 2x2 utilization matrices, with decision quality, evidence consistency, and actionability shown separately. Retain individual paired observations and no significance/error bars.}
 }}
-\caption{Reporter ON/OFF decision replay. Scores summarize five blind-review dimensions for six matched checkpoints; proposed actions are not physical execution outcomes.}
-\label{fig:reporter-ablation}
-\end{figure*}
-
-\subsection{Knowledge and Skill as complementary experience channels}
-
-The Knowledge/Skill experiment uses a complete $2\times2$ factorial replay at T04 and T07, with one Main decision in each of four cells per task. All eight decisions receive the maximum score (4/4) for decision quality, evidence consistency, and research actionability, and no invalid proposed research action is identified. The discriminating measure is historical-experience utilization: for both tasks, the K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$ cells score 0, 3, 3, and 3, respectively.
-
-The descriptive Knowledge and Skill main effects on historical-experience utilization are both +1.5 points. The difference-in-differences interaction contrast is -3, and the joint condition does not exceed the best single-resource condition. This pattern is consistent with overlapping but distinct routes for making prior research usable: Knowledge contributes historical observations and conclusions, whereas Skill contributes reusable procedures and operational constraints. The observed benefit is therefore access to prior experience, not an increase in the already ceiling-level decision-quality dimensions or a demonstrated synergistic effect.
-
-The factorial study contains one observation per cell and one joint blind review per task. The K$+$S$+$ sessions were acquired after the original six sessions; frozen inputs and requested settings match, but backend/default reasoning identity is not exposed. These contrasts are descriptive and do not establish population-level causal effects.
-
-\begin{figure*}[t]
-\centering
-\fbox{\parbox[c][2.5cm][c]{0.94\linewidth}{\centering
-\todo{Insert compact T04/T07 Knowledge--Skill 2x2 factorial plots. Show historical-experience utilization 0/3/3/3 and the three ceiling-level decision metrics separately. Keep the interaction contrast distinct from the +/-1 regression coefficient.}
-}}
-\caption{Knowledge and Skill factorial decision replay at T04 and T07. Each cell contains one Main LLM decision; values are ordinal blind-review scores.}
-\label{fig:knowledge-skill-ablation}
+\caption{Architecture component decision replays. Panel (a) evaluates the read-only Reporter across six matched checkpoints; panel (b) evaluates Knowledge and Skill as independent experience-access factors at T04 and T07. Each Main decision is scored against frozen evidence; no physical execution follows these replays.}
+\label{fig:architecture-ablation}
 \end{figure*}
 
 \subsection{Hierarchical context: input efficiency and evidence coverage}
