@@ -1,0 +1,46 @@
+\begin{tikzpicture}[x=1cm,y=.65cm]
+\node[font=\sffamily\scriptsize\bfseries,anchor=west,text=sraNavy] at (.1,7.0) {(a) Six paired decision-quality scores};
+\draw[sraGray!75,line width=.4pt] (3.75,.7)--(11.65,.7);
+\foreach \v in {0,1,2,3,4}{
+\pgfmathsetmacro{\px}{3.85+1.88*\v}
+\draw[sraLight,line width=.3pt] (\px,1)--(\px,6.4);
+\node[font=\sffamily\tiny,text=sraGray] at (\px,.45) {\v};
+}
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.15,6.10) {M1-A};
+\draw[sraGray,line width=.65pt] (11.37,6.10) -- (11.37,6.10);
+\fill[sraGray] (11.37,6.10) circle (1.8pt);
+\fill[sraNavy] (11.37,6.10) circle (2.2pt);
+\node[font=\sffamily\tiny,anchor=west,text=sraGray] at (12.05,6.10) {tie};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.15,5.25) {M1-B};
+\draw[sraGray,line width=.65pt] (11.37,5.25) -- (11.37,5.25);
+\fill[sraGray] (11.37,5.25) circle (1.8pt);
+\fill[sraNavy] (11.37,5.25) circle (2.2pt);
+\node[font=\sffamily\tiny,anchor=west,text=sraGray] at (12.05,5.25) {tie};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.15,4.40) {M1-C};
+\draw[sraNavy,line width=.95pt] (9.11,4.40) -- (10.62,4.40);
+\fill[sraGray] (9.11,4.40) circle (1.8pt);
+\fill[sraNavy] (10.62,4.40) circle (2.2pt);
+\node[font=\sffamily\tiny,anchor=west,text=sraNavy] at (12.05,4.40) {+0.8};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.15,3.55) {P3-A};
+\draw[sraNavy,line width=.95pt] (9.49,3.55) -- (11.37,3.55);
+\fill[sraGray] (9.49,3.55) circle (1.8pt);
+\fill[sraNavy] (11.37,3.55) circle (2.2pt);
+\node[font=\sffamily\tiny,anchor=west,text=sraNavy] at (12.05,3.55) {+1.0};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.15,2.70) {P3-B};
+\draw[sraGray,line width=.65pt] (10.99,2.70) -- (10.99,2.70);
+\fill[sraGray] (10.99,2.70) circle (1.8pt);
+\fill[sraNavy] (10.99,2.70) circle (2.2pt);
+\node[font=\sffamily\tiny,anchor=west,text=sraGray] at (12.05,2.70) {tie};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.15,1.85) {P3-C};
+\draw[sraGray,line width=.65pt] (9.49,1.85) -- (9.49,1.85);
+\fill[sraGray] (9.49,1.85) circle (1.8pt);
+\fill[sraNavy] (9.49,1.85) circle (2.2pt);
+\node[font=\sffamily\tiny,anchor=west,text=sraGray] at (12.05,1.85) {tie};
+\node[font=\sffamily\tiny,anchor=west,text=sraGray] at (.3,-.35) {\textcolor{sraGray}{\(\bullet\)} Reporter OFF \qquad \textcolor{sraNavy}{\(\bullet\)} Reporter ON};
+\draw[sraLight,line width=.45pt] (0,-.62)--(16.6,-.62);
+\node[font=\sffamily\scriptsize\bfseries,anchor=west,text=sraNavy] at (.15,-1.30) {(b) Positive paired cases};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.3,-2.05) {M1-C \quad 2.8 \(\rightarrow\) 3.6};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraPhysical] at (5.2,-2.05) {Frozen iteration bound and unsupported initialization};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraNavy] at (.3,-2.78) {P3-A \quad 3.0 \(\rightarrow\) 4.0};
+\node[font=\sffamily\scriptsize,anchor=west,text=sraPhysical] at (5.2,-2.78) {Matched, direction-specific passive-tendon intervention};
+\end{tikzpicture}
