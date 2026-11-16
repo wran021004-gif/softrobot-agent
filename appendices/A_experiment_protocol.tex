@@ -1,25 +1,23 @@
 \section{Research-Mode Comparison Protocol}
 \label{app:abc-protocol}
 
-\subsection{Method permissions}
+\subsection{Method Permissions}
 
-\paragraph{A: LLM-only.}
-The LLM proposes and revises structures and controls using the frozen task information and physical-evaluation feedback. It may generate candidates, set control inputs through the unified execution interface, run the physical simulator, and read the independent evaluator. Optional mathematical diagnosis and automated mathematical optimization tools are not exposed.
+\paragraph{A: Physical-feedback design.}
+A may propose and revise legal structures or controls, execute the native physical simulator, and read the independent evaluator. Optional mathematical diagnosis and automated mathematical optimization tools are not exposed.
 
 \paragraph{B: Direct mathematical tools.}
-B has the A capabilities and may invoke supported bottom-level mathematical tools, including Jacobian, equilibrium/KKT, finite-difference, and supported optimization routines. The LLM constructs the mathematical question and requests itself; the high-level research-intent projection and mathematical research orchestration are not exposed.
+B has the same legal design and physical-evaluation interfaces as A, with access to supported lower-level mathematical operations. The model formulates the requested mathematical problem without the structured PPRP research-intent projection and associated orchestration.
 
-\paragraph{C: \softrobotagent{} FULL.}
-C uses the archived FULL study and its original Store/Trace. It is not re-run. Its historical configuration is retained as recorded.
+\paragraph{C: Full research process.}
+C uses the complete research framework, including structured research-intent projection, applicability-aware mathematical analysis, evidence feedback, and persistent research context. Its entries correspond to the archived FULL task studies.
 
-\subsection{Initial conditions and design-space access}
+\subsection{Task Initialization and Evaluation}
 
-A and B start from the original task initial condition rather than an intermediate FULL candidate or decision node. Both receive the complete legal design space and the same candidate-generation and physical-evaluation interfaces. Topology, segment count, tendon count, routing, geometry, and material choices remain open within the task generator's legal bounds. The task contract and acceptance criteria are unchanged.
+The A and B cases start from the original task condition, not from an intermediate accepted FULL candidate. Their legal morphology and control domains are governed by the original task generator. Task thresholds are fixed. Completion is assessed at the task-case level, with required-condition coverage separate from constraint violation and qualification status. Qualification failure, incomplete execution, and a measured failure are not equivalent outcomes.
 
-The first A/B batch comprises PHS-2D, T01, T04, and T07, with one A run and one B run per task. The representative A/B/C case comparison in Section~\ref{sec:results} focuses on T01, T04, and T07, where the task-wise A/B records are read alongside the corresponding historical FULL cases. The PHS-2D A/B runs are retained as separate research-mode records; the principal nine-segment PHS-2D design is reported from its dedicated Round-3 evidence package.
+Some direct-tool records were completed through an additional, explicitly documented tool procedure and use a different execution or discretization configuration. They are retained as separate variants in the complete matrix rather than represented as repeated samples of a homogeneous protocol. C is a historical FULL reference, not a newly randomized paired trial. No across-task significance claim follows from the single task-level outcome for each mode.
 
-\subsection{Resource accounting and outputs}
+\subsection{Resource Reporting}
 
-Within each task, A and B use the same configured ceilings for model tokens, candidate generation, physical evaluations, integration steps, and wall-clock time. Mathematical calls are recorded separately. The comparison reports task-specific completion and normalized violation, best violation against cumulative physical-evaluation budget where trace checkpoints are available, candidate count, physical evaluations, mathematical calls, tokens, integration steps, and recorded wall-clock cost.
-
-The comparison is presented as task-wise research cases. Raw errors from different task families are not pooled into a cross-task average. Historical C remains identified as an archived FULL reference.
+We retain candidate count, mathematical calls, physical evaluations, model input/output where available, integration attempts, and wall-clock cost with their recorded measurement scope. Costs that cover different internal computations or time windows are not pooled or used to construct a common mean. The full 33-condition matrix, known numerical violations, and original resource fields accompany the paper data.

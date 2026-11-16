@@ -1,46 +1,36 @@
-\section{Architecture Ablation Protocols}
+\section{Research Architecture Evaluation Protocols}
 \label{app:architecture-ablations}
 
-\subsection{Common decision-replay protocol}
+\subsection{Common Decision-Replay Setup}
 
-The architecture ablations use immutable historical task checkpoints and compare proposed Main Agent decisions under controlled context or component settings. Each replay begins from a fresh isolated conversation with the same task/candidate/evidence snapshot for its matched conditions. The unit of evaluation is the proposed next research decision. No replay launches a mathematical worker, candidate search, physical simulation, or hardware execution. Scores therefore characterize research-decision behavior and evidence use, not downstream robot success.
+Each decision-only comparison begins from a frozen task, candidate, and evidence checkpoint. A new isolated Main Agent session receives the assigned resource condition but the same scientific question and fixed acceptance constraints. Independent anonymous model review uses the original frozen evidence. No robot candidate search, mathematical worker, or physical evaluation follows these decision replays. Their unit of observation is a proposed next research decision.
 
-Decisions are anonymized before independent model review. The review rubrics use ordinal scores from 0 to 4. Human-scoring templates are retained separately; the reported scores are independent-model assessments with human verification pending. All reported contrasts are descriptive. No significance test, confidence interval, or population-level causal effect is inferred from one decision per cell or one reviewer per paired set.
+\subsection{Reporter OFF/ON}
 
-\subsection{Reporter ON/OFF}
+Six paired checkpoints (M1-A/B/C and P3-A/B/C) compare identical evidence delivery with and without the corresponding saved read-only Reporter interpretation. Twelve Main sessions produce six paired reviews. Each review scores physical interpretation, evidence consistency, limitation recognition, research actionability, and Main decision quality on a 0--4 ordinal scale.
 
-Six matched checkpoints are included: M1-A, M1-B, M1-C, P3-A, P3-B, and P3-C. Each is replayed with Reporter interpretations withheld (OFF) or included in the Main context (ON), producing twelve Main sessions and six blind paired reviews. The ON condition reuses the six corresponding saved Reporter reports; the study does not regenerate Reporter reports or measure Reporter generation latency.
+The mean changes from 3.433 to 3.733, with two improvements, four ties, and no declines. The two improved cases are M1-C (iteration/initialization scope) and P3-A (paired mechanism-intervention selection). The six Reporter reports are reused; their historical generation expense is not part of the decision-only ON/OFF runtime.
 
-The five scored dimensions are physical interpretation, evidence consistency, limitation recognition, research actionability, and Main decision quality. The reported mean score is the equal-weight average. Across the six pairs, OFF and ON means are 3.433 and 3.733, respectively; the paired mean difference is +0.300, the paired median is 0, and the win/tie/loss count is 2/4/0. The mean dimension differences (ON minus OFF) are +0.167, +0.500, +0.167, +0.333, and +0.333, respectively. The number of unsupported conclusions identified by the reviewer is 2 for OFF and 0 for ON. Each Main session produced one complete response. The transport log retains 24 Main send attempts: twelve initial requests were rejected locally with HTTP 400 before upstream inference, followed by twelve successful Main inference responses. The six independent blind reviews are additional reviewer requests. The Main model was gpt-5.6-sol; the Gateway default reasoning setting was not exposed, so a specific reasoning level is not asserted.
+\subsection{Knowledge/Skill Factorial Replays}
 
-Main Provider token usage is unavailable. The average 1,450.5-token increase is computed from visible-context text using a local \texttt{o200k\_base} tokenizer proxy; it is not verified against the model tokenizer, hidden reasoning, or billing. The six reused reports were historically generated with gpt-5.6-sol using a medium setting; their historical generation usage (540,933 input and 5,891 output tokens) is separate from the current decision replay. The current Reporter ON/OFF sessions issue no new Reporter-generation requests.
-
-\subsection{Knowledge/Skill factorial replay}
-
-The experiment is a $2\times2$ factorial design with Knowledge (K) and Skill (S) as binary factors. For each task, the four conditions are K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$. One Main decision is collected per cell for T04 and T07, giving eight decisions and two joint blind reviews.
-
-For a metric $y$, the descriptive main effects and interaction contrast are
+Knowledge (K) and Skill (S) are independently switched in a \(2\times2\) factorial design. The original E1 comprises T04 and T07, with one decision for each K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$ cell (eight decisions). For an outcome \(y\), the descriptive contrasts are
 \begin{align}
-E_K &= \frac{(y_{10}-y_{00})+(y_{11}-y_{01})}{2},\\
-E_S &= \frac{(y_{01}-y_{00})+(y_{11}-y_{10})}{2},\\
-I_{KS} &= y_{11}-y_{10}-y_{01}+y_{00}.
+E_K &=\frac{(y_{10}-y_{00})+(y_{11}-y_{01})}{2},\\
+E_S &=\frac{(y_{01}-y_{00})+(y_{11}-y_{10})}{2},\\
+I_{KS}&=y_{11}-y_{10}-y_{01}+y_{00}.
 \end{align}
-The corresponding interaction coefficient in a $\{-1,+1\}$ coded regression is $I_{KS}/4$ and is not interchangeable with the difference-in-differences contrast.
+The main effects describe the delivered resource bundles and do not by themselves imply a causal population interaction.
 
-For both T04 and T07, historical-experience utilization scores are $(0,3,3,3)$ in the order above. Decision quality, evidence consistency, and research actionability are 4 in every cell; no invalid proposed actions are identified. Thus, $E_K=E_S=+1.5$, $I_{KS}=-3$, and the joint condition equals the best single-resource condition. The K/S entries overlap semantically, so the factors represent delivered resource bundles rather than perfectly separable facts and procedures.
+The original four dimensions are decision quality, evidence consistency, historical-experience utilization, and research actionability. Sixteen supplemental sessions at four later checkpoints yield fifteen valid final decisions; a budget-exhausted session remains incomplete. The original eight and supplemental sixteen decisions also receive a separately labeled common five-dimension review (physical interpretation, evidence consistency, limitation recognition, actionability, and evidence-reference accuracy), comprising 120 dimension entries. Historical utilization remains separate. The original four-score and later five-score averages are not mixed.
 
-The six original sessions and the two supplemental K$+$S$+$ sessions share frozen inputs and requested settings. The latter were acquired later, and the Gateway backend/default reasoning identity is not exposed. The eight sessions generated fifteen Main Provider send attempts in total; the two supplemental sessions account for four requests, and the original six were not rerun. Two joint blind-review requests score the two task-wise four-condition sets. Main Provider usage is unavailable; generic full-wire token estimates are retained separately. No engineering Core Plan is included in the eight scored Main decisions, and no scientific execution follows the replay.
+\subsection{Flat and Hierarchical Context}
 
-\subsection{Flat and hierarchical context studies}
+The original C035 comparison supplies a complete 66-record evidence corpus to Flat and an L0 brief plus a retrieval directory to the hierarchical condition. No further evidence reads occur; the cost metric includes accepted provider inference only. The C037 follow-up uses a 106-record frozen corpus and allows on-demand evidence reads. Hierarchical makes three L3 reads and no L1/L2 reads; cumulative input includes the subsequent accepted request. The second planned C042 checkpoint is not executed due to a preregistered request-capacity gate.
 
-E2 compares Flat and hierarchical context at PHS-C035 using a frozen 66-record corpus. Flat receives the full corpus; the hierarchical condition receives an automatically assembled L0 brief and a directory for optional retrieval. No evidence reads occur. The accepted-inference actual Provider input is 675,802 tokens for Flat and 78,785 for the hierarchical condition, an 88.342\% reduction. The blind mean scores are 4.0 and 3.8. The hierarchical condition includes an initial HTTP 400 request with no usage, so its all-attempt actual usage is unknown; the comparison uses accepted-inference actual usage and keeps generic full-wire estimates separate.
+Six further frozen checkpoints span T01, T04, T07, T08, T09, and T10. Twelve sessions yield eleven valid final decisions. Both conditions receive the same evidence availability and request budget, while Flat receives the full scoped corpus and Hierarchical receives its L0 delivery. The Flat T08 session exhausts its request budget without a valid final decision. Per-checkpoint quality, evidence recall, and completed status are preserved.
 
-E2-R2 is a preregistered follow-up with two candidate checkpoints. C037 is admitted and executed with 106 records. C042 is omitted before inference because its Flat request exceeds the preregistered context-capacity gate; it is not replaced. At C037, Flat receives the complete included corpus, while the hierarchical condition receives L0 and makes three parallel L3 reads. The three exact raw returns are delivered before the final decision. No L1/L2 reads or repeated reads occur. The completed run contains two Main sessions, three accepted Main requests, one blind-review request, zero rejected Main requests, and no missing Main usage.
+The saved-request input counts are reconstructed under one offline tokenizer-based accounting procedure applied uniformly to the six additional pairs. Across these cases Flat totals 1,546,342 input tokens and Hierarchical 280,283. The earlier C035/C037 values are provider-reported and are therefore shown in a separate figure panel. The two accounting methods and their differing request scopes are not pooled into one statistical efficiency estimate.
 
-For C037, Flat uses one Main request and 877,197 actual cumulative input tokens. Hierarchical uses two Main requests and 174,298 actual cumulative input tokens, an 80.130\% reduction. Blind mean scores are 3.4 and 3.6, while key-evidence coverage is 5/5 and 3/5. The hierarchical decision narrows causal attribution but omits two useful evidence trends. The three read returns are verified and linked to the final decision; without a pre-read Plan or controlled counterfactual, the causal effect of an individual read on the decision is not established.
+\subsection{Interpretation}
 
-E2 and E2-R2 are separate checkpoints and protocol stages, not repeated samples of the same case. E2 reports accepted-inference usage because the rejected request has no Provider usage. E2-R2 reports cumulative actual usage for every accepted Main request. Generic tokenizer allocations for component and tool-feedback costs are not treated as actual model tokens or billing.
-
-\subsection{Interpretation boundary}
-
-The Reporter and Knowledge/Skill studies measure changes in proposed research decisions and the use of stored experience. The context studies measure the relationship between context delivery, actual Provider input, blind decision scores, and key-evidence coverage. None of these decision-only replays measures physical task-success improvement. The eleven-task FULL portfolio and PHS-2D physical/sensitivity studies provide the separate physical and mathematical evidence layers.
+The architecture studies are descriptive decision evaluations rather than repeated end-to-end physical trials. A model review is not a physical task acceptance; a missing or failed decision is not silently converted into a zero-valued valid outcome. Complete per-session decisions, cost records, retrieval paths, and review details accompany the publication data.
