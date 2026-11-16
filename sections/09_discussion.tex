@@ -1,11 +1,13 @@
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{From candidate search to scientific research}
+\subsection{The primary contribution: agentic scientific research for soft-robot co-design}
 
-The completed cases show that soft-robot co-design often requires more than repeatedly updating a fixed parameter vector. T01 and T07 include structural revisions and reversals; T02, T04, and T10 change the physical or control formulation in response to the task and observed behavior; and PHS-2D moves from local mechanism analysis to finite-load and guide-path investigations. These processes motivate a framework in which the agent can revise both the design and the question being investigated.
+The central contribution of \softrobotagent{} is a physics-grounded research process, not a new low-level controller or a standalone structure--control optimizer. The agent decides what physical question to ask, which parameters and observables are relevant, whether mathematical analysis or direct physical evaluation is appropriate, and how the resulting evidence should change the next action. Structural modification, control re-optimization, mechanism diagnosis, and physical testing are the scientific actions within this process.
 
-The division of responsibility is central to this process. The Main Agent interprets the physical situation, selects the research intent, and decides what the evidence should change. Deterministic software binds the request to registered physical quantities, executes the numerical operation, and preserves its scope and provenance. The Reporter interprets completed evidence without taking over the research decision.
+This positioning is important because morphology and control are coupled in tendon-driven soft robots. A structural change can alter the response under a fixed input, while the task capability after control re-optimization may change differently. M0--M3 make these distinctions explicit and give the agent a set of complementary mathematical views. The PPRP then binds the chosen question to the frozen task, candidate, registered variables, observables, physical model, and budget. The framework therefore treats structure--control co-design as a sequence of evidence-grounded research decisions rather than a single joint optimization call.
+
+Recent LLM-based continuum-robot design systems demonstrate the value of simulator feedback for generating physically feasible candidates \cite{chen2026aidsr}. The present work complements this direction by making the research question and mathematical investigation explicit parts of the agent's action space. The agent is not only asked to propose a design after receiving physical feedback; it can select a mechanism, fixed-input, re-optimized-capability, or closed-loop question and decide whether the next step should be analysis, structural refinement, control update, or direct physical testing.
 
 \subsection{Complementary mathematical views}
 
@@ -19,6 +21,12 @@ The PHS-2D study connects local mechanism reasoning, equilibrium sensitivity, ph
 
 The broader methodological point is that mathematical evidence is used to inform an agent decision rather than to trigger an unconditional gradient update. The agent can select a continuous parameter optimization, a discrete morphology comparison, a control update, or a direct physical test. This makes the mathematical layer a composable research resource within a larger scientific process.
 
+\subsection{What the architecture studies establish}
+
+The decision-replay studies examine three distinct mechanisms in the final architecture. The Reporter comparison tests whether read-only interpretation improves how the Main Agent turns an existing evidence state into a next action. Its positive mean paired score and zero negative pairs support this role at the sampled checkpoints, while the zero median difference shows that the effect is concentrated in two cases rather than uniform. The Knowledge/Skill factorial replay shows that either resource can make historical experience operationally visible in a proposed decision; the measured joint condition does not exceed the best single-resource condition. The context studies show that L0--L3 organization can substantially reduce online input and support exact on-demand retrieval, while evidence coverage remains a separate quantity from blind decision score.
+
+These studies are complementary to the physical task portfolio. The eleven FULL cases establish task-level physical outcomes; the PHS-2D sensitivity audit checks local mathematical consistency; and the decision replays examine how architecture components influence research decisions and information use. The decision-only studies do not establish improved robot success rates, and their small ordinal samples are interpreted descriptively. Together, however, they provide evidence at three levels of the proposed method: physical capability, mathematical validity, and research-process behavior.
+
 \subsection{Evidence continuity across tasks}
 
 The context architecture separates the automatically supplied decision brief from on-demand method details and numerical provenance. Knowledge preserves prior findings and their evidence links; Skill preserves reusable procedures and applicability conditions. The T04, T07, and T10 traces illustrate reuse of prior methods or control initializations followed by task-specific reconstruction and evaluation.
@@ -27,4 +35,4 @@ This form of continuity is particularly relevant to soft robots because the same
 
 \subsection{Implications for autonomous robot research}
 
-The framework provides a route from physical observation to mathematical problem construction and from mathematical evidence to candidate refinement. Its contribution lies in the coordination of research intent, task-conditioned mathematical analysis, and independent physical validation. The eleven-task portfolio and the PHS-2D case demonstrate how this organization can be applied across active, passive, multi-condition, tracking, orientation, contact, and disturbance-recovery problems.
+The framework provides a route from physical observation to mathematical problem construction and from mathematical evidence to candidate refinement. Its contribution lies in the coordination of research intent, task-conditioned mathematical analysis, independent physical validation, and evidence-grounded research continuity. The eleven-task portfolio and the PHS-2D case demonstrate how this organization can be applied across active, passive, multi-condition, tracking, orientation, contact, and disturbance-recovery problems. The Reporter, Knowledge/Skill, and context studies further characterize how the research architecture supports the decisions that connect these physical and mathematical capabilities.
