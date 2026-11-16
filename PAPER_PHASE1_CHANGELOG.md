@@ -10,7 +10,7 @@ Phase 1 reorganizes the manuscript using the already-pushed publication handoff.
 - Merged registries, PPRP compilation, numerical routing, Main Agent/Reporter responsibilities, L0--L3, Knowledge/Skill, evidence storage, and independent physical evaluation into Method.
 - Removed the duplicated agentic state-transition formulation from Problem Formulation; the research state/update now appears once in Method.
 - Removed the empty Real-World Validation placeholder from the compiled manuscript. Hardware validation can be added when a complete hardware evidence package is available.
-- Reduced the main text to one data table; full task metrics and protocol details are in the appendices/supplement.
+- Removed the repeated main-text task table; Figure 2 serves as the integrated portfolio and Appendix B retains detailed task metrics and protocol conventions.
 
 ## Scientific corrections
 
@@ -23,6 +23,11 @@ Phase 1 reorganizes the manuscript using the already-pushed publication handoff.
 - New cross-task Gateway Provider usage remains UNKNOWN. Local serialized-text token counts remain estimates and are not presented as actual usage.
 - The matched physical M1/M2 replay is prepared but not executed; no empirical effect is claimed.
 
-## Validation boundary
+## Figure assets and validation boundary
 
-Static LaTeX labels/references and data-linked headline values are checked after the commit. A full LaTeX/Overleaf compile and final float/layout review remain part of the synchronization step.
+- Committed seven vector PDF/SVG pairs for Figures 2–8, using normalized numeric and decision data already on GitHub.
+- Figure 3 currently uses recorded nine-segment physical centerlines and ten signed-load metric curves; the native MuJoCo candidate-stage renders remain the only planned visual enhancement.
+- Figure 1's original TeX blob was rechecked against the baseline and is unchanged.
+- All seven PDF objects passed structure/xref/content-length checks; all SVG text bounds were checked, and detected Figure 3 axis-label overlaps were corrected.
+- Static LaTeX labels/references and citation keys were checked; full pdfLaTeX/Overleaf compilation and page-by-page float/layout review remain for the Codex synchronization step.
+- `OVERLEAF_SYNC_CODEX_PROMPT.md` specifies the safe sync and compile protocol.
