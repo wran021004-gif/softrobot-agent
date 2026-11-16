@@ -1,103 +1,58 @@
 \section{Experimental Setup}
 \label{sec:experimental-setup}
 
-\subsection{Completed task portfolio}
+\subsection{Task portfolio and physical evaluation}
 
-The evaluation portfolio contains eleven task cases, T01--T10 and PHS-2D, spanning active and passive structures, single- and multi-condition requirements, and distinct physical regimes. The archived FULL summary contains 30 required conditions, all of which passed their task-specific evaluators. T10 includes two additional frozen control conditions, reported separately from the required set.
+The FULL portfolio contains eleven task cases, T01--T10 and PHS-2D-7S, spanning active and passive designs, single- and multi-condition requirements, and distinct physical regimes. The task contracts retain their original initial states, targets or references, loads, horizons, observables, thresholds, and independent evaluators. The 30 required conditions all pass in the archived FULL results. T10 also contains two frozen control conditions, which are reported separately and are not included in the required-condition denominator.
 
 \begin{table*}[t]
 \centering
-\caption{Completed soft-robot research portfolio. Required conditions are distinguished from the two additional T10 frozen controls.}
+\caption{Canonical FULL task portfolio. Morphology is reported as flexible segments/tendons/active actuators; the independent nine-segment PHS-2D study is not part of this table or the eleven-case denominator.}
 \label{tab:task-portfolio}
 \small
-\begin{tabularx}{\textwidth}{@{}l l Y c@{}}
+\begin{tabularx}{\textwidth}{@{}l Y l c c@{}}
 \toprule
-Task & Research family & Main physical/design question & Required \\
+ID & Canonical task name & Regime & Morphology & Required \\
 \midrule
-T01 & Active reach and hold & One shared structure reaches and holds three spatial targets under tendon and terminal constraints. & 3 \\
-T02 & Loaded hold & One structure satisfies positive, negative, and zero external-load conditions. & 3 \\
-T03 & Fast reach & Rapid target acquisition with terminal and post-arrival requirements. & 1 \\
-T04 & Trajectory tracking & Full two-cycle figure-eight tracking over a 22-s horizon. & 1 \\
-T05 & Position and tool axis & Joint end-effector position and directed tool-axis requirements. & 1 \\
-T06 & Loaded timed scan & Time-indexed position--orientation scan under a 20-g payload. & 1 \\
-T07 & Shared-structure multi-task design & One four-tendon morphology supports four distinct task conditions. & 4 \\
-T08 & Passive progressive stiffness & One passive two-tendon structure exhibits bilateral progressive response. & 2 \\
-T09 & Contact manipulation & Press and hold a spring button under depth and force constraints. & 1 \\
-T10 & Impact recovery & One state-feedback recipe recovers from three required impact conditions. & 3 (+2 controls) \\
-PHS-2D & Passive mechanism design & One nine-segment, four-tendon structure limits tip motion while retaining loaded-point compliance. & 10 \\
+T01 & Multi-target Reach-and-Hold & Active & 2/6/6 & 3 \\
+T02 & Load-Conditioned Hold & Active & 2/6/6 & 3 \\
+T03 & Fast Target Reaching & Active & 2/6/6 & 1 \\
+T04 & Figure-Eight Trajectory Tracking & Active & 2/4/4 & 1 \\
+T05 & End-Effector Position and Tool-Axis Alignment & Active & 2/6/6 & 1 \\
+T06 & Loaded Time-Indexed Pose Scanning & Active & 2/6/6 & 1 \\
+T07 & Shared-Morphology Multi-Task Design & Active & 2/4/4 & 4 \\
+T08 & Passive Progressive-Stiffness Response & Passive & 2/2/0 & 2 \\
+T09 & Guided Spring-Button Contact Manipulation & Active & 2/4/4 & 1 \\
+T10 & Impact-Recovery Control & Active & 2/6/6 & 3 (+2 controls) \\
+PHS-2D-7S & Passive Tendon-Constrained Compliance and Tip Suppression & Passive & 7/4/0 & 10 \\
 \bottomrule
 \end{tabularx}
 \end{table*}
 
-The PHS-2D results in this paper refer to the nine-segment, four-tendon Round-3 evidence package. Older seven-segment records are not combined with its geometry or performance values.
-
-\begin{figure*}[t]
-\centering
-\fbox{\parbox[c][2.2cm][c]{0.94\linewidth}{\centering
-\todo{Insert the 11-task coverage matrix with task family, active/passive morphology, required-condition count, and principal physical metric. Keep T10 frozen controls separate from required conditions.}
-}}
-\caption{Task portfolio and physical-evaluation coverage across eleven soft-robot research cases.}
-\label{fig:task-portfolio-visual}
-\end{figure*}
-
-\subsection{Task protocols and physical evaluation}
-
-Each task retains its frozen initial condition, target or reference, loading conditions, time horizon, observables, thresholds, and required/control classification. The corresponding independent physical evaluator determines final acceptance. Mathematical analysis may use a reduced or equilibrium model, but its output is not substituted for the original task evaluation.
-
-For active tasks, each condition may use its own control sequence while sharing the required morphology. For passive tasks, the same structure is evaluated under prescribed loads and fixed-payout conditions. The multi-condition requirement is assessed on one shared design rather than a collection of condition-specific structures.
+PHS-2D-9S denotes a separate nine-segment, four-passive-tendon mechanism study with eight physical guide plates. It is reported as an independent extension and is not substituted for the seven-segment PHS-2D-7S FULL case. For active multi-condition tasks, one morphology is shared while each condition may use its own control sequence. Passive tasks use fixed-payout structures and prescribed loading conditions.
 
 \subsection{Research-mode comparison}
 
-The task-wise comparison distinguishes three research modes:
+The task-wise research-mode comparison contains 33 task--method records across the eleven tasks and three methods:
+\begin{itemize}[leftmargin=*]
+\item \textbf{A: LLM-only.} The agent proposes and revises structure and control using task information and physical-evaluation feedback. Optional mathematical diagnosis and automated mathematical optimization are not exposed.
+\item \textbf{B: Direct Mathematical Tools.} The agent has the A capabilities and may invoke supported bottom-level mathematical tools. It constructs the mathematical question and request itself; the high-level research-intent projection and mathematical research orchestration are not exposed.
+\item \textbf{C: \softrobotagent{} FULL.} C uses the archived FULL research record, including research-intent projection, \PPRP{} construction, M0--M3 semantics, differentiation routing, validity checks, and evidence feedback. C is a historical reference and is not re-run.
+\end{itemize}
+A and B begin from the original task initial states and the legal design space rather than from intermediate FULL candidates. Two B entries, T03 and T05, were recorded under a direct-mathematical-only variant and are marked as protocol deviations; they are not treated as standard B runs. Qualification failures, incomplete evaluations, and valid physical failures remain distinct outcomes.
 
-\begin{table}[t]
-\centering
-\caption{Research modes used in the task-wise comparison.}
-\label{tab:methods-abc}
-\small
-\begin{tabularx}{\columnwidth}{@{}l Y@{}}
-\toprule
-Method & Research capability \\
-\midrule
-A: LLM-only & The agent proposes and revises structure and control using task information and physical-evaluation feedback. It can generate candidates, set control inputs, execute the robot, and read the independent evaluator. Optional mathematical diagnosis and automated mathematical optimization are not exposed. \\
-B: Direct mathematical tools & The agent has the A capabilities and can directly invoke supported bottom-level mathematical tools. It constructs the mathematical question and requests itself; the high-level research-intent projection and mathematical research orchestration are not exposed. \\
-C: Ours / FULL & The completed full research process, including research-intent projection, PPRP construction, M0--M3 semantics, differentiation routing, validity checks, evidence feedback, and hierarchical context. C is taken from the archived FULL record. \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\subsection{Architecture-level decision studies}
 
-The representative comparison focuses on T01, T04, and T07, for which the task-wise A/B records can be read alongside the corresponding historical FULL cases. PHS-2D is presented separately as the principal mathematical and passive-design case. The archived C records are identified as historical FULL references; A/B runs begin from their task initial states and use the legal design space rather than FULL intermediate candidates.
+Architecture studies evaluate proposed research decisions at frozen checkpoints. They do not launch candidate search, mathematical workers, physical simulation, or hardware execution. Their outcomes are therefore decision-level measures, not additional robot task successes.
 
-\subsection{Architecture-level decision-replay studies}
+The Reporter study contains six matched OFF/ON checkpoint pairs, twelve Main sessions, and six anonymous independent-model reviews. The ON condition receives the corresponding read-only Reporter interpretation; six previously generated reports are reused. The reviewer scores physical interpretation, evidence consistency, limitation recognition, research actionability, and Main decision quality on a 0--4 ordinal scale.
 
-In addition to physical task evaluation, we conducted decision-only studies on frozen research checkpoints to examine how individual architecture components affect the Main Agent's proposed next research action. These studies preserve the original task, candidate, and evidence state. They do not launch mathematical workers, structure search, MuJoCo, or physical experiments; their outcome is a proposed research decision rather than a robot-performance measurement. Across the four protocols, the archive contains 24 isolated Main sessions and ten independent blind-review submissions.
+The original Knowledge/Skill experiment is a $2\times2$ factorial replay at T04 and T07, with one Main decision per cell and eight decisions overall. A later decision-only extension evaluates the same four K/S conditions at four frozen checkpoints, producing sixteen sessions, fifteen valid decisions, and one request-budget-exhausted submission. A common five-dimensional assessment is reported separately from the original four-dimensional scores. The original and supplemental checkpoint identities are retained.
 
-\subsubsection{Reporter ON/OFF}
+The context studies comprise two historical PHS-2D checkpoint pairs and six additional cross-task checkpoint pairs at T01, T04, T07, T08, T09, and T10. The six-checkpoint extension contains twelve Main sessions, eleven valid decisions, one request-budget-exhausted session, and six anonymous paired reviews. The two historical pairs have Provider-reported usage under different accounting scopes. Provider usage was not returned for the six new Gateway pairs; their token usage is therefore unavailable.
 
-Six historical checkpoints are evaluated in matched pairs: M1-A/B/C and P3-A/B/C. Each checkpoint is replayed in two isolated Main sessions with identical task and evidence inputs. In the ON condition, the corresponding saved Reporter interpretation is added to the Main context; in the OFF condition, it is not. Six previously generated Reporter reports are reused, so this study isolates the downstream use of Reporter interpretations rather than the cost or quality of generating new reports.
+\subsection{Scoring and resource accounting}
 
-The experiment contains twelve Main decision sessions and six anonymous paired reviews. An independent model reviewer scores each pair on five dimensions—physical interpretation, evidence consistency, limitation recognition, research actionability, and Main decision quality—using an ordinal 0--4 rubric. The paired mean is the equal-weight average of these five dimensions. The human-scoring template is retained separately.
+Decision reviews use anonymous outputs and frozen evidence. Scores are descriptive ordinal assessments. The samples do not support significance tests, population-level causal claims, or statistical noninferiority. Human verification of the independent-model assessments remains separate.
 
-\subsubsection{Knowledge/Skill factorial replay}
-
-A complete $2\times2$ design independently toggles Knowledge (K) and Skill (S) at two task checkpoints, T04 and T07. The four conditions are K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$. Each task contributes one Main LLM decision per cell, giving eight decisions in total. The two tasks receive separate joint blind reviews, each comparing the four anonymized decisions.
-
-The reviewer scores decision quality, evidence consistency, historical-experience utilization, and research actionability on a 0--4 ordinal scale. The factorial main effects and difference-in-differences interaction are computed descriptively within each task. The complete four-condition Main-LLM table excludes authored engineering Core Plans. The two K$+$S$+$ decisions were collected in a supplemental completion after the original six sessions; frozen inputs and requested settings match, while the historical backend/default reasoning identity is not exposed. Each cell contains one observation, so the contrasts are not used for significance or population-synergy claims.
-
-\subsubsection{Flat versus hierarchical context: E2 and E2-R2}
-
-E2 compares Flat context delivery with the L0--L3 context organization at checkpoint PHS-C035. Both conditions use the same 66-record frozen corpus. Flat receives the complete corpus directly; the hierarchical condition receives the automatically assembled L0 brief and a directory for optional retrieval. No additional evidence reads occurred in this first pair. One accepted inference is available for each condition; the hierarchical condition also contains an initial HTTP 400 request with no Provider usage, so its actual token comparison is reported on the accepted-inference basis only.
-
-E2-R2 is a preregistered decision-only follow-up using a new PHS checkpoint. C037 was admitted with a 106-record corpus. Flat receives the complete included corpus, whereas the hierarchical condition receives L0 and may request any evidence through the same read-only tools. The executed hierarchical path contains three parallel L3 reads and no L1/L2 reads. All three returned records were verified against their frozen sources and were delivered in the subsequent Main request. C042 was prepared but omitted before inference by the preregistered context-capacity gate; it was not replaced or resampled. The executed E2-R2 comparison therefore contains one paired checkpoint, two Main sessions, and one independent blind review.
-
-Both context studies use actual Provider input usage as the primary token measure when available. Generic full-wire tokenizer estimates are kept separate and are not treated as model-matched or billing tokens. E2-R2 cumulative usage includes every accepted Main request, including repeated context.
-
-\subsection{Scoring and interpretation}
-
-The decision-replay studies use an independent model reviewer with anonymous decisions and frozen evidence. Human-scoring templates are retained for subsequent verification. Scores are descriptive ordinal measures; no confidence intervals, significance tests, or cross-task robot-success claims are inferred from these small decision samples. The Reporter and Knowledge/Skill studies have unavailable Main Provider usage; visible-context token estimates are reported only as generic proxies. E2 and E2-R2 have Provider-reported input usage for the accepted requests described above. This evaluation is organized at three distinct levels: the physical task portfolio tests domain outcomes, the local sensitivity audit tests numerical consistency, and the architecture replays test research-decision behavior and information-use efficiency. This separation follows the evaluation logic used in recent scientific-agent studies, which report component ablations and expert assessment separately from end-to-end experimental validation \cite{gottweis2026coscientist,chen2025scienceagentbench}.
-
-\subsection{Evaluation measures for physical tasks}
-
-Each physical task is reported using its own frozen metrics. The common reporting fields are required-condition completion, normalized constraint violation, candidate count, physical evaluations, mathematical calls, LLM tokens, integration steps, and recorded wall-clock cost. For representative task-wise comparisons, we also report the sequence of best task violation against cumulative physical-evaluation budget when the trace contains comparable checkpoints.
-
-Raw errors from different task families are not averaged. Resource fields retain their original scope, and unavailable quantities are not replaced with estimated values. The A/B/C comparison is presented as task-wise research cases and resource traces rather than a multi-seed statistical benchmark.
+For physical tasks, reporting retains required-condition completion, evaluation coverage, task-specific normalized violation, candidate count, mathematical calls, physical evaluations, integration steps, and recorded time. Raw errors from different task families are not averaged. Resource fields are compared only when their measurement populations and scopes match. Provider token counts are reported only when returned by the Provider; local text-token reconstructions are kept separately as estimates in the supplementary accounting.
