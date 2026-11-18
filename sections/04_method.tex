@@ -38,7 +38,52 @@ The deterministic projection resolves the request against registered capabilitie
 \end{equation}
 where $\Iparam_k$ is the selected parameter group, $\mathcal O_k$ the selected observables, $\mathcal F_k$ the inner physical problem, $\sigma_k$ the requested analysis semantics, and $\mathcal B_k$ the allocated budget. The working hypothesis $\mathcal H_k$ remains associated with the research decision and evidence record. The symbol $\Dspace$ is reserved for the admissible design space.
 
-The projection is staged: the agent supplies the scientific intent; schemas constrain request fields; registries resolve names to actual parameters and observables; and the compiler binds the task, candidate, physical model, and solver requirements. The agent does not manually construct simulator-specific Jacobians, KKT arrays, or finite-difference steps. A request is executable only after deterministic checks succeed. This division allows the agent to choose the question without allowing it to invent unregistered physical quantities or alter task acceptance criteria.
+The frozen task contract $\tau$ retains the task targets, loads, constraints, scoring windows, and acceptance semantics; $\mathcal F_k$ binds the candidate-specific physical model and selected operating point. The projection is staged: the agent supplies the scientific intent; schemas constrain request fields; registries resolve parameter and observable identifiers; and the compiler binds the task, candidate, physical problem, analysis semantics, and budget. The agent does not manually construct simulator-specific Jacobians, KKT arrays, or finite-difference steps.
+
+Algorithm~\ref{alg:pprp} summarizes this research-level procedure. The semantic selector chooses one suitable view for the current question; M0--M3 are complementary alternatives, not a four-stage sequence. A request that is incomplete, unregistered, inapplicable, outside its validity conditions, or over budget returns a typed status rather than a numerical result. The Main Agent can then reformulate the question, select another supported investigation, or take the optional direct-physics branch.
+
+
+
+\begin{algorithm}[t]
+\caption{PPRP construction and evidence-guided research}
+\label{alg:pprp}
+\begin{algorithmic}[1]
+\Require Frozen task $\tau$, candidate $d_k$, research state $(\mathcal H_k,\mathcal E_k)$, registries $\mathcal R$, remaining budget $\mathcal B_k$
+\Ensure Updated candidate $d_{k+1}$ and scoped evidence $\mathcal E_{k+1}$
+\State $I_k \gets \operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$
+\If{$I_k$ selects a direct physical test}
+    \State $e_k \gets \operatorname{EvaluatePhysics}(\tau,d_k)$
+\Else
+    \State $\sigma_k \gets \operatorname{SelectApplicableView}(I_k,\mathcal R)$ \Comment{one suitable view among M0--M3}
+    \State $\mathcal P_k \gets \operatorname{CompilePPRP}(\tau,d_k,I_k,\sigma_k,\mathcal R,\mathcal B_k)$
+    \If{$\mathcal P_k$ is incomplete or not applicable}
+        \State $e_k \gets \operatorname{ReturnTypedStatus}(\mathcal P_k)$ \Comment{no numerical execution}
+    \Else
+        \State $m_k \gets \operatorname{RouteMethod}(\mathcal P_k)$
+        \If{$m_k$ is unsupported, unqualified, or over budget}
+            \State $e_k \gets \operatorname{ReturnTypedStatus}(m_k,\mathcal P_k)$
+        \Else
+            \State $z_k \gets \operatorname{Execute}(m_k,\mathcal P_k)$
+            \State $e_k \gets \operatorname{ValidateAndScope}(z_k,\mathcal P_k)$
+        \EndIf
+    \EndIf
+\EndIf
+\State $\widetilde{\mathcal E}_k \gets \operatorname{Store}(\mathcal E_k,e_k)$
+\State $r_k \gets \operatorname{Reporter}(\widetilde{\mathcal E}_k)$ \Comment{optional, read-only}
+\State $a_k \gets \operatorname{MainAgent}(\widetilde{\mathcal E}_k,r_k)$
+\If{$a_k$ modifies the candidate}
+    \State $d_{k+1} \gets \operatorname{ApplyResearchAction}(d_k,a_k)$
+    \State $e_k^{\mathrm{phys}} \gets \operatorname{EvaluatePhysics}(\tau,d_{k+1})$
+    \State $\mathcal E_{k+1} \gets \operatorname{Store}(\widetilde{\mathcal E}_k,e_k^{\mathrm{phys}})$
+\Else
+    \State $d_{k+1} \gets d_k$
+    \State $\mathcal E_{k+1} \gets \widetilde{\mathcal E}_k$
+\EndIf
+\State \Return $(d_{k+1},\mathcal E_{k+1})$
+\end{algorithmic}
+\end{algorithm}
+
+The PPRP is the structured bridge between a physical hypothesis and a numerical investigation: it binds the frozen task, current candidate, selected parameters and observables, inner physical problem, analysis semantics, and budget. The numerical primitives routed through it (e.g., KKT/IFT sensitivity, envelope or dual sensitivity, automatic differentiation, and controlled finite differences) are established methods. The methodological contribution is their task-conditioned composition, validity-aware routing, and return as scoped evidence to the research agent.
 
 \subsection{Task-conditioned composable analysis semantics}
 The mathematical layer distinguishes four complementary views. Each view corresponds to a different physical or optimization object and is selected according to the research question.

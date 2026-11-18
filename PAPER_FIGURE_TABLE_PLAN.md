@@ -2,7 +2,11 @@
 
 ## Narrative
 
-The results are organized as a visual scientific argument: task-space breadth, mechanism-level design discovery, process-level research adaptation, local mathematical validation, research-mode comparison, and research continuity. Figure 1 remains frozen and unchanged.
+The Method section defines PPRP and Algorithm 1; Figures 3--5 are empirical Results figures that support, rather than belong to, the Method section. The results are organized as a visual scientific argument: task-space breadth, mechanism-level design discovery, process-level research adaptation, local mathematical validation, research-mode comparison, and research continuity. Figure 1 remains frozen and unchanged.
+
+## Method algorithm
+
+- **Algorithm 1 — PPRP construction and evidence-guided research** belongs in Method immediately after the PPRP tuple. It shows research-intent input, one applicable M0--M3 semantic choice, deterministic problem compilation, method routing and validity/budget gates, scoped evidence storage, Main-agent feedback, and an optional direct-physics branch. It is an abstract algorithm, not a line-by-line code listing.
 
 ## Main figures
 
@@ -31,8 +35,8 @@ Observation → Hypothesis → Investigation → Action → Validated outcome.
 
 Use actual native MuJoCo states and saved plots. The text is a concise editorial reconstruction of archived decisions, not verbatim internal reasoning.
 
-### Figure 5 — Local mathematical sensitivity
-Retain the 18-pair implicit-derivative versus finite-difference validation. State that the pairs are six loading branches by three metrics along one common material-parameter direction; maximum relative discrepancy is 0.1191%.
+### Figure 5 — Task-conditioned mathematical evidence
+Retain the 18-pair implicit-derivative versus finite-difference validation. State that the pairs are six loading branches by three metrics along one common material-parameter direction; maximum relative discrepancy is 0.1191%. Add the signed-response interpretation: all 18 derivatives are negative, while the PHS-2D design target couples tip suppression with at least 10 mm early-load motion. This illustrates why multiple observables and task targets must accompany a local derivative.
 
 ### Figure 6 — Research-mode comparison
 Show the 11-by-3 A/B/FULL matrix with status, evaluated/required coverage, and known normalized violation. Partial evaluations must be labeled partial; unexecuted conditions remain unavailable.

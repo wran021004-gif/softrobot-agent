@@ -26,8 +26,8 @@ Autonomous research is the organizing contribution. Structure–control decoupli
 - M2: re-optimized task capability.
 - M3: closed-loop performance.
 - Mathematical basis: KKT and active-set analysis, implicit differentiation, envelope/dual sensitivity, analytic/automatic differentiation, finite differences, directional comparisons, and finite-scale interaction analysis.
-- Main evidence: nine-segment PHS-2D gradient audit; T01/T02/T07 structure–control cases; T04/T10 control-method changes.
-- PHS-2D sensitivity audit: six loading branches × three task metrics = 18 derivative pairs along one common Young's-modulus direction; maximum relative discrepancy 0.1191223%.
+- Main evidence: nine-segment PHS-2D gradient audit; T01/T02/T07 structure–control cases; T04/T10 control-method changes. T07 adds one matched M1_B fixed-input replay and four d1 re-optimized outcomes; the baseline d0 M2 attempts remain unresolved, so no cross-structure M2 improvement is claimed.
+- PHS-2D sensitivity audit: six loading branches × three task metrics = 18 derivative pairs along one common Young's-modulus direction; all signed derivatives are negative, implicit/FD signs agree in all 18 pairs, and maximum relative discrepancy is 0.1191223%. The interpretation is task-conditioned: tip suppression is considered together with the ≥10 mm early-load-motion target.
 - The contribution is the task-conditioned composition, validity-aware routing, and integration into agent-directed research—not a new KKT, IFT, envelope, or finite-difference theorem.
 
 ## C3 — Evidence-grounded research continuity
@@ -35,6 +35,7 @@ Autonomous research is the organizing contribution. Structure–control decoupli
 **Claim.** Historical findings, methods, candidates, and physical evidence inform subsequent decisions through separate, auditable resources.
 
 - Architecture: independent Knowledge and Skill resources, L0–L3 context, immutable Store/Trace, fixed evidence extraction, and read-only Reporter.
+- Aggregate evidence-to-action audit: 220 evidence-linked proposals, 205 dispatched, 160 executed with inspectable outputs, and 10 later linked to independent PASS evaluations; 72.73% proposal-to-execution conversion.
 - Reporter ON/OFF: six matched historical decision pairs; five-dimension blind mean 3.433→3.733 (+0.300), two wins/four ties/no losses; unsupported conclusions 2→0 in the blind review.
 - Knowledge/Skill: two task checkpoints (T04/T07), complete 2×2 replay, eight Main decisions. Historical-experience utilization is 0/3/3/3 for K−S−, K+S−, K−S+, K+S+. Decision quality, evidence consistency, and actionability remain 4 in every cell. K and S main effects are each +1.5 on utilization; the interaction contrast is −3 and the joint condition equals the best single-resource condition.
 - Context E2: at C035, accepted-inference input falls 88.34% (675,802→78,785 tokens), with blind score 4.0→3.8 and no additional evidence reads.

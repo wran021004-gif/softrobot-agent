@@ -92,19 +92,24 @@
 \end{minipage}\hfill
 \begin{minipage}[t]{0.27\textwidth}
 \small
-\textbf{18/18}\par\scriptsize derivative signs agree
-\vspace{5pt}
+\textbf{18/18}\par\scriptsize implicit--FD sign agreement
+\vspace{3pt}
 
-\textbf{0.1191\%}\par\scriptsize maximum relative discrepancy
-\vspace{5pt}
+\textbf{All 18 $<0$}\par\scriptsize signed local sensitivities
+\vspace{3pt}
 
-\textbf{0.0260\%}\par\scriptsize median relative discrepancy
-\vspace{5pt}
+\textbf{0.1191\%}\par\scriptsize maximum discrepancy
+\vspace{3pt}
+
+\textbf{0.0260\%}\par\scriptsize median discrepancy
+\vspace{3pt}
+
+\textbf{PHS-2D target}\par\scriptsize retain $\geq10$~mm early-load motion while suppressing tip motion
 
 \textcolor{TraceNavy}{\scriptsize $\bullet$ Point displacement}\par
 \textcolor{TraceTeal}{\scriptsize $\bullet$ Tip displacement}\par
 \textcolor{TraceSlate}{\scriptsize $\bullet$ Tip/point ratio}
 \end{minipage}
-\caption{Local validation of implicit PHS-2D-9S equilibrium sensitivities. The three parity facets compare absolute implicit and central finite-difference gradients for the three observables; the lower plot reports all 18 relative discrepancies (six signed-loading branches by three metrics). The perturbation is along one normalized Young's-modulus direction around $E_0=8$~MPa. All signed derivatives agree; the maximum relative discrepancy is 0.1191\%. The check establishes local numerical consistency for this fixed topology and parameter direction, not a global error bound or cross-parameter guarantee.}
+\caption{Local validation of implicit PHS-2D-9S equilibrium sensitivities. The three parity facets compare absolute implicit and central finite-difference gradients for the three observables; the lower plot reports all 18 relative discrepancies (six signed-loading branches by three metrics). The perturbation is along one normalized Young's-modulus direction around $E_0=8$~MPa. All 18 signed derivatives are negative and the implicit/finite-difference signs agree; the maximum relative discrepancy is 0.1191\%. The PHS-2D target retains at least 10~mm early-load motion while suppressing tip motion, so the three-observable sign pattern is interpreted against the task target rather than as an automatic descent direction. The check establishes local numerical consistency for this fixed topology and parameter direction, not a global error bound or cross-parameter guarantee.}
 \label{fig:gradient-validation}
 \end{figure*}
