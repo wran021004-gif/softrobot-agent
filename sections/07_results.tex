@@ -17,7 +17,7 @@ T07 illustrates morphology refinement under a shared multi-condition requirement
 
 \subsection{Evidence-guided research trajectories}
 
-Figure~\ref{fig:research-trajectory} presents two representative route changes. For T04, the incomplete GVS route was replaced by a candidate-native equilibrium-point bank and tension feedforward. The final two-cycle, 22-s figure-eight trajectory has an RMSE of 0.688~mm and a maximum tracking error of 1.021~mm.
+Figure~\ref{fig:research-trajectory} links recorded Agent decisions to executed research actions and their physical consequences. In T04, an all-4~N reference initialization produced an inadmissible optimization trial. The Agent restarted from the time-zero equilibrium, perturbed boundary tensions from 0.20 to 0.21~N and constructed an 89-point bank. The final two-cycle, 22-s figure-eight has an RMSE of 0.688~mm and a maximum tracking error of 1.021~mm.
 
 For T10, the robot morphology remains fixed while the control route changes from GVS/NMPC to a native tangent model, discrete LQR, and bounded tension allocation. A common feedback recipe passes the three required impact conditions. The two frozen-input controls are reported separately and both fail their corresponding recovery requirements. These are discrete route comparisons, not a convergence curve.
 
@@ -25,7 +25,7 @@ For T10, the robot morphology remains fixed while the control route changes from
 
 \subsection{Contact execution}
 
-Figure~\ref{fig:physical-execution} shows the T09 approach, maximum button travel, and joint depth/force holding phases. The final execution maintains the required 0.5-s hold, with a maximum depth error of 0.0528~mm and contact-force error of 0.00247~N. The accepted run records no unexpected collision.
+Figure~\ref{fig:physical-execution} relates T09's corrected contact-execution setup to the observed approach, maximum button travel, and joint depth/force hold. The final run maintains the required 0.5-s hold, with a maximum depth error of 0.0528~mm, contact-force error of 0.00247~N and no unexpected collision.
 
 \input{figures/fig04_physical_execution}
 
@@ -48,7 +48,7 @@ Table~\ref{tab:abc-comparison} reports the task-wise A/B/FULL comparison. FULL p
 
 \subsection{Reporter, Knowledge, Skill, and context}
 
-Across six matched Reporter OFF/ON pairs, the mean five-dimensional blind score increases from 3.433 to 3.733, a paired mean difference of +0.300/4. The paired median difference is zero, with two wins, four ties, and no losses. The clearest examples concern a budget-boundary violation and a missing directional tendon-ablation comparison; these are examples within the six pairs, not additional samples.
+Across six matched Reporter OFF/ON pairs, the mean five-dimensional blind score increases from 3.433 to 3.733, a paired mean difference of +0.300/4. The paired median difference is zero, with two wins, four ties, and no losses. In M1-C, the Reporter identifies a 120-iteration proposal that exceeds the 100-iteration budget (blind score 2.8 to 3.6). In P3-A, it identifies a missing directional tendon-ablation comparison (3.0 to 4.0). These are two cases within the six pairs.
 
 The original Knowledge/Skill replay contains eight decisions across T04 and T07. Historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$, while the other three original dimensions are saturated at 4. The four-checkpoint extension contains fifteen valid decisions from sixteen sessions. These small decision-only studies do not establish a general synergistic effect or downstream physical improvement.
 
