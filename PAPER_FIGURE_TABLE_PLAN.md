@@ -42,9 +42,10 @@ Combine the Reporter matched-pair summary, original Knowledge/Skill utilization,
 
 ## Main tables
 
-- Table I: A/B/FULL task-wise outcomes, grouped using the same four task families as Figure 2. PASS is reported consistently; incomplete and qualification outcomes remain separate from valid physical failures.
+- Table I: four-family portfolio summary with task counts, capability coverage, and required-condition completion.
+- Table II: A/B/FULL task-wise outcomes, grouped using the same four task families as Figure 2. PASS is reported consistently; incomplete and qualification outcomes remain separate from valid physical failures.
 - Detailed FULL task metrics are retained in the task-portfolio appendix table.
-- The A/B/FULL table reports task-level status and violation fractions; Figure 6 adds evaluation coverage and known partial violations.
+- Figure 6 adds evaluation coverage and known partial violations to the Table II outcome categories.
 
 ## Style
 
