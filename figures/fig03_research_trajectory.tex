@@ -1,0 +1,39 @@
+\begin{figure*}[t]
+\centering
+\begin{minipage}[t]{0.485\textwidth}
+\centering\textbf{(a) T04: trajectory-tracking route}
+\par\vspace{3pt}
+\begin{minipage}[t]{0.48\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/native/t04_earlier_route.png}
+\par\footnotesize Earlier route
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/native/t04_final.png}
+\par\footnotesize Final execution
+\end{minipage}
+\par\vspace{3pt}
+\includegraphics[width=0.96\linewidth]{figures/native/t04_tracking.png}
+\par\small GVS $\rightarrow$ equilibrium-point bank $\rightarrow$ tension feedforward
+\end{minipage}\hfill
+\begin{minipage}[t]{0.485\textwidth}
+\centering\textbf{(b) T10: impact-recovery control}
+\par\vspace{3pt}
+\begin{minipage}[t]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/native/t10_preimpact.png}
+\par\footnotesize Before
+\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/native/t10_impact.png}
+\par\footnotesize Impact
+\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering
+\includegraphics[width=\linewidth]{figures/native/t10_final_hold.png}
+\par\footnotesize Recovery
+\end{minipage}
+\par\vspace{3pt}
+\includegraphics[width=0.96\linewidth]{figures/native/t10_control_comparison.png}
+\par\small GVS/NMPC $\rightarrow$ tangent model and LQR $\rightarrow$ bounded tension allocation
+\end{minipage}
+\caption{Representative research-route changes recorded for T04 and T10. T04 replaces an incomplete GVS route with a candidate-native equilibrium-point bank and tension feedforward before completing the 22-s reference. T10 retains its morphology while changing the feedback formulation; the common recipe passes the three required impact conditions, while the two frozen-input controls remain separate. The timelines summarize archived task-study records and do not add independent task trials.}
+\label{fig:research-trajectory}
+\end{figure*}

@@ -1,0 +1,32 @@
+\begin{table*}[t]
+\centering
+\caption{Task-wise comparison of A (LLM-only), B (direct mathematical tools), and the historical FULL method.}
+\label{tab:abc-comparison}
+\small
+\renewcommand{\arraystretch}{1.10}
+\begin{tabularx}{\textwidth}{@{}l X c c c@{}}
+\toprule
+Task group & Task & A & B & FULL \\
+\midrule
+\multirow{8}{*}{Active control}
+& T01 Reach-and-Hold & Fail (44.4\%) & Fail (55.6\%) & \textbf{Pass} \\
+& T02 Load-Conditioned Hold & Incomplete (1/3) & Incomplete (0/3) & \textbf{Pass} \\
+& T03 Fast Target Reaching & Fail (44.4\%) & \textbf{Pass}$^\dagger$ & \textbf{Pass} \\
+& T04 Figure-Eight Tracking & Fail (16.7\%) & Qualification failure & \textbf{Pass} \\
+& T05 Position and Tool-Axis Alignment & Fail (37.5\%) & \textbf{Pass} & \textbf{Pass} \\
+& T06 Loaded Pose Scanning & Fail (33.3\%) & Fail (44.4\%) & \textbf{Pass} \\
+& T09 Spring-Button Contact & Fail (31.6\%) & Fail (31.6\%) & \textbf{Pass} \\
+& T10 Impact Recovery & Incomplete (1/3) & Fail (57.1\%) & \textbf{Pass} \\
+\midrule
+Shared morphology
+& T07 Shared-Morphology Multi-Task & Fail (42.9\%) & Fail (40.0\%) & \textbf{Pass} \\
+\midrule
+Passive mechanics
+& T08 Progressive Stiffness & Incomplete (0/2) & Qualification failure & \textbf{Pass} \\
+& PHS-2D Passive Compliance & Qualification failure & Qualification failure & \textbf{Pass} \\
+\midrule
+\multicolumn{5}{@{}l@{}}{\footnotesize Fail: valid physical evaluation with violated constraints; percentages denote the violated fraction of evaluated constraints.}\\
+\multicolumn{5}{@{}l@{}}{\footnotesize Incomplete: required evaluation not completed; qualification failure: no valid physical evaluation. $^\dagger$ T03-B used the marked direct-mathematical-only protocol variant.}\\
+\bottomrule
+\end{tabularx}
+\end{table*}
