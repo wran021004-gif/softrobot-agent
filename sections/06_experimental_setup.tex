@@ -3,23 +3,23 @@
 
 \subsection{Task portfolio and physical evaluation}
 
-The FULL portfolio contains eleven task cases, T01--T10 and PHS-2D, spanning active manipulation, trajectory tracking, shared-morphology design, contact, passive stiffness, and tendon-constrained compliance. The task contracts retain their original initial conditions, targets or references, loads, horizons, observables, thresholds, and independent evaluators. All 30 required conditions pass. T10 also includes two frozen-input controls, which are reported separately and are not included in the required-condition count. Table~\ref{tab:physical-portfolio} summarizes the principal task-specific outcomes without pooling heterogeneous error measures.
+The physical portfolio contains eleven task cases, T01--T10 and PHS-2D, organized into four functional families: reaching and dynamic motion (T01--T04), pose and contact interaction (T05, T06, and T09), shared-morphology and control co-design (T07 and T10), and passive mechanics (T08 and PHS-2D). This organization exposes the range of physical capabilities covered by the benchmark while retaining the native task definition of each case. Figure~\ref{fig:task-portfolio} provides the visual task-space overview; detailed task metrics and reporting conventions are listed in Appendix~\ref{app:task-portfolio}.
 
-For active multi-condition tasks, one morphology is shared while each condition may use its own control sequence. T07 contains four required conditions and 35 original hard constraints. The PHS-2D study evaluates ten prescribed signed-loading conditions using a fixed-payout passive structure. Task-specific acceptance criteria remain unchanged throughout the studies.
+The FULL portfolio satisfies all 30 required physical conditions. T10 also includes two frozen-input controls, which are separate from its three required impact conditions. T07 evaluates one shared morphology across four required conditions and 35 original hard constraints. The portfolio PHS-2D case evaluates ten prescribed signed-loading conditions. A separate PHS-2D mechanism-design study is presented in Section~\ref{subsec:structural-evolution}; its response metrics are kept distinct from the portfolio entry.
 
 \subsection{Research-mode comparison}
 
-The task-wise comparison contains 33 task--method records across eleven tasks:
+The task-wise comparison spans the same eleven task cases and contrasts three research modes:
 \begin{itemize}[leftmargin=*]
-\item \textbf{A: LLM-only.} The agent proposes and revises structure and control using task information and physical-evaluation feedback. Optional mathematical diagnosis and automated mathematical optimization are not exposed.
-\item \textbf{B: Direct Mathematical Tools.} The agent has the A capabilities and may invoke supported bottom-level mathematical tools. It constructs the mathematical question and request itself; high-level research-intent projection and mathematical research orchestration are not exposed.
-\item \textbf{FULL: \softrobotagent{}.} The archived FULL record includes research-intent projection, \PPRP{} construction, M0--M3 semantics, differentiation routing, validity checks, and evidence feedback. FULL is a historical reference and is not re-run.
+\item \textbf{A: LLM-only.} The agent proposes and revises structure and control using task information and physical-evaluation feedback. Dedicated mathematical diagnosis and automated mathematical optimization are not exposed.
+\item \textbf{B: Direct Mathematical Tools.} The agent has the A capabilities and may invoke supported bottom-level mathematical operations. It constructs the mathematical question and request itself, without the high-level research-intent projection and mathematical orchestration.
+\item \textbf{FULL: \softrobotagent{}.} The complete research framework exposes research-intent projection, \PPRP{} construction, complementary M0--M3 analysis semantics, differentiation routing, validity checks, and evidence feedback.
 \end{itemize}
-A and B begin from the original task initial states and legal design spaces rather than from intermediate FULL candidates. T03-B is marked as a direct-mathematical-only protocol variant. Qualification failures, incomplete evaluations, and valid physical failures remain distinct outcomes; the task-wise results are summarized in Table~\ref{tab:abc-comparison}.
+A and B begin from the corresponding task initial states and admissible design spaces; FULL denotes the complete-framework task records. Every outcome is assessed against the required conditions and task-specific physical evaluator. Valid physical failures, incomplete evaluations, and qualification failures are retained as distinct evaluation states. The task-wise results are summarized in Table~\ref{tab:abc-comparison} and Figure~\ref{fig:abc-matrix}.
 
 \subsection{Representative research and execution records}
 
-Figures~\ref{fig:structure-evolution}--\ref{fig:physical-execution} use recorded candidate models and saved physical states to illustrate structural evolution, route changes, and task execution. The selected T04, T07, and T10 timelines are representative archived task-study records; they are not counted as additional independent task trials. Images are rendered from saved states without re-running the physical experiments.
+Figures~\ref{fig:structure-evolution} and~\ref{fig:process-dissection} present complementary views of the research process. The structural-evolution figure emphasizes physical design changes and their measured consequences. The process-dissection figure reconstructs three archived research cases---T04, T07, and T10---as observation, hypothesis, investigation, action, and validated outcome. These are representative research records, not additional independent task trials.
 
 \subsection{Architecture-level decision studies}
 
@@ -31,4 +31,4 @@ The original Knowledge/Skill experiment is a $2\times2$ factorial replay at T04 
 
 \subsection{Scoring and resource accounting}
 
-Decision reviews use frozen evidence and anonymous outputs. Scores are descriptive ordinal assessments; the samples do not support significance tests, population-level causal claims, or statistical noninferiority. Provider token counts are reported only when returned by the Provider. Local serialized-text token reconstructions are kept separate from Provider usage and are not used as measured billing or context consumption.
+Decision reviews use frozen evidence and anonymous outputs. Scores are descriptive ordinal assessments; the samples do not support significance tests, confidence intervals, or population-level causal claims. Provider token counts are reported only when returned by the Provider. Local serialized-text token reconstructions are kept separate from Provider usage and are not used as measured billing or context consumption.

@@ -1,43 +1,54 @@
 \begin{figure*}[t]
 \centering
-\setlength{\tabcolsep}{3pt}
-\noindent\textbf{(a) PHS-2D: from mechanism diagnosis to a passive tendon design}\par\vspace{2pt}
-\begin{minipage}[t]{0.315\textwidth}
-\centering\includegraphics[width=\linewidth]{figures/native/phs2d_initial.png}
-\par\small Initial diagnostic
+\noindent\textbf{(a) PHS-2D: passive mechanism refinement under signed loading}\par\vspace{3pt}
+\begin{minipage}[t]{0.435\textwidth}
+\centering
+\includegraphics[width=.315\linewidth,height=1.12in,keepaspectratio]{figures/native/phs2d_initial.png}\hfill
+\includegraphics[width=.315\linewidth,height=1.12in,keepaspectratio]{figures/native/phs2d_intermediate.png}\hfill
+\includegraphics[width=.315\linewidth,height=1.12in,keepaspectratio]{figures/native/phs2d_final.png}
+\par\scriptsize Initial tendon arrangement \hfill Intermediate routing \hfill Guide-plate design
 \end{minipage}\hfill
-\begin{minipage}[t]{0.315\textwidth}
-\centering\includegraphics[width=\linewidth]{figures/native/phs2d_intermediate.png}
-\par\small Intermediate routing
-\end{minipage}\hfill
-\begin{minipage}[t]{0.315\textwidth}
-\centering\includegraphics[width=\linewidth]{figures/native/phs2d_final.png}
-\par\small Accepted mechanism
+\begin{minipage}[t]{0.535\textwidth}
+\centering
+\textbf{Signed-load response and motion-transfer metrics}\par\vspace{1pt}
+\includegraphics[width=\linewidth,trim=0 0 0 0.34in,clip]{figures/fig03_phs2d_mechanism.pdf}
 \end{minipage}
-\par\vspace{3pt}
+\par\vspace{4pt}
 \noindent\small
-\textcolor{TraceNavy}{\textbf{Agent hypothesis:}} Reduce transmitted tip motion while retaining local compliance.
-\quad \(\longrightarrow\) \textcolor{TraceTeal}{\textbf{Action:}} Revise passive tendon guidance.
-\quad \(\longrightarrow\) \textbf{Outcome:} 10/10 load cases; maximum tip-to-point ratio 0.1538.
+\textcolor{TraceNavy}{\textbf{Mechanism hypothesis:}} suppress transmitted tip motion while preserving local compliance.
+\quad
+\textcolor{TraceTeal}{\textbf{Design response:}} inspect finite-load slack and revise the passive tendon guidance.
 \par\vspace{7pt}
-\noindent\textbf{(b) T07: structure revision under a shared four-task contract}\par\vspace{2pt}
-\begin{minipage}[t]{0.325\textwidth}
-\centering\includegraphics[width=\linewidth]{figures/native/t07_ellipse_root.png}
-\par\small Elliptical root
+\noindent\textbf{(b) T07: root geometry and routing refinement for a shared morphology}\par\vspace{3pt}
+\begin{minipage}[t]{0.245\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/native/t07_ellipse_root.png}
+\par\scriptsize Anisotropic elliptical root
 \end{minipage}\hfill
-\begin{minipage}[t]{0.325\textwidth}
-\centering\includegraphics[width=\linewidth]{figures/native/t07_round_root.png}
-\par\small Rounded root
+\begin{minipage}[t]{0.245\textwidth}
+\centering
+\includegraphics[width=\linewidth]{figures/native/t07_round_root.png}
+\par\scriptsize Rounded root
 \end{minipage}\hfill
-\begin{minipage}[t]{0.325\textwidth}
+\begin{minipage}[t]{0.205\textwidth}
+\centering
+\scriptsize Root-section outlines (schematic)
+\begin{tikzpicture}[scale=.78]
+\draw[TraceNavy,line width=1.1pt] (0.0,0.35) ellipse (0.58 and 0.27);
+\node[font=\scriptsize] at (0.0,-0.05) {Elliptical};
+\draw[TraceTeal,line width=1.1pt] (1.45,0.35) circle (0.31);
+\node[font=\scriptsize] at (1.45,-0.05) {Rounded};
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.265\textwidth}
 \small
-\textcolor{TraceNavy}{\textbf{Agent observation}}\par
-\emph{The historical geometry still violates condition A despite control refinement.}\par\vspace{3pt}
-\textcolor{TraceTeal}{\textbf{Research action}}\par
-Test an isotropic root; refine the tendon route and re-optimize control.\par\vspace{3pt}
+\textcolor{TraceNavy}{\textbf{Research finding}}\par
+The initial root geometry constrained the shared task set.\par\vspace{3pt}
+\textcolor{TraceTeal}{\textbf{Structural action}}\par
+Round the root, refine tendon routing (14.1 to 14.0~mm), and re-optimize control.\par\vspace{3pt}
 \textbf{Validated outcome}\par
-One morphology passes \textbf{4/4} conditions (35 original hard constraints).
+4/4 conditions; 35 original hard constraints.
 \end{minipage}
-\caption{Evidence-guided structural evolution. Actual MuJoCo views show three stages of passive PHS-2D design and two physically instantiated T07 morphologies. Agent findings motivate changes in tendon guidance or root geometry; the resulting designs are evaluated under their respective task contracts.}
+\caption{Mechanism-guided structural evolution. (a) Recorded PHS-2D design stages and signed-load responses from a dedicated passive mechanism study. (b) T07 root-shape and routing refinement under a shared four-condition contract. The PHS-2D mechanism study is distinct from the portfolio PHS-2D result in Fig.~\ref{fig:task-portfolio}.}
 \label{fig:structure-evolution}
 \end{figure*}

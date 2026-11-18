@@ -1,56 +1,54 @@
-# Phase-2 Figure and Table Plan
+# Phase-3 Figure and Table Plan
 
 ## Narrative
 
-The main paper should let the reader see the robot, understand how its structure or research route changed, and then inspect the physical evidence. Figure 1 remains frozen. Figures 2--4 use the actual MuJoCo renders and saved execution plots from the current task archive.
+The results are organized as a visual scientific argument: task-space breadth, mechanism-level design discovery, process-level research adaptation, local mathematical validation, research-mode comparison, and research continuity. Figure 1 remains frozen and unchanged.
 
 ## Main figures
 
 ### Figure 1 — Framework
-Keep the approved Overleaf figure unchanged. Do not import or substitute the older GitHub TikZ drawing during Overleaf synchronization.
+Preserve the approved Overleaf figure and its complete LaTeX environment byte-for-byte.
 
-### Figure 2 — Structural evolution and Agent decisions
-- PHS-2D: actual MuJoCo F0 initial diagnostic, F3 intermediate and F8 accepted final morphology with native lighting, floor and shadows.
-- T07: actual elliptical-root and round-root candidates.
-- Each task couples native design changes with a compact, evidence-grounded Agent hypothesis / action / outcome line; no cards or decorative speech bubbles.
-- Text is a concise editorial paraphrase of archived decision records, not a verbatim hidden internal thought trace.
-- Reader-facing label is PHS-2D. Detailed Study identity remains in source data; do not pool two distinct studies.
+### Figure 2 — Eleven-task functional portfolio
+Organize all eleven FULL task cases into four functional families:
+- Reach and dynamic motion: T01--T04.
+- Pose and contact interaction: T05, T06, T09.
+- Shared morphology and control: T07, T10.
+- Passive mechanics: T08, PHS-2D.
 
-### Figure 3 — Agent research traces and quantitative execution
-- Two full-width study rows, T04 and T10.
-- T04: earlier native state, final native state, measured 22-s figure-eight tracking curve. Include original Agent observation of an inadmissible all-4 N initialization, the 0.20 to 0.21 N bound-interior adjustment, the 89-point equilibrium bank and the final 0.688-mm RMSE.
-- T10: preimpact, pulse and postimpact MuJoCo states plus the actual route-comparison graph. Explain Agent decision to replace GVS/NMPC with native tangent-model LQR and bounded tension allocation; keep the same morphology throughout.
-- Use native visuals + agent output + executed action + physical evidence as one coherent trace. No colored cards, excessive explanatory footnotes or fabricated chain-of-thought passages.
-- Do not portray incomplete initial T04 work as a fully evaluated physical baseline.
+Use one representative native robot state for each active family and a restrained passive-mechanism schematic for the passive family. List every task, required-condition completion, and its principal task-specific physical metric. Keep task-native units; do not average unlike quantities.
 
-### Figure 4 — Contact execution and task evidence
-- T09: native MuJoCo approach, maximum button displacement and held-contact states, plus recorded displacement/force curves.
-- A brief Agent observation/action line links unintended contacts and corrected contact setup; do not imply the guiding hardware was removed.
-- Report only final measured 0.5-s depth/force hold and native outcome metrics; leave full timing and evaluator details to supplement.
+### Figure 3 — Mechanism-guided structural evolution
+Combine the three recorded PHS-2D mechanism-design stages with the signed-load response plot. The plot belongs to the independent mechanism-design study, not the portfolio PHS-2D record. Pair it with the T07 root-shape and routing comparison, a schematic root-section inset, and the four-condition shared-morphology outcome.
+
+### Figure 4 — Process-level dissection
+Use three actual archived cases (T04, T07, T10). Each case follows:
+Observation → Hypothesis → Investigation → Action → Validated outcome.
+
+- T04: inadmissible all-4 N initialization → equilibrium-consistent restart → 0.20 to 0.21 N boundary-tension adjustment → 89-point bank → 22-s figure-eight result.
+- T07: shared-task limitation associated with the anisotropic root → rounded-root/routing investigation → structural and control refinement → four-condition validation.
+- T10: GVS/NMPC recovery conflict → controller-formulation hypothesis → native tangent model and discrete LQR → bounded tension allocation → three required impact cases.
+
+Use actual native MuJoCo states and saved plots. The text is a concise editorial reconstruction of archived decisions, not verbatim internal reasoning.
 
 ### Figure 5 — Local mathematical sensitivity
-- Preserve the existing implicit-derivative versus finite-difference comparison.
-- State that 18 pairs represent six loading branches by three metrics along one common material-parameter direction.
-- Maximum relative discrepancy: 0.1191%.
+Retain the 18-pair implicit-derivative versus finite-difference validation. State that the pairs are six loading branches by three metrics along one common material-parameter direction; maximum relative discrepancy is 0.1191%.
 
-### Figure 6 — Architecture decision studies
-- Reporter six-pair OFF/ON comparison.
-- Original Knowledge/Skill utilization and supplemental four-checkpoint replay.
-- Keep decision-only results distinct from physical task success.
+### Figure 6 — Research-mode comparison
+Show the 11-by-3 A/B/FULL matrix with status, evaluated/required coverage, and known normalized violation. Partial evaluations must be labeled partial; unexecuted conditions remain unavailable.
 
-### Figure 7 — Hierarchical context
-- Historical actual Provider-usage pairs and six cross-task decision/evidence pairs.
-- Keep unavailable Provider usage distinct from local text-token estimates.
+### Figure 7 — Research continuity
+Combine the Reporter matched-pair summary, original Knowledge/Skill utilization, and the two historical context-compression comparisons. Show input reduction alongside decision-score and key-evidence-coverage changes.
 
 ## Main tables
 
-### Table I — Physical task portfolio
-Eleven rows grouped by active control, shared-morphology design, and passive mechanics. Each row reports the task's native metric and unit. Do not pool unlike errors or repeat all evaluator fields.
+- Table I: A/B/FULL task-wise outcomes, grouped using the same four task families as Figure 2. PASS is reported consistently; incomplete and qualification outcomes remain separate from valid physical failures.
+- Detailed FULL task metrics are retained in the task-portfolio appendix table.
+- The A/B/FULL table reports task-level status and violation fractions; Figure 6 adds evaluation coverage and known partial violations.
 
-### Table II — A/B/FULL task comparison
-Use the same 11 task rows, grouped by task family. Columns are A, B, and FULL. Report Pass, valid failure with evaluated-constraint violation fraction, incomplete evaluation, or qualification failure. Bold passing results; mark the T03-B protocol variant with a dagger and one concise note.
+## Style
 
-Both tables use traditional IEEE booktabs grouping: no vertical rules, cell shading, dashboard boxes, or explanatory paragraphs inside cells. Keep category grouping with fine horizontal rules and bold fully passed method results. Avoid explanatory paragraphs inside cells.
-
-## Supplementary material
-Retain the full condition-level metrics, complete A/B/FULL matrix, task-specific thresholds, all decision records, source indices, and detailed architecture/context protocols. Use PHS-2D as the reader-facing name while retaining exact study identifiers only in underlying source metadata.
+- White background, restrained Navy/Teal/Slate palette, native MuJoCo renders, and consistent camera/lighting.
+- No rounded cards, dashboard tiles, drop shadows, gradient fills, vertical table rules, or colored table-cell backgrounds.
+- Use concise captions and readable print-scale labels.
+- Reader-facing task labels use PHS-2D only; exact study identity remains in provenance records.

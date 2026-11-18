@@ -1,0 +1,65 @@
+\begin{figure*}[t]
+\centering
+\begin{minipage}[t]{0.315\textwidth}
+\centering
+\textbf{(a) Read-only Reporter}
+\par\scriptsize Six matched decision pairs; five-dimensional blind score
+\par\vspace{3pt}
+\begin{tikzpicture}[x=0.43cm,y=0.42cm]
+\draw[->,TraceSlate] (0,0) -- (4.3,0) node[right,font=\scriptsize]{score};
+\foreach \x in {0,1,2,3,4} {\draw[TraceSlate] (\x,0) -- (\x,-0.07) node[below,font=\tiny]{\x};}
+\node[anchor=east,font=\scriptsize] at (-0.1,0.62) {OFF};
+\fill[TraceSlate] (0,0.48) rectangle (3.433,0.72);
+\node[anchor=west,font=\scriptsize] at (3.48,0.60) {3.433};
+\node[anchor=east,font=\scriptsize] at (-0.1,1.12) {ON};
+\fill[TraceTeal] (0,0.98) rectangle (3.733,1.22);
+\node[anchor=west,font=\scriptsize] at (3.78,1.10) {3.733};
+\end{tikzpicture}
+\par\vspace{3pt}
+\scriptsize Mean change +0.300/4; paired median 0; 2 wins / 4 ties / 0 losses. Unsupported conclusions: 2 to 0.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.315\textwidth}
+\centering
+\textbf{(b) Knowledge and Skill}
+\par\scriptsize Historical-experience utilization in the original T04/T07 replay
+\par\vspace{3pt}
+\begin{tikzpicture}[x=0.55cm,y=0.42cm]
+\draw[->,TraceSlate] (0,0) -- (3.5,0) node[right,font=\scriptsize]{score};
+\foreach \x in {0,1,2,3} {\draw[TraceSlate] (\x,0) -- (\x,-0.07) node[below,font=\tiny]{\x};}
+\node[anchor=east,font=\scriptsize] at (-0.12,0.52) {K$-$S$-$};
+\fill[TraceSlate] (0,0.40) rectangle (0,0.62);
+\node[anchor=east,font=\scriptsize] at (-0.12,1.02) {K$+$S$-$};
+\fill[TraceTeal] (0,0.90) rectangle (3,1.12);
+\node[anchor=east,font=\scriptsize] at (-0.12,1.52) {K$-$S$+$};
+\fill[TraceTeal] (0,1.40) rectangle (3,1.62);
+\node[anchor=east,font=\scriptsize] at (-0.12,2.02) {K$+$S$+$};
+\fill[TraceTeal] (0,1.90) rectangle (3,2.12);
+\end{tikzpicture}
+\par\vspace{3pt}
+\scriptsize Utilization: 0/3/3/3. Decision quality, evidence consistency, and actionability remain 4/4 in every cell.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.315\textwidth}
+\centering
+\textbf{(c) Hierarchical context}
+\par\scriptsize Provider-reported accepted input (thousands of tokens)
+\par\vspace{3pt}
+\begin{tikzpicture}[x=0.0030cm,y=0.40cm]
+\node[anchor=east,font=\scriptsize] at (-18,0.62) {C035 Flat};
+\fill[TraceSlate] (0,0.50) rectangle (675.8,0.74);
+\node[anchor=west,font=\tiny] at (684,0.62) {675.8k};
+\node[anchor=east,font=\scriptsize] at (-18,1.12) {C035 Hier.};
+\fill[TraceTeal] (0,1.00) rectangle (78.8,1.24);
+\node[anchor=west,font=\tiny] at (88,1.12) {78.8k};
+\node[anchor=east,font=\scriptsize] at (-18,1.62) {C037 Flat};
+\fill[TraceSlate] (0,1.50) rectangle (877.2,1.74);
+\node[anchor=west,font=\tiny] at (885,1.62) {877.2k};
+\node[anchor=east,font=\scriptsize] at (-18,2.12) {C037 Hier.};
+\fill[TraceTeal] (0,2.00) rectangle (174.3,2.24);
+\node[anchor=west,font=\tiny] at (183,2.12) {174.3k};
+\end{tikzpicture}
+\par\vspace{3pt}
+\scriptsize C035: 88.34\% less input; score 4.0 to 3.8. C037: 80.13\% less input; score 3.4 to 3.6, while key-evidence coverage changes 5/5 to 3/5.
+\end{minipage}
+\caption{Research-continuity studies at the decision level. (a) Reporter OFF/ON paired review summary. (b) Original Knowledge/Skill factorial replay. (c) Two historical context comparisons showing input reduction alongside decision-score and evidence-coverage changes. These measures characterize research decisions and information access, not physical task success.}
+\label{fig:research-continuity}
+\end{figure*}

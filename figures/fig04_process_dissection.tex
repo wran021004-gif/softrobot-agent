@@ -1,0 +1,70 @@
+\begin{figure*}[t]
+\centering
+\small
+\noindent\textbf{Three research cases, five decision stages}\par\vspace{3pt}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\textwidth}{@{}p{0.055\textwidth}X X X X X@{}}
+\toprule
+& \textbf{Observation} & \textbf{Hypothesis} & \textbf{Investigation} & \textbf{Action} & \textbf{Validated outcome}\\
+\midrule
+\textbf{T04}
+&
+\centering
+\includegraphics[width=\linewidth,height=0.60in,keepaspectratio]{figures/native/t04_earlier_route.png}\par
+\scriptsize All-4~N initialization gives an inadmissible trial.
+&
+\scriptsize The immediate bottleneck is the reference initialization at the boundary, not the tracking objective.
+&
+\scriptsize Restart from the time-zero equilibrium; move boundary tensions from 0.20 to 0.21~N; construct an 89-point bank.
+&
+\centering
+\includegraphics[width=\linewidth,height=0.60in,keepaspectratio]{figures/native/t04_final.png}\par
+\scriptsize Use the equilibrium-consistent bank and interior seed.
+&
+\centering
+\includegraphics[width=\linewidth,height=0.60in,keepaspectratio]{figures/native/t04_tracking.png}\par
+\scriptsize 22-s, two-cycle tracking; RMSE 0.688~mm; maximum error 1.021~mm.
+\\
+\midrule
+\textbf{T07}
+&
+\centering
+\includegraphics[width=\linewidth,height=0.60in,keepaspectratio]{figures/native/t07_ellipse_root.png}\par
+\scriptsize Anisotropic root limits the shared task set.
+&
+\scriptsize The common morphology is constrained by root geometry as well as control.
+&
+\scriptsize Compare a rounded root and routing revision against all four required conditions.
+&
+\centering
+\includegraphics[width=\linewidth,height=0.60in,keepaspectratio]{figures/native/t07_round_root.png}\par
+\scriptsize Refine the root and tendon route; re-optimize control.
+&
+\scriptsize One shared morphology satisfies four required conditions and 35 original hard constraints. The structural comparison is detailed in Fig.~\ref{fig:structure-evolution}.
+\\
+\midrule
+\textbf{T10}
+&
+\centering
+\includegraphics[width=\linewidth,height=0.60in,keepaspectratio]{figures/native/t10_preimpact.png}\par
+\scriptsize GVS/NMPC trials retain recovery and tendon-limit conflicts.
+&
+\scriptsize The controller formulation is the bottleneck; the morphology can remain fixed.
+&
+\scriptsize Construct a native tangent model, discrete LQR, and bounded tension allocation.
+&
+\centering
+\includegraphics[width=.48\linewidth,height=0.60in,keepaspectratio]{figures/native/t10_impact.png}\hfill
+\includegraphics[width=.48\linewidth,height=0.60in,keepaspectratio]{figures/native/t10_final_hold.png}\par
+\scriptsize Impact and recovered hold.
+&
+\centering
+\includegraphics[width=\linewidth,height=0.60in,keepaspectratio]{figures/native/t10_control_comparison.png}\par
+\scriptsize Common feedback: 3/3 required; frozen controls: 0/2.
+\\
+\bottomrule
+\end{tabularx}
+\caption{Process-level dissection of adaptive research. Each row links a recorded observation to a concise physical hypothesis, a discriminating investigation, an executed research action, and its validated task outcome. Text is an editorial reconstruction of archived research decisions rather than a verbatim internal reasoning trace.}
+\label{fig:process-dissection}
+\end{figure*}
