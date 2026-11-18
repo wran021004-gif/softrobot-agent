@@ -4,22 +4,22 @@
 \begin{tabularx}{\textwidth}{@{}XXX@{}}
 \multicolumn{3}{@{}l}{\textbf{(a) T04: evidence-guided tracking research}}\\
 \toprule
-\textbf{Observation} & \textbf{Agent decision and action} & \textbf{Physical outcome}\\
+\textbf{Observation} & \textbf{Research decision and action} & \textbf{Physical outcome}\\
 \midrule
-\includegraphics[width=.94\linewidth]{figures/native/t04_earlier_route}
+\includegraphics[width=.94\linewidth]{figures/native/t04_earlier_route.png}
 &
-\includegraphics[width=.94\linewidth]{figures/native/t04_final}
+\includegraphics[width=.94\linewidth]{figures/native/t04_final.png}
 &
-\includegraphics[width=.94\linewidth]{figures/native/t04_final}\\
-\footnotesize \textit{Evidence:} All-4 N initialization produced an inadmissible trial; no usable reference bank.
+\parbox[c]{\linewidth}{\centering\textbf{22-s full trajectory}\\RMSE: 0.688~mm\\Maximum error: 1.021~mm}\\
+\footnotesize All-4 N initialization produced an inadmissible trial; no usable reference bank.
 &
-\footnotesize \textit{Agent:} Retry from the previously computed time-zero equilibrium.\par\textit{Action:} Shift boundary entries from 0.20 to 0.21 N and rebuild the 89-point bank.
+\footnotesize Reinitialize from the time-zero equilibrium; shift boundary entries from 0.20 to 0.21 N and rebuild the 89-point bank.
 &
-\footnotesize \textit{Action:} Independently evaluate the complete 22-s trajectory.\par\textit{Outcome:} RMSE 0.688 mm.\\
+\footnotesize Independently evaluate the complete two-cycle reference.\\
 \bottomrule
 \end{tabularx}
 \vspace{3pt}
-\includegraphics[width=.78\textwidth]{figures/native/t04_tracking}
+\includegraphics[width=.78\textwidth]{figures/native/t04_tracking.png}
 \vspace{5pt}
 
 \begin{tabularx}{\textwidth}{@{}XXX@{}}
@@ -27,20 +27,20 @@
 \toprule
 \textbf{Diagnose} & \textbf{Revise controller} & \textbf{Evaluate}\\
 \midrule
-\includegraphics[width=.94\linewidth]{figures/native/t10_preimpact}
+\includegraphics[width=.94\linewidth]{figures/native/t10_preimpact.png}
 &
-\includegraphics[width=.94\linewidth]{figures/native/t10_impact}
+\includegraphics[width=.94\linewidth]{figures/native/t10_impact.png}
 &
-\includegraphics[width=.94\linewidth]{figures/native/t10_final_hold}\\
-\footnotesize \textit{Evidence:} GVS/NMPC route exhibits holding, tendon-speed and stroke conflicts.\par\textit{Action:} Inspect native sampled dynamics.
+\includegraphics[width=.94\linewidth]{figures/native/t10_final_hold.png}\\
+\footnotesize GVS/NMPC exhibits holding, tendon-speed, and stroke conflicts.
 &
-\footnotesize \textit{Agent:} Retain the mandatory morphology and use a common native-state feedback recipe.\par\textit{Action:} Recompute tangent dynamics and gains.
+\footnotesize Retain the morphology; recompute the native tangent model and discrete LQR gains.
 &
-\footnotesize \textit{Action:} Run no-pulse and signed-pulse cases.\par\textit{Outcome:} 3/3 pass; frozen-input controls fail.\\
+\footnotesize Apply bounded tension allocation. The common recipe passes 3/3 required cases; both frozen-input controls fail.\\
 \bottomrule
 \end{tabularx}
 \vspace{3pt}
-\includegraphics[width=.78\textwidth]{figures/native/t10_control_comparison}
-\caption{Evidence-to-action research traces. Recorded MuJoCo states are paired with selected agent decisions, scientific actions, and quantitative evidence. The T04 decision is a concise excerpt from its recorded research action. T10 depicts different states of the same morphology, not structural redesign.}
+\includegraphics[width=.78\textwidth]{figures/native/t10_control_comparison.png}
+\caption{Recorded evidence-to-action trajectories. T04 replaces an incomplete GVS route with a candidate-native equilibrium-point bank and tension feedforward before completing the 22-s reference. T10 retains its morphology while changing the feedback formulation. The panels pair recorded robot states with the corresponding research action and physical outcome; the selected task-study records do not add independent task trials.}
 \label{fig:research-trajectory}
 \end{figure*}
