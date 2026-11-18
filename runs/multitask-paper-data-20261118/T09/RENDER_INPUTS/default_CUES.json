@@ -1,0 +1,452 @@
+{
+  "target_m": null,
+  "axis_local": null,
+  "target_axis_world": null,
+  "path_m": [],
+  "axis_vertices_world": [],
+  "environment": {
+    "environment": {
+      "coordinate_frame": "world_base_x_forward_yz_cross_section",
+      "environment_id": "reach_free",
+      "gravity_m_s2": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+      "lights": [
+        {
+          "direction": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "position_m": [
+            0.0,
+            0.0,
+            2.0
+          ]
+        }
+      ],
+      "objects": [
+        {
+          "conaffinity": 1,
+          "contype": 0,
+          "half_size_m": [
+            2.0,
+            2.0,
+            0.1
+          ],
+          "kind": "plane",
+          "name": "floor",
+          "position_m": [
+            0.0,
+            0.0,
+            -0.02
+          ]
+        }
+      ],
+      "schema_version": "1",
+      "truth_status": "HUMAN_OWNED",
+      "units": "SI"
+    },
+    "external_forces": [],
+    "floor_id": "floor",
+    "mount": {
+      "position_m": [
+        0.0,
+        0.0,
+        0.15
+      ],
+      "quaternion_wxyz": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "physical_environment": {
+      "actuator_min_tension_n": null,
+      "bodies": [
+        {
+          "axis_local": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "com_local_m": [
+            0.0,
+            0.0023076923076923075,
+            0.0
+          ],
+          "damping": 0.2,
+          "inertia_com_local_kg_m2": [
+            [
+              1.136612426035503e-07,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              6.538461538461539e-08,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              1.136612426035503e-07
+            ]
+          ],
+          "initial_position": 0.0,
+          "initial_velocity": 0.0,
+          "joint_kind": "slide",
+          "joint_name": "button_slide",
+          "joint_range": [
+            0.0,
+            0.003
+          ],
+          "mass_kg": 0.005,
+          "name": "button_slider",
+          "position_m": [
+            0.29549999999999993,
+            0.030499999999999965,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "spring_reference": 0.0,
+          "stiffness": 50.0
+        }
+      ],
+      "collision_policy": "self_environment_frictionless",
+      "contact_pairs": [
+        {
+          "condim": 1,
+          "friction": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "geom1": "probe",
+          "geom2": "button_cap",
+          "solimp": [
+            0.98,
+            0.995,
+            0.0001
+          ],
+          "solref": [
+            0.003,
+            1.0
+          ]
+        }
+      ],
+      "geometries": [
+        {
+          "body": "payload",
+          "conaffinity": 13,
+          "contype": 1,
+          "kind": "box",
+          "name": "tool_block",
+          "position_m": [
+            0.007,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.007,
+            0.004,
+            0.004
+          ]
+        },
+        {
+          "body": "payload",
+          "conaffinity": 13,
+          "contype": 1,
+          "kind": "box",
+          "name": "tool_bracket",
+          "position_m": [
+            0.014,
+            0.011,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.002,
+            0.007,
+            0.002
+          ]
+        },
+        {
+          "body": "payload",
+          "conaffinity": 13,
+          "contype": 1,
+          "kind": "sphere",
+          "name": "probe",
+          "position_m": [
+            0.014,
+            0.021,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.003
+          ]
+        },
+        {
+          "body": "button_slider",
+          "conaffinity": 1,
+          "contype": 4,
+          "kind": "cylinder",
+          "name": "button_cap",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            0.7071067811865476,
+            0.7071067811865476,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.006,
+            0.0015
+          ]
+        },
+        {
+          "body": "button_slider",
+          "conaffinity": 1,
+          "contype": 4,
+          "kind": "cylinder",
+          "name": "button_rod",
+          "position_m": [
+            0.0,
+            0.0075,
+            0.0
+          ],
+          "quaternion_wxyz": [
+            0.7071067811865476,
+            0.7071067811865476,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.002,
+            0.006
+          ]
+        },
+        {
+          "body": "world",
+          "conaffinity": 1,
+          "contype": 8,
+          "kind": "box",
+          "name": "housing_rail_0",
+          "position_m": [
+            0.2864999999999999,
+            0.04149999999999997,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.002,
+            0.01,
+            0.011
+          ]
+        },
+        {
+          "body": "world",
+          "conaffinity": 1,
+          "contype": 8,
+          "kind": "box",
+          "name": "housing_rail_1",
+          "position_m": [
+            0.30449999999999994,
+            0.04149999999999997,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.002,
+            0.01,
+            0.011
+          ]
+        },
+        {
+          "body": "world",
+          "conaffinity": 1,
+          "contype": 8,
+          "kind": "box",
+          "name": "housing_rail_2",
+          "position_m": [
+            0.29549999999999993,
+            0.04149999999999997,
+            0.141
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.007,
+            0.01,
+            0.002
+          ]
+        },
+        {
+          "body": "world",
+          "conaffinity": 1,
+          "contype": 8,
+          "kind": "box",
+          "name": "housing_rail_3",
+          "position_m": [
+            0.29549999999999993,
+            0.04149999999999997,
+            0.159
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.007,
+            0.01,
+            0.002
+          ]
+        },
+        {
+          "body": "world",
+          "conaffinity": 1,
+          "contype": 8,
+          "kind": "box",
+          "name": "mount_plate",
+          "position_m": [
+            0.29549999999999993,
+            0.05649999999999997,
+            0.15
+          ],
+          "quaternion_wxyz": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "size_m": [
+            0.018,
+            0.003,
+            0.018
+          ]
+        }
+      ],
+      "input_freeze_after_s": null,
+      "replace_robot_geometries": [
+        "payload_shape"
+      ],
+      "robot_hinge_range_rad": null,
+      "sites": [
+        {
+          "body": "payload",
+          "name": "probe_center",
+          "position_m": [
+            0.014,
+            0.021,
+            0.0
+          ]
+        }
+      ],
+      "solver_iterations": 100,
+      "solver_tolerance": 1e-10,
+      "version": "physical_environment_v1",
+      "wrenches": []
+    }
+  },
+  "goal_data": {
+    "reference": {
+      "center_m": [
+        0.29549999999999993,
+        0.020999999999999963,
+        0.15
+      ],
+      "duration_s": 2.0,
+      "kind": "quintic_nodes",
+      "positions_m": [
+        [
+          0.29549999999999993,
+          0.020999999999999963,
+          0.15
+        ],
+        [
+          0.29549999999999993,
+          0.025999999999999964,
+          0.15
+        ],
+        [
+          0.29549999999999993,
+          0.027999999999999962,
+          0.15
+        ],
+        [
+          0.29549999999999993,
+          0.027999999999999962,
+          0.15
+        ],
+        [
+          0.29549999999999993,
+          0.020999999999999963,
+          0.15
+        ],
+        [
+          0.29549999999999993,
+          0.020999999999999963,
+          0.15
+        ]
+      ],
+      "times_s": [
+        0,
+        0.5,
+        0.9,
+        1.4,
+        1.8,
+        2.0
+      ]
+    },
+    "time_requirement": "timed"
+  },
+  "source": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\platform.sqlite#artifacts/52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9/configuration/task"
+}

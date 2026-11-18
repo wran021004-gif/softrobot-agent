@@ -1,0 +1,980 @@
+{
+  "acceptance": {
+    "evaluator": "passive_program",
+    "grid": "physics_including_initial",
+    "historical_status": "development_not_registered_SELECT",
+    "parameters": {
+      "acceptance": {
+        "denominator_min_m": 1e-06,
+        "denominator_uncertainty_multiplier": 10.0,
+        "high_constraint_residual_max_m": 5e-05,
+        "high_displacement_max_m": 0.025,
+        "high_tension_min_n": 0.05,
+        "low_displacement_min_m": 0.006,
+        "low_slack_min_m": 1e-07,
+        "low_tension_max_n": 0.005,
+        "residual_max_m": 0.002,
+        "stiffness_ratio_min": 1.5
+      },
+      "confirmation": {
+        "half_timestep_s": 6.25e-05,
+        "max_displacement_difference_m": 0.001,
+        "perturbation_rad": 0.001
+      },
+      "design_domain": {
+        "full_assembly_length_max_m": 0.35,
+        "payout_offset_m": [
+          0,
+          0.003
+        ],
+        "segments": [
+          2,
+          6
+        ],
+        "tendons": [
+          2,
+          4
+        ]
+      },
+      "directions": {
+        "minus_x": [
+          -1,
+          0,
+          0
+        ],
+        "plus_x": [
+          1,
+          0,
+          0
+        ]
+      },
+      "force_point": {
+        "kind": "material_coordinate",
+        "s": 0.7
+      },
+      "gravity": [
+        0,
+        0,
+        -9.81
+      ],
+      "independent_channels": 0,
+      "initial_state": "same qualified unloaded equilibrium for each direction; continuous stages without resets",
+      "length_excess_limit_m": 5e-05,
+      "limits": {
+        "candidates": 40,
+        "dynamic_candidates": 12,
+        "final_reserved_steps": 2000000,
+        "math_requests": 300,
+        "physics_step_attempts": 8000000
+      },
+      "mechanism": {
+        "high_displacement_increase_min": 1.25,
+        "late_stiffness_ratio_max": 0.8,
+        "require_stable_comparable": true
+      },
+      "monitor_s": [
+        0,
+        0.05,
+        0.1,
+        0.15,
+        0.2,
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45,
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.7,
+        0.75,
+        0.8,
+        0.85,
+        0.9,
+        0.95,
+        1
+      ],
+      "monitor_speed_limit_m_s": 0.001,
+      "mount_position": [
+        0,
+        0,
+        0.5
+      ],
+      "mount_rotation": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ]
+      ],
+      "qvel_inf_limit_rad_s": 0.01,
+      "ramp_s": 0.5,
+      "raw_recording": "every attempted successful mj_step; post-step forward; applied force held over preceding step",
+      "restrictions": {
+        "NMPC": 0,
+        "PPO": 0,
+        "base_only": true,
+        "fixed_payout": true,
+        "nu": 0,
+        "provider": 0,
+        "research_agent": 0
+      },
+      "route_check_semantics": "scoring poses during exploration; every recorded physical step required for final witness",
+      "scoring_interval_s": 0.01,
+      "solimplimit": [
+        0.999,
+        0.999,
+        0.001,
+        0.5,
+        2
+      ],
+      "solreflimit": [
+        0.004,
+        1
+      ],
+      "stability_source": "phs2d_protocol_inverse_v2; only physical stability/constraint thresholds reused",
+      "stages": [
+        {
+          "duration_s": 4.0,
+          "force_n": 0.0,
+          "name": "unloaded"
+        },
+        {
+          "duration_s": 4.0,
+          "force_n": 0.05,
+          "name": "low"
+        },
+        {
+          "duration_s": 4.0,
+          "force_n": 0.1,
+          "name": "middle"
+        },
+        {
+          "duration_s": 4.0,
+          "force_n": 0.2,
+          "name": "high"
+        },
+        {
+          "duration_s": 4.0,
+          "force_n": 0.0,
+          "name": "recovery"
+        }
+      ],
+      "static_balance_inf_limit_nm": 1e-05,
+      "static_solver": {
+        "active_tolerance_m": 1e-07,
+        "complementarity_tolerance_nm": 1e-08,
+        "ftol": 1e-13,
+        "hessian_step_rad": 1e-05,
+        "length_tolerance_m": 1e-08,
+        "max_iterations": 400,
+        "method": "SLSQP",
+        "minimum_reduced_eigenvalue": 1e-07,
+        "rank_relative_tolerance": 1e-08,
+        "stationarity_tolerance_nm": 1e-06
+      },
+      "status": "development_not_registered_SELECT",
+      "tail_drift_limit_m": 0.0005,
+      "tail_s": 0.25,
+      "task_id": "passive_progressive_stiffness_dev_v1",
+      "timestep_s": 0.000125,
+      "tip_speed_limit_m_s": 0.001,
+      "version": "passive_force_response_v1"
+    },
+    "required_signals": [
+      "time_s",
+      "material_positions_m",
+      "material_velocities_m_s",
+      "qpos",
+      "qvel",
+      "length_residual_m",
+      "tension_n",
+      "static_balance_inf_nm"
+    ],
+    "source_files": [
+      {
+        "path": "P3_progressive_stiffness/task.json",
+        "sha256": "3f88a70e4461a384969d2173ae7c5da68379556344fd89df3fed7a7e993b064d"
+      }
+    ],
+    "task_id": "T08",
+    "version": "task_acceptance_v1"
+  },
+  "actuator_channels": [],
+  "contract_version": "1.0.0",
+  "environment": {
+    "contract": "experiment.assembly",
+    "data": {
+      "environment": {
+        "coordinate_frame": "world_base_x_forward_yz_cross_section",
+        "environment_id": "reach_free",
+        "gravity_m_s2": [
+          0,
+          0,
+          -9.81
+        ],
+        "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+        "lights": [
+          {
+            "direction": [
+              0.0,
+              0.0,
+              -1.0
+            ],
+            "position_m": [
+              0.0,
+              0.0,
+              2.0
+            ]
+          }
+        ],
+        "objects": [
+          {
+            "conaffinity": 1,
+            "contype": 0,
+            "half_size_m": [
+              2.0,
+              2.0,
+              0.1
+            ],
+            "kind": "plane",
+            "name": "floor",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        ],
+        "schema_version": "1",
+        "truth_status": "HUMAN_OWNED",
+        "units": "SI"
+      },
+      "external_forces": [],
+      "floor_id": "floor",
+      "mount": {
+        "position_m": [
+          0,
+          0,
+          0.5
+        ],
+        "quaternion_wxyz": [
+          0.7071067811865475,
+          0.0,
+          0.7071067811865475,
+          0.0
+        ]
+      }
+    },
+    "version": "1.0.0"
+  },
+  "evaluator": {
+    "extension_id": "evaluate.passive_response",
+    "parameters": {
+      "contract": "reference.passive_response_evaluation",
+      "data": {
+        "bounds": [
+          {
+            "aggregation": "mean_state",
+            "direction_world": [
+              1,
+              0,
+              0
+            ],
+            "load_condition": "plus_x",
+            "material_s": 0.7,
+            "minimum": 0.006,
+            "name": "plus_x_low",
+            "quantity": "material_displacement",
+            "reduction": "component",
+            "reference_reduction": "mean",
+            "reference_window": "unloaded",
+            "window": "low"
+          },
+          {
+            "aggregation": "mean_state",
+            "direction_world": [
+              1,
+              0,
+              0
+            ],
+            "load_condition": "plus_x",
+            "material_s": 0.7,
+            "maximum": 0.025,
+            "name": "plus_x_high",
+            "quantity": "material_displacement",
+            "reduction": "component",
+            "reference_reduction": "mean",
+            "reference_window": "unloaded",
+            "window": "high"
+          },
+          {
+            "aggregation": "mean_state",
+            "load_condition": "plus_x",
+            "material_s": 0.7,
+            "maximum": 0.002,
+            "name": "plus_x_residual",
+            "quantity": "material_displacement",
+            "reduction": "norm",
+            "reference_reduction": "mean",
+            "reference_window": "unloaded",
+            "window": "recovery"
+          },
+          {
+            "aggregation": "mean_state",
+            "direction_world": [
+              -1,
+              0,
+              0
+            ],
+            "load_condition": "minus_x",
+            "material_s": 0.7,
+            "minimum": 0.006,
+            "name": "minus_x_low",
+            "quantity": "material_displacement",
+            "reduction": "component",
+            "reference_reduction": "mean",
+            "reference_window": "unloaded",
+            "window": "low"
+          },
+          {
+            "aggregation": "mean_state",
+            "direction_world": [
+              -1,
+              0,
+              0
+            ],
+            "load_condition": "minus_x",
+            "material_s": 0.7,
+            "maximum": 0.025,
+            "name": "minus_x_high",
+            "quantity": "material_displacement",
+            "reduction": "component",
+            "reference_reduction": "mean",
+            "reference_window": "unloaded",
+            "window": "high"
+          },
+          {
+            "aggregation": "mean_state",
+            "load_condition": "minus_x",
+            "material_s": 0.7,
+            "maximum": 0.002,
+            "name": "minus_x_residual",
+            "quantity": "material_displacement",
+            "reduction": "norm",
+            "reference_reduction": "mean",
+            "reference_window": "unloaded",
+            "window": "recovery"
+          }
+        ],
+        "mechanism": {
+          "high_displacement_increase_min": 1.25,
+          "late_stiffness_ratio_max": 0.8,
+          "require_stable_comparable": true
+        },
+        "numerical_confirmation": {
+          "half_timestep_s": 6.25e-05,
+          "max_displacement_difference_m": 0.001,
+          "perturbation_rad": 0.001,
+          "saved_state_replay": true
+        },
+        "progressive_stiffness": [
+          {
+            "denominator_min_m": 1e-06,
+            "denominator_uncertainty_multiplier": 10.0,
+            "direction_world": [
+              1,
+              0,
+              0
+            ],
+            "high_constraint_residual_max_m": 5e-05,
+            "high_tension_min_n": 0.05,
+            "load_condition": "plus_x",
+            "low_slack_min_m": 1e-07,
+            "low_tension_max_n": 0.005,
+            "material_s": 0.7,
+            "reference_stage": "unloaded",
+            "stages": [
+              "low",
+              "middle",
+              "high"
+            ],
+            "stiffness_ratio_min": 1.5
+          },
+          {
+            "denominator_min_m": 1e-06,
+            "denominator_uncertainty_multiplier": 10.0,
+            "direction_world": [
+              -1,
+              0,
+              0
+            ],
+            "high_constraint_residual_max_m": 5e-05,
+            "high_tension_min_n": 0.05,
+            "load_condition": "minus_x",
+            "low_slack_min_m": 1e-07,
+            "low_tension_max_n": 0.005,
+            "material_s": 0.7,
+            "reference_stage": "unloaded",
+            "stages": [
+              "low",
+              "middle",
+              "high"
+            ],
+            "stiffness_ratio_min": 1.5
+          }
+        ],
+        "prohibit_contact": true
+      },
+      "version": "2.0.0"
+    },
+    "version": "2.0.0"
+  },
+  "failure_policy": "retain_invalid_and_constraint_failures",
+  "family": "task.passive_response",
+  "goal": {
+    "contract": "reference.passive_response_goal",
+    "data": {
+      "allow_saved_state": false,
+      "allowed_ablation": "disable_selected_passive_limits",
+      "constraint_direction_tolerance": 1e-08,
+      "execution_protocol": "hard_equilibrium_continuous_v1",
+      "force_map_tolerance_nm": 1e-10,
+      "force_sampling": "interval_end",
+      "initial_source": "fresh_unloaded_hard_equilibrium",
+      "length_tolerance_m": 5e-05,
+      "load_conditions": [
+        "plus_x",
+        "minus_x"
+      ],
+      "multiplier_sign_tolerance_n": 1e-10,
+      "programs": {
+        "minus_x": [
+          {
+            "end_s": 4.0,
+            "force_end_world_n": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "unloaded",
+            "observation_window_s": [
+              0.0,
+              4.0
+            ],
+            "ramp_until_s": 0.5,
+            "scoring_window_s": [
+              3.75,
+              4.0
+            ],
+            "start_s": 0.0
+          },
+          {
+            "end_s": 8.0,
+            "force_end_world_n": [
+              -0.05,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "low",
+            "observation_window_s": [
+              4.0,
+              8.0
+            ],
+            "ramp_until_s": 4.5,
+            "scoring_window_s": [
+              7.75,
+              8.0
+            ],
+            "start_s": 4.0
+          },
+          {
+            "end_s": 12.0,
+            "force_end_world_n": [
+              -0.1,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              -0.05,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "middle",
+            "observation_window_s": [
+              8.0,
+              12.0
+            ],
+            "ramp_until_s": 8.5,
+            "scoring_window_s": [
+              11.75,
+              12.0
+            ],
+            "start_s": 8.0
+          },
+          {
+            "end_s": 16.0,
+            "force_end_world_n": [
+              -0.2,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              -0.1,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "high",
+            "observation_window_s": [
+              12.0,
+              16.0
+            ],
+            "ramp_until_s": 12.5,
+            "scoring_window_s": [
+              15.75,
+              16.0
+            ],
+            "start_s": 12.0
+          },
+          {
+            "end_s": 20.0,
+            "force_end_world_n": [
+              -0.0,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              -0.2,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "recovery",
+            "observation_window_s": [
+              16.0,
+              20.0
+            ],
+            "ramp_until_s": 16.5,
+            "scoring_window_s": [
+              19.75,
+              20.0
+            ],
+            "start_s": 16.0
+          }
+        ],
+        "plus_x": [
+          {
+            "end_s": 4.0,
+            "force_end_world_n": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "unloaded",
+            "observation_window_s": [
+              0.0,
+              4.0
+            ],
+            "ramp_until_s": 0.5,
+            "scoring_window_s": [
+              3.75,
+              4.0
+            ],
+            "start_s": 0.0
+          },
+          {
+            "end_s": 8.0,
+            "force_end_world_n": [
+              0.05,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "low",
+            "observation_window_s": [
+              4.0,
+              8.0
+            ],
+            "ramp_until_s": 4.5,
+            "scoring_window_s": [
+              7.75,
+              8.0
+            ],
+            "start_s": 4.0
+          },
+          {
+            "end_s": 12.0,
+            "force_end_world_n": [
+              0.1,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              0.05,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "middle",
+            "observation_window_s": [
+              8.0,
+              12.0
+            ],
+            "ramp_until_s": 8.5,
+            "scoring_window_s": [
+              11.75,
+              12.0
+            ],
+            "start_s": 8.0
+          },
+          {
+            "end_s": 16.0,
+            "force_end_world_n": [
+              0.2,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              0.1,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "high",
+            "observation_window_s": [
+              12.0,
+              16.0
+            ],
+            "ramp_until_s": 12.5,
+            "scoring_window_s": [
+              15.75,
+              16.0
+            ],
+            "start_s": 12.0
+          },
+          {
+            "end_s": 20.0,
+            "force_end_world_n": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "force_start_world_n": [
+              0.2,
+              0.0,
+              0.0
+            ],
+            "interpolation": "smoothstep",
+            "name": "recovery",
+            "observation_window_s": [
+              16.0,
+              20.0
+            ],
+            "ramp_until_s": 16.5,
+            "scoring_window_s": [
+              19.75,
+              20.0
+            ],
+            "start_s": 16.0
+          }
+        ]
+      },
+      "protocol_source": {
+        "artifact_id": "7df0162f9b8d9e8213fb2ef6dbd8bb20628bcd4a411e3788c0532b8402b0e340",
+        "media_type": "application/json"
+      },
+      "qualifications": [
+        {
+          "length_excess_max_m": 5e-05,
+          "monitor_speed_max_m_s": 0.001,
+          "qvel_max_rad_s": 0.01,
+          "sampling": "every_physics_step",
+          "stage": "unloaded",
+          "static_balance_max_nm": 1e-05,
+          "tail_drift_max_m": 0.0005,
+          "tip_speed_max_m_s": 0.001,
+          "window_s": [
+            3.75,
+            4.0
+          ]
+        },
+        {
+          "length_excess_max_m": 5e-05,
+          "monitor_speed_max_m_s": 0.001,
+          "qvel_max_rad_s": 0.01,
+          "sampling": "every_physics_step",
+          "stage": "low",
+          "static_balance_max_nm": 1e-05,
+          "tail_drift_max_m": 0.0005,
+          "tip_speed_max_m_s": 0.001,
+          "window_s": [
+            7.75,
+            8.0
+          ]
+        },
+        {
+          "length_excess_max_m": 5e-05,
+          "monitor_speed_max_m_s": 0.001,
+          "qvel_max_rad_s": 0.01,
+          "sampling": "every_physics_step",
+          "stage": "middle",
+          "static_balance_max_nm": 1e-05,
+          "tail_drift_max_m": 0.0005,
+          "tip_speed_max_m_s": 0.001,
+          "window_s": [
+            11.75,
+            12.0
+          ]
+        },
+        {
+          "length_excess_max_m": 5e-05,
+          "monitor_speed_max_m_s": 0.001,
+          "qvel_max_rad_s": 0.01,
+          "sampling": "every_physics_step",
+          "stage": "high",
+          "static_balance_max_nm": 1e-05,
+          "tail_drift_max_m": 0.0005,
+          "tip_speed_max_m_s": 0.001,
+          "window_s": [
+            15.75,
+            16.0
+          ]
+        },
+        {
+          "length_excess_max_m": 5e-05,
+          "monitor_speed_max_m_s": 0.001,
+          "qvel_max_rad_s": 0.01,
+          "sampling": "every_physics_step",
+          "stage": "recovery",
+          "static_balance_max_nm": 1e-05,
+          "tail_drift_max_m": 0.0005,
+          "tip_speed_max_m_s": 0.001,
+          "window_s": [
+            19.75,
+            20.0
+          ]
+        }
+      ],
+      "recording": "full_physics_csv",
+      "reset": "same_complete_initial_state_each_episode",
+      "route_check": "every_physics_step",
+      "solimplimit": [
+        0.999,
+        0.999,
+        0.001,
+        0.5,
+        2
+      ],
+      "solreflimit": [
+        0.004,
+        1
+      ],
+      "static_balance_reference": "cold_zero_velocity",
+      "tension_tolerance_n": 1e-07,
+      "unloaded_stage": "unloaded",
+      "unloaded_static_solver": {
+        "active_tolerance_m": 1e-07,
+        "complementarity_tolerance_nm": 1e-08,
+        "ftol": 1e-13,
+        "hessian_step_rad": 1e-05,
+        "length_tolerance_m": 1e-08,
+        "max_iterations": 400,
+        "minimum_reduced_eigenvalue": 1e-07,
+        "rank_relative_tolerance": 1e-08,
+        "stationarity_tolerance_nm": 1e-06
+      },
+      "version": "passive_response_v2"
+    },
+    "version": "2.0.0"
+  },
+  "initializer": {
+    "extension_id": "initialize.family",
+    "parameters": {
+      "contract": "family.initial",
+      "data": {
+        "qpos_rad": {},
+        "qvel_rad_s": {},
+        "unspecified": "zero"
+      },
+      "version": "1.0.0"
+    },
+    "version": "1.0.0"
+  },
+  "name": "Passive progressive stiffness development task",
+  "objectives": [
+    {
+      "direction": "minimize",
+      "metric": "plus_x_residual_maximum",
+      "units": "m",
+      "weight": 1.0
+    }
+  ],
+  "observations": [
+    {
+      "dimension": 3,
+      "entity": "plus_x__tip",
+      "frame": "world",
+      "missing": "unsupported",
+      "name": "tip_position",
+      "phase": "post_step",
+      "units": "m"
+    },
+    {
+      "dimension": 3,
+      "entity": "minus_x__tip",
+      "frame": "world",
+      "missing": "unsupported",
+      "name": "tip_position",
+      "phase": "post_step",
+      "units": "m"
+    }
+  ],
+  "physical_problem": {
+    "baseline_load": "unloaded",
+    "gravity": [
+      0,
+      0,
+      -9.81
+    ],
+    "loads": [
+      {
+        "force_world_n": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material_s": 0.7,
+        "name": "unloaded"
+      },
+      {
+        "force_world_n": [
+          0.2,
+          0.0,
+          0.0
+        ],
+        "material_s": 0.7,
+        "name": "plus_x"
+      },
+      {
+        "force_world_n": [
+          -0.2,
+          0.0,
+          0.0
+        ],
+        "material_s": 0.7,
+        "name": "minus_x"
+      }
+    ],
+    "mode": "passive_unilateral_equilibrium",
+    "monitor_s": [
+      0,
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95,
+      1
+    ],
+    "mount_position": [
+      0,
+      0,
+      0.5
+    ],
+    "mount_rotation": [
+      [
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        -1,
+        0,
+        0
+      ]
+    ],
+    "observations": []
+  },
+  "robot_families": [
+    "tendon_robot_family"
+  ],
+  "sampling": {
+    "aggregation": "per_instance",
+    "seeds": [
+      1
+    ],
+    "split": "development",
+    "window_s": [
+      0.0,
+      20.0
+    ]
+  },
+  "source": "Registered translation of passive_progressive_stiffness_dev_v1; original development status retained, no benchmark certification. Original canonical protocol SHA256 7df0162f9b8d9e8213fb2ef6dbd8bb20628bcd4a411e3788c0532b8402b0e340",
+  "status": "development_valid",
+  "task_id": "passive-progressive-stiffness-dev-v1",
+  "task_version": "1.0.0",
+  "timing": {
+    "control_period_s": 0.01,
+    "duration_s": 20.0,
+    "sample_period_s": 0.01,
+    "termination": [
+      "duration",
+      "numerical_failure"
+    ],
+    "timestep_s": 0.000125
+  }
+}

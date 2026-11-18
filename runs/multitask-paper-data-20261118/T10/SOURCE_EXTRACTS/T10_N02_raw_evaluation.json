@@ -1,0 +1,292 @@
+{
+  "acceptance_status": null,
+  "candidate_id": null,
+  "comparison_identity": "4defea9068918c3aaf692e40f7318c59be6b97c04a8b5545584ba35c347c2e41",
+  "constraints": [
+    {
+      "limit": 0.01,
+      "name": "pre_impact_hold_position",
+      "observed": 0.009134954652715615,
+      "satisfied": true,
+      "units": "m"
+    },
+    {
+      "limit": 0.02,
+      "name": "pre_impact_hold_speed",
+      "observed": 0.013921021760920518,
+      "satisfied": true,
+      "units": "m/s"
+    },
+    {
+      "limit": 0.01,
+      "name": "final_hold_position",
+      "observed": 0.004105285126688788,
+      "satisfied": true,
+      "units": "m"
+    },
+    {
+      "limit": 0.02,
+      "name": "final_hold_speed",
+      "observed": 0.005534036355573024,
+      "satisfied": true,
+      "units": "m/s"
+    },
+    {
+      "limit": 0.0,
+      "name": "tension_min",
+      "observed": -0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 8.0,
+      "name": "tension_max",
+      "observed": 7.496626020047512,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 0.015,
+      "name": "stroke_limit",
+      "observed": 0.0056857878737437695,
+      "satisfied": true,
+      "units": "m"
+    },
+    {
+      "limit": 0.025,
+      "name": "actual_speed_limit",
+      "observed": 0.022072276970788823,
+      "satisfied": true,
+      "units": "m/s"
+    },
+    {
+      "limit": 0.0,
+      "name": "no_unexpected_collision",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "count"
+    },
+    {
+      "limit": 0.0,
+      "name": "finite_no_warning",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "count"
+    },
+    {
+      "limit": 1e-12,
+      "name": "force_off_after_pulse",
+      "observed": 0.0,
+      "satisfied": true,
+      "units": "N"
+    },
+    {
+      "limit": 1.0,
+      "name": "pre_impact_hold_all_timesteps",
+      "observed": 1.0,
+      "satisfied": true,
+      "units": "predicate (1=true, 0=false)"
+    },
+    {
+      "limit": 1.0,
+      "name": "final_hold_all_timesteps",
+      "observed": 1.0,
+      "satisfied": true,
+      "units": "predicate (1=true, 0=false)"
+    },
+    {
+      "limit": 1.0,
+      "name": "recovery_within_0p35s_with_100ms_hold",
+      "observed": 1.0,
+      "satisfied": true,
+      "units": "predicate (1=true, 0=false)"
+    }
+  ],
+  "contract_version": "1.3.0",
+  "diagnostics": {
+    "bound_task_identity": "10f647b1eb84c814bc1791f0918a78ebaad8063ad40251689a529e6502e2f047",
+    "checks": {
+      "actual_speed_limit": true,
+      "final_hold_all_timesteps": true,
+      "final_hold_position": true,
+      "final_hold_speed": true,
+      "finite_no_warning": true,
+      "force_off_after_pulse": true,
+      "no_unexpected_collision": true,
+      "pre_impact_hold_all_timesteps": true,
+      "pre_impact_hold_position": true,
+      "pre_impact_hold_speed": true,
+      "recovery_within_0p35s_with_100ms_hold": true,
+      "stroke_limit": true,
+      "tension_max": true,
+      "tension_min": true
+    },
+    "constraints": {
+      "actual_speed_limit": {
+        "direction": "maximum",
+        "limit": 0.025,
+        "margin": 0.0029277230292111787,
+        "observed": 0.022072276970788823,
+        "strict": false,
+        "tolerance": 1e-09,
+        "units": "m/s"
+      },
+      "final_hold_all_timesteps": {
+        "direction": "minimum",
+        "limit": 1.0,
+        "margin": 0.0,
+        "observed": 1.0,
+        "strict": false,
+        "tolerance": 0.0,
+        "units": "predicate (1=true, 0=false)"
+      },
+      "final_hold_position": {
+        "direction": "maximum",
+        "limit": 0.01,
+        "margin": 0.005894714873311212,
+        "observed": 0.004105285126688788,
+        "strict": false,
+        "tolerance": 1e-12,
+        "units": "m"
+      },
+      "final_hold_speed": {
+        "direction": "maximum",
+        "limit": 0.02,
+        "margin": 0.014465963644426975,
+        "observed": 0.005534036355573024,
+        "strict": false,
+        "tolerance": 1e-12,
+        "units": "m/s"
+      },
+      "finite_no_warning": {
+        "direction": "maximum",
+        "limit": 0.0,
+        "margin": 0.0,
+        "observed": 0.0,
+        "strict": false,
+        "tolerance": 0.0,
+        "units": "count"
+      },
+      "force_off_after_pulse": {
+        "direction": "maximum",
+        "limit": 1e-12,
+        "margin": 1e-12,
+        "observed": 0.0,
+        "strict": true,
+        "tolerance": 0.0,
+        "units": "N"
+      },
+      "no_unexpected_collision": {
+        "direction": "maximum",
+        "limit": 0.0,
+        "margin": 0.0,
+        "observed": 0.0,
+        "strict": false,
+        "tolerance": 0.0,
+        "units": "count"
+      },
+      "pre_impact_hold_all_timesteps": {
+        "direction": "minimum",
+        "limit": 1.0,
+        "margin": 0.0,
+        "observed": 1.0,
+        "strict": false,
+        "tolerance": 0.0,
+        "units": "predicate (1=true, 0=false)"
+      },
+      "pre_impact_hold_position": {
+        "direction": "maximum",
+        "limit": 0.01,
+        "margin": 0.0008650453472843853,
+        "observed": 0.009134954652715615,
+        "strict": false,
+        "tolerance": 1e-12,
+        "units": "m"
+      },
+      "pre_impact_hold_speed": {
+        "direction": "maximum",
+        "limit": 0.02,
+        "margin": 0.006078978239079482,
+        "observed": 0.013921021760920518,
+        "strict": false,
+        "tolerance": 1e-12,
+        "units": "m/s"
+      },
+      "recovery_within_0p35s_with_100ms_hold": {
+        "direction": "minimum",
+        "limit": 1.0,
+        "margin": 0.0,
+        "observed": 1.0,
+        "strict": false,
+        "tolerance": 0.0,
+        "units": "predicate (1=true, 0=false)"
+      },
+      "stroke_limit": {
+        "direction": "maximum",
+        "limit": 0.015,
+        "margin": 0.00931421212625623,
+        "observed": 0.0056857878737437695,
+        "strict": false,
+        "tolerance": 1e-09,
+        "units": "m"
+      },
+      "tension_max": {
+        "direction": "maximum",
+        "limit": 8.0,
+        "margin": 0.5033739799524879,
+        "observed": 7.496626020047512,
+        "strict": false,
+        "tolerance": 1e-09,
+        "units": "N"
+      },
+      "tension_min": {
+        "direction": "minimum",
+        "limit": 0.0,
+        "margin": -0.0,
+        "observed": -0.0,
+        "strict": false,
+        "tolerance": 1e-09,
+        "units": "N"
+      }
+    },
+    "controller_identity": "bc3de28e7adc1faa11f083643570c732d174607156c92ab4bc919741e9663ddc",
+    "design_identity": "f0837aacfde3c795e7b305f3e074866425e2b585eb0a152c3ea2c5f6dd6df1e4",
+    "failed_checks": [],
+    "metrics": {
+      "continuous_post_pulse_valid_s": 0.44999999999995044,
+      "final_hold_max_error_m": 0.004105285126688788,
+      "final_hold_max_speed_m_s": 0.005534036355573024,
+      "max_tendon_speed_m_s": 0.022072276970788823,
+      "max_tendon_stroke_m": 0.0056857878737437695,
+      "pre_hold_max_error_m": 0.009134954652715615,
+      "pre_hold_max_speed_m_s": 0.013921021760920518,
+      "recovery_time_after_pulse_s": 0
+    },
+    "origin": "core_execution",
+    "reason": null,
+    "source_status": null,
+    "task_success": true,
+    "validity": "valid",
+    "worst_constraint": "pre_impact_hold_all_timesteps",
+    "worst_constraint_basis": "Failed checks first; first failed zero-limit check, otherwise smallest margin/abs(limit). Predicate margins are dimensionless."
+  },
+  "evaluator": "evaluate.reach",
+  "evaluator_version": "1.0.0",
+  "metrics": [
+    {
+      "name": "hard_constraints_passed",
+      "units": "count",
+      "value": 14.0
+    }
+  ],
+  "original_execution_id": null,
+  "overall_status": null,
+  "reason": null,
+  "source": {
+    "artifact_id": "4bcf2f328563e5dd958313c136dde33f001bc00420e1f60d00e4174b00f9547a",
+    "media_type": "application/json"
+  },
+  "source_execution_id": null,
+  "task_success": true,
+  "validity": "valid"
+}

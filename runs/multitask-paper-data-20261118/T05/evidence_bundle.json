@@ -1,0 +1,989 @@
+{
+  "schema_version": "multitask_evidence_bundle_v1",
+  "task_id": "T05",
+  "task_name": "End-Effector Position and Tool-Axis Alignment",
+  "scope": "historical FULL method C; no new solver, optimizer or mj_step",
+  "actor_notice": "Codex surrogate / Codex expert formal trace; not a Main SDK experiment unless separate original evidence says so",
+  "editorial_note": "单一结构，必须展示位置与有方向的真实工具轴同时满足；位置静力入口不适用后从零预张力基线进入原生时变张力优化。未发生可见结构改造。",
+  "source_stores": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\platform.sqlite"
+  ],
+  "source_traces": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl"
+  ],
+  "final_conditions": [
+    {
+      "task_id": "T05",
+      "condition": "default",
+      "run_id": "codex-surrogate-T05-20261112",
+      "candidate_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+      "internal_candidate_id": "core-f8e4901b2264bc3c3c6ab055271c4f8ca4dcbd4791d26ecba23a3f5200c84208",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\platform.sqlite",
+      "candidate_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\platform.sqlite#artifacts/b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+      "configuration_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\platform.sqlite#artifacts/a4d27477398cad4317ee58fed628fb16cd65e9e5dfcd40718ebe3758295de68e",
+      "result_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\platform.sqlite#artifacts/cd1e6aa8326938f069ad096e8f196aa688ac66c82df5e7ba4fbf36f3e165e5b2",
+      "raw_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\platform.sqlite#artifacts/ee35c5593701062332c1fdb3b096a5e48a90175cf30f94fdee8a80f8ab550af7",
+      "execution_id": "4849bc687ebf44ec8a7bc2e085416f44",
+      "original_xml_files": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\robot.xml"
+      ],
+      "recorded_state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\samples.json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\result.json",
+          "pointer": "/samples",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        }
+      ],
+      "structure": {
+        "segments": 2,
+        "tendons": 6,
+        "actuators": 6,
+        "lengths_m": [
+          0.16,
+          0.11
+        ],
+        "young_pa": [
+          12000000.0,
+          12000000.0
+        ],
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12
+        },
+        "component_kind_counts": {
+          "flexible_segment": 2,
+          "guide": 1,
+          "rigid_connector": 1,
+          "payload": 1
+        }
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 0.0,
+          "terminal_tip_speed_weight": 0.0
+        },
+        "family_space_identity": "034e32256d365bb589e5c2b3016e26e4cd54d041d66a5d2fb2948fe62bb215d2",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": null,
+            "length_m": 0.16,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.009
+                }
+              }
+            ],
+            "young_pa": 12000000.0
+          },
+          "1": {
+            "cells": null,
+            "length_m": 0.11,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.007
+                }
+              },
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.007
+                }
+              }
+            ],
+            "young_pa": 12000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.0141
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.0471975511965976,
+            "radius_m": 0.0141
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "pretension_n": 0.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "accepted": true,
+      "acceptance_metrics": {
+        "geometric_stroke_max_m": 0.0030902659168050017,
+        "geometric_stroke_min_m": -0.003370090902027778,
+        "geometric_tendon_speed_max_m_s": 0.024746331837824785,
+        "max_position_error": 0.007458477556880469,
+        "max_tool_axis_angle_error": 0.05182348756322416
+      },
+      "acceptance_components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:geometric_stroke_max": {
+          "limit": 0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0030902659168050017
+        },
+        "evaluator:geometric_stroke_min": {
+          "limit": -0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": -0.003370090902027778
+        },
+        "evaluator:geometric_tendon_speed": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.024746331837824785
+        },
+        "evaluator:solver_errors": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:tension_max": {
+          "limit": 8.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 1.4877256938863477
+        },
+        "evaluator:tension_min": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": -0.0
+        },
+        "evaluator:tool_axis_direction": {
+          "limit": 0.05235987755982988,
+          "passed": true,
+          "reason": null,
+          "unit": "rad",
+          "value": 0.05182348756322416
+        },
+        "evaluator:tool_position": {
+          "limit": 0.008,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.007458477556880469
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "constraint_margins": {
+        "geometric_stroke_max": {
+          "direction": "maximum",
+          "limit": 0.015,
+          "margin": 0.011909734083194998,
+          "observed": 0.0030902659168050017,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_stroke_min": {
+          "direction": "minimum",
+          "limit": -0.015,
+          "margin": 0.011629909097972221,
+          "observed": -0.003370090902027778,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_tendon_speed": {
+          "direction": "maximum",
+          "limit": 0.025,
+          "margin": 0.00025366816217521626,
+          "observed": 0.024746331837824785,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "solver_errors": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "tension_max": {
+          "direction": "maximum",
+          "limit": 8.0,
+          "margin": 6.512274306113652,
+          "observed": 1.4877256938863477,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "tension_min": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.0,
+          "observed": -0.0,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "tool_axis_direction": {
+          "direction": "maximum",
+          "limit": 0.05235987755982988,
+          "margin": 0.0005363899966057198,
+          "observed": 0.05182348756322416,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "rad"
+        },
+        "tool_position": {
+          "direction": "maximum",
+          "limit": 0.008,
+          "margin": 0.0005415224431195315,
+          "observed": 0.007458477556880469,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        }
+      },
+      "resource_consumption_this_execution_only": {
+        "forward_evaluations": 662,
+        "kernel_wall_s": 0.21972439999808557,
+        "model_builds": 1,
+        "physics_step_attempts": 600,
+        "physics_steps": 600,
+        "rollouts": 1
+      },
+      "evaluation_version": 1,
+      "implementation": "74f97bbb329a8df8970e7602010a492b0540bdd1",
+      "task_timing": {
+        "control_period_s": 0.02,
+        "duration_s": 0.6,
+        "sample_period_s": 0.02,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "initialization_provenance": {
+        "canonical_task_identity": "f9cdb5450c5f72b1bb297f0260a5eceb24840ed19c9e699b4718823b5f9ff85d",
+        "effective": {
+          "qpos_rad": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "rule": "all_candidate_dofs_zero_v1"
+      }
+    }
+  ],
+  "selected_node_evidence": [
+    {
+      "node_id": "T05-001-cold-directed-tool-axis-structure-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:2",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:3",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T05-001-cold-directed-tool-axis-structure",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "generate",
+          "hypothesis": "Generate a new source-domain6channel/2segment T05 structure with public default lengths,12MPa circular9/7mm sections,14.1mm routing and zero state. Preserve the exact10g COM/full tensor and actual local tool axis. No previous accepted candidate or successful control is a seed.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "DESIGN_MODIFICATION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": null,
+            "requested_budget": 0
+          },
+          "generation": {
+            "version": "serial_family_generation_v2",
+            "family_space_identity": "034e32256d365bb589e5c2b3016e26e4cd54d041d66a5d2fb2948fe62bb215d2",
+            "segment_count": 2,
+            "tendon_count": 6,
+            "spans": [
+              {
+                "first_segment": 0,
+                "last_segment": 0,
+                "count": 3,
+                "phase_rad": 0.0,
+                "radius_m": 0.0141,
+                "guide_s": [
+                  0.5
+                ],
+                "anchor_s": 1.0
+              },
+              {
+                "first_segment": 0,
+                "last_segment": 1,
+                "count": 3,
+                "phase_rad": 1.0471975511965976,
+                "radius_m": 0.0141,
+                "guide_s": [
+                  0.5
+                ],
+                "anchor_s": 1.0
+              }
+            ],
+            "segments": {
+              "0": {
+                "length_m": 0.16,
+                "young_pa": 12000000.0,
+                "sections": [
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.009
+                    },
+                    "angle_rad": 0.0
+                  }
+                ]
+              },
+              "1": {
+                "length_m": 0.11,
+                "young_pa": 12000000.0,
+                "sections": [
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.007
+                    },
+                    "angle_rad": 0.0
+                  },
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.007
+                    },
+                    "angle_rad": 0.0
+                  }
+                ]
+              }
+            },
+            "tendon_parameters": {
+              "pretension_n": 0.0
+            },
+            "control_weights": {
+              "holding_tip_speed_weight": 0.0,
+              "terminal_tip_speed_weight": 0.0
+            }
+          }
+        },
+        "evidence": [],
+        "reason": "Generate a new source-domain6channel/2segment T05 structure with public default lengths,12MPa circular9/7mm sections,14.1mm routing and zero state. Preserve the exact10g COM/full tensor and actual local tool axis. No previous accepted candidate or successful control is a seed.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "generated",
+        "candidate": {
+          "artifact_id": "83fa73b8bf78d9179e6d2894022ff74722e95f9cd6aa6dbad0207d3092904f0c",
+          "media_type": "application/json"
+        }
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "7e1c52a77dbe6738d1c3ad6cbb331958ca19501a3fb26a9de5a6fcc3fd52b54d",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T05-003-fresh-position-static-trial-only-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:6",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:7",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T05-003-fresh-position-static-trial-only",
+        "tool_id": "research.math",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "candidate": {
+            "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+            "media_type": "application/json"
+          },
+          "operation": "equilibrium",
+          "model_source": "gvs",
+          "operating_point": "target_equilibrium",
+          "protocol": {
+            "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "authority_threshold": null,
+            "baseline_lengths_m": {
+              "segment_0": 0.16,
+              "segment_1": 0.11,
+              "segment_2": 0.14,
+              "segment_3": 0.14,
+              "segment_4": 0.14,
+              "segment_5": 0.14,
+              "segment_6": 0.14,
+              "segment_7": 0.14,
+              "segment_8": 0.14
+            },
+            "candidate_rule": "initial_target_equilibrium_halfway",
+            "comparison_atol": 1e-08,
+            "comparison_rtol": 2e-06,
+            "construction_max_iterations": 20,
+            "derivative_atol": 2e-05,
+            "derivative_rtol": 0.0002,
+            "derivative_step": 1e-05,
+            "duration_s": 0.6,
+            "endpoint_check_atol": 1e-08,
+            "endpoint_max_iterations": 100,
+            "equilibrium_normalized_residual": 1e-05,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0,
+              100.0
+            ],
+            "horizon_alignment_atol_s": 1e-12,
+            "input_scale_n": 8.0,
+            "output_scale_m": 0.01,
+            "period_s": 0.02,
+            "pole_margin_s_inv": 1e-07,
+            "protocol_id": "task-local-v2",
+            "rank_atol": 1e-12,
+            "rank_rtol": 1e-09,
+            "samples_s": [
+              0.0,
+              0.3,
+              0.6
+            ],
+            "static_force_tolerance": 1e-10,
+            "static_max_iterations": 20,
+            "windows_s": [
+              0.1,
+              0.6
+            ]
+          },
+          "scoring_window_s": 0.6
+        },
+        "evidence": [
+          {
+            "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Check the existing constant-target static construction only as an unmeasured initial tension trial. Its position output does not establish tool-axis direction or any full task success; the existing native direct-control method will handle the directed axis.",
+        "cache": "new"
+      },
+      "recorded_output": {},
+      "output_artifact_ids": [
+        {
+          "artifact_id": "02f84290add3bcc4ca9e18792dfc8f73674bf8670d69bde760c7438a249a0b5e",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T05-004-cold-native-tension-sequence-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:8",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:9",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T05-004-cold-native-tension-sequence",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "initialize_control",
+          "hypothesis": "Use the candidate-owned zero-pretension baseline because the static construction was not applicable. No historical source or position-only success is supplied.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "CONTROL_SEARCH",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": {
+              "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+              "media_type": "application/json"
+            },
+            "requested_budget": 0
+          },
+          "control_seed": {
+            "candidate": {
+              "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+              "media_type": "application/json"
+            },
+            "method": "baseline"
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Use the candidate-owned zero-pretension baseline because the static construction was not applicable. No historical source or position-only success is supplied.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "candidate": {
+          "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+          "media_type": "application/json"
+        },
+        "task_acceptance": "unmeasured"
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "18c34c8918fd0caca84cddbdd5c2416c2262a2b97431b2691842da7c5230e7cf",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T05-005-native-directed-position-and-axis-search-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:10",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:11",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T05-005-native-directed-position-and-axis-search",
+        "tool_id": "research.math",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "candidate": {
+            "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+            "media_type": "application/json"
+          },
+          "operation": "mujoco_direct_control_v1",
+          "model_source": "mujoco",
+          "operating_point": "standardized_initial_pretension",
+          "protocol": {
+            "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "authority_threshold": null,
+            "baseline_lengths_m": {
+              "segment_0": 0.16,
+              "segment_1": 0.11,
+              "segment_2": 0.14,
+              "segment_3": 0.14,
+              "segment_4": 0.14,
+              "segment_5": 0.14,
+              "segment_6": 0.14,
+              "segment_7": 0.14,
+              "segment_8": 0.14
+            },
+            "candidate_rule": "initial_target_equilibrium_halfway",
+            "comparison_atol": 1e-08,
+            "comparison_rtol": 2e-06,
+            "construction_max_iterations": 20,
+            "derivative_atol": 2e-05,
+            "derivative_rtol": 0.0002,
+            "derivative_step": 1e-05,
+            "duration_s": 0.6,
+            "endpoint_check_atol": 1e-08,
+            "endpoint_max_iterations": 100,
+            "equilibrium_normalized_residual": 1e-05,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0,
+              100.0
+            ],
+            "horizon_alignment_atol_s": 1e-12,
+            "input_scale_n": 8.0,
+            "output_scale_m": 0.01,
+            "period_s": 0.02,
+            "pole_margin_s_inv": 1e-07,
+            "protocol_id": "task-local-v2",
+            "rank_atol": 1e-12,
+            "rank_rtol": 1e-09,
+            "samples_s": [
+              0.0,
+              0.3,
+              0.6
+            ],
+            "static_force_tolerance": 1e-10,
+            "static_max_iterations": 20,
+            "windows_s": [
+              0.1,
+              0.6
+            ]
+          },
+          "scoring_window_s": 0.6,
+          "control_optimization": {
+            "source": {
+              "artifact_id": "b2fe64de0ee3ab79d816c14180b0b080ff010bf48ad7ed9afac29c5537e3546e",
+              "media_type": "application/json"
+            },
+            "settings": {
+              "version": "local_control_search_v2",
+              "correction_window_s": [
+                0.0,
+                0.6
+              ],
+              "method": "response",
+              "knots_s": [
+                0.0,
+                0.06,
+                0.15,
+                0.3,
+                0.48,
+                0.6
+              ],
+              "coefficient_limit_n": 8.0,
+              "difference_step_n": 0.005,
+              "initial_radius_n": 0.4,
+              "minimum_radius_n": 1e-06,
+              "evaluation_requests": 2000,
+              "iterations": 40,
+              "safety_margin_fraction": 0.01
+            }
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "b2fe64de0ee3ab79d816c14180b0b080ff010bf48ad7ed9afac29c5537e3546e",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Use the existing native direct-control method for both original position and directed unit-axis constraints, with2000callback/40iteration cap. Compute actual local-to-world tool axis from native pose; preserve complete dynamics and dense tendon stroke/speed limits. This is not the Reach-only T1 method.",
+        "cache": "new"
+      },
+      "recorded_output": {},
+      "output_artifact_ids": [
+        {
+          "artifact_id": "87f5ff69a04d7ad524888eced25181d0a5601b7db6869468a17c3225628253ba",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T05-008-select-actual-position-and-directed-axis-pass-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:16",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STUDY_TRACE.jsonl:17",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T05-008-select-actual-position-and-directed-axis-pass",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "select",
+          "hypothesis": "The exact new independent physical M5 result passed both actual position and directed tool-axis constraints together with every dense actuator/payload/solver gate. Select this publicly read complete result and stop at the sealed successful selection.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "cd1e6aa8326938f069ad096e8f196aa688ac66c82df5e7ba4fbf36f3e165e5b2",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "SELECT",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": null,
+            "requested_budget": 0
+          },
+          "selected_execution": {
+            "artifact_id": "cd1e6aa8326938f069ad096e8f196aa688ac66c82df5e7ba4fbf36f3e165e5b2",
+            "media_type": "application/json"
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "cd1e6aa8326938f069ad096e8f196aa688ac66c82df5e7ba4fbf36f3e165e5b2",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "The exact new independent physical M5 result passed both actual position and directed tool-axis constraints together with every dense actuator/payload/solver gate. Select this publicly read complete result and stop at the sealed successful selection.",
+        "cache": "new"
+      },
+      "recorded_output": {},
+      "output_artifact_ids": [
+        {
+          "artifact_id": "b5316def52552672a7700cc1ec119c43f500848d3411ea65d5cbbe4621488e50",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    }
+  ],
+  "complete_indices": {
+    "candidates": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T05\\complete_candidate_index.csv",
+    "models": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T05\\complete_model_index.csv",
+    "decisions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T05\\complete_decision_index.csv",
+    "conditions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T05\\complete_condition_index.csv",
+    "source_index": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T05\\source_index.csv"
+  },
+  "separate_cost_sources": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\COST_REPORT.json"
+  ],
+  "additional_experiments_separate_scope": [
+    {
+      "path": "D:\\softrobot-agent\\paper_experiments\\direct_math_only_20261114\\T05_B_MATH_ONLY",
+      "role": "separate_method_or_run_reference_only; never combine with FULL outcomes"
+    },
+    {
+      "path": "D:\\softrobot-agent\\paper_experiments\\ab_batch2_20261114\\T05",
+      "role": "separate_method_or_run_reference_only; never combine with FULL outcomes"
+    }
+  ],
+  "known_missing": [
+    "Explicit contemporaneous observation/hypothesis fields are unavailable where the source only records a combined rationale.",
+    "Original XML or full dynamic state unavailable for some purely mathematical candidate trials; no geometry or state is fabricated."
+  ],
+  "render_policy": "Only original XML plus saved qpos/time. Visual models and screenshots are created separately by parent workflow.",
+  "provenance_policy": "Existing master CSV/JSON used only to locate Store artifacts; numeric final values extracted directly from original Store acceptance components.",
+  "representative_render_sources": [
+    {
+      "task_id": "T05",
+      "candidate_id": "b43827b0a1cd9f98a93aa3340fb577c8d599acae84d117e0d24d7a44c128f5b2",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\platform.sqlite",
+      "execution_id": "4849bc687ebf44ec8a7bc2e085416f44",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T05_M5_tool_axis\\STORE\\physical_replay\\4849bc687ebf44ec8a7bc2e085416f44\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.02,
+        "duration_s": 0.6,
+        "sample_period_s": 0.02,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    }
+  ]
+}

@@ -1,0 +1,1589 @@
+{
+  "schema_version": "multitask_evidence_bundle_v1",
+  "task_id": "T09",
+  "task_name": "Guided Spring-Button Contact Manipulation",
+  "scope": "historical FULL method C; no new solver, optimizer or mj_step",
+  "actor_notice": "Codex surrogate / Codex expert formal trace; not a Main SDK experiment unless separate original evidence says so",
+  "editorial_note": "最初因缺失 20 个实体导向硬件接口而阻塞；后真实导向质量/COM/惯量齐全，首轮暴露原应禁碰的眼孔/辐条被环境重启碰撞。最终接口修复保留原 no-contact 语义，并非人为删去失败碰撞。使用历史实际中点命令作为新 Store 未测输入，未复制历史状态或验收。",
+  "source_stores": [
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\platform.sqlite",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\platform.sqlite",
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T09_spring_button\\STORE\\platform.sqlite"
+  ],
+  "source_traces": [
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STUDY_TRACE.jsonl",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STUDY_TRACE.jsonl",
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T09_spring_button\\STUDY_TRACE.jsonl"
+  ],
+  "final_conditions": [
+    {
+      "task_id": "T09",
+      "condition": "default",
+      "run_id": "codex-expert-T09-20261113-core027",
+      "candidate_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+      "internal_candidate_id": "core-a4d93be1bab9fa20b46dd84ef323eb3fa2109e1ccb36f479b1d79656b4a6db4f",
+      "store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\platform.sqlite",
+      "candidate_reference": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\platform.sqlite#artifacts/52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+      "configuration_reference": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\platform.sqlite#artifacts/1f0cf2028c11b981bfe8ee51990a47dd5f00946e938b38f35251a7513790496a",
+      "result_reference": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\platform.sqlite#artifacts/ad09f5570e18a7b651051c251af13347b1c30ca60ecf9b080180575470a01adb",
+      "raw_reference": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\platform.sqlite#artifacts/0cfacab6df02444019ea8d8037d4e2705212523116265ffb91eb1dd44e2505f2",
+      "execution_id": "450ac79d594044acb544188f4dc06452",
+      "original_xml_files": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\robot.xml"
+      ],
+      "recorded_state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\samples.json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "robot-only overview; 48 coordinates omit button_slide; not complete scene",
+          "role": "robot_only_overview_do_not_load_as_full_scene"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\result.json",
+          "pointer": "/task_evidence/arrays",
+          "time_field": "time_s",
+          "qpos_field": "qpos",
+          "qvel_field": "qvel",
+          "phase": "full original49-coordinate scene including button_slide at qpos_address48",
+          "joint_layout_pointer": "/task_evidence/joint_layout",
+          "role": "preferred_full_scene_state"
+        }
+      ],
+      "structure": {
+        "segments": 2,
+        "tendons": 4,
+        "actuators": 4,
+        "lengths_m": [
+          0.149,
+          0.1205
+        ],
+        "young_pa": [
+          8000000.0,
+          8000000.0
+        ],
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12
+        },
+        "component_kind_counts": {
+          "flexible_segment": 2,
+          "guide": 21,
+          "rigid_connector": 1,
+          "payload": 1
+        }
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 0.0,
+          "terminal_tip_speed_weight": 0.0
+        },
+        "family_space_identity": "cddee825c97ba7f940ad81e15edbbf33621230a4fed8376455dfc7fcc63df585",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.149,
+            "sections": [
+              {
+                "angle_rad": 0.35,
+                "holes_yz_m": [],
+                "kind": "ellipse",
+                "outer_yz_m": [],
+                "parameters": {
+                  "semi_y_m": 0.011685,
+                  "semi_z_m": 0.01064
+                }
+              }
+            ],
+            "young_pa": 8000000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.1205,
+            "sections": [
+              {
+                "angle_rad": -0.25,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.015674999999999998,
+                  "width_y_m": 0.017689
+                }
+              },
+              {
+                "angle_rad": 0.15000000000000002,
+                "holes_yz_m": [],
+                "kind": "rectangle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "height_z_m": 0.014107499999999997,
+                  "width_y_m": 0.015162000000000002
+                }
+              }
+            ],
+            "young_pa": 8000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": null,
+            "angular_offsets_rad": [
+              0.0,
+              -0.2617993877991493
+            ],
+            "count": 2,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": null,
+            "last_segment": 0,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.021
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": null,
+            "angular_offsets_rad": [
+              0.0,
+              -1.5707963267948966
+            ],
+            "count": 2,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": null,
+            "last_segment": 1,
+            "phase_rad": 0.6981317007977318,
+            "radius_m": 0.021
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 4,
+        "tendon_parameters": {},
+        "version": "serial_family_generation_v2"
+      },
+      "accepted": true,
+      "acceptance_metrics": {
+        "hold_valid_continuous_s": 0.4999999999999559,
+        "max_hold_contact_force_error_n": 0.002465057424524908,
+        "max_hold_depth_error_m": 5.2752700179421914e-05,
+        "max_rope_speed_m_s": 0.018224426063267712,
+        "max_stroke_m": 0.0032966105752161856,
+        "max_tension_n": 4.402568121786447
+      },
+      "acceptance_components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:button_travel_max": {
+          "limit": 0.003,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.002052752700179422
+        },
+        "evaluator:button_travel_min": {
+          "limit": -1e-06,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": -9.458299618748604e-08
+        },
+        "evaluator:contact_near_approach_end": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 1.0
+        },
+        "evaluator:depth_and_force_hold_0p4s": {
+          "limit": 0.4,
+          "passed": true,
+          "reason": null,
+          "unit": "s",
+          "value": 0.4999999999999559
+        },
+        "evaluator:finite_no_warning": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:no_external_force": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "zero-only wrench diagnostic: force N / torque N.m",
+          "value": 0.0
+        },
+        "evaluator:no_unexpected_collision": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:real_contact_established": {
+          "limit": 0.0001,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.002052752700179422
+        },
+        "evaluator:release_1p8_depth": {
+          "limit": 0.0001,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 9.163145029673288e-11
+        },
+        "evaluator:release_1p8_force": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "evaluator:release_1p8_speed": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.0014543316152657777
+        },
+        "evaluator:release_2p0_depth": {
+          "limit": 0.0001,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 5.309534589328372e-17
+        },
+        "evaluator:release_2p0_force": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.0
+        },
+        "evaluator:release_2p0_speed": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.0004168938873019986
+        },
+        "evaluator:speed_limit": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.018224426063267712
+        },
+        "evaluator:stroke_max": {
+          "limit": 0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.00117591245911558
+        },
+        "evaluator:stroke_min": {
+          "limit": -0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": -0.0032966105752161856
+        },
+        "evaluator:tension_max": {
+          "limit": 8.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 4.402568121786447
+        },
+        "evaluator:tension_min": {
+          "limit": 0.2,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.2
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "constraint_margins": {
+        "button_travel_max": {
+          "direction": "maximum",
+          "limit": 0.003,
+          "margin": 0.0009472472998205781,
+          "observed": 0.002052752700179422,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "m"
+        },
+        "button_travel_min": {
+          "direction": "minimum",
+          "limit": -1e-06,
+          "margin": 9.054170038125139e-07,
+          "observed": -9.458299618748604e-08,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "contact_near_approach_end": {
+          "direction": "minimum",
+          "limit": 1.0,
+          "margin": 0.0,
+          "observed": 1.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "depth_and_force_hold_0p4s": {
+          "direction": "minimum",
+          "limit": 0.4,
+          "margin": 0.0999999999999559,
+          "observed": 0.4999999999999559,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "s"
+        },
+        "finite_no_warning": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "no_external_force": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "zero-only wrench diagnostic: force N / torque N.m"
+        },
+        "no_unexpected_collision": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "real_contact_established": {
+          "direction": "minimum",
+          "limit": 0.0001,
+          "margin": 0.001952752700179422,
+          "observed": 0.002052752700179422,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "release_1p8_depth": {
+          "direction": "maximum",
+          "limit": 0.0001,
+          "margin": 9.999990836854971e-05,
+          "observed": 9.163145029673288e-11,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "release_1p8_force": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.01,
+          "observed": 0.0,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "N"
+        },
+        "release_1p8_speed": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.008545668384734223,
+          "observed": 0.0014543316152657777,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "release_2p0_depth": {
+          "direction": "maximum",
+          "limit": 0.0001,
+          "margin": 9.99999999999469e-05,
+          "observed": 5.309534589328372e-17,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "release_2p0_force": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.01,
+          "observed": 0.0,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "N"
+        },
+        "release_2p0_speed": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.009583106112698001,
+          "observed": 0.0004168938873019986,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "speed_limit": {
+          "direction": "maximum",
+          "limit": 0.025,
+          "margin": 0.006775573936732289,
+          "observed": 0.018224426063267712,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "m/s"
+        },
+        "stroke_max": {
+          "direction": "maximum",
+          "limit": 0.015,
+          "margin": 0.01382408754088442,
+          "observed": 0.00117591245911558,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "m"
+        },
+        "stroke_min": {
+          "direction": "minimum",
+          "limit": -0.015,
+          "margin": 0.011703389424783814,
+          "observed": -0.0032966105752161856,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "m"
+        },
+        "tension_max": {
+          "direction": "maximum",
+          "limit": 8.0,
+          "margin": 3.597431878213553,
+          "observed": 4.402568121786447,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "N"
+        },
+        "tension_min": {
+          "direction": "minimum",
+          "limit": 0.2,
+          "margin": 0.0,
+          "observed": 0.2,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "N"
+        }
+      },
+      "resource_consumption_this_execution_only": {
+        "forward_evaluations": 2402,
+        "kernel_wall_s": 3.304693900005077,
+        "model_builds": 1,
+        "physics_step_attempts": 2000,
+        "physics_steps": 2000,
+        "rollouts": 1
+      },
+      "evaluation_version": 1,
+      "implementation": "1879879e8fb00333e9f0fffab1d9296711cde60b",
+      "task_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 2.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "initialization_provenance": {
+        "canonical_task_identity": "c69a3591859d5d6b39e0bb1f0230c7648e2584872e27209a082da07758677cb9",
+        "effective": {
+          "qpos_rad": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "rule": "all_candidate_dofs_zero_v1"
+      }
+    }
+  ],
+  "selected_node_evidence": [
+    {
+      "node_id": "T09-002-stop-at-original-v1-2-hardware-interface-gap-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T09_spring_button\\STUDY_TRACE.jsonl:4",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T09_spring_button\\STUDY_TRACE.jsonl:5",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T09-002-stop-at-original-v1-2-hardware-interface-gap",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "stop",
+          "hypothesis": "T09 is BLOCKED_CORE at original v1.2 hardware fidelity. The source design_space.json SHA e91bdf91e1811618c2d878d8f8837e1b61621af99d063b356693662993574ac6 requires20 added guide eye/spoke assemblies at5stations with explicit mass, COM and full inertia. The frozen Core family space and public serial generation schema expose only the original single2g guide and route/hole edits; its contact fixture adds button/probe geometry without that required guide hardware. SOURCE_DOMAIN_AUDIT.json records the original public constraints and exact schema comparison. Do not generate a reduced-hardware candidate, claim a strict contact result, load C009 as a seed or write a new controller/solver. No physics or mathematical solve was launched; preserve this exact blocked trace and unused independent budget.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "b3247f5fb4385f81754cbf0adb3cdd3071305e947de18a3178929154e1a61d54",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "STOP",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": null,
+            "requested_budget": 0
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "b3247f5fb4385f81754cbf0adb3cdd3071305e947de18a3178929154e1a61d54",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "T09 is BLOCKED_CORE at original v1.2 hardware fidelity. The source design_space.json SHA e91bdf91e1811618c2d878d8f8837e1b61621af99d063b356693662993574ac6 requires20 added guide eye/spoke assemblies at5stations with explicit mass, COM and full inertia. The frozen Core family space and public serial generation schema expose only the original single2g guide and route/hole edits; its contact fixture adds button/probe geometry without that required guide hardware. SOURCE_DOMAIN_AUDIT.json records the original public constraints and exact schema comparison. Do not generate a reduced-hardware candidate, claim a strict contact result, load C009 as a seed or write a new controller/solver. No physics or mathematical solve was launched; preserve this exact blocked trace and unused independent budget.",
+        "cache": "new"
+      },
+      "recorded_output": {},
+      "output_artifact_ids": [
+        {
+          "artifact_id": "01fe764f51c7796cb29f715bc9cb2c623eeca7e0f05f8130a1247a1e32d97d1f",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T09-014-execute-complete-hardware-baseline-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STUDY_TRACE.jsonl:16",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STUDY_TRACE.jsonl:17",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T09-014-execute-complete-hardware-baseline",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "execute",
+          "hypothesis": "Measure the existing registered GVS NMPC route on the full original native button hardware. Historical event-latched controller behavior is not assumed; use actual dense contact/depth/force/actuator returns to identify any remaining control interface gap.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "99cd57113058da96fae807e4af93a54e80455c0fe7075617cea9cddbf05838ef",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "NMPC_EXECUTION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": {
+              "artifact_id": "99cd57113058da96fae807e4af93a54e80455c0fe7075617cea9cddbf05838ef",
+              "media_type": "application/json"
+            },
+            "requested_budget": 1
+          },
+          "candidate": {
+            "artifact_id": "99cd57113058da96fae807e4af93a54e80455c0fe7075617cea9cddbf05838ef",
+            "media_type": "application/json"
+          },
+          "experience_disposition": {
+            "expert-t09-history@1": "adopted",
+            "skill-physical-assembly-fidelity@1": "adopted",
+            "skill-feedback-dynamics-diagnosis@1": "adopted"
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "99cd57113058da96fae807e4af93a54e80455c0fe7075617cea9cddbf05838ef",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Measure the existing registered GVS NMPC route on the full original native button hardware. Historical event-latched controller behavior is not assumed; use actual dense contact/depth/force/actuator returns to identify any remaining control interface gap.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "execution_incomplete",
+        "acceptance": null,
+        "candidate": {
+          "artifact_id": "99cd57113058da96fae807e4af93a54e80455c0fe7075617cea9cddbf05838ef",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "361ec8700c89dc5fa2fcb8922855d1ef3d910339c6e8dbe41a9b10ad5b9c05ce",
+          "media_type": "application/json"
+        },
+        "execution_id": "b07c6e86e35c448db68fd3dc6ea519f7",
+        "numerical_s": 687.3654317999899
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "5c91fa85dc729cb77c4da7d7dbf9f2a437ea06373e51d41fb1c3190d67f4e68e",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\physical_replay\\dcb0b53b77c243d0abc69ad24f865b68\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T09-210-generate-collision-faithful-hardware-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STUDY_TRACE.jsonl:8",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STUDY_TRACE.jsonl:9",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T09-210-generate-collision-faithful-hardware",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "generate",
+          "hypothesis": "The first physical trial revealed that environment assembly re-enabled collisions on explicitly disabled guide eyes/spokes. Core 0.2.7 preserves their original no-contact semantics while retaining all twenty true masses, COMs and inertias. Regenerate the full S4 hypothesis under that repaired interface; no old acceptance is transferred.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "DESIGN_MODIFICATION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": null,
+            "requested_budget": 0
+          },
+          "generation": {
+            "control_weights": {
+              "holding_tip_speed_weight": 0.0,
+              "terminal_tip_speed_weight": 0.0
+            },
+            "family_space_identity": "cddee825c97ba7f940ad81e15edbbf33621230a4fed8376455dfc7fcc63df585",
+            "route_overrides": {},
+            "segment_count": 2,
+            "segments": {
+              "0": {
+                "cells": 12,
+                "length_m": 0.149,
+                "young_pa": 8000000.0,
+                "sections": [
+                  {
+                    "kind": "ellipse",
+                    "parameters": {
+                      "semi_y_m": 0.011685,
+                      "semi_z_m": 0.01064
+                    },
+                    "outer_yz_m": [],
+                    "holes_yz_m": [],
+                    "angle_rad": 0.35
+                  }
+                ]
+              },
+              "1": {
+                "cells": 12,
+                "length_m": 0.1205,
+                "young_pa": 8000000.0,
+                "sections": [
+                  {
+                    "kind": "rectangle",
+                    "parameters": {
+                      "height_z_m": 0.015674999999999998,
+                      "width_y_m": 0.017689
+                    },
+                    "outer_yz_m": [],
+                    "holes_yz_m": [],
+                    "angle_rad": -0.25
+                  },
+                  {
+                    "kind": "rectangle",
+                    "parameters": {
+                      "height_z_m": 0.014107499999999997,
+                      "width_y_m": 0.015162000000000002
+                    },
+                    "outer_yz_m": [],
+                    "holes_yz_m": [],
+                    "angle_rad": 0.15000000000000002
+                  }
+                ]
+              }
+            },
+            "spans": [
+              {
+                "count": 2,
+                "last_segment": 0,
+                "phase_rad": 1.5707963267948966,
+                "angular_offsets_rad": [
+                  0.0,
+                  -0.2617993877991493
+                ],
+                "radius_m": 0.021
+              },
+              {
+                "count": 2,
+                "last_segment": 1,
+                "phase_rad": 0.6981317007977318,
+                "angular_offsets_rad": [
+                  0.0,
+                  -1.5707963267948966
+                ],
+                "radius_m": 0.021
+              }
+            ],
+            "strategy": "polar_consecutive_spans_v1",
+            "tendon_count": 4,
+            "tendon_parameters": {},
+            "version": "serial_family_generation_v2"
+          },
+          "experience_disposition": {
+            "expert-t09-history@1": "adopted",
+            "skill-physical-assembly-fidelity@1": "adopted",
+            "skill-feedback-dynamics-diagnosis@1": "adopted"
+          }
+        },
+        "evidence": [],
+        "reason": "The first physical trial revealed that environment assembly re-enabled collisions on explicitly disabled guide eyes/spokes. Core 0.2.7 preserves their original no-contact semantics while retaining all twenty true masses, COMs and inertias. Regenerate the full S4 hypothesis under that repaired interface; no old acceptance is transferred.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "generated",
+        "candidate": {
+          "artifact_id": "55d4282a0428f79ccf0811c49d5a3247a529195927c39c8dbc8e663c4d3de3a3",
+          "media_type": "application/json"
+        }
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "a59c3b25186c030d47011721716eb7528b1d6ee1fae9c781cade76eb5e99748e",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\physical_replay\\dcb0b53b77c243d0abc69ad24f865b68\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T09-213-replay-complete-collision-faithful-task-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STUDY_TRACE.jsonl:14",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STUDY_TRACE.jsonl:15",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T09-213-replay-complete-collision-faithful-task",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "physical_replay",
+          "hypothesis": "Independently execute every original contact, depth, force, release, geometric tendon and unexpected-collision constraint with all twenty real guide assemblies.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "PHYSICAL_VALIDATION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": {
+              "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+              "media_type": "application/json"
+            },
+            "requested_budget": 1
+          },
+          "physical_replay": {
+            "candidate": {
+              "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+              "media_type": "application/json"
+            },
+            "source": {
+              "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+              "media_type": "application/json"
+            }
+          },
+          "experience_disposition": {
+            "expert-t09-history@1": "adopted",
+            "skill-physical-assembly-fidelity@1": "adopted",
+            "skill-feedback-dynamics-diagnosis@1": "adopted"
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Independently execute every original contact, depth, force, release, geometric tendon and unexpected-collision constraint with all twenty real guide assemblies.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "evaluated",
+        "acceptance": {
+          "accepted": true,
+          "components": {
+            "all_frozen_constraints": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "evaluator:button_travel_max": {
+              "limit": 0.003,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.002052752700179422
+            },
+            "evaluator:button_travel_min": {
+              "limit": -1e-06,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": -9.458299618748604e-08
+            },
+            "evaluator:contact_near_approach_end": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 1.0
+            },
+            "evaluator:depth_and_force_hold_0p4s": {
+              "limit": 0.4,
+              "passed": true,
+              "reason": null,
+              "unit": "s",
+              "value": 0.4999999999999559
+            },
+            "evaluator:finite_no_warning": {
+              "limit": 0.0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0.0
+            },
+            "evaluator:no_external_force": {
+              "limit": 0.0,
+              "passed": true,
+              "reason": null,
+              "unit": "zero-only wrench diagnostic: force N / torque N.m",
+              "value": 0.0
+            },
+            "evaluator:no_unexpected_collision": {
+              "limit": 0.0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0.0
+            },
+            "evaluator:real_contact_established": {
+              "limit": 0.0001,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.002052752700179422
+            },
+            "evaluator:release_1p8_depth": {
+              "limit": 0.0001,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 9.163145029673288e-11
+            },
+            "evaluator:release_1p8_force": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "evaluator:release_1p8_speed": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.0014543316152657777
+            },
+            "evaluator:release_2p0_depth": {
+              "limit": 0.0001,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 5.309534589328372e-17
+            },
+            "evaluator:release_2p0_force": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.0
+            },
+            "evaluator:release_2p0_speed": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.0004168938873019986
+            },
+            "evaluator:speed_limit": {
+              "limit": 0.025,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.018224426063267712
+            },
+            "evaluator:stroke_max": {
+              "limit": 0.015,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.00117591245911558
+            },
+            "evaluator:stroke_min": {
+              "limit": -0.015,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": -0.0032966105752161856
+            },
+            "evaluator:tension_max": {
+              "limit": 8.0,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 4.402568121786447
+            },
+            "evaluator:tension_min": {
+              "limit": 0.2,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 0.2
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "protocol_sampling": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "constraint_margins": {
+            "button_travel_max": {
+              "direction": "maximum",
+              "limit": 0.003,
+              "margin": 0.0009472472998205781,
+              "observed": 0.002052752700179422,
+              "strict": false,
+              "tolerance": 1e-09,
+              "units": "m"
+            },
+            "button_travel_min": {
+              "direction": "minimum",
+              "limit": -1e-06,
+              "margin": 9.054170038125139e-07,
+              "observed": -9.458299618748604e-08,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m"
+            },
+            "contact_near_approach_end": {
+              "direction": "minimum",
+              "limit": 1.0,
+              "margin": 0.0,
+              "observed": 1.0,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "count"
+            },
+            "depth_and_force_hold_0p4s": {
+              "direction": "minimum",
+              "limit": 0.4,
+              "margin": 0.0999999999999559,
+              "observed": 0.4999999999999559,
+              "strict": false,
+              "tolerance": 1e-09,
+              "units": "s"
+            },
+            "finite_no_warning": {
+              "direction": "maximum",
+              "limit": 0.0,
+              "margin": 0.0,
+              "observed": 0.0,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "count"
+            },
+            "no_external_force": {
+              "direction": "maximum",
+              "limit": 0.0,
+              "margin": 0.0,
+              "observed": 0.0,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "zero-only wrench diagnostic: force N / torque N.m"
+            },
+            "no_unexpected_collision": {
+              "direction": "maximum",
+              "limit": 0.0,
+              "margin": 0.0,
+              "observed": 0.0,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "count"
+            },
+            "real_contact_established": {
+              "direction": "minimum",
+              "limit": 0.0001,
+              "margin": 0.001952752700179422,
+              "observed": 0.002052752700179422,
+              "strict": true,
+              "tolerance": 0.0,
+              "units": "m"
+            },
+            "release_1p8_depth": {
+              "direction": "maximum",
+              "limit": 0.0001,
+              "margin": 9.999990836854971e-05,
+              "observed": 9.163145029673288e-11,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m"
+            },
+            "release_1p8_force": {
+              "direction": "maximum",
+              "limit": 0.01,
+              "margin": 0.01,
+              "observed": 0.0,
+              "strict": true,
+              "tolerance": 0.0,
+              "units": "N"
+            },
+            "release_1p8_speed": {
+              "direction": "maximum",
+              "limit": 0.01,
+              "margin": 0.008545668384734223,
+              "observed": 0.0014543316152657777,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m/s"
+            },
+            "release_2p0_depth": {
+              "direction": "maximum",
+              "limit": 0.0001,
+              "margin": 9.99999999999469e-05,
+              "observed": 5.309534589328372e-17,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m"
+            },
+            "release_2p0_force": {
+              "direction": "maximum",
+              "limit": 0.01,
+              "margin": 0.01,
+              "observed": 0.0,
+              "strict": true,
+              "tolerance": 0.0,
+              "units": "N"
+            },
+            "release_2p0_speed": {
+              "direction": "maximum",
+              "limit": 0.01,
+              "margin": 0.009583106112698001,
+              "observed": 0.0004168938873019986,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m/s"
+            },
+            "speed_limit": {
+              "direction": "maximum",
+              "limit": 0.025,
+              "margin": 0.006775573936732289,
+              "observed": 0.018224426063267712,
+              "strict": false,
+              "tolerance": 1e-09,
+              "units": "m/s"
+            },
+            "stroke_max": {
+              "direction": "maximum",
+              "limit": 0.015,
+              "margin": 0.01382408754088442,
+              "observed": 0.00117591245911558,
+              "strict": false,
+              "tolerance": 1e-09,
+              "units": "m"
+            },
+            "stroke_min": {
+              "direction": "minimum",
+              "limit": -0.015,
+              "margin": 0.011703389424783814,
+              "observed": -0.0032966105752161856,
+              "strict": false,
+              "tolerance": 1e-09,
+              "units": "m"
+            },
+            "tension_max": {
+              "direction": "maximum",
+              "limit": 8.0,
+              "margin": 3.597431878213553,
+              "observed": 4.402568121786447,
+              "strict": false,
+              "tolerance": 1e-09,
+              "units": "N"
+            },
+            "tension_min": {
+              "direction": "minimum",
+              "limit": 0.2,
+              "margin": 0.0,
+              "observed": 0.2,
+              "strict": false,
+              "tolerance": 1e-09,
+              "units": "N"
+            }
+          },
+          "continuous_time_guarantee": false,
+          "contract": "research.task_acceptance",
+          "evidence_binding": {
+            "evaluation": {
+              "artifact_id": "9632321b7e216eb82f36ff8c5c3dfc8482257c44c2a89016f013ebf580d1475f",
+              "media_type": "application/json"
+            },
+            "evaluation_binding": {
+              "original_execution_id": null,
+              "source": {
+                "artifact_id": "0cfacab6df02444019ea8d8037d4e2705212523116265ffb91eb1dd44e2505f2",
+                "media_type": "application/json"
+              },
+              "source_execution_id": null
+            },
+            "profile": {
+              "artifact_id": "c5814424b9f32cff5e94887d5b00b96d4513dfe0656ad5eaa67c317371d7a506",
+              "media_type": "application/json"
+            },
+            "profile_binding": {
+              "evaluation": {
+                "artifact_id": "9632321b7e216eb82f36ff8c5c3dfc8482257c44c2a89016f013ebf580d1475f",
+                "media_type": "application/json"
+              },
+              "execution_id": "450ac79d594044acb544188f4dc06452",
+              "simulation": {
+                "artifact_id": "0cfacab6df02444019ea8d8037d4e2705212523116265ffb91eb1dd44e2505f2",
+                "media_type": "application/json"
+              }
+            },
+            "simulation": {
+              "artifact_id": "0cfacab6df02444019ea8d8037d4e2705212523116265ffb91eb1dd44e2505f2",
+              "media_type": "application/json"
+            }
+          },
+          "execution_id": "450ac79d594044acb544188f4dc06452",
+          "issues": [],
+          "metrics": {
+            "hold_valid_continuous_s": 0.4999999999999559,
+            "max_hold_contact_force_error_n": 0.002465057424524908,
+            "max_hold_depth_error_m": 5.2752700179421914e-05,
+            "max_rope_speed_m_s": 0.018224426063267712,
+            "max_stroke_m": 0.0032966105752161856,
+            "max_tension_n": 4.402568121786447
+          },
+          "missing": [],
+          "protocol_id": "offline_frozen_task_v1",
+          "source_status": null,
+          "sources": {
+            "evaluation": {
+              "artifact_id": "9632321b7e216eb82f36ff8c5c3dfc8482257c44c2a89016f013ebf580d1475f",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "c5814424b9f32cff5e94887d5b00b96d4513dfe0656ad5eaa67c317371d7a506",
+              "media_type": "application/json"
+            }
+          },
+          "status": "accepted",
+          "task_family": "task.tracking",
+          "task_identity": "e241ec6fec77f79e1a8d9348528924d35a4b8915fd049ca62c7fc3e78dac30f2",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 2.0,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.001
+          },
+          "version": "1.0.0",
+          "worst_constraint": "contact_near_approach_end"
+        },
+        "candidate": {
+          "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "ad09f5570e18a7b651051c251af13347b1c30ca60ecf9b080180575470a01adb",
+          "media_type": "application/json"
+        },
+        "source_reference": {
+          "artifact_id": "4b3a05471f6cb25955fbe4b06dc29409d24992ec8f3d37ceb12e0cb58422f0b5",
+          "media_type": "application/json"
+        },
+        "execution_id": "450ac79d594044acb544188f4dc06452"
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "63ce8a860a435ccb480cb33c0c4b4bc954415c0bed5b231198bab6c43a6a40f4",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\physical_replay\\dcb0b53b77c243d0abc69ad24f865b68\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T09-215-select-full-hardware-solution-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STUDY_TRACE.jsonl:18",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STUDY_TRACE.jsonl:19",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T09-215-select-full-hardware-solution",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "select",
+          "hypothesis": "Select only the publicly read complete original v1.2 physical pass. Historical acceptance was never imported; old failed studies and their cost remain separate.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "ad09f5570e18a7b651051c251af13347b1c30ca60ecf9b080180575470a01adb",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "SELECT",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": {
+              "artifact_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+              "media_type": "application/json"
+            },
+            "requested_budget": 0
+          },
+          "selected_execution": {
+            "artifact_id": "ad09f5570e18a7b651051c251af13347b1c30ca60ecf9b080180575470a01adb",
+            "media_type": "application/json"
+          },
+          "experience_disposition": {
+            "expert-t09-history@1": "adopted",
+            "skill-physical-assembly-fidelity@1": "adopted",
+            "skill-feedback-dynamics-diagnosis@1": "adopted"
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "ad09f5570e18a7b651051c251af13347b1c30ca60ecf9b080180575470a01adb",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Select only the publicly read complete original v1.2 physical pass. Historical acceptance was never imported; old failed studies and their cost remain separate.",
+        "cache": "new"
+      },
+      "recorded_output": {},
+      "output_artifact_ids": [
+        {
+          "artifact_id": "72b06518608d5dc9119520d9912988e76bb7ee2d6ae7bb1e109182b2cb8b6d1f",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\physical_replay\\dcb0b53b77c243d0abc69ad24f865b68\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    }
+  ],
+  "complete_indices": {
+    "candidates": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T09\\complete_candidate_index.csv",
+    "models": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T09\\complete_model_index.csv",
+    "decisions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T09\\complete_decision_index.csv",
+    "conditions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T09\\complete_condition_index.csv",
+    "source_index": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T09\\source_index.csv"
+  },
+  "separate_cost_sources": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T09_spring_button\\COST_REPORT.json",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\COST_REPORT.json",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\COST_REPORT.json"
+  ],
+  "additional_experiments_separate_scope": [
+    {
+      "path": "D:\\softrobot-agent\\paper_experiments\\ab_batch2_20261114\\T09",
+      "role": "separate_method_or_run_reference_only; never combine with FULL outcomes"
+    }
+  ],
+  "known_missing": [
+    "Explicit contemporaneous observation/hypothesis fields are unavailable where the source only records a combined rationale.",
+    "Original XML or full dynamic state unavailable for some purely mathematical candidate trials; no geometry or state is fabricated."
+  ],
+  "render_policy": "Only original XML plus saved qpos/time. Visual models and screenshots are created separately by parent workflow.",
+  "provenance_policy": "Existing master CSV/JSON used only to locate Store artifacts; numeric final values extracted directly from original Store acceptance components.",
+  "representative_render_sources": [
+    {
+      "task_id": "T09",
+      "candidate_id": "99cd57113058da96fae807e4af93a54e80455c0fe7075617cea9cddbf05838ef",
+      "store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\platform.sqlite",
+      "execution_id": "dcb0b53b77c243d0abc69ad24f865b68",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\physical_replay\\dcb0b53b77c243d0abc69ad24f865b68\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\physical_replay\\dcb0b53b77c243d0abc69ad24f865b68\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\STORE_RESEARCH\\physical_replay\\dcb0b53b77c243d0abc69ad24f865b68\\result.json",
+          "format": "json",
+          "pointer": "/task_evidence/arrays",
+          "time_field": "time_s",
+          "qpos_field": "qpos",
+          "qvel_field": "qvel",
+          "joint_layout_pointer": "/task_evidence/joint_layout",
+          "role": "complete49-coordinate_scene; samples.json is48-coordinate_robot_only"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 2.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T09",
+      "candidate_id": "52fbff225dd926fb7d2bc7f3bba7d89a18a90047adaece3471f750970141caf9",
+      "store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\platform.sqlite",
+      "execution_id": "450ac79d594044acb544188f4dc06452",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T09_spring_button\\T09_RUN_02\\STORE_RESEARCH\\physical_replay\\450ac79d594044acb544188f4dc06452\\result.json",
+          "format": "json",
+          "pointer": "/task_evidence/arrays",
+          "time_field": "time_s",
+          "qpos_field": "qpos",
+          "qvel_field": "qvel",
+          "joint_layout_pointer": "/task_evidence/joint_layout",
+          "role": "complete49-coordinate_scene; samples.json is48-coordinate_robot_only"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 2.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    }
+  ],
+  "contact_specific_note": "First retained 20-guide replay dcb0... failed with 9 unexpected contact pairs and 0 s valid hold. Final 450a... preserves explicit source no-contact guide semantics after an interface repair and passes with 0 unexpected collisions and 0.5 s continuous valid hold. Historical midpoint inputs are a control seed; no original physics state or acceptance was imported."
+}

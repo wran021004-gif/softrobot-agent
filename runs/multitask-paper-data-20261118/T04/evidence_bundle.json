@@ -1,0 +1,1262 @@
+{
+  "schema_version": "multitask_evidence_bundle_v1",
+  "task_id": "T04",
+  "task_name": "Figure-Eight Trajectory Tracking",
+  "scope": "historical FULL method C; no new solver, optimizer or mj_step",
+  "actor_notice": "Codex surrogate / Codex expert formal trace; not a Main SDK experiment unless separate original evidence says so",
+  "editorial_note": "研究路线由长期 GVS NMPC 比较改为原生静力平衡参考库和绝对张力前馈。原 GVS 执行未完整完成并在成功后终止，不应写为已完成的性能失败或全局不可行。89 点静态库不构成轨迹验收。",
+  "source_stores": [
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\STORE\\platform.sqlite",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\STORE_RESEARCH\\platform.sqlite",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STORE_RESEARCH\\platform.sqlite",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite",
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T04_figure_eight_tracking\\STORE\\platform.sqlite"
+  ],
+  "source_traces": [
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\STUDY_TRACE.jsonl",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STUDY_TRACE.jsonl",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl",
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T04_figure_eight_tracking\\STUDY_TRACE.jsonl"
+  ],
+  "final_conditions": [
+    {
+      "task_id": "T04",
+      "condition": "default",
+      "run_id": "codex-expert-T04-20261113-core029-interior",
+      "candidate_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+      "internal_candidate_id": "core-c9bb26910328b896b9d19bb52ae2ec0a75d35675161731df476f4d0df1402206",
+      "store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite",
+      "candidate_reference": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite#artifacts/a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+      "configuration_reference": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite#artifacts/d9a271014ab972c4c21b2d46217f9add1f98b2f6a69e0092873fa3efb7596190",
+      "result_reference": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite#artifacts/f9d19d368c9f183fab8f69ea8d984c97c0665dc67117cbcc46c7f245a4de5f8c",
+      "raw_reference": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite#artifacts/6dfbafcb1c3fbb8ba0f572104beaec9c2697ac296a4cc58d5bfb107b2b2c9d9a",
+      "execution_id": "496aeda075dd4db4be66d809cc462ea0",
+      "original_xml_files": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\robot.xml"
+      ],
+      "recorded_state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\samples.json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\result.json",
+          "pointer": "/samples",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        }
+      ],
+      "structure": {
+        "segments": 2,
+        "tendons": 4,
+        "actuators": 4,
+        "lengths_m": [
+          0.14,
+          0.118
+        ],
+        "young_pa": [
+          4000000.0,
+          4000000.0
+        ],
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12
+        },
+        "component_kind_counts": {
+          "flexible_segment": 2,
+          "guide": 1,
+          "rigid_connector": 1,
+          "payload": 1
+        }
+      },
+      "parameters": {
+        "control_weights": {
+          "holding_tip_speed_weight": 0.0,
+          "terminal_tip_speed_weight": 0.0
+        },
+        "controller_recipe": {
+          "basis": {
+            "strategy": "first_order"
+          },
+          "minimum_tension_n": 0.2
+        },
+        "family_space_identity": "e8497f039682fc480aea289ffdb582130670bb9db1450acd6a56d5798112a290",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 12,
+            "length_m": 0.14,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.008
+                }
+              }
+            ],
+            "young_pa": 4000000.0
+          },
+          "1": {
+            "cells": 12,
+            "length_m": 0.118,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.008
+                }
+              },
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.008
+                }
+              }
+            ],
+            "young_pa": 4000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": null,
+            "angular_offsets_rad": [],
+            "count": 4,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": null,
+            "last_segment": 1,
+            "phase_rad": 0.0,
+            "radius_m": 0.0141
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 4,
+        "tendon_parameters": {
+          "pretension_n": 0.2
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "accepted": true,
+      "acceptance_metrics": {
+        "cycle_phase_matched_max_difference_m": 0.0010088782522628332,
+        "max_error_m": 0.0010206639031726755,
+        "terminal_speed_m_s": 8.880355752485461e-05,
+        "tracking_rmse_m": 0.0006878528448055238
+      },
+      "acceptance_components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:actual_two_lobes_each_cycle": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "predicate (1=true, 0=false)",
+          "value": 1.0
+        },
+        "evaluator:contacts": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:cycle_1_lobe_clearance": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0008965565703454303
+        },
+        "evaluator:cycle_2_lobe_clearance": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0008964712539745179
+        },
+        "evaluator:cycle_count_error": {
+          "limit": 1e-06,
+          "passed": true,
+          "reason": null,
+          "unit": "cycles",
+          "value": 0.0
+        },
+        "evaluator:cycle_drift": {
+          "limit": 0.002,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0010088782522628332
+        },
+        "evaluator:no_saturation": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.00990000000000002
+        },
+        "evaluator:speed": {
+          "limit": 0.03,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.0012876943118840245
+        },
+        "evaluator:stroke": {
+          "limit": 0.03,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.003729687336853027
+        },
+        "evaluator:tracking_max": {
+          "limit": 0.006,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0010206639031726755
+        },
+        "evaluator:tracking_rmse": {
+          "limit": 0.003,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0006878528448055238
+        },
+        "evaluator:warnings": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "constraint_margins": {
+        "actual_two_lobes_each_cycle": {
+          "direction": "minimum",
+          "limit": 1.0,
+          "margin": 0.0,
+          "observed": 1.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "predicate (1=true, 0=false)"
+        },
+        "contacts": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "cycle_1_lobe_clearance": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": 0.0008965565703454303,
+          "observed": 0.0008965565703454303,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "cycle_2_lobe_clearance": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": 0.0008964712539745179,
+          "observed": 0.0008964712539745179,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "cycle_count_error": {
+          "direction": "maximum",
+          "limit": 1e-06,
+          "margin": 1e-06,
+          "observed": 0.0,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "cycles"
+        },
+        "cycle_drift": {
+          "direction": "maximum",
+          "limit": 0.002,
+          "margin": 0.0009911217477371669,
+          "observed": 0.0010088782522628332,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "no_saturation": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": 0.00990000000000002,
+          "observed": 0.00990000000000002,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "N"
+        },
+        "speed": {
+          "direction": "maximum",
+          "limit": 0.03,
+          "margin": 0.028712305688115974,
+          "observed": 0.0012876943118840245,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "stroke": {
+          "direction": "maximum",
+          "limit": 0.03,
+          "margin": 0.026270312663146972,
+          "observed": 0.003729687336853027,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "tracking_max": {
+          "direction": "maximum",
+          "limit": 0.006,
+          "margin": 0.004979336096827325,
+          "observed": 0.0010206639031726755,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "tracking_rmse": {
+          "direction": "maximum",
+          "limit": 0.003,
+          "margin": 0.0023121471551944763,
+          "observed": 0.0006878528448055238,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "warnings": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        }
+      },
+      "resource_consumption_this_execution_only": {
+        "forward_evaluations": 26402,
+        "kernel_wall_s": 284.5725412000029,
+        "model_builds": 1,
+        "physics_step_attempts": 22000,
+        "physics_steps": 22000,
+        "rollouts": 1
+      },
+      "evaluation_version": 1,
+      "implementation": "db3483a773d4db1e1e85d19ddef6ce8bdde3d79e",
+      "task_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 22.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "initialization_provenance": {
+        "canonical_task_identity": "af8283bb8af73f666e3103ddd0256ed59145efd12da56b72781eac7cd76f83c3",
+        "effective": {
+          "qpos_rad": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "rule": "all_candidate_dofs_zero_v1"
+      }
+    }
+  ],
+  "selected_node_evidence": [
+    {
+      "node_id": "T04-017-execute-full-tracking-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\STUDY_TRACE.jsonl:20",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\STUDY_TRACE.jsonl:21",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T04-017-execute-full-tracking",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "execute",
+          "hypothesis": "Execute the complete original 22-second figure-eight on the new legal structure and independently qualified native initial state. All original dense path, actuator, lobe and cycle-drift constraints remain active.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "42d057675c36f946138c8583106afd99d378331b5c65c69fc839169095bae13a",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "NMPC_EXECUTION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": {
+              "artifact_id": "42d057675c36f946138c8583106afd99d378331b5c65c69fc839169095bae13a",
+              "media_type": "application/json"
+            },
+            "requested_budget": 1
+          },
+          "candidate": {
+            "artifact_id": "42d057675c36f946138c8583106afd99d378331b5c65c69fc839169095bae13a",
+            "media_type": "application/json"
+          },
+          "experience_disposition": {
+            "expert-t04-history@1": "adopted",
+            "skill-native-equilibrium-reference@1": "adopted",
+            "skill-feedback-dynamics-diagnosis@1": "adopted"
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "42d057675c36f946138c8583106afd99d378331b5c65c69fc839169095bae13a",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Execute the complete original 22-second figure-eight on the new legal structure and independently qualified native initial state. All original dense path, actuator, lobe and cycle-drift constraints remain active.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "execution_incomplete",
+        "acceptance": null,
+        "candidate": {
+          "artifact_id": "42d057675c36f946138c8583106afd99d378331b5c65c69fc839169095bae13a",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "6c728106c39b269cb08f9eb8e4ddbf6e62a59a49e9a58dd021b0a3debb2228d9",
+          "media_type": "application/json"
+        },
+        "execution_id": "6c99ff396613431295f31b855f96a20a",
+        "numerical_s": 7293.336670100005
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "45f89b9eb15c53d6d0201e8bce48c4809df63b46ee3af0e3419926cf8f34eb84",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STORE_RESEARCH\\physical_replay\\74dd1b67218445229d671467752dec2f\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T04-210-generate-legal-quasistatic-tracking-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl:12",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl:13",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T04-210-generate-legal-quasistatic-tracking",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "generate",
+          "hypothesis": "Use the same legal geometry as the current GVS trial to compare control routes without changing structure. Historical quasistatic success supports a native equilibrium continuation hypothesis, not current acceptance.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "DESIGN_MODIFICATION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": null,
+            "requested_budget": 0
+          },
+          "generation": {
+            "version": "serial_family_generation_v2",
+            "family_space_identity": "e8497f039682fc480aea289ffdb582130670bb9db1450acd6a56d5798112a290",
+            "segment_count": 2,
+            "tendon_count": 4,
+            "segments": {
+              "0": {
+                "cells": 12,
+                "length_m": 0.14,
+                "young_pa": 4000000.0,
+                "sections": [
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.008
+                    }
+                  }
+                ]
+              },
+              "1": {
+                "cells": 12,
+                "length_m": 0.118,
+                "young_pa": 4000000.0,
+                "sections": [
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.008
+                    }
+                  },
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.008
+                    }
+                  }
+                ]
+              }
+            },
+            "spans": [
+              {
+                "last_segment": 1,
+                "count": 4,
+                "phase_rad": 0.0,
+                "radius_m": 0.0141
+              }
+            ],
+            "tendon_parameters": {
+              "pretension_n": 0.2
+            },
+            "controller_recipe": {
+              "basis": {
+                "strategy": "first_order"
+              },
+              "minimum_tension_n": 0.2
+            },
+            "control_weights": {
+              "holding_tip_speed_weight": 0.0,
+              "terminal_tip_speed_weight": 0.0
+            }
+          },
+          "experience_disposition": {
+            "expert-t04-history@1": "adopted",
+            "expert-t04-method-selection@1": "adopted",
+            "skill-native-equilibrium-reference@1": "adopted",
+            "skill-native-equilibrium-reference-bank@1": "adopted",
+            "expert-t04-phase-and-preload@1": "adopted"
+          }
+        },
+        "evidence": [],
+        "reason": "Use the same legal geometry as the current GVS trial to compare control routes without changing structure. Historical quasistatic success supports a native equilibrium continuation hypothesis, not current acceptance.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "generated",
+        "candidate": {
+          "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+          "media_type": "application/json"
+        }
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "705c4d085f3cc104590b9431e34a9ab5c7ff93533ff6a73727e303bcd7770bcb",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STORE_RESEARCH\\physical_replay\\74dd1b67218445229d671467752dec2f\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T04-211-construct-native-frozen-reference-bank-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl:14",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl:15",
+      "operation_status": "failed",
+      "failure_reason": "NATIVE_V1_REQUIRES_FINITE_CONTACT_FREE_UNCONSTRAINED_STATE",
+      "original_exact_input": {
+        "request_id": "T04-211-construct-native-frozen-reference-bank",
+        "tool_id": "task.initial_state.construct",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "configuration": {
+            "artifact_id": "7e7e718a1414bed2b1617bbf884a15959e6131ccb16b91e419557ae10e01ca7a",
+            "media_type": "application/json"
+          },
+          "reference_times_s": [
+            0.0,
+            0.25,
+            0.5,
+            0.75,
+            1.0,
+            1.25,
+            1.5,
+            1.75,
+            2.0,
+            2.25,
+            2.5,
+            2.75,
+            3.0,
+            3.25,
+            3.5,
+            3.75,
+            4.0,
+            4.25,
+            4.5,
+            4.75,
+            5.0,
+            5.25,
+            5.5,
+            5.75,
+            6.0,
+            6.25,
+            6.5,
+            6.75,
+            7.0,
+            7.25,
+            7.5,
+            7.75,
+            8.0,
+            8.25,
+            8.5,
+            8.75,
+            9.0,
+            9.25,
+            9.5,
+            9.75,
+            10.0,
+            10.25,
+            10.5,
+            10.75,
+            11.0,
+            11.25,
+            11.5,
+            11.75,
+            12.0,
+            12.25,
+            12.5,
+            12.75,
+            13.0,
+            13.25,
+            13.5,
+            13.75,
+            14.0,
+            14.25,
+            14.5,
+            14.75,
+            15.0,
+            15.25,
+            15.5,
+            15.75,
+            16.0,
+            16.25,
+            16.5,
+            16.75,
+            17.0,
+            17.25,
+            17.5,
+            17.75,
+            18.0,
+            18.25,
+            18.5,
+            18.75,
+            19.0,
+            19.25,
+            19.5,
+            19.75,
+            20.0,
+            20.25,
+            20.5,
+            20.75,
+            21.0,
+            21.25,
+            21.5,
+            21.75,
+            22.0
+          ],
+          "max_iterations": 250,
+          "qpos_seed_rad": {
+            "segment_0_cell_0_y": 0.03731473869972904,
+            "segment_0_cell_0_z": -3.361052532556199e-10,
+            "segment_0_cell_10_y": -0.018921185770033457,
+            "segment_0_cell_10_z": -4.56734066407872e-10,
+            "segment_0_cell_11_y": -0.021073384190887133,
+            "segment_0_cell_11_z": -4.0891830208179e-10,
+            "segment_0_cell_1_y": 0.036494291313105394,
+            "segment_0_cell_1_z": -4.103405005597177e-10,
+            "segment_0_cell_2_y": 0.03324676222802161,
+            "segment_0_cell_2_z": -4.5485202547413885e-10,
+            "segment_0_cell_3_y": 0.02781426581662053,
+            "segment_0_cell_3_z": -4.668171646212436e-10,
+            "segment_0_cell_4_y": 0.02060025149203413,
+            "segment_0_cell_4_z": -4.4572292787623297e-10,
+            "segment_0_cell_5_y": 0.012137639081178864,
+            "segment_0_cell_5_z": -3.933476735782412e-10,
+            "segment_0_cell_6_y": 0.0030486654085041167,
+            "segment_0_cell_6_z": -3.1360968416435217e-10,
+            "segment_0_cell_7_y": -0.003730212407616166,
+            "segment_0_cell_7_z": -3.966016018677638e-10,
+            "segment_0_cell_8_y": -0.00991576152107714,
+            "segment_0_cell_8_z": -4.5019754975994655e-10,
+            "segment_0_cell_9_y": -0.015107456696822938,
+            "segment_0_cell_9_z": -4.707948973962703e-10,
+            "segment_1_cell_0_y": -0.028029359218155463,
+            "segment_1_cell_0_z": -3.627488988853247e-10,
+            "segment_1_cell_10_y": -0.04155545023444004,
+            "segment_1_cell_10_z": -3.644823414916594e-10,
+            "segment_1_cell_11_y": -0.038655781050883686,
+            "segment_1_cell_11_z": -3.354809196248519e-10,
+            "segment_1_cell_1_y": -0.033458622426347166,
+            "segment_1_cell_1_z": -4.0394038800242177e-10,
+            "segment_1_cell_2_y": -0.036974846314770965,
+            "segment_1_cell_2_z": -4.237255153772136e-10,
+            "segment_1_cell_3_y": -0.03838811051640635,
+            "segment_1_cell_3_z": -4.210380390628662e-10,
+            "segment_1_cell_4_y": -0.037621839785615535,
+            "segment_1_cell_4_z": -3.9604072455338795e-10,
+            "segment_1_cell_5_y": -0.034717963507513064,
+            "segment_1_cell_5_z": -3.5010062731462445e-10,
+            "segment_1_cell_6_y": -0.029834038533559294,
+            "segment_1_cell_6_z": -2.856875139385493e-10,
+            "segment_1_cell_7_y": -0.036187650375842866,
+            "segment_1_cell_7_z": -3.347091556979875e-10,
+            "segment_1_cell_8_y": -0.04028982292044727,
+            "segment_1_cell_8_z": -3.6417356451714464e-10,
+            "segment_1_cell_9_y": -0.042111327835573836,
+            "segment_1_cell_9_z": -3.742530433537638e-10
+          },
+          "tensions_seed_n": {
+            "tendon_0": 4.0,
+            "tendon_1": 4.0,
+            "tendon_2": 4.0,
+            "tendon_3": 4.0
+          },
+          "tension_reference_n": {
+            "tendon_0": 4.0,
+            "tendon_1": 4.0,
+            "tendon_2": 4.0,
+            "tendon_3": 4.0
+          },
+          "tension_interior_margin_n": 0.01
+        },
+        "evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Recompute 89 native equilibria along the original reference with warm continuation and interior antagonistic preload. Charge 89 mathematical evaluations, record residual and target error at every point, and perform no dynamic integration.",
+        "cache": "new"
+      },
+      "recorded_output": null,
+      "output_artifact_ids": [],
+      "model_xml": [],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T04-216-construct-local-interior-reference-bank-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl:16",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl:17",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T04-216-construct-local-interior-reference-bank",
+        "tool_id": "task.initial_state.construct",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "configuration": {
+            "artifact_id": "7e7e718a1414bed2b1617bbf884a15959e6131ccb16b91e419557ae10e01ca7a",
+            "media_type": "application/json"
+          },
+          "reference_times_s": [
+            0.0,
+            0.25,
+            0.5,
+            0.75,
+            1.0,
+            1.25,
+            1.5,
+            1.75,
+            2.0,
+            2.25,
+            2.5,
+            2.75,
+            3.0,
+            3.25,
+            3.5,
+            3.75,
+            4.0,
+            4.25,
+            4.5,
+            4.75,
+            5.0,
+            5.25,
+            5.5,
+            5.75,
+            6.0,
+            6.25,
+            6.5,
+            6.75,
+            7.0,
+            7.25,
+            7.5,
+            7.75,
+            8.0,
+            8.25,
+            8.5,
+            8.75,
+            9.0,
+            9.25,
+            9.5,
+            9.75,
+            10.0,
+            10.25,
+            10.5,
+            10.75,
+            11.0,
+            11.25,
+            11.5,
+            11.75,
+            12.0,
+            12.25,
+            12.5,
+            12.75,
+            13.0,
+            13.25,
+            13.5,
+            13.75,
+            14.0,
+            14.25,
+            14.5,
+            14.75,
+            15.0,
+            15.25,
+            15.5,
+            15.75,
+            16.0,
+            16.25,
+            16.5,
+            16.75,
+            17.0,
+            17.25,
+            17.5,
+            17.75,
+            18.0,
+            18.25,
+            18.5,
+            18.75,
+            19.0,
+            19.25,
+            19.5,
+            19.75,
+            20.0,
+            20.25,
+            20.5,
+            20.75,
+            21.0,
+            21.25,
+            21.5,
+            21.75,
+            22.0
+          ],
+          "max_iterations": 250,
+          "qpos_seed_rad": {
+            "segment_0_cell_0_y": 0.03731475678336127,
+            "segment_0_cell_0_z": 7.675615143595387e-11,
+            "segment_0_cell_10_y": -0.01892131967095381,
+            "segment_0_cell_10_z": 1.0430958920173842e-10,
+            "segment_0_cell_11_y": -0.021073462976193322,
+            "segment_0_cell_11_z": 9.338805491364096e-11,
+            "segment_0_cell_1_y": 0.036494509074381974,
+            "segment_0_cell_1_z": 9.371289968347947e-11,
+            "segment_0_cell_2_y": 0.033247092320502165,
+            "segment_0_cell_2_z": 1.0387697810762727e-10,
+            "segment_0_cell_3_y": 0.027814618861109665,
+            "segment_0_cell_3_z": 1.0661138125923152e-10,
+            "segment_0_cell_4_y": 0.02060054709927673,
+            "segment_0_cell_4_z": 1.0179452686588715e-10,
+            "segment_0_cell_5_y": 0.012137815283852998,
+            "segment_0_cell_5_z": 8.98331946732901e-11,
+            "segment_0_cell_6_y": 0.0030486855731298853,
+            "segment_0_cell_6_z": 7.162155507814482e-11,
+            "segment_0_cell_7_y": -0.0037302637794449332,
+            "segment_0_cell_7_z": 9.057599478301827e-11,
+            "segment_0_cell_8_y": -0.009915872017207231,
+            "segment_0_cell_8_z": 1.0281500186492193e-10,
+            "segment_0_cell_9_y": -0.015107598874689251,
+            "segment_0_cell_9_z": 1.0752133544110865e-10,
+            "segment_1_cell_0_y": -0.028029597607226286,
+            "segment_1_cell_0_z": 8.284509935719078e-11,
+            "segment_1_cell_10_y": -0.04155570258905938,
+            "segment_1_cell_10_z": 8.32385149167767e-11,
+            "segment_1_cell_11_y": -0.03865592639208023,
+            "segment_1_cell_11_z": 7.661399817371354e-11,
+            "segment_1_cell_1_y": -0.03345899255859549,
+            "segment_1_cell_1_z": 9.225334405758041e-11,
+            "segment_1_cell_2_y": -0.0369752822866657,
+            "segment_1_cell_2_z": 9.676834619073231e-11,
+            "segment_1_cell_3_y": -0.038388537886063064,
+            "segment_1_cell_3_z": 9.615724226063642e-11,
+            "segment_1_cell_4_y": -0.03762218256744623,
+            "segment_1_cell_4_z": 9.044716614546262e-11,
+            "segment_1_cell_5_y": -0.034718151397122275,
+            "segment_1_cell_5_z": 7.995509998520178e-11,
+            "segment_1_cell_6_y": -0.029834013678886908,
+            "segment_1_cell_6_z": 6.524180758514611e-11,
+            "segment_1_cell_7_y": -0.036187793632994195,
+            "segment_1_cell_7_z": 7.643797348821582e-11,
+            "segment_1_cell_8_y": -0.04029007332579885,
+            "segment_1_cell_8_z": 8.317005790794797e-11,
+            "segment_1_cell_9_y": -0.0421116161420968,
+            "segment_1_cell_9_z": 8.546957298806313e-11
+          },
+          "tensions_seed_n": {
+            "tendon_0": 1.7417744418888519,
+            "tendon_1": 3.341012457420033,
+            "tendon_2": 1.7417744357305274,
+            "tendon_3": 0.21
+          },
+          "tension_reference_n": {
+            "tendon_0": 4.0,
+            "tendon_1": 4.0,
+            "tendon_2": 4.0,
+            "tendon_3": 4.0
+          },
+          "tension_interior_margin_n": 0.01
+        },
+        "evidence": [
+          {
+            "artifact_id": "5bb8205923a19aa2f423c02d34e1a3907512b4078eb43827103bf196dfc273ed",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "The all-4 N initialization caused an inadmissible native optimizer trial and the call failed without a bank. Retain its charged 89-point allocation and actual failure. Retry from the previously computed time-zero equilibrium, perturbing only 0.2 N entries inward to 0.21 N; keep the narrower search box and all original native guards.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "charged_mathematical_evaluations": 89,
+        "maximum_position_error_m": 0.0006110494311492155,
+        "maximum_static_balance_inf_nm": 5.075230166684541e-12,
+        "physics_steps": 0,
+        "optimizer_success": false
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "f7dff6a0bd5ef4bed36c20d2cb9172a915dfe1fa61c8d48e7a360264d8adcbc6",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T04-223-select-exact-qualified-physical-execution-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl:30",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STUDY_TRACE.jsonl:31",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T04-223-select-exact-qualified-physical-execution",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "select",
+          "hypothesis": "Select the exact already publicly read current physical pass through selected_execution and exact selected_candidate. The previous optional duplicate supporting_evidence citation was rejected by the generic family zero-initialization comparability check. The owned qualified native initializer, original independent acceptance and exact-selection/read gates remain unchanged.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "SELECT",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": {
+              "artifact_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+              "media_type": "application/json"
+            },
+            "requested_budget": 0
+          },
+          "selected_execution": {
+            "artifact_id": "f9d19d368c9f183fab8f69ea8d984c97c0665dc67117cbcc46c7f245a4de5f8c",
+            "media_type": "application/json"
+          },
+          "experience_disposition": {
+            "expert-t04-history@1": "adopted",
+            "expert-t04-method-selection@1": "adopted",
+            "skill-native-equilibrium-reference@1": "adopted",
+            "skill-native-equilibrium-reference-bank@1": "adopted",
+            "expert-t04-phase-and-preload@1": "adopted"
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "f9d19d368c9f183fab8f69ea8d984c97c0665dc67117cbcc46c7f245a4de5f8c",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Select the exact already publicly read current physical pass through selected_execution and exact selected_candidate. The previous optional duplicate supporting_evidence citation was rejected by the generic family zero-initialization comparability check. The owned qualified native initializer, original independent acceptance and exact-selection/read gates remain unchanged.",
+        "cache": "new"
+      },
+      "recorded_output": {},
+      "output_artifact_ids": [
+        {
+          "artifact_id": "ed6ab88fc16fe23895100f1a82282f9b9ef73e9d3be5822eb0494194083927de",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STORE_RESEARCH\\physical_replay\\74dd1b67218445229d671467752dec2f\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    }
+  ],
+  "complete_indices": {
+    "candidates": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T04\\complete_candidate_index.csv",
+    "models": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T04\\complete_model_index.csv",
+    "decisions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T04\\complete_decision_index.csv",
+    "conditions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T04\\complete_condition_index.csv",
+    "source_index": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T04\\source_index.csv"
+  },
+  "separate_cost_sources": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T04_figure_eight_tracking\\COST_REPORT.json",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\COST_REPORT.json",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\COST_REPORT.json",
+    "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\COST_REPORT.json"
+  ],
+  "additional_experiments_separate_scope": [
+    {
+      "path": "D:\\softrobot-agent\\paper_experiments\\ab_batch1_20261114\\T04",
+      "role": "separate_method_or_run_reference_only; never combine with FULL outcomes"
+    }
+  ],
+  "known_missing": [
+    "Explicit contemporaneous observation/hypothesis fields are unavailable where the source only records a combined rationale.",
+    "Original XML or full dynamic state unavailable for some purely mathematical candidate trials; no geometry or state is fabricated."
+  ],
+  "render_policy": "Only original XML plus saved qpos/time. Visual models and screenshots are created separately by parent workflow.",
+  "provenance_policy": "Existing master CSV/JSON used only to locate Store artifacts; numeric final values extracted directly from original Store acceptance components.",
+  "representative_render_sources": [
+    {
+      "task_id": "T04",
+      "candidate_id": "2416054ea89bb460f34983204f4cfa352efa4d21e90266553ed5b0c82be85b49",
+      "store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STORE_RESEARCH\\platform.sqlite",
+      "execution_id": "74dd1b67218445229d671467752dec2f",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STORE_RESEARCH\\physical_replay\\74dd1b67218445229d671467752dec2f\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STORE_RESEARCH\\physical_replay\\74dd1b67218445229d671467752dec2f\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_02\\STORE_RESEARCH\\physical_replay\\74dd1b67218445229d671467752dec2f\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 22.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T04",
+      "candidate_id": "a2b86a9c493cbc5d15bc37f341f86ec0600f418522b41f8e8c8d3de8fc92884f",
+      "store": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\platform.sqlite",
+      "execution_id": "496aeda075dd4db4be66d809cc462ea0",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\STORE_RESEARCH\\physical_replay\\496aeda075dd4db4be66d809cc462ea0\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 22.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    }
+  ],
+  "route_change_evidence": {
+    "original_read_knowledge": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\KNOWLEDGE\\expert-t04-method-selection@1.json",
+    "original_bank_result": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\T04_RUN_03\\NATIVE_REFERENCE_BANK.json",
+    "original_gvs_execution_result": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\INITIAL_EXECUTION.json",
+    "original_gvs_xml": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\STORE_RESEARCH\\sessions\\codex-expert-T04-20261113-s1-exec-1951b2d6978f46d2\\executions\\6c99ff396613431295f31b855f96a20a\\backend\\robot.xml",
+    "original_gvs_initial_state": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\NATIVE_INITIAL_CONSTRUCTION.json",
+    "original_gvs_termination_record": "D:\\softrobot-agent\\paper_experiments\\five_task_completion_20261113\\T04_figure_eight_tracking\\SUPERSEDED_NMPC_TERMINATION_REQUEST.json",
+    "precise_interpretation": "The method-selection Knowledge explicitly records GVS NMPC as still running, with timed SoRoSim/PPO applicability gaps. Try native equilibrium feedforward was a prospective original choice. The superseded GVS run was later terminated after independent feedforward success; its incomplete run cannot supply a full tracking error or a completed failure comparison."
+  }
+}

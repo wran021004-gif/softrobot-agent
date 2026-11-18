@@ -1,0 +1,3304 @@
+{
+  "schema_version": "multitask_evidence_bundle_v1",
+  "task_id": "T08",
+  "task_name": "Passive Progressive-Stiffness Response",
+  "scope": "historical FULL method C; no new solver, optimizer or mj_step",
+  "actor_notice": "Codex surrogate / Codex expert formal trace; not a Main SDK experiment unless separate original evidence says so",
+  "editorial_note": "被动 P3、0 主动执行器，2 段 2 腱，每段 2 单元。唯一修改为两腱固定放绳偏置 1.5 → 1.8 mm；正负向受载和撤载回弹应分别显示。不能套用主动控制策略。保留 development_not_registered_SELECT，物理通过不升级为注册基准 SELECT。",
+  "source_stores": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite"
+  ],
+  "source_traces": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl"
+  ],
+  "final_conditions": [
+    {
+      "task_id": "T08",
+      "condition": "plus_x",
+      "run_id": "codex-surrogate-T08-20261112",
+      "candidate_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "internal_candidate_id": "core-658a3063ed8430c18810c1b723e06584d1807d1f92234645a60db8d3230723d1",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "candidate_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "configuration_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/7d62426b93328ec10d741a2deb837f024653b84abfbe3f1cb674d3c0bbb3af33",
+      "result_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/94482c41482419411b7a7e39d07d5f40e5fbb97b979cbfe00346c6a1050beeb0",
+      "raw_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/59fe9525177aa71e10103f32ed7eff17c1be3778a384a2185e27cc73482032e6",
+      "execution_id": "d8b294000d274e2b918ba1da44d4dc85",
+      "original_xml_files": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml"
+      ],
+      "recorded_state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml"
+        }
+      ],
+      "structure": {
+        "segments": 2,
+        "tendons": 2,
+        "actuators": 0,
+        "lengths_m": [
+          0.1,
+          0.1
+        ],
+        "young_pa": [
+          7000000.0,
+          7000000.0
+        ],
+        "cells": {
+          "segment_0": 2,
+          "segment_1": 2
+        },
+        "component_kind_counts": {
+          "flexible_segment": 2,
+          "guide": 1,
+          "rigid_connector": 1,
+          "payload": 1
+        }
+      },
+      "parameters": {
+        "control_weights": {},
+        "family_space_identity": "711460ba6ee003e5b9c2cd9da4751d6284387b81eab185ed6715c791da1e40ff",
+        "payout_offsets_m": {
+          "tendon_0": 0.0018,
+          "tendon_1": 0.0018
+        },
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 2,
+            "length_m": null,
+            "sections": null,
+            "young_pa": null
+          },
+          "1": {
+            "cells": 2,
+            "length_m": null,
+            "sections": null,
+            "young_pa": null
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 2,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 2,
+        "tendon_parameters": {},
+        "version": "serial_family_generation_v2"
+      },
+      "accepted": true,
+      "acceptance_metrics": {
+        "minus_x_high_maximum": 0.02250849035374532,
+        "minus_x_low_minimum": 0.007928066911447379,
+        "minus_x_paired_mechanism": 1.0,
+        "minus_x_residual_maximum": 6.858960174326618e-07,
+        "minus_x_slack_to_taut": 1.0,
+        "minus_x_stiffness_ratio": 1.631454749259155,
+        "no_contact": 0.0,
+        "plus_x_high_maximum": 0.022508490353744023,
+        "plus_x_low_minimum": 0.007928066911447334,
+        "plus_x_paired_mechanism": 1.0,
+        "plus_x_residual_maximum": 6.858960174692536e-07,
+        "plus_x_slack_to_taut": 1.0,
+        "plus_x_stiffness_ratio": 1.6314547492588845
+      },
+      "acceptance_components": {
+        "actual_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "all_load_cases": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "dynamic_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:minus_x_high_maximum": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.02250849035374532
+        },
+        "evaluator:minus_x_low_minimum": {
+          "limit": 0.006,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.007928066911447379
+        },
+        "evaluator:minus_x_paired_mechanism": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:minus_x_residual_maximum": {
+          "limit": 0.002,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 6.858960174326618e-07
+        },
+        "evaluator:minus_x_slack_to_taut": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:minus_x_stiffness_ratio": {
+          "limit": 1.5,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.631454749259155
+        },
+        "evaluator:no_contact": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:plus_x_high_maximum": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.022508490353744023
+        },
+        "evaluator:plus_x_low_minimum": {
+          "limit": 0.006,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.007928066911447334
+        },
+        "evaluator:plus_x_paired_mechanism": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:plus_x_residual_maximum": {
+          "limit": 0.002,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 6.858960174692536e-07
+        },
+        "evaluator:plus_x_slack_to_taut": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:plus_x_stiffness_ratio": {
+          "limit": 1.5,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.6314547492588845
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "initial_qualification": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "physical_source": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "stage_program": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_bounds": {
+          "limit": null,
+          "passed": true,
+          "reason": "Every frozen dynamic bound; no active tension-command substitute",
+          "unit": null,
+          "value": [
+            "minus_x_high_maximum",
+            "minus_x_low_minimum",
+            "minus_x_paired_mechanism",
+            "minus_x_residual_maximum",
+            "minus_x_slack_to_taut",
+            "minus_x_stiffness_ratio",
+            "no_contact",
+            "plus_x_high_maximum",
+            "plus_x_low_minimum",
+            "plus_x_paired_mechanism",
+            "plus_x_residual_maximum",
+            "plus_x_slack_to_taut",
+            "plus_x_stiffness_ratio"
+          ]
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "constraint_margins": null,
+      "resource_consumption_this_execution_only": {
+        "KKT_solves": 0,
+        "QP_calls": 0,
+        "attempted_steps": 1600000,
+        "constraint_calls": 4,
+        "constraint_jacobian_calls": 18,
+        "constraint_observations": 1600008,
+        "episodes_completed": 8,
+        "episodes_started": 8,
+        "equilibrium_solves": 1,
+        "gradient_calls": 18,
+        "hessian_columns": 8,
+        "integration_state_restores": 0,
+        "integration_state_saves": 48,
+        "material_point_jacobian_calls": 8375242,
+        "model_builds": 8,
+        "multiplier_fits": 0,
+        "native_forward_calls": 3430050,
+        "native_position_attempts": 1,
+        "native_position_calls": 1,
+        "objective_calls": 2,
+        "optimizer_iterations": 1,
+        "physics_steps": 1600000,
+        "route_checked_poses": 3200008,
+        "route_segment_body_checks": 179200448,
+        "static_balance_forwards": 230016,
+        "tendon_jacobian_extractions": 1600026
+      },
+      "evaluation_version": 1,
+      "implementation": "a77d79ebff870630d949de4149d3993773554781",
+      "task_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "initialization_provenance": {
+        "canonical_task_identity": "0edd28d321ea8afe8e117748bb27bb1f8204bf4ff009633ebebdde1325bee927",
+        "effective": {
+          "qpos_rad": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0
+          },
+          "qvel_rad_s": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "rule": "all_candidate_dofs_zero_v1"
+      }
+    },
+    {
+      "task_id": "T08",
+      "condition": "minus_x",
+      "run_id": "codex-surrogate-T08-20261112",
+      "candidate_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "internal_candidate_id": "core-658a3063ed8430c18810c1b723e06584d1807d1f92234645a60db8d3230723d1",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "candidate_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "configuration_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/7d62426b93328ec10d741a2deb837f024653b84abfbe3f1cb674d3c0bbb3af33",
+      "result_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/94482c41482419411b7a7e39d07d5f40e5fbb97b979cbfe00346c6a1050beeb0",
+      "raw_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite#artifacts/59fe9525177aa71e10103f32ed7eff17c1be3778a384a2185e27cc73482032e6",
+      "execution_id": "d8b294000d274e2b918ba1da44d4dc85",
+      "original_xml_files": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml"
+      ],
+      "recorded_state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "phase": "one post-step state per successful historical mj_step",
+          "stage_field": "stage",
+          "original_model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml"
+        }
+      ],
+      "structure": {
+        "segments": 2,
+        "tendons": 2,
+        "actuators": 0,
+        "lengths_m": [
+          0.1,
+          0.1
+        ],
+        "young_pa": [
+          7000000.0,
+          7000000.0
+        ],
+        "cells": {
+          "segment_0": 2,
+          "segment_1": 2
+        },
+        "component_kind_counts": {
+          "flexible_segment": 2,
+          "guide": 1,
+          "rigid_connector": 1,
+          "payload": 1
+        }
+      },
+      "parameters": {
+        "control_weights": {},
+        "family_space_identity": "711460ba6ee003e5b9c2cd9da4751d6284387b81eab185ed6715c791da1e40ff",
+        "payout_offsets_m": {
+          "tendon_0": 0.0018,
+          "tendon_1": 0.0018
+        },
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": 2,
+            "length_m": null,
+            "sections": null,
+            "young_pa": null
+          },
+          "1": {
+            "cells": 2,
+            "length_m": null,
+            "sections": null,
+            "young_pa": null
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 2,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.5707963267948966,
+            "radius_m": 0.018
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 2,
+        "tendon_parameters": {},
+        "version": "serial_family_generation_v2"
+      },
+      "accepted": true,
+      "acceptance_metrics": {
+        "minus_x_high_maximum": 0.02250849035374532,
+        "minus_x_low_minimum": 0.007928066911447379,
+        "minus_x_paired_mechanism": 1.0,
+        "minus_x_residual_maximum": 6.858960174326618e-07,
+        "minus_x_slack_to_taut": 1.0,
+        "minus_x_stiffness_ratio": 1.631454749259155,
+        "no_contact": 0.0,
+        "plus_x_high_maximum": 0.022508490353744023,
+        "plus_x_low_minimum": 0.007928066911447334,
+        "plus_x_paired_mechanism": 1.0,
+        "plus_x_residual_maximum": 6.858960174692536e-07,
+        "plus_x_slack_to_taut": 1.0,
+        "plus_x_stiffness_ratio": 1.6314547492588845
+      },
+      "acceptance_components": {
+        "actual_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "all_load_cases": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "dynamic_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": "valid"
+        },
+        "evaluator:minus_x_high_maximum": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.02250849035374532
+        },
+        "evaluator:minus_x_low_minimum": {
+          "limit": 0.006,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.007928066911447379
+        },
+        "evaluator:minus_x_paired_mechanism": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:minus_x_residual_maximum": {
+          "limit": 0.002,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 6.858960174326618e-07
+        },
+        "evaluator:minus_x_slack_to_taut": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:minus_x_stiffness_ratio": {
+          "limit": 1.5,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.631454749259155
+        },
+        "evaluator:no_contact": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:plus_x_high_maximum": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.022508490353744023
+        },
+        "evaluator:plus_x_low_minimum": {
+          "limit": 0.006,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.007928066911447334
+        },
+        "evaluator:plus_x_paired_mechanism": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:plus_x_residual_maximum": {
+          "limit": 0.002,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 6.858960174692536e-07
+        },
+        "evaluator:plus_x_slack_to_taut": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:plus_x_stiffness_ratio": {
+          "limit": 1.5,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.6314547492588845
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "initial_qualification": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "physical_source": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "stage_program": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_bounds": {
+          "limit": null,
+          "passed": true,
+          "reason": "Every frozen dynamic bound; no active tension-command substitute",
+          "unit": null,
+          "value": [
+            "minus_x_high_maximum",
+            "minus_x_low_minimum",
+            "minus_x_paired_mechanism",
+            "minus_x_residual_maximum",
+            "minus_x_slack_to_taut",
+            "minus_x_stiffness_ratio",
+            "no_contact",
+            "plus_x_high_maximum",
+            "plus_x_low_minimum",
+            "plus_x_paired_mechanism",
+            "plus_x_residual_maximum",
+            "plus_x_slack_to_taut",
+            "plus_x_stiffness_ratio"
+          ]
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "constraint_margins": null,
+      "resource_consumption_this_execution_only": {
+        "KKT_solves": 0,
+        "QP_calls": 0,
+        "attempted_steps": 1600000,
+        "constraint_calls": 4,
+        "constraint_jacobian_calls": 18,
+        "constraint_observations": 1600008,
+        "episodes_completed": 8,
+        "episodes_started": 8,
+        "equilibrium_solves": 1,
+        "gradient_calls": 18,
+        "hessian_columns": 8,
+        "integration_state_restores": 0,
+        "integration_state_saves": 48,
+        "material_point_jacobian_calls": 8375242,
+        "model_builds": 8,
+        "multiplier_fits": 0,
+        "native_forward_calls": 3430050,
+        "native_position_attempts": 1,
+        "native_position_calls": 1,
+        "objective_calls": 2,
+        "optimizer_iterations": 1,
+        "physics_steps": 1600000,
+        "route_checked_poses": 3200008,
+        "route_segment_body_checks": 179200448,
+        "static_balance_forwards": 230016,
+        "tendon_jacobian_extractions": 1600026
+      },
+      "evaluation_version": 1,
+      "implementation": "a77d79ebff870630d949de4149d3993773554781",
+      "task_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "initialization_provenance": {
+        "canonical_task_identity": "0edd28d321ea8afe8e117748bb27bb1f8204bf4ff009633ebebdde1325bee927",
+        "effective": {
+          "qpos_rad": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0
+          },
+          "qvel_rad_s": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "rule": "all_candidate_dofs_zero_v1"
+      }
+    }
+  ],
+  "selected_node_evidence": [
+    {
+      "node_id": "T08-002-generate-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:4",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:5",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T08-002-generate",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "generate",
+          "hypothesis": "A symmetric opposing route can engage under either load direction after an initially slack response.",
+          "expected_observation": "A legal passive design with no active channels.",
+          "weakening_observation": "Illegal routing, missing passive payout or a failed structural admission.",
+          "fixed_conditions": "Original P3 source protocol, task seed, original geometry/material domains and no active control.",
+          "stopping_condition": "One new cold candidate.",
+          "interpretation": "Construction establishes no task performance.",
+          "generation": {
+            "version": "serial_family_generation_v2",
+            "family_space_identity": "711460ba6ee003e5b9c2cd9da4751d6284387b81eab185ed6715c791da1e40ff",
+            "segment_count": 2,
+            "tendon_count": 2,
+            "segments": {
+              "0": {
+                "cells": 2
+              },
+              "1": {
+                "cells": 2
+              }
+            },
+            "spans": [
+              {
+                "first_segment": 0,
+                "last_segment": 1,
+                "count": 2,
+                "phase_rad": 1.5707963267948966,
+                "radius_m": 0.018,
+                "guide_s": [
+                  0.5
+                ],
+                "anchor_s": 1.0
+              }
+            ],
+            "payout_offsets_m": {
+              "tendon_0": 0.0015,
+              "tendon_1": 0.0015
+            }
+          }
+        },
+        "reason": "Cold passive construction from the original space and typed original payout bounds.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "generated",
+        "candidate": {
+          "artifact_id": "e204a256575b9c22c8abc38c870fb0a1d6cdf80c895d2f1895eb404632737ff6",
+          "media_type": "application/json"
+        }
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "82319fa353fe8d55f4ea330eb2b21d52a0a2bda10a48dbc5bcc1adced61097e9",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\baseline\\passive.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T08-006-generate-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:12",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:13",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T08-006-generate",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "generate",
+          "hypothesis": "A modest delay of tendon engagement can increase late-to-early interval stiffness ratio while retaining low compliance and the high displacement bound.",
+          "expected_observation": "A legal passive design with no active channels.",
+          "weakening_observation": "Illegal routing, missing passive payout or a failed structural admission.",
+          "fixed_conditions": "Original P3 source protocol, task seed, original geometry/material domains and no active control.",
+          "stopping_condition": "One new cold candidate.",
+          "interpretation": "Only payout offsets change; the causal hypothesis requires a new physical test.",
+          "generation": {
+            "version": "serial_family_generation_v2",
+            "family_space_identity": "711460ba6ee003e5b9c2cd9da4751d6284387b81eab185ed6715c791da1e40ff",
+            "segment_count": 2,
+            "tendon_count": 2,
+            "segments": {
+              "0": {
+                "cells": 2
+              },
+              "1": {
+                "cells": 2
+              }
+            },
+            "spans": [
+              {
+                "first_segment": 0,
+                "last_segment": 1,
+                "count": 2,
+                "phase_rad": 1.5707963267948966,
+                "radius_m": 0.018,
+                "guide_s": [
+                  0.5
+                ],
+                "anchor_s": 1.0
+              }
+            ],
+            "payout_offsets_m": {
+              "tendon_0": 0.0018,
+              "tendon_1": 0.0018
+            }
+          },
+          "supporting_evidence": [
+            {
+              "artifact_id": "543df0325ac2338e0cdb182a15b32e841a2f2def50be5ddc6010b1844a37235d",
+              "media_type": "application/json"
+            }
+          ]
+        },
+        "reason": "Cold passive construction from the original space and typed original payout bounds.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "generated",
+        "candidate": {
+          "artifact_id": "bca367320313f088af99417da17cb55e04362532109e0be80587c7e65b00e8bd",
+          "media_type": "application/json"
+        }
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "aa795c21e55038e8aa829c21e6d66015947ac624b8fa5a0d146a0522ddeec33d",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\baseline\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T08-008-physical-pair-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:16",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:17",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T08-008-physical-pair",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "physical_replay",
+          "hypothesis": "The cold opposing fixed-payout tendons remain slack at low force and engage at high force in both directions.",
+          "expected_observation": "Complete stable source-program traces and a measurable paired mechanism on the same structure.",
+          "weakening_observation": "Insufficient low compliance, early engagement, high displacement, residual, instability or route failure.",
+          "fixed_conditions": "Original source P3 protocol, same new design, no active controller; only the source-required tendon-limit intervention differs in the paired arm.",
+          "stopping_condition": "One full paired attempt within the 24-episode and 8,000,000-attempt bounds.",
+          "interpretation": "Physical results determine feasibility; neither construction nor static KKT alone establishes a task pass.",
+          "physical_replay": {
+            "candidate": {
+              "artifact_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+              "media_type": "application/json"
+            },
+            "passive_ablation": [
+              "tendon_0",
+              "tendon_1"
+            ]
+          },
+          "decision": {
+            "hypothesis_id": "T08-cold-symmetric-engagement",
+            "research_intent": "PHYSICAL_VALIDATION",
+            "selected_method": "registered_passive_source_program_pair",
+            "selected_candidate": {
+              "artifact_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+              "media_type": "application/json"
+            },
+            "requested_budget": 4
+          },
+          "supporting_evidence": [
+            {
+              "artifact_id": "543df0325ac2338e0cdb182a15b32e841a2f2def50be5ddc6010b1844a37235d",
+              "media_type": "application/json"
+            }
+          ]
+        },
+        "evidence": [
+          {
+            "artifact_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Evaluate the first new passive candidate with original bilateral loading and required mechanism pair.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "evaluated",
+        "acceptance": {
+          "accepted": null,
+          "components": {
+            "actual_constraints": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "all_load_cases": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "dynamic_sampling": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "evaluation_validity": {
+              "limit": null,
+              "passed": false,
+              "reason": null,
+              "unit": null,
+              "value": "incomplete"
+            },
+            "evaluator:minus_x_high_maximum": {
+              "limit": 0.025,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.02250849035374532
+            },
+            "evaluator:minus_x_low_minimum": {
+              "limit": 0.006,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007928066911447379
+            },
+            "evaluator:minus_x_paired_mechanism": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.0
+            },
+            "evaluator:minus_x_residual_maximum": {
+              "limit": 0.002,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 6.858960174326618e-07
+            },
+            "evaluator:minus_x_slack_to_taut": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.0
+            },
+            "evaluator:minus_x_stiffness_ratio": {
+              "limit": 1.5,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.631454749259155
+            },
+            "evaluator:no_contact": {
+              "limit": 0.0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0.0
+            },
+            "evaluator:plus_x_high_maximum": {
+              "limit": 0.025,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.022508490353744023
+            },
+            "evaluator:plus_x_low_minimum": {
+              "limit": 0.006,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007928066911447334
+            },
+            "evaluator:plus_x_paired_mechanism": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.0
+            },
+            "evaluator:plus_x_residual_maximum": {
+              "limit": 0.002,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 6.858960174692536e-07
+            },
+            "evaluator:plus_x_slack_to_taut": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.0
+            },
+            "evaluator:plus_x_stiffness_ratio": {
+              "limit": 1.5,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.6314547492588845
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "initial_qualification": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "physical_source": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "stage_program": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "task_bounds": {
+              "limit": null,
+              "passed": null,
+              "reason": "Every frozen dynamic bound; no active tension-command substitute",
+              "unit": null,
+              "value": [
+                "minus_x_high_maximum",
+                "minus_x_low_minimum",
+                "minus_x_paired_mechanism",
+                "minus_x_residual_maximum",
+                "minus_x_slack_to_taut",
+                "minus_x_stiffness_ratio",
+                "no_contact",
+                "plus_x_high_maximum",
+                "plus_x_low_minimum",
+                "plus_x_paired_mechanism",
+                "plus_x_residual_maximum",
+                "plus_x_slack_to_taut",
+                "plus_x_stiffness_ratio"
+              ]
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": null,
+              "reason": null,
+              "unit": null,
+              "value": null
+            }
+          },
+          "constraint_observations": [
+            {
+              "bound": 0.006,
+              "bound_type": "lower",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_low_minimum",
+              "frame": "world",
+              "load_condition": "plus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.006,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.3213444852412222,
+              "observed_value": 0.007928066911447334,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.0019280669114473334,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_low_minimum",
+              "time_window": [
+                7.75,
+                8.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.025,
+              "bound_type": "upper",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_high_maximum",
+              "frame": "world",
+              "load_condition": "plus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.025,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.09966038585023915,
+              "observed_value": 0.022508490353744023,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.0024915096462559787,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_high_maximum",
+              "time_window": [
+                15.75,
+                16.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.002,
+              "bound_type": "upper",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_residual_maximum",
+              "frame": "world",
+              "load_condition": "plus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.002,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.9996570519912654,
+              "observed_value": 6.858960174692536e-07,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.001999314103982531,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_residual_maximum",
+              "time_window": [
+                19.75,
+                20.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.006,
+              "bound_type": "lower",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_low_minimum",
+              "frame": "world",
+              "load_condition": "minus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.006,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.3213444852412297,
+              "observed_value": 0.007928066911447379,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.0019280669114473785,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_low_minimum",
+              "time_window": [
+                7.75,
+                8.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.025,
+              "bound_type": "upper",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_high_maximum",
+              "frame": "world",
+              "load_condition": "minus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.025,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.09966038585018724,
+              "observed_value": 0.02250849035374532,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.002491509646254681,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_high_maximum",
+              "time_window": [
+                15.75,
+                16.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.002,
+              "bound_type": "upper",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_residual_maximum",
+              "frame": "world",
+              "load_condition": "minus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.002,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.9996570519912836,
+              "observed_value": 6.858960174326618e-07,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.001999314103982567,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_residual_maximum",
+              "time_window": [
+                19.75,
+                20.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 1.5,
+              "bound_type": "lower",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_stiffness_ratio",
+              "measurement_status": "PASS",
+              "normalization_scale": 1.5,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.08763649950592296,
+              "observed_value": 1.6314547492588845,
+              "passed": true,
+              "signal": "stiffness_ratio",
+              "signed_violation": -0.13145474925888445,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_stiffness_ratio",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1,
+              "bound_type": "lower",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_slack_to_taut",
+              "measurement_status": "PASS",
+              "normalization_scale": 1,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": 0.0,
+              "observed_value": 1.0,
+              "passed": true,
+              "signal": "slack_to_taut",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_slack_to_taut",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1,
+              "bound_type": "lower",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_paired_mechanism",
+              "measurement_status": "PASS",
+              "normalization_scale": 1,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": 0.0,
+              "observed_value": 1.0,
+              "passed": true,
+              "signal": "paired_mechanism",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_paired_mechanism",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1.5,
+              "bound_type": "lower",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_stiffness_ratio",
+              "measurement_status": "PASS",
+              "normalization_scale": 1.5,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.08763649950610326,
+              "observed_value": 1.631454749259155,
+              "passed": true,
+              "signal": "stiffness_ratio",
+              "signed_violation": -0.1314547492591549,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_stiffness_ratio",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1,
+              "bound_type": "lower",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_slack_to_taut",
+              "measurement_status": "PASS",
+              "normalization_scale": 1,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": 0.0,
+              "observed_value": 1.0,
+              "passed": true,
+              "signal": "slack_to_taut",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_slack_to_taut",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1,
+              "bound_type": "lower",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_paired_mechanism",
+              "measurement_status": "PASS",
+              "normalization_scale": 1,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": 0.0,
+              "observed_value": 1.0,
+              "passed": true,
+              "signal": "paired_mechanism",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_paired_mechanism",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 0,
+              "bound_type": "upper",
+              "condition_id": "all_load_conditions",
+              "constraint_id": "evaluator:no_contact",
+              "measurement_status": "PASS",
+              "normalization_scale": null,
+              "normalization_source": null,
+              "normalized_violation": null,
+              "observed_value": 0.0,
+              "passed": true,
+              "signal": "maximum_contacts",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:no_contact",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "count"
+            }
+          ],
+          "continuous_time_guarantee": false,
+          "contract": "research.task_acceptance",
+          "evaluator_tension_channels": null,
+          "evidence_binding": {
+            "evaluation": {
+              "artifact_id": "ff0b6ddea76c795687bc16c844d85c3ca03f306fb44db7ecac89a9dbe19c9737",
+              "media_type": "application/json"
+            },
+            "evaluation_binding": {
+              "original_execution_id": null,
+              "source": {
+                "artifact_id": "333d005f70d298d84a56d6660c4da400297f623b7edd63e71f20287a98c22a06",
+                "media_type": "application/json"
+              },
+              "source_execution_id": null
+            },
+            "profile": {
+              "artifact_id": "09ba37f827d8adf5346df3e0244f235eee6afdf478151c8958dde8764629a6d6",
+              "media_type": "application/json"
+            },
+            "profile_binding": {
+              "evaluation": {
+                "artifact_id": "ff0b6ddea76c795687bc16c844d85c3ca03f306fb44db7ecac89a9dbe19c9737",
+                "media_type": "application/json"
+              },
+              "execution_id": "264bc9e9edaa49b3b14bcd01de3d9c94",
+              "simulation": {
+                "artifact_id": "333d005f70d298d84a56d6660c4da400297f623b7edd63e71f20287a98c22a06",
+                "media_type": "application/json"
+              }
+            },
+            "simulation": {
+              "artifact_id": "333d005f70d298d84a56d6660c4da400297f623b7edd63e71f20287a98c22a06",
+              "media_type": "application/json"
+            }
+          },
+          "execution_id": "264bc9e9edaa49b3b14bcd01de3d9c94",
+          "issues": [],
+          "metrics": {
+            "minus_x_high_maximum": 0.02250849035374532,
+            "minus_x_low_minimum": 0.007928066911447379,
+            "minus_x_paired_mechanism": 1.0,
+            "minus_x_residual_maximum": 6.858960174326618e-07,
+            "minus_x_slack_to_taut": 1.0,
+            "minus_x_stiffness_ratio": 1.631454749259155,
+            "no_contact": 0.0,
+            "plus_x_high_maximum": 0.022508490353744023,
+            "plus_x_low_minimum": 0.007928066911447334,
+            "plus_x_paired_mechanism": 1.0,
+            "plus_x_residual_maximum": 6.858960174692536e-07,
+            "plus_x_slack_to_taut": 1.0,
+            "plus_x_stiffness_ratio": 1.6314547492588845
+          },
+          "missing": [
+            "task_evaluator",
+            "task_bounds"
+          ],
+          "protocol_id": "offline_passive_response_v2",
+          "sources": {
+            "evaluation": {
+              "artifact_id": "ff0b6ddea76c795687bc16c844d85c3ca03f306fb44db7ecac89a9dbe19c9737",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "09ba37f827d8adf5346df3e0244f235eee6afdf478151c8958dde8764629a6d6",
+              "media_type": "application/json"
+            }
+          },
+          "status": "incomplete",
+          "task_family": "task.passive_response",
+          "task_identity": "d031cb2f20fe48501b218158207bae1da71030a441973ec02c7b41324bae2d87",
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 20.0,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": 605.4364299000008,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.000125
+          },
+          "version": "1.0.0"
+        },
+        "candidate": {
+          "artifact_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "e3f4812380898408cc92ca97d7fcc84fa2c25155927b2b8dd908a0f4dd509e9f",
+          "media_type": "application/json"
+        },
+        "source_reference": {
+          "artifact_id": "8ff98a8689485ca0ea612e26f0675a61c8de61051f832e3fd567415756dd7710",
+          "media_type": "application/json"
+        },
+        "execution_id": "264bc9e9edaa49b3b14bcd01de3d9c94"
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "bbc1faaedad30b944bedad3313bb56c95ea40dd6f1371ee459e796c5aea4dfca",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\baseline\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T08-009-independent-confirmation-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:18",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:19",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T08-009-independent-confirmation",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "physical_replay",
+          "hypothesis": "The newly measured1.631 bilateral stiffness ratio and all original bounds survive the complete frozen independent numerical confirmation.",
+          "expected_observation": "Complete stable source-program traces and a measurable paired mechanism on the same structure.",
+          "weakening_observation": "Insufficient low compliance, early engagement, high displacement, residual, instability or route failure.",
+          "fixed_conditions": "Original source P3 protocol, same new design, no active controller; only the source-required tendon-limit intervention differs in the paired arm.",
+          "stopping_condition": "One original complete confirmation scope; stop immediately on a formal pass, otherwise retain failure and remaining budget.",
+          "interpretation": "Physical results determine feasibility; neither construction nor static KKT alone establishes a task pass.",
+          "physical_replay": {
+            "candidate": {
+              "artifact_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+              "media_type": "application/json"
+            },
+            "validation_source": {
+              "artifact_id": "e3f4812380898408cc92ca97d7fcc84fa2c25155927b2b8dd908a0f4dd509e9f",
+              "media_type": "application/json"
+            }
+          },
+          "decision": {
+            "hypothesis_id": "T08-cold-symmetric-engagement",
+            "research_intent": "PHYSICAL_VALIDATION",
+            "selected_method": "registered_passive_source_program_pair",
+            "selected_candidate": {
+              "artifact_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+              "media_type": "application/json"
+            },
+            "requested_budget": 8
+          },
+          "supporting_evidence": [
+            {
+              "artifact_id": "e3f4812380898408cc92ca97d7fcc84fa2c25155927b2b8dd908a0f4dd509e9f",
+              "media_type": "application/json"
+            }
+          ]
+        },
+        "evidence": [
+          {
+            "artifact_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "e3f4812380898408cc92ca97d7fcc84fa2c25155927b2b8dd908a0f4dd509e9f",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Evaluate the first new passive candidate with original bilateral loading and required mechanism pair.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "evaluated",
+        "acceptance": {
+          "accepted": true,
+          "components": {
+            "actual_constraints": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "all_load_cases": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "dynamic_sampling": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": "valid"
+            },
+            "evaluator:minus_x_high_maximum": {
+              "limit": 0.025,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.02250849035374532
+            },
+            "evaluator:minus_x_low_minimum": {
+              "limit": 0.006,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007928066911447379
+            },
+            "evaluator:minus_x_paired_mechanism": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.0
+            },
+            "evaluator:minus_x_residual_maximum": {
+              "limit": 0.002,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 6.858960174326618e-07
+            },
+            "evaluator:minus_x_slack_to_taut": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.0
+            },
+            "evaluator:minus_x_stiffness_ratio": {
+              "limit": 1.5,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.631454749259155
+            },
+            "evaluator:no_contact": {
+              "limit": 0.0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0.0
+            },
+            "evaluator:plus_x_high_maximum": {
+              "limit": 0.025,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.022508490353744023
+            },
+            "evaluator:plus_x_low_minimum": {
+              "limit": 0.006,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.007928066911447334
+            },
+            "evaluator:plus_x_paired_mechanism": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.0
+            },
+            "evaluator:plus_x_residual_maximum": {
+              "limit": 0.002,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 6.858960174692536e-07
+            },
+            "evaluator:plus_x_slack_to_taut": {
+              "limit": 1.0,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.0
+            },
+            "evaluator:plus_x_stiffness_ratio": {
+              "limit": 1.5,
+              "passed": true,
+              "reason": null,
+              "unit": "1",
+              "value": 1.6314547492588845
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "initial_qualification": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "physical_source": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "solver_errors": {
+              "limit": 0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0
+            },
+            "stage_program": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "task_bounds": {
+              "limit": null,
+              "passed": true,
+              "reason": "Every frozen dynamic bound; no active tension-command substitute",
+              "unit": null,
+              "value": [
+                "minus_x_high_maximum",
+                "minus_x_low_minimum",
+                "minus_x_paired_mechanism",
+                "minus_x_residual_maximum",
+                "minus_x_slack_to_taut",
+                "minus_x_stiffness_ratio",
+                "no_contact",
+                "plus_x_high_maximum",
+                "plus_x_low_minimum",
+                "plus_x_paired_mechanism",
+                "plus_x_residual_maximum",
+                "plus_x_slack_to_taut",
+                "plus_x_stiffness_ratio"
+              ]
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "constraint_observations": [
+            {
+              "bound": 0.006,
+              "bound_type": "lower",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_low_minimum",
+              "frame": "world",
+              "load_condition": "plus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.006,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.3213444852412222,
+              "observed_value": 0.007928066911447334,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.0019280669114473334,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_low_minimum",
+              "time_window": [
+                7.75,
+                8.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.025,
+              "bound_type": "upper",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_high_maximum",
+              "frame": "world",
+              "load_condition": "plus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.025,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.09966038585023915,
+              "observed_value": 0.022508490353744023,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.0024915096462559787,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_high_maximum",
+              "time_window": [
+                15.75,
+                16.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.002,
+              "bound_type": "upper",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_residual_maximum",
+              "frame": "world",
+              "load_condition": "plus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.002,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.9996570519912654,
+              "observed_value": 6.858960174692536e-07,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.001999314103982531,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_residual_maximum",
+              "time_window": [
+                19.75,
+                20.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.006,
+              "bound_type": "lower",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_low_minimum",
+              "frame": "world",
+              "load_condition": "minus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.006,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.3213444852412297,
+              "observed_value": 0.007928066911447379,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.0019280669114473785,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_low_minimum",
+              "time_window": [
+                7.75,
+                8.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.025,
+              "bound_type": "upper",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_high_maximum",
+              "frame": "world",
+              "load_condition": "minus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.025,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.09966038585018724,
+              "observed_value": 0.02250849035374532,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.002491509646254681,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_high_maximum",
+              "time_window": [
+                15.75,
+                16.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 0.002,
+              "bound_type": "upper",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_residual_maximum",
+              "frame": "world",
+              "load_condition": "minus_x",
+              "material_s": 0.7,
+              "measurement_status": "PASS",
+              "normalization_scale": 0.002,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.9996570519912836,
+              "observed_value": 6.858960174326618e-07,
+              "passed": true,
+              "signal": "material_displacement",
+              "signed_violation": -0.001999314103982567,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_residual_maximum",
+              "time_window": [
+                19.75,
+                20.0
+              ],
+              "unit": "m"
+            },
+            {
+              "bound": 1.5,
+              "bound_type": "lower",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_stiffness_ratio",
+              "measurement_status": "PASS",
+              "normalization_scale": 1.5,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.08763649950592296,
+              "observed_value": 1.6314547492588845,
+              "passed": true,
+              "signal": "stiffness_ratio",
+              "signed_violation": -0.13145474925888445,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_stiffness_ratio",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1,
+              "bound_type": "lower",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_slack_to_taut",
+              "measurement_status": "PASS",
+              "normalization_scale": 1,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": 0.0,
+              "observed_value": 1.0,
+              "passed": true,
+              "signal": "slack_to_taut",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_slack_to_taut",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1,
+              "bound_type": "lower",
+              "condition_id": "plus_x",
+              "constraint_id": "evaluator:plus_x_paired_mechanism",
+              "measurement_status": "PASS",
+              "normalization_scale": 1,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": 0.0,
+              "observed_value": 1.0,
+              "passed": true,
+              "signal": "paired_mechanism",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:plus_x_paired_mechanism",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1.5,
+              "bound_type": "lower",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_stiffness_ratio",
+              "measurement_status": "PASS",
+              "normalization_scale": 1.5,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": -0.08763649950610326,
+              "observed_value": 1.631454749259155,
+              "passed": true,
+              "signal": "stiffness_ratio",
+              "signed_violation": -0.1314547492591549,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_stiffness_ratio",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1,
+              "bound_type": "lower",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_slack_to_taut",
+              "measurement_status": "PASS",
+              "normalization_scale": 1,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": 0.0,
+              "observed_value": 1.0,
+              "passed": true,
+              "signal": "slack_to_taut",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_slack_to_taut",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 1,
+              "bound_type": "lower",
+              "condition_id": "minus_x",
+              "constraint_id": "evaluator:minus_x_paired_mechanism",
+              "measurement_status": "PASS",
+              "normalization_scale": 1,
+              "normalization_source": "absolute_frozen_bound",
+              "normalized_violation": 0.0,
+              "observed_value": 1.0,
+              "passed": true,
+              "signal": "paired_mechanism",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:minus_x_paired_mechanism",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "1"
+            },
+            {
+              "bound": 0,
+              "bound_type": "upper",
+              "condition_id": "all_load_conditions",
+              "constraint_id": "evaluator:no_contact",
+              "measurement_status": "PASS",
+              "normalization_scale": null,
+              "normalization_source": null,
+              "normalized_violation": null,
+              "observed_value": 0.0,
+              "passed": true,
+              "signal": "maximum_contacts",
+              "signed_violation": 0.0,
+              "source_pointer": "/acceptance/components/evaluator:no_contact",
+              "time_window": [
+                0.0,
+                20.0
+              ],
+              "unit": "count"
+            }
+          ],
+          "continuous_time_guarantee": false,
+          "contract": "research.task_acceptance",
+          "evaluator_tension_channels": null,
+          "evidence_binding": {
+            "evaluation": {
+              "artifact_id": "3a0e992883817d30f0a762fc7111b998bd4ba39dbc6505fe7e2a4c8de841db13",
+              "media_type": "application/json"
+            },
+            "evaluation_binding": {
+              "original_execution_id": null,
+              "source": {
+                "artifact_id": "59fe9525177aa71e10103f32ed7eff17c1be3778a384a2185e27cc73482032e6",
+                "media_type": "application/json"
+              },
+              "source_execution_id": null
+            },
+            "profile": {
+              "artifact_id": "a34a6b29e2ed127f120d06eded0591d7b3784c3fe2744daa5916e63adb09af15",
+              "media_type": "application/json"
+            },
+            "profile_binding": {
+              "evaluation": {
+                "artifact_id": "3a0e992883817d30f0a762fc7111b998bd4ba39dbc6505fe7e2a4c8de841db13",
+                "media_type": "application/json"
+              },
+              "execution_id": "d8b294000d274e2b918ba1da44d4dc85",
+              "simulation": {
+                "artifact_id": "59fe9525177aa71e10103f32ed7eff17c1be3778a384a2185e27cc73482032e6",
+                "media_type": "application/json"
+              }
+            },
+            "simulation": {
+              "artifact_id": "59fe9525177aa71e10103f32ed7eff17c1be3778a384a2185e27cc73482032e6",
+              "media_type": "application/json"
+            }
+          },
+          "execution_id": "d8b294000d274e2b918ba1da44d4dc85",
+          "issues": [],
+          "metrics": {
+            "minus_x_high_maximum": 0.02250849035374532,
+            "minus_x_low_minimum": 0.007928066911447379,
+            "minus_x_paired_mechanism": 1.0,
+            "minus_x_residual_maximum": 6.858960174326618e-07,
+            "minus_x_slack_to_taut": 1.0,
+            "minus_x_stiffness_ratio": 1.631454749259155,
+            "no_contact": 0.0,
+            "plus_x_high_maximum": 0.022508490353744023,
+            "plus_x_low_minimum": 0.007928066911447334,
+            "plus_x_paired_mechanism": 1.0,
+            "plus_x_residual_maximum": 6.858960174692536e-07,
+            "plus_x_slack_to_taut": 1.0,
+            "plus_x_stiffness_ratio": 1.6314547492588845
+          },
+          "missing": [],
+          "protocol_id": "offline_passive_response_v2",
+          "sources": {
+            "evaluation": {
+              "artifact_id": "3a0e992883817d30f0a762fc7111b998bd4ba39dbc6505fe7e2a4c8de841db13",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "a34a6b29e2ed127f120d06eded0591d7b3784c3fe2744daa5916e63adb09af15",
+              "media_type": "application/json"
+            }
+          },
+          "status": "accepted",
+          "task_family": "task.passive_response",
+          "task_identity": "d031cb2f20fe48501b218158207bae1da71030a441973ec02c7b41324bae2d87",
+          "timing": {
+            "control_period_s": 0.01,
+            "deadline_misses": null,
+            "duration_s": 20.0,
+            "mean_update_s": null,
+            "real_time_demonstrated": null,
+            "real_time_required": false,
+            "sample_period_s": 0.01,
+            "simulation_wall_s": 2535.815360700006,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.000125
+          },
+          "version": "1.0.0"
+        },
+        "candidate": {
+          "artifact_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "94482c41482419411b7a7e39d07d5f40e5fbb97b979cbfe00346c6a1050beeb0",
+          "media_type": "application/json"
+        },
+        "source_reference": {
+          "artifact_id": "01f0f485b44baa9ca9cdfea08bf9a9cff285eff1ec557781303c07d6bf771f16",
+          "media_type": "application/json"
+        },
+        "execution_id": "d8b294000d274e2b918ba1da44d4dc85"
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "0248d06e607fe76f0ae222153247206622633955e9d9c52ddaf744f12b815762",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\baseline\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T08-011-classification-preserving-stop-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:22",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STUDY_TRACE.jsonl:23",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T08-011-classification-preserving-stop",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "stop",
+          "hypothesis": "The fresh complete original P3 confirmation is accepted with every component passed and no missing evidence. Both stiffness ratios are1.631, high displacements22.51mm and residuals below1micrometre. Stop after preserving all three physical results,2.88million attempted successful steps and the original development_not_registered_SELECT classification; do not promote a benchmark SELECT.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "543df0325ac2338e0cdb182a15b32e841a2f2def50be5ddc6010b1844a37235d",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "e3f4812380898408cc92ca97d7fcc84fa2c25155927b2b8dd908a0f4dd509e9f",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "94482c41482419411b7a7e39d07d5f40e5fbb97b979cbfe00346c6a1050beeb0",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "STOP",
+            "selected_method": "source_classification_preserving_stop",
+            "selected_candidate": null,
+            "requested_budget": 0
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "543df0325ac2338e0cdb182a15b32e841a2f2def50be5ddc6010b1844a37235d",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "e3f4812380898408cc92ca97d7fcc84fa2c25155927b2b8dd908a0f4dd509e9f",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "94482c41482419411b7a7e39d07d5f40e5fbb97b979cbfe00346c6a1050beeb0",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "The fresh complete original P3 confirmation is accepted with every component passed and no missing evidence. Both stiffness ratios are1.631, high displacements22.51mm and residuals below1micrometre. Stop after preserving all three physical results,2.88million attempted successful steps and the original development_not_registered_SELECT classification; do not promote a benchmark SELECT.",
+        "cache": "new"
+      },
+      "recorded_output": {},
+      "output_artifact_ids": [
+        {
+          "artifact_id": "2b977887cb0618a94f51bf8e66cd1607b1a94b611e10659652e737b20d4ac3e9",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\baseline\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    }
+  ],
+  "complete_indices": {
+    "candidates": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T08\\complete_candidate_index.csv",
+    "models": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T08\\complete_model_index.csv",
+    "decisions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T08\\complete_decision_index.csv",
+    "conditions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T08\\complete_condition_index.csv",
+    "source_index": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T08\\source_index.csv"
+  },
+  "separate_cost_sources": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\COST_REPORT.json"
+  ],
+  "additional_experiments_separate_scope": [
+    {
+      "path": "D:\\softrobot-agent\\paper_experiments\\ab_batch2_20261114\\T08",
+      "role": "separate_method_or_run_reference_only; never combine with FULL outcomes"
+    }
+  ],
+  "known_missing": [
+    "Explicit contemporaneous observation/hypothesis fields are unavailable where the source only records a combined rationale.",
+    "Original XML or full dynamic state unavailable for some purely mathematical candidate trials; no geometry or state is fabricated."
+  ],
+  "render_policy": "Only original XML plus saved qpos/time. Visual models and screenshots are created separately by parent workflow.",
+  "provenance_policy": "Existing master CSV/JSON used only to locate Store artifacts; numeric final values extracted directly from original Store acceptance components.",
+  "representative_render_sources": [
+    {
+      "task_id": "T08",
+      "candidate_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "execution_id": "264bc9e9edaa49b3b14bcd01de3d9c94",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\ablation\\passive.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\ablation\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\ablation\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T08",
+      "candidate_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "execution_id": "264bc9e9edaa49b3b14bcd01de3d9c94",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\baseline\\passive.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\baseline\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\264bc9e9edaa49b3b14bcd01de3d9c94\\baseline\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T08",
+      "candidate_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "execution_id": "d8b294000d274e2b918ba1da44d4dc85",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\passive.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\half_timestep\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T08",
+      "candidate_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "execution_id": "d8b294000d274e2b918ba1da44d4dc85",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\passive.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\initial_perturbation\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T08",
+      "candidate_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "execution_id": "d8b294000d274e2b918ba1da44d4dc85",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\passive.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\ablation\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T08",
+      "candidate_id": "a0438dc77c16e221b07447f2a75d2f3d1739d1741dbd14840ff28a54f1b647cc",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "execution_id": "d8b294000d274e2b918ba1da44d4dc85",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\passive.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\d8b294000d274e2b918ba1da44d4dc85\\independent\\baseline\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T08",
+      "candidate_id": "e87a0bff90645b7fe0a4933b9fc6c3dd1d4519984b4bfc4b197ef13b08476a40",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "execution_id": "e3b1c46ddd1945348baea5a0d31b268c",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\ablation\\passive.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\ablation\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\ablation\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T08",
+      "candidate_id": "e87a0bff90645b7fe0a4933b9fc6c3dd1d4519984b4bfc4b197ef13b08476a40",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\platform.sqlite",
+      "execution_id": "e3b1c46ddd1945348baea5a0d31b268c",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\baseline\\passive.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\baseline\\episode_0.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T08_P3_progressive_stiffness\\STORE\\physical_replay\\e3b1c46ddd1945348baea5a0d31b268c\\baseline\\episode_1.csv",
+          "format": "csv",
+          "time_field": "time_s",
+          "qpos_fields": [
+            "qpos_0",
+            "qpos_1",
+            "qpos_2",
+            "qpos_3",
+            "qpos_4",
+            "qpos_5",
+            "qpos_6",
+            "qpos_7"
+          ],
+          "qvel_fields": [
+            "qvel_0",
+            "qvel_1",
+            "qvel_2",
+            "qvel_3",
+            "qvel_4",
+            "qvel_5",
+            "qvel_6",
+            "qvel_7"
+          ],
+          "stage_field": "stage"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 20.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    }
+  ],
+  "passive_specific_note": "Fixed payout 1.5 and 1.8 mm; no controller, no active actuators. Compare native states at matched loading stages using the respective baseline XML. Paired ablation removes selected passive limits only as the original task-required mechanism check. It is not an additional morphology search."
+}

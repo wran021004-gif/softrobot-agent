@@ -1,0 +1,2417 @@
+{
+  "schema_version": "multitask_evidence_bundle_v1",
+  "task_id": "T02",
+  "task_name": "Load-Conditioned Hold",
+  "scope": "historical FULL method C; no new solver, optimizer or mj_step",
+  "actor_notice": "Codex surrogate / Codex expert formal trace; not a Main SDK experiment unless separate original evidence says so",
+  "editorial_note": "结构差别主要是两段材料模量 14 MPa → 12 MPa，几何外观不变；适合受载状态/定量结果比较，不能靠颜色或尺寸制造结构演化。三负载工况分别评价。",
+  "source_stores": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite"
+  ],
+  "source_traces": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl"
+  ],
+  "final_conditions": [
+    {
+      "task_id": "T02",
+      "condition": "negative",
+      "run_id": "codex-surrogate-T02-20261112",
+      "candidate_id": "9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+      "internal_candidate_id": "core-dcf0e30cadb05f529eb52313a4876e95f5ae9d7f8b3a24028aaed768beaf1fd9",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "candidate_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+      "configuration_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/64cf026f60123dbd01a1eb09aa0e39c8414e88b347d434a82daa49f002379b83",
+      "result_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/23ee40479be0ddb92035c39075f5898e97a3eb16d41aed6b7b98581e542bb375",
+      "raw_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/186e66778bb9244e31d6ed5053028868e7dab60920e418c7f98a1781493c4310",
+      "execution_id": "a457e22f73764a98a4f798682e52d940",
+      "original_xml_files": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\robot.xml"
+      ],
+      "recorded_state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\samples.json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\result.json",
+          "pointer": "/samples",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        }
+      ],
+      "structure": {
+        "segments": 2,
+        "tendons": 6,
+        "actuators": 6,
+        "lengths_m": [
+          0.16,
+          0.11
+        ],
+        "young_pa": [
+          12000000.0,
+          12000000.0
+        ],
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12
+        },
+        "component_kind_counts": {
+          "flexible_segment": 2,
+          "guide": 1,
+          "rigid_connector": 1,
+          "payload": 1
+        }
+      },
+      "parameters": {
+        "control_weights": {},
+        "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": null,
+            "length_m": 0.16,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.009
+                }
+              }
+            ],
+            "young_pa": 12000000.0
+          },
+          "1": {
+            "cells": null,
+            "length_m": 0.11,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.007
+                }
+              },
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.007
+                }
+              }
+            ],
+            "young_pa": 12000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.0141
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.0471975511965976,
+            "radius_m": 0.0141
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "pretension_n": 0.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "accepted": true,
+      "acceptance_metrics": {
+        "geometric_stroke_max_m": 0.005316207417810803,
+        "geometric_stroke_min_m": -0.0034143066130029043,
+        "geometric_tendon_speed_max_m_s": 0.024736707763668535,
+        "holding_max_error_m": 0.009897088402492153,
+        "holding_max_speed_m_s": 0.019757280334218204,
+        "terminal_error_m": 0.00943946043182984
+      },
+      "acceptance_components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:geometric_stroke_max": {
+          "limit": 0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.005316207417810803
+        },
+        "evaluator:geometric_stroke_min": {
+          "limit": -0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": -0.0034143066130029043
+        },
+        "evaluator:geometric_tendon_speed": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.024736707763668535
+        },
+        "evaluator:holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.009897088402492153
+        },
+        "evaluator:holding_speed": {
+          "limit": 0.02,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.019757280334218204
+        },
+        "evaluator:solver_errors": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:tension_max": {
+          "limit": 8.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 4.718492376283703
+        },
+        "evaluator:tension_min": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": -0.0
+        },
+        "evaluator:terminal_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.00943946043182984
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "constraint_margins": {
+        "geometric_stroke_max": {
+          "direction": "maximum",
+          "limit": 0.015,
+          "margin": 0.009683792582189196,
+          "observed": 0.005316207417810803,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_stroke_min": {
+          "direction": "minimum",
+          "limit": -0.015,
+          "margin": 0.011585693386997095,
+          "observed": -0.0034143066130029043,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_tendon_speed": {
+          "direction": "maximum",
+          "limit": 0.025,
+          "margin": 0.0002632922363314666,
+          "observed": 0.024736707763668535,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "holding_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.00010291159750784769,
+          "observed": 0.009897088402492153,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "holding_speed": {
+          "direction": "maximum",
+          "limit": 0.02,
+          "margin": 0.00024271966578179663,
+          "observed": 0.019757280334218204,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "solver_errors": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "tension_max": {
+          "direction": "maximum",
+          "limit": 8.0,
+          "margin": 3.281507623716297,
+          "observed": 4.718492376283703,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "tension_min": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.0,
+          "observed": -0.0,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "terminal_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.0005605395681701607,
+          "observed": 0.00943946043182984,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        }
+      },
+      "resource_consumption_this_execution_only": {
+        "forward_evaluations": 772,
+        "kernel_wall_s": 0.29621809998934623,
+        "model_builds": 1,
+        "physics_step_attempts": 700,
+        "physics_steps": 700,
+        "rollouts": 1
+      },
+      "evaluation_version": 1,
+      "implementation": "74f97bbb329a8df8970e7602010a492b0540bdd1",
+      "task_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "initialization_provenance": {
+        "canonical_task_identity": "9aa597056377390d88c89fc57d579d55126173344af59a14bae6033cbf4f9511",
+        "effective": {
+          "qpos_rad": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "qvel_rad_s": {
+            "segment_0_cell_0_y": 0.0,
+            "segment_0_cell_0_z": 0.0,
+            "segment_0_cell_10_y": 0.0,
+            "segment_0_cell_10_z": 0.0,
+            "segment_0_cell_11_y": 0.0,
+            "segment_0_cell_11_z": 0.0,
+            "segment_0_cell_1_y": 0.0,
+            "segment_0_cell_1_z": 0.0,
+            "segment_0_cell_2_y": 0.0,
+            "segment_0_cell_2_z": 0.0,
+            "segment_0_cell_3_y": 0.0,
+            "segment_0_cell_3_z": 0.0,
+            "segment_0_cell_4_y": 0.0,
+            "segment_0_cell_4_z": 0.0,
+            "segment_0_cell_5_y": 0.0,
+            "segment_0_cell_5_z": 0.0,
+            "segment_0_cell_6_y": 0.0,
+            "segment_0_cell_6_z": 0.0,
+            "segment_0_cell_7_y": 0.0,
+            "segment_0_cell_7_z": 0.0,
+            "segment_0_cell_8_y": 0.0,
+            "segment_0_cell_8_z": 0.0,
+            "segment_0_cell_9_y": 0.0,
+            "segment_0_cell_9_z": 0.0,
+            "segment_1_cell_0_y": 0.0,
+            "segment_1_cell_0_z": 0.0,
+            "segment_1_cell_10_y": 0.0,
+            "segment_1_cell_10_z": 0.0,
+            "segment_1_cell_11_y": 0.0,
+            "segment_1_cell_11_z": 0.0,
+            "segment_1_cell_1_y": 0.0,
+            "segment_1_cell_1_z": 0.0,
+            "segment_1_cell_2_y": 0.0,
+            "segment_1_cell_2_z": 0.0,
+            "segment_1_cell_3_y": 0.0,
+            "segment_1_cell_3_z": 0.0,
+            "segment_1_cell_4_y": 0.0,
+            "segment_1_cell_4_z": 0.0,
+            "segment_1_cell_5_y": 0.0,
+            "segment_1_cell_5_z": 0.0,
+            "segment_1_cell_6_y": 0.0,
+            "segment_1_cell_6_z": 0.0,
+            "segment_1_cell_7_y": 0.0,
+            "segment_1_cell_7_z": 0.0,
+            "segment_1_cell_8_y": 0.0,
+            "segment_1_cell_8_z": 0.0,
+            "segment_1_cell_9_y": 0.0,
+            "segment_1_cell_9_z": 0.0
+          },
+          "unspecified": "zero"
+        },
+        "rule": "all_candidate_dofs_zero_v1"
+      }
+    },
+    {
+      "task_id": "T02",
+      "condition": "positive",
+      "run_id": "codex-surrogate-T02-20261112",
+      "candidate_id": "6f75954bda64ef713ced9db0eff0139a19c71224ad60b21bb789464edf8ad647",
+      "internal_candidate_id": "core-b8e04ed0f174688c7fc8ad03db346ddf30a8878745c7ac4550a8de8af4c002c9",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "candidate_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/6f75954bda64ef713ced9db0eff0139a19c71224ad60b21bb789464edf8ad647",
+      "configuration_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/9f4b1bf62c4ab0485158a50ab96320bd027568b7775af02e28e2d884c6495ab5",
+      "result_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/ee6526754ee50859f37b38c277ca353dd081d7f788f49a7dc6bc5ebeaa9a2141",
+      "raw_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/383c0af9e7e8f5e47f434fb96cbd774a33f60abe5f1280222b871c839bfc7c4c",
+      "execution_id": "f45ddf6eecb24149a717be52d664c622",
+      "original_xml_files": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\robot.xml"
+      ],
+      "recorded_state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\samples.json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\result.json",
+          "pointer": "/samples",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        }
+      ],
+      "structure": {
+        "segments": 2,
+        "tendons": 6,
+        "actuators": 6,
+        "lengths_m": [
+          0.16,
+          0.11
+        ],
+        "young_pa": [
+          12000000.0,
+          12000000.0
+        ],
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12
+        },
+        "component_kind_counts": {
+          "flexible_segment": 2,
+          "guide": 1,
+          "rigid_connector": 1,
+          "payload": 1
+        }
+      },
+      "parameters": {
+        "control_weights": {},
+        "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": null,
+            "length_m": 0.16,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.009
+                }
+              }
+            ],
+            "young_pa": 12000000.0
+          },
+          "1": {
+            "cells": null,
+            "length_m": 0.11,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.007
+                }
+              },
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.007
+                }
+              }
+            ],
+            "young_pa": 12000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.0141
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.0471975511965976,
+            "radius_m": 0.0141
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "pretension_n": 0.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "accepted": true,
+      "acceptance_metrics": {
+        "geometric_stroke_max_m": 0.005093465479993953,
+        "geometric_stroke_min_m": -0.0027839089451672794,
+        "geometric_tendon_speed_max_m_s": 0.024744238841624546,
+        "holding_max_error_m": 0.009880943306424453,
+        "holding_max_speed_m_s": 0.019725865714044232,
+        "terminal_error_m": 0.00953349902465537
+      },
+      "acceptance_components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:geometric_stroke_max": {
+          "limit": 0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.005093465479993953
+        },
+        "evaluator:geometric_stroke_min": {
+          "limit": -0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": -0.0027839089451672794
+        },
+        "evaluator:geometric_tendon_speed": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.024744238841624546
+        },
+        "evaluator:holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.009880943306424453
+        },
+        "evaluator:holding_speed": {
+          "limit": 0.02,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.019725865714044232
+        },
+        "evaluator:solver_errors": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:tension_max": {
+          "limit": 8.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 4.7314513049519435
+        },
+        "evaluator:tension_min": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": -0.0
+        },
+        "evaluator:terminal_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.00953349902465537
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "constraint_margins": {
+        "geometric_stroke_max": {
+          "direction": "maximum",
+          "limit": 0.015,
+          "margin": 0.009906534520006047,
+          "observed": 0.005093465479993953,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_stroke_min": {
+          "direction": "minimum",
+          "limit": -0.015,
+          "margin": 0.01221609105483272,
+          "observed": -0.0027839089451672794,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_tendon_speed": {
+          "direction": "maximum",
+          "limit": 0.025,
+          "margin": 0.0002557611583754553,
+          "observed": 0.024744238841624546,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "holding_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.00011905669357554702,
+          "observed": 0.009880943306424453,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "holding_speed": {
+          "direction": "maximum",
+          "limit": 0.02,
+          "margin": 0.0002741342859557683,
+          "observed": 0.019725865714044232,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "solver_errors": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "tension_max": {
+          "direction": "maximum",
+          "limit": 8.0,
+          "margin": 3.2685486950480565,
+          "observed": 4.7314513049519435,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "tension_min": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.0,
+          "observed": -0.0,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "terminal_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.0004665009753446296,
+          "observed": 0.00953349902465537,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        }
+      },
+      "resource_consumption_this_execution_only": {
+        "forward_evaluations": 772,
+        "kernel_wall_s": 0.31196220000856556,
+        "model_builds": 1,
+        "physics_step_attempts": 700,
+        "physics_steps": 700,
+        "rollouts": 1
+      },
+      "evaluation_version": 1,
+      "implementation": "74f97bbb329a8df8970e7602010a492b0540bdd1",
+      "task_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "initialization_provenance": {
+        "condition_id": "positive",
+        "effective": {
+          "extension_id": "initialize.family",
+          "parameters": {
+            "contract": "family.initial",
+            "data": {
+              "qpos_rad": {
+                "segment_0_cell_0_y": 0.0,
+                "segment_0_cell_0_z": 0.0,
+                "segment_0_cell_10_y": 0.0,
+                "segment_0_cell_10_z": 0.0,
+                "segment_0_cell_11_y": 0.0,
+                "segment_0_cell_11_z": 0.0,
+                "segment_0_cell_1_y": 0.0,
+                "segment_0_cell_1_z": 0.0,
+                "segment_0_cell_2_y": 0.0,
+                "segment_0_cell_2_z": 0.0,
+                "segment_0_cell_3_y": 0.0,
+                "segment_0_cell_3_z": 0.0,
+                "segment_0_cell_4_y": 0.0,
+                "segment_0_cell_4_z": 0.0,
+                "segment_0_cell_5_y": 0.0,
+                "segment_0_cell_5_z": 0.0,
+                "segment_0_cell_6_y": 0.0,
+                "segment_0_cell_6_z": 0.0,
+                "segment_0_cell_7_y": 0.0,
+                "segment_0_cell_7_z": 0.0,
+                "segment_0_cell_8_y": 0.0,
+                "segment_0_cell_8_z": 0.0,
+                "segment_0_cell_9_y": 0.0,
+                "segment_0_cell_9_z": 0.0,
+                "segment_1_cell_0_y": 0.0,
+                "segment_1_cell_0_z": 0.0,
+                "segment_1_cell_10_y": 0.0,
+                "segment_1_cell_10_z": 0.0,
+                "segment_1_cell_11_y": 0.0,
+                "segment_1_cell_11_z": 0.0,
+                "segment_1_cell_1_y": 0.0,
+                "segment_1_cell_1_z": 0.0,
+                "segment_1_cell_2_y": 0.0,
+                "segment_1_cell_2_z": 0.0,
+                "segment_1_cell_3_y": 0.0,
+                "segment_1_cell_3_z": 0.0,
+                "segment_1_cell_4_y": 0.0,
+                "segment_1_cell_4_z": 0.0,
+                "segment_1_cell_5_y": 0.0,
+                "segment_1_cell_5_z": 0.0,
+                "segment_1_cell_6_y": 0.0,
+                "segment_1_cell_6_z": 0.0,
+                "segment_1_cell_7_y": 0.0,
+                "segment_1_cell_7_z": 0.0,
+                "segment_1_cell_8_y": 0.0,
+                "segment_1_cell_8_z": 0.0,
+                "segment_1_cell_9_y": 0.0,
+                "segment_1_cell_9_z": 0.0
+              },
+              "qvel_rad_s": {
+                "segment_0_cell_0_y": 0.0,
+                "segment_0_cell_0_z": 0.0,
+                "segment_0_cell_10_y": 0.0,
+                "segment_0_cell_10_z": 0.0,
+                "segment_0_cell_11_y": 0.0,
+                "segment_0_cell_11_z": 0.0,
+                "segment_0_cell_1_y": 0.0,
+                "segment_0_cell_1_z": 0.0,
+                "segment_0_cell_2_y": 0.0,
+                "segment_0_cell_2_z": 0.0,
+                "segment_0_cell_3_y": 0.0,
+                "segment_0_cell_3_z": 0.0,
+                "segment_0_cell_4_y": 0.0,
+                "segment_0_cell_4_z": 0.0,
+                "segment_0_cell_5_y": 0.0,
+                "segment_0_cell_5_z": 0.0,
+                "segment_0_cell_6_y": 0.0,
+                "segment_0_cell_6_z": 0.0,
+                "segment_0_cell_7_y": 0.0,
+                "segment_0_cell_7_z": 0.0,
+                "segment_0_cell_8_y": 0.0,
+                "segment_0_cell_8_z": 0.0,
+                "segment_0_cell_9_y": 0.0,
+                "segment_0_cell_9_z": 0.0,
+                "segment_1_cell_0_y": 0.0,
+                "segment_1_cell_0_z": 0.0,
+                "segment_1_cell_10_y": 0.0,
+                "segment_1_cell_10_z": 0.0,
+                "segment_1_cell_11_y": 0.0,
+                "segment_1_cell_11_z": 0.0,
+                "segment_1_cell_1_y": 0.0,
+                "segment_1_cell_1_z": 0.0,
+                "segment_1_cell_2_y": 0.0,
+                "segment_1_cell_2_z": 0.0,
+                "segment_1_cell_3_y": 0.0,
+                "segment_1_cell_3_z": 0.0,
+                "segment_1_cell_4_y": 0.0,
+                "segment_1_cell_4_z": 0.0,
+                "segment_1_cell_5_y": 0.0,
+                "segment_1_cell_5_z": 0.0,
+                "segment_1_cell_6_y": 0.0,
+                "segment_1_cell_6_z": 0.0,
+                "segment_1_cell_7_y": 0.0,
+                "segment_1_cell_7_z": 0.0,
+                "segment_1_cell_8_y": 0.0,
+                "segment_1_cell_8_z": 0.0,
+                "segment_1_cell_9_y": 0.0,
+                "segment_1_cell_9_z": 0.0
+              },
+              "unspecified": "zero"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "inherited_acceptance": false
+      }
+    },
+    {
+      "task_id": "T02",
+      "condition": "zero",
+      "run_id": "codex-surrogate-T02-20261112",
+      "candidate_id": "ebb144c06c9914db2ac14f70e03983cc9e46afca5e2ce5c91039461ca042738f",
+      "internal_candidate_id": "core-06409bc7a3901fe14efbed3958bd3751ef843e8916030720e193d6623e2d754a",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "candidate_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/ebb144c06c9914db2ac14f70e03983cc9e46afca5e2ce5c91039461ca042738f",
+      "configuration_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/db6c2c4fe0512bc14894037d49e6a4da8aaf7791bdc594ef96e4b3f4f31bc510",
+      "result_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/bc6b846d34fef0c5e8b3ba47f3e3b7252ce057b0044f654882fe0295abb2ba4b",
+      "raw_reference": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite#artifacts/4aac355d743f1605fcc1c702395fd31fc9b33c0f6c7bc6200a84a527cb46c955",
+      "execution_id": "c740cee3351947939b94ea216727d834",
+      "original_xml_files": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\robot.xml"
+      ],
+      "recorded_state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\samples.json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        },
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\result.json",
+          "pointer": "/samples",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s",
+          "phase": "recorded native physical states; no reintegration"
+        }
+      ],
+      "structure": {
+        "segments": 2,
+        "tendons": 6,
+        "actuators": 6,
+        "lengths_m": [
+          0.16,
+          0.11
+        ],
+        "young_pa": [
+          12000000.0,
+          12000000.0
+        ],
+        "cells": {
+          "segment_0": 12,
+          "segment_1": 12
+        },
+        "component_kind_counts": {
+          "flexible_segment": 2,
+          "guide": 1,
+          "rigid_connector": 1,
+          "payload": 1
+        }
+      },
+      "parameters": {
+        "control_weights": {},
+        "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+        "route_overrides": {},
+        "segment_count": 2,
+        "segments": {
+          "0": {
+            "cells": null,
+            "length_m": 0.16,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.009
+                }
+              }
+            ],
+            "young_pa": 12000000.0
+          },
+          "1": {
+            "cells": null,
+            "length_m": 0.11,
+            "sections": [
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.007
+                }
+              },
+              {
+                "angle_rad": 0.0,
+                "holes_yz_m": [],
+                "kind": "circle",
+                "outer_yz_m": [],
+                "parameters": {
+                  "radius_m": 0.007
+                }
+              }
+            ],
+            "young_pa": 12000000.0
+          }
+        },
+        "spans": [
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 0,
+            "phase_rad": 0.0,
+            "radius_m": 0.0141
+          },
+          {
+            "anchor_angle_offset_rad": 0.0,
+            "anchor_s": 1.0,
+            "angular_offsets_rad": [],
+            "count": 3,
+            "first_segment": 0,
+            "guide_angle_offset_rad": 0.0,
+            "guide_s": [
+              0.5
+            ],
+            "last_segment": 1,
+            "phase_rad": 1.0471975511965976,
+            "radius_m": 0.0141
+          }
+        ],
+        "strategy": "polar_consecutive_spans_v1",
+        "tendon_count": 6,
+        "tendon_parameters": {
+          "pretension_n": 0.0
+        },
+        "version": "serial_family_generation_v2"
+      },
+      "accepted": true,
+      "acceptance_metrics": {
+        "geometric_stroke_max_m": 0.0054192244835994385,
+        "geometric_stroke_min_m": -0.0029546945485629528,
+        "geometric_tendon_speed_max_m_s": 0.02473691807375513,
+        "holding_max_error_m": 0.005357274331766039,
+        "holding_max_speed_m_s": 0.019790830274628676,
+        "terminal_error_m": 0.0050628666986212625
+      },
+      "acceptance_components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:geometric_stroke_max": {
+          "limit": 0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0054192244835994385
+        },
+        "evaluator:geometric_stroke_min": {
+          "limit": -0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": -0.0029546945485629528
+        },
+        "evaluator:geometric_tendon_speed": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.02473691807375513
+        },
+        "evaluator:holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.005357274331766039
+        },
+        "evaluator:holding_speed": {
+          "limit": 0.02,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.019790830274628676
+        },
+        "evaluator:solver_errors": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:tension_max": {
+          "limit": 8.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 4.726844883959983
+        },
+        "evaluator:tension_min": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": -0.0
+        },
+        "evaluator:terminal_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0050628666986212625
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        }
+      },
+      "constraint_margins": {
+        "geometric_stroke_max": {
+          "direction": "maximum",
+          "limit": 0.015,
+          "margin": 0.009580775516400561,
+          "observed": 0.0054192244835994385,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_stroke_min": {
+          "direction": "minimum",
+          "limit": -0.015,
+          "margin": 0.012045305451437047,
+          "observed": -0.0029546945485629528,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_tendon_speed": {
+          "direction": "maximum",
+          "limit": 0.025,
+          "margin": 0.0002630819262448708,
+          "observed": 0.02473691807375513,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "holding_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.0046427256682339615,
+          "observed": 0.005357274331766039,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "holding_speed": {
+          "direction": "maximum",
+          "limit": 0.02,
+          "margin": 0.00020916972537132414,
+          "observed": 0.019790830274628676,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "solver_errors": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "tension_max": {
+          "direction": "maximum",
+          "limit": 8.0,
+          "margin": 3.2731551160400167,
+          "observed": 4.726844883959983,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "tension_min": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.0,
+          "observed": -0.0,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "terminal_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.004937133301378738,
+          "observed": 0.0050628666986212625,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        }
+      },
+      "resource_consumption_this_execution_only": {
+        "forward_evaluations": 772,
+        "kernel_wall_s": 0.2881675999960862,
+        "model_builds": 1,
+        "physics_step_attempts": 700,
+        "physics_steps": 700,
+        "rollouts": 1
+      },
+      "evaluation_version": 1,
+      "implementation": "74f97bbb329a8df8970e7602010a492b0540bdd1",
+      "task_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "initialization_provenance": {
+        "condition_id": "zero",
+        "effective": {
+          "extension_id": "initialize.family",
+          "parameters": {
+            "contract": "family.initial",
+            "data": {
+              "qpos_rad": {
+                "segment_0_cell_0_y": 0.0,
+                "segment_0_cell_0_z": 0.0,
+                "segment_0_cell_10_y": 0.0,
+                "segment_0_cell_10_z": 0.0,
+                "segment_0_cell_11_y": 0.0,
+                "segment_0_cell_11_z": 0.0,
+                "segment_0_cell_1_y": 0.0,
+                "segment_0_cell_1_z": 0.0,
+                "segment_0_cell_2_y": 0.0,
+                "segment_0_cell_2_z": 0.0,
+                "segment_0_cell_3_y": 0.0,
+                "segment_0_cell_3_z": 0.0,
+                "segment_0_cell_4_y": 0.0,
+                "segment_0_cell_4_z": 0.0,
+                "segment_0_cell_5_y": 0.0,
+                "segment_0_cell_5_z": 0.0,
+                "segment_0_cell_6_y": 0.0,
+                "segment_0_cell_6_z": 0.0,
+                "segment_0_cell_7_y": 0.0,
+                "segment_0_cell_7_z": 0.0,
+                "segment_0_cell_8_y": 0.0,
+                "segment_0_cell_8_z": 0.0,
+                "segment_0_cell_9_y": 0.0,
+                "segment_0_cell_9_z": 0.0,
+                "segment_1_cell_0_y": 0.0,
+                "segment_1_cell_0_z": 0.0,
+                "segment_1_cell_10_y": 0.0,
+                "segment_1_cell_10_z": 0.0,
+                "segment_1_cell_11_y": 0.0,
+                "segment_1_cell_11_z": 0.0,
+                "segment_1_cell_1_y": 0.0,
+                "segment_1_cell_1_z": 0.0,
+                "segment_1_cell_2_y": 0.0,
+                "segment_1_cell_2_z": 0.0,
+                "segment_1_cell_3_y": 0.0,
+                "segment_1_cell_3_z": 0.0,
+                "segment_1_cell_4_y": 0.0,
+                "segment_1_cell_4_z": 0.0,
+                "segment_1_cell_5_y": 0.0,
+                "segment_1_cell_5_z": 0.0,
+                "segment_1_cell_6_y": 0.0,
+                "segment_1_cell_6_z": 0.0,
+                "segment_1_cell_7_y": 0.0,
+                "segment_1_cell_7_z": 0.0,
+                "segment_1_cell_8_y": 0.0,
+                "segment_1_cell_8_z": 0.0,
+                "segment_1_cell_9_y": 0.0,
+                "segment_1_cell_9_z": 0.0
+              },
+              "qvel_rad_s": {
+                "segment_0_cell_0_y": 0.0,
+                "segment_0_cell_0_z": 0.0,
+                "segment_0_cell_10_y": 0.0,
+                "segment_0_cell_10_z": 0.0,
+                "segment_0_cell_11_y": 0.0,
+                "segment_0_cell_11_z": 0.0,
+                "segment_0_cell_1_y": 0.0,
+                "segment_0_cell_1_z": 0.0,
+                "segment_0_cell_2_y": 0.0,
+                "segment_0_cell_2_z": 0.0,
+                "segment_0_cell_3_y": 0.0,
+                "segment_0_cell_3_z": 0.0,
+                "segment_0_cell_4_y": 0.0,
+                "segment_0_cell_4_z": 0.0,
+                "segment_0_cell_5_y": 0.0,
+                "segment_0_cell_5_z": 0.0,
+                "segment_0_cell_6_y": 0.0,
+                "segment_0_cell_6_z": 0.0,
+                "segment_0_cell_7_y": 0.0,
+                "segment_0_cell_7_z": 0.0,
+                "segment_0_cell_8_y": 0.0,
+                "segment_0_cell_8_z": 0.0,
+                "segment_0_cell_9_y": 0.0,
+                "segment_0_cell_9_z": 0.0,
+                "segment_1_cell_0_y": 0.0,
+                "segment_1_cell_0_z": 0.0,
+                "segment_1_cell_10_y": 0.0,
+                "segment_1_cell_10_z": 0.0,
+                "segment_1_cell_11_y": 0.0,
+                "segment_1_cell_11_z": 0.0,
+                "segment_1_cell_1_y": 0.0,
+                "segment_1_cell_1_z": 0.0,
+                "segment_1_cell_2_y": 0.0,
+                "segment_1_cell_2_z": 0.0,
+                "segment_1_cell_3_y": 0.0,
+                "segment_1_cell_3_z": 0.0,
+                "segment_1_cell_4_y": 0.0,
+                "segment_1_cell_4_z": 0.0,
+                "segment_1_cell_5_y": 0.0,
+                "segment_1_cell_5_z": 0.0,
+                "segment_1_cell_6_y": 0.0,
+                "segment_1_cell_6_z": 0.0,
+                "segment_1_cell_7_y": 0.0,
+                "segment_1_cell_7_z": 0.0,
+                "segment_1_cell_8_y": 0.0,
+                "segment_1_cell_8_z": 0.0,
+                "segment_1_cell_9_y": 0.0,
+                "segment_1_cell_9_z": 0.0
+              },
+              "unspecified": "zero"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "inherited_acceptance": false
+      }
+    }
+  ],
+  "selected_node_evidence": [
+    {
+      "node_id": "T02-001-cold-loaded-structure-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:2",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:3",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T02-001-cold-loaded-structure",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "generate",
+          "hypothesis": "Construct an independent cold T02 design inside the original6channel/2segment source space: public default0.16/0.11m lengths,14MPa circular9/7mm sections and14.1mm routing. Use exact original10g off-axis COM/full inertia and zero initial state. Smaller routing and higher stiffness are a new domain choice motivated by actuator-speed failures in the preceding task, not an imported accepted seed.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "DESIGN_MODIFICATION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": null,
+            "requested_budget": 0
+          },
+          "generation": {
+            "version": "serial_family_generation_v2",
+            "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+            "segment_count": 2,
+            "tendon_count": 6,
+            "spans": [
+              {
+                "first_segment": 0,
+                "last_segment": 0,
+                "count": 3,
+                "phase_rad": 0.0,
+                "radius_m": 0.0141,
+                "guide_s": [
+                  0.5
+                ],
+                "anchor_s": 1.0
+              },
+              {
+                "first_segment": 0,
+                "last_segment": 1,
+                "count": 3,
+                "phase_rad": 1.0471975511965976,
+                "radius_m": 0.0141,
+                "guide_s": [
+                  0.5
+                ],
+                "anchor_s": 1.0
+              }
+            ],
+            "segments": {
+              "0": {
+                "length_m": 0.16,
+                "young_pa": 14000000.0,
+                "sections": [
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.009
+                    },
+                    "angle_rad": 0.0
+                  }
+                ]
+              },
+              "1": {
+                "length_m": 0.11,
+                "young_pa": 14000000.0,
+                "sections": [
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.007
+                    },
+                    "angle_rad": 0.0
+                  },
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.007
+                    },
+                    "angle_rad": 0.0
+                  }
+                ]
+              }
+            },
+            "tendon_parameters": {
+              "pretension_n": 0.0
+            }
+          }
+        },
+        "evidence": [],
+        "reason": "Construct an independent cold T02 design inside the original6channel/2segment source space: public default0.16/0.11m lengths,14MPa circular9/7mm sections and14.1mm routing. Use exact original10g off-axis COM/full inertia and zero initial state. Smaller routing and higher stiffness are a new domain choice motivated by actuator-speed failures in the preceding task, not an imported accepted seed.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "generated",
+        "candidate": {
+          "artifact_id": "0cfa8e1df7cce8f720f3b2c61e15fb3a60adf834039fc571865fe4c5332d2658",
+          "media_type": "application/json"
+        }
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "06cb41f95d1e9d7eedb1903ae3fe7c8b04c2cae1d94ff6df0d1f4480781f7222",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\11f1cf0ea8f64bd5992904d956d15c7e\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1a4ba459cd4b46edbd6d8d571f4ba495\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1de61bf4a6204897a60396b7a00b65d2\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T02-007-negative-bounded-pattern-check-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:14",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:15",
+      "operation_status": "rejected",
+      "failure_reason": "INVALID_TOOL_ARGUMENTS: arguments.control_optimization.settings: Value error, SAFETY_MARGIN_REQUIRES_RESPONSE_METHOD. Required fields: candidate, operation, protocol. Allowed fields: candidate, operation, mechanism_study, model_source, native, nonlinear_response, structure_response, control_optimization, operating_point, design_sensitivity, capability_comparison, capability_method, optimal_sensitivity, saved_state, native_state_selection, execution, update_id, protocol, scoring_window_s",
+      "original_exact_input": {
+        "request_id": "T02-007-negative-bounded-pattern-check",
+        "tool_id": "research.math",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "candidate": {
+            "artifact_id": "12500a1e04a251f1711b5bdfb6807000344342b01e6f4f374afdf102d3cf09ee",
+            "media_type": "application/json"
+          },
+          "operation": "mujoco_nonlinear_task_capability_v1",
+          "model_source": "mujoco",
+          "operating_point": "standardized_initial_pretension",
+          "protocol": {
+            "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+            "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+            "authority_threshold": null,
+            "baseline_lengths_m": {
+              "segment_0": 0.16,
+              "segment_1": 0.11,
+              "segment_2": 0.14,
+              "segment_3": 0.14,
+              "segment_4": 0.14,
+              "segment_5": 0.14,
+              "segment_6": 0.14,
+              "segment_7": 0.14,
+              "segment_8": 0.14
+            },
+            "candidate_rule": "initial_target_equilibrium_halfway",
+            "comparison_atol": 1e-08,
+            "comparison_rtol": 2e-06,
+            "construction_max_iterations": 20,
+            "derivative_atol": 2e-05,
+            "derivative_rtol": 0.0002,
+            "derivative_step": 1e-05,
+            "duration_s": 0.35,
+            "endpoint_check_atol": 1e-08,
+            "endpoint_max_iterations": 100,
+            "equilibrium_normalized_residual": 1e-05,
+            "frequency_rad_s": [
+              0.1,
+              1.0,
+              10.0,
+              100.0
+            ],
+            "horizon_alignment_atol_s": 1e-12,
+            "input_scale_n": 8.0,
+            "output_scale_m": 0.01,
+            "period_s": 0.01,
+            "pole_margin_s_inv": 1e-07,
+            "protocol_id": "task-local-v2",
+            "rank_atol": 1e-12,
+            "rank_rtol": 1e-09,
+            "samples_s": [
+              0.0,
+              0.175,
+              0.35
+            ],
+            "static_force_tolerance": 1e-10,
+            "static_max_iterations": 20,
+            "windows_s": [
+              0.1,
+              0.35
+            ]
+          },
+          "scoring_window_s": 0.35,
+          "control_optimization": {
+            "source": {
+              "artifact_id": "11422db9ba6386673dabff4a94d40afbb07dcbe2fe67f3cc79430f532381a77f",
+              "media_type": "application/json"
+            },
+            "settings": {
+              "version": "local_control_search_v2",
+              "correction_window_s": [
+                0.0,
+                0.35
+              ],
+              "method": "pattern",
+              "knots_s": [
+                0,
+                0.035,
+                0.0875,
+                0.175,
+                0.28,
+                0.35
+              ],
+              "coefficient_limit_n": 8.0,
+              "difference_step_n": 0.001,
+              "initial_radius_n": 0.05,
+              "minimum_radius_n": 1e-06,
+              "evaluation_requests": 500,
+              "iterations": 20,
+              "safety_margin_fraction": 0.01
+            }
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "12500a1e04a251f1711b5bdfb6807000344342b01e6f4f374afdf102d3cf09ee",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "11422db9ba6386673dabff4a94d40afbb07dcbe2fe67f3cc79430f532381a77f",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "Response search and finer response refinement both plateau near4.29percent strict violation. Use the already registered pattern method as one bounded500callback/20iteration local check on the owned failed sequence; this changes no model, controller algorithm or thresholds. Then physically validate the returned best sequence and evaluate the two remaining load cases.",
+        "cache": "new"
+      },
+      "recorded_output": null,
+      "output_artifact_ids": [],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\11f1cf0ea8f64bd5992904d956d15c7e\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1a4ba459cd4b46edbd6d8d571f4ba495\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1de61bf4a6204897a60396b7a00b65d2\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T02-018-final-bounded-stiffness-comparison-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:36",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:37",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T02-018-final-bounded-stiffness-comparison",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "generate",
+          "hypothesis": "All three first-structure load cases have complete physical failures near strict position/speed bounds. Test one final legal structural direction: reduce both Young moduli14MPa to12MPa, preserving all geometry,6independent channels, zero initial state and exact10g tool. This bounded comparison addresses a structure-dependent local plateau, without claiming infeasibility or spending another task budget.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "DESIGN_MODIFICATION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": null,
+            "requested_budget": 0
+          },
+          "generation": {
+            "version": "serial_family_generation_v2",
+            "family_space_identity": "946326b03ecd16c21dd1c1b6580c1ef3c34402bce1dc7e4e2a914307ef290271",
+            "segment_count": 2,
+            "tendon_count": 6,
+            "spans": [
+              {
+                "first_segment": 0,
+                "last_segment": 0,
+                "count": 3,
+                "phase_rad": 0.0,
+                "radius_m": 0.0141,
+                "guide_s": [
+                  0.5
+                ],
+                "anchor_s": 1.0
+              },
+              {
+                "first_segment": 0,
+                "last_segment": 1,
+                "count": 3,
+                "phase_rad": 1.0471975511965976,
+                "radius_m": 0.0141,
+                "guide_s": [
+                  0.5
+                ],
+                "anchor_s": 1.0
+              }
+            ],
+            "segments": {
+              "0": {
+                "length_m": 0.16,
+                "young_pa": 12000000.0,
+                "sections": [
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.009
+                    },
+                    "angle_rad": 0.0
+                  }
+                ]
+              },
+              "1": {
+                "length_m": 0.11,
+                "young_pa": 12000000.0,
+                "sections": [
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.007
+                    },
+                    "angle_rad": 0.0
+                  },
+                  {
+                    "kind": "circle",
+                    "parameters": {
+                      "radius_m": 0.007
+                    },
+                    "angle_rad": 0.0
+                  }
+                ]
+              }
+            },
+            "tendon_parameters": {
+              "pretension_n": 0.0
+            }
+          }
+        },
+        "evidence": [],
+        "reason": "All three first-structure load cases have complete physical failures near strict position/speed bounds. Test one final legal structural direction: reduce both Young moduli14MPa to12MPa, preserving all geometry,6independent channels, zero initial state and exact10g tool. This bounded comparison addresses a structure-dependent local plateau, without claiming infeasibility or spending another task budget.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "generated",
+        "candidate": {
+          "artifact_id": "a54869e94ed3fbd05ecbde50ed62ec4cb2ff4e816c99491532ad648619650c17",
+          "media_type": "application/json"
+        }
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "22f607dbc99507fbc752e1aba35c62d4821a376af93554b1c6045753e3d6d60f",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T02-022-comparison-negative-independent-acceptance-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:44",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:45",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T02-022-comparison-negative-independent-acceptance",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "physical_replay",
+          "hypothesis": "The12MPa comparison produced a new mathematically feasible sequence with J-0.010291. Independently execute it under the complete negative external-load evaluator, exact payload and dense actuator constraints before claiming any condition pass.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "64f9e9bc5cca67891db621d4aa7b4cd5fca07551e2ae34dc57a46113a71c5d81",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "PHYSICAL_VALIDATION",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": {
+              "artifact_id": "9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+              "media_type": "application/json"
+            },
+            "requested_budget": 1
+          },
+          "physical_replay": {
+            "candidate": {
+              "artifact_id": "9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+              "media_type": "application/json"
+            },
+            "source": {
+              "artifact_id": "64f9e9bc5cca67891db621d4aa7b4cd5fca07551e2ae34dc57a46113a71c5d81",
+              "media_type": "application/json"
+            }
+          }
+        },
+        "evidence": [
+          {
+            "artifact_id": "9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "64f9e9bc5cca67891db621d4aa7b4cd5fca07551e2ae34dc57a46113a71c5d81",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "The12MPa comparison produced a new mathematically feasible sequence with J-0.010291. Independently execute it under the complete negative external-load evaluator, exact payload and dense actuator constraints before claiming any condition pass.",
+        "cache": "new"
+      },
+      "recorded_output": {
+        "status": "evaluated",
+        "acceptance": {
+          "accepted": true,
+          "components": {
+            "all_frozen_constraints": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "evaluation_validity": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "evaluator:geometric_stroke_max": {
+              "limit": 0.015,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.005316207417810803
+            },
+            "evaluator:geometric_stroke_min": {
+              "limit": -0.015,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": -0.0034143066130029043
+            },
+            "evaluator:geometric_tendon_speed": {
+              "limit": 0.025,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.024736707763668535
+            },
+            "evaluator:holding_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.009897088402492153
+            },
+            "evaluator:holding_speed": {
+              "limit": 0.02,
+              "passed": true,
+              "reason": null,
+              "unit": "m/s",
+              "value": 0.019757280334218204
+            },
+            "evaluator:solver_errors": {
+              "limit": 0.0,
+              "passed": true,
+              "reason": null,
+              "unit": "count",
+              "value": 0.0
+            },
+            "evaluator:tension_max": {
+              "limit": 8.0,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": 4.718492376283703
+            },
+            "evaluator:tension_min": {
+              "limit": 0.0,
+              "passed": true,
+              "reason": null,
+              "unit": "N",
+              "value": -0.0
+            },
+            "evaluator:terminal_position": {
+              "limit": 0.01,
+              "passed": true,
+              "reason": null,
+              "unit": "m",
+              "value": 0.00943946043182984
+            },
+            "execution_complete": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "protocol_sampling": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            },
+            "task_evaluator": {
+              "limit": null,
+              "passed": true,
+              "reason": null,
+              "unit": null,
+              "value": true
+            }
+          },
+          "constraint_margins": {
+            "geometric_stroke_max": {
+              "direction": "maximum",
+              "limit": 0.015,
+              "margin": 0.009683792582189196,
+              "observed": 0.005316207417810803,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m"
+            },
+            "geometric_stroke_min": {
+              "direction": "minimum",
+              "limit": -0.015,
+              "margin": 0.011585693386997095,
+              "observed": -0.0034143066130029043,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m"
+            },
+            "geometric_tendon_speed": {
+              "direction": "maximum",
+              "limit": 0.025,
+              "margin": 0.0002632922363314666,
+              "observed": 0.024736707763668535,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m/s"
+            },
+            "holding_position": {
+              "direction": "maximum",
+              "limit": 0.01,
+              "margin": 0.00010291159750784769,
+              "observed": 0.009897088402492153,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m"
+            },
+            "holding_speed": {
+              "direction": "maximum",
+              "limit": 0.02,
+              "margin": 0.00024271966578179663,
+              "observed": 0.019757280334218204,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m/s"
+            },
+            "solver_errors": {
+              "direction": "maximum",
+              "limit": 0.0,
+              "margin": 0.0,
+              "observed": 0.0,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "count"
+            },
+            "tension_max": {
+              "direction": "maximum",
+              "limit": 8.0,
+              "margin": 3.281507623716297,
+              "observed": 4.718492376283703,
+              "strict": false,
+              "tolerance": 1e-08,
+              "units": "N"
+            },
+            "tension_min": {
+              "direction": "minimum",
+              "limit": 0.0,
+              "margin": -0.0,
+              "observed": -0.0,
+              "strict": false,
+              "tolerance": 1e-08,
+              "units": "N"
+            },
+            "terminal_position": {
+              "direction": "maximum",
+              "limit": 0.01,
+              "margin": 0.0005605395681701607,
+              "observed": 0.00943946043182984,
+              "strict": false,
+              "tolerance": 0.0,
+              "units": "m"
+            }
+          },
+          "continuous_time_guarantee": false,
+          "contract": "research.task_acceptance",
+          "evidence_binding": {
+            "evaluation": {
+              "artifact_id": "e726e8809eb39e94ba2b4fc24fb86ee523b2fc6978da8d3fb74b44bcdd12b804",
+              "media_type": "application/json"
+            },
+            "evaluation_binding": {
+              "original_execution_id": null,
+              "source": {
+                "artifact_id": "186e66778bb9244e31d6ed5053028868e7dab60920e418c7f98a1781493c4310",
+                "media_type": "application/json"
+              },
+              "source_execution_id": null
+            },
+            "profile": {
+              "artifact_id": "b70827337730f785f24b180548239b6e35f6c4a57e580298f91637bedf5a199f",
+              "media_type": "application/json"
+            },
+            "profile_binding": {
+              "evaluation": {
+                "artifact_id": "e726e8809eb39e94ba2b4fc24fb86ee523b2fc6978da8d3fb74b44bcdd12b804",
+                "media_type": "application/json"
+              },
+              "execution_id": "a457e22f73764a98a4f798682e52d940",
+              "simulation": {
+                "artifact_id": "186e66778bb9244e31d6ed5053028868e7dab60920e418c7f98a1781493c4310",
+                "media_type": "application/json"
+              }
+            },
+            "simulation": {
+              "artifact_id": "186e66778bb9244e31d6ed5053028868e7dab60920e418c7f98a1781493c4310",
+              "media_type": "application/json"
+            }
+          },
+          "execution_id": "a457e22f73764a98a4f798682e52d940",
+          "issues": [],
+          "metrics": {
+            "geometric_stroke_max_m": 0.005316207417810803,
+            "geometric_stroke_min_m": -0.0034143066130029043,
+            "geometric_tendon_speed_max_m_s": 0.024736707763668535,
+            "holding_max_error_m": 0.009897088402492153,
+            "holding_max_speed_m_s": 0.019757280334218204,
+            "terminal_error_m": 0.00943946043182984
+          },
+          "missing": [],
+          "protocol_id": "offline_frozen_task_v1",
+          "source_status": null,
+          "sources": {
+            "evaluation": {
+              "artifact_id": "e726e8809eb39e94ba2b4fc24fb86ee523b2fc6978da8d3fb74b44bcdd12b804",
+              "media_type": "application/json"
+            },
+            "profile": {
+              "artifact_id": "b70827337730f785f24b180548239b6e35f6c4a57e580298f91637bedf5a199f",
+              "media_type": "application/json"
+            }
+          },
+          "status": "accepted",
+          "task_family": "task.reach",
+          "task_identity": "b9a230a192350574a20ab2d7a23676748dd382350afca7d6fe02fed5d0679eb3",
+          "timing": {
+            "control_period_s": 0.01,
+            "duration_s": 0.35,
+            "sample_period_s": 0.01,
+            "termination": [
+              "duration",
+              "numerical_failure"
+            ],
+            "timestep_s": 0.0005
+          },
+          "version": "1.0.0",
+          "worst_constraint": "holding_position"
+        },
+        "candidate": {
+          "artifact_id": "9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+          "media_type": "application/json"
+        },
+        "reference": {
+          "artifact_id": "23ee40479be0ddb92035c39075f5898e97a3eb16d41aed6b7b98581e542bb375",
+          "media_type": "application/json"
+        },
+        "source_reference": {
+          "artifact_id": "64f9e9bc5cca67891db621d4aa7b4cd5fca07551e2ae34dc57a46113a71c5d81",
+          "media_type": "application/json"
+        },
+        "execution_id": "a457e22f73764a98a4f798682e52d940"
+      },
+      "output_artifact_ids": [
+        {
+          "artifact_id": "c1ccbc97b27ac8a1a85d2684eabbb75dde2db79cb22c6b0cb630b72f94977d62",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    },
+    {
+      "node_id": "T02-034-joint-select-all-original-load-conditions-decision",
+      "decision_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:68",
+      "operation_trace": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STUDY_TRACE.jsonl:69",
+      "operation_status": "completed",
+      "failure_reason": null,
+      "original_exact_input": {
+        "request_id": "T02-034-joint-select-all-original-load-conditions",
+        "tool_id": "research.dispatch",
+        "tool_version": "1.0.0",
+        "arguments": {
+          "action": "select",
+          "hypothesis": "All three original T02 load conditions independently passed complete strict acceptance on one identical12MPa structure with genuine10g COM/full inertia. Select exactly those publicly read fresh physical results; the earlier14MPa failures remain part of the evidence and costs.",
+          "expected_observation": "A complete registered result with its original measurements and limitations.",
+          "weakening_observation": "Constraint failure, model inapplicability, incomplete evidence or exhausted authorization.",
+          "fixed_conditions": "Frozen original task, source domains, Core commit, independent Study and cumulative budgets.",
+          "stopping_condition": "Stop at formal acceptance, an identified existing-interface barrier, or the finite authorized budget.",
+          "interpretation": "Construction and mathematical diagnostics do not establish physical task acceptance.",
+          "supporting_evidence": [
+            {
+              "artifact_id": "23ee40479be0ddb92035c39075f5898e97a3eb16d41aed6b7b98581e542bb375",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "ee6526754ee50859f37b38c277ca353dd081d7f788f49a7dc6bc5ebeaa9a2141",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "bc6b846d34fef0c5e8b3ba47f3e3b7252ce057b0044f654882fe0295abb2ba4b",
+              "media_type": "application/json"
+            }
+          ],
+          "decision": {
+            "hypothesis_id": "new-study-agent-choice",
+            "research_intent": "SELECT",
+            "selected_method": "explicit_agent_choice",
+            "selected_candidate": null,
+            "requested_budget": 0
+          },
+          "selected_execution": [
+            {
+              "artifact_id": "23ee40479be0ddb92035c39075f5898e97a3eb16d41aed6b7b98581e542bb375",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "ee6526754ee50859f37b38c277ca353dd081d7f788f49a7dc6bc5ebeaa9a2141",
+              "media_type": "application/json"
+            },
+            {
+              "artifact_id": "bc6b846d34fef0c5e8b3ba47f3e3b7252ce057b0044f654882fe0295abb2ba4b",
+              "media_type": "application/json"
+            }
+          ]
+        },
+        "evidence": [
+          {
+            "artifact_id": "23ee40479be0ddb92035c39075f5898e97a3eb16d41aed6b7b98581e542bb375",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "ee6526754ee50859f37b38c277ca353dd081d7f788f49a7dc6bc5ebeaa9a2141",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "bc6b846d34fef0c5e8b3ba47f3e3b7252ce057b0044f654882fe0295abb2ba4b",
+            "media_type": "application/json"
+          }
+        ],
+        "reason": "All three original T02 load conditions independently passed complete strict acceptance on one identical12MPa structure with genuine10g COM/full inertia. Select exactly those publicly read fresh physical results; the earlier14MPa failures remain part of the evidence and costs.",
+        "cache": "new"
+      },
+      "recorded_output": {},
+      "output_artifact_ids": [
+        {
+          "artifact_id": "e19b1d8d0f9da4037349bc30b94dcdadcffb111d708d05f8cfdfe719b449c3d3",
+          "media_type": "application/json"
+        }
+      ],
+      "model_xml": [
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\robot.xml",
+        "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\robot.xml"
+      ],
+      "model_mapping_scope": "Exact candidate artifact or identical recorded robot-structure serialization; environment/state must use the original model-specific saved source."
+    }
+  ],
+  "complete_indices": {
+    "candidates": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T02\\complete_candidate_index.csv",
+    "models": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T02\\complete_model_index.csv",
+    "decisions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T02\\complete_decision_index.csv",
+    "conditions": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T02\\complete_condition_index.csv",
+    "source_index": "D:\\softrobot-agent\\runs\\multitask-paper-data-20261118\\T02\\source_index.csv"
+  },
+  "separate_cost_sources": [
+    "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\COST_REPORT.json"
+  ],
+  "additional_experiments_separate_scope": [
+    {
+      "path": "D:\\softrobot-agent\\paper_experiments\\ab_batch2_20261114\\T02",
+      "role": "separate_method_or_run_reference_only; never combine with FULL outcomes"
+    }
+  ],
+  "known_missing": [
+    "Explicit contemporaneous observation/hypothesis fields are unavailable where the source only records a combined rationale.",
+    "Original XML or full dynamic state unavailable for some purely mathematical candidate trials; no geometry or state is fabricated."
+  ],
+  "render_policy": "Only original XML plus saved qpos/time. Visual models and screenshots are created separately by parent workflow.",
+  "provenance_policy": "Existing master CSV/JSON used only to locate Store artifacts; numeric final values extracted directly from original Store acceptance components.",
+  "representative_render_sources": [
+    {
+      "task_id": "T02",
+      "candidate_id": "12500a1e04a251f1711b5bdfb6807000344342b01e6f4f374afdf102d3cf09ee",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "execution_id": "11f1cf0ea8f64bd5992904d956d15c7e",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\11f1cf0ea8f64bd5992904d956d15c7e\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\11f1cf0ea8f64bd5992904d956d15c7e\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\11f1cf0ea8f64bd5992904d956d15c7e\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T02",
+      "candidate_id": "9fb234b96046d0d2c69e7b68d1d575e9af3666e59e5594554b4e0a0964981b1b",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "execution_id": "1a4ba459cd4b46edbd6d8d571f4ba495",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1a4ba459cd4b46edbd6d8d571f4ba495\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1a4ba459cd4b46edbd6d8d571f4ba495\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1a4ba459cd4b46edbd6d8d571f4ba495\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T02",
+      "candidate_id": "585e74e71a8c68e905a65a3a086cb3fc740f0134950b46af42dd1ca3d2f27f8f",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "execution_id": "1de61bf4a6204897a60396b7a00b65d2",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1de61bf4a6204897a60396b7a00b65d2\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1de61bf4a6204897a60396b7a00b65d2\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\1de61bf4a6204897a60396b7a00b65d2\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "role": "retained_earlier_physical_execution",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T02",
+      "candidate_id": "9df57f510c42a321e4f9f7b58fa67ddd7255ba39f4f5f3675e02c8a6a8ce8969",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "execution_id": "a457e22f73764a98a4f798682e52d940",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\a457e22f73764a98a4f798682e52d940\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T02",
+      "candidate_id": "ebb144c06c9914db2ac14f70e03983cc9e46afca5e2ce5c91039461ca042738f",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "execution_id": "c740cee3351947939b94ea216727d834",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\c740cee3351947939b94ea216727d834\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    },
+    {
+      "task_id": "T02",
+      "candidate_id": "6f75954bda64ef713ced9db0eff0139a19c71224ad60b21bb789464edf8ad647",
+      "store": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\platform.sqlite",
+      "execution_id": "f45ddf6eecb24149a717be52d664c622",
+      "original_request": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\request.json",
+      "model_xml": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\robot.xml",
+      "state_sources": [
+        {
+          "path": "D:\\softrobot-agent\\paper_experiments\\ten_task_codex_solve_20261112\\T02_M2_loaded_hold\\STORE\\physical_replay\\f45ddf6eecb24149a717be52d664c622\\samples.json",
+          "format": "json",
+          "pointer": "/",
+          "time_field": "time_s",
+          "qpos_field": "qpos_rad",
+          "qvel_field": "qvel_rad_s"
+        }
+      ],
+      "original_timing": {
+        "control_period_s": 0.01,
+        "duration_s": 0.35,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "role": "final_original_confirmation",
+      "evidence_scope": "Historical original physics model and its own saved states. Ablation and numerical-confirmation subdirectories keep their original roles; never relabel them as new design candidates."
+    }
+  ]
+}

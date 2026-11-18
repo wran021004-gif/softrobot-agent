@@ -1,0 +1,16 @@
+% Requires \usepackage{booktabs}; values from original Store evaluations.
+\begin{tabular}{lrrrrl}
+\toprule
+Case & Hold error (mm) & Hold speed (mm/s) & Recovery (ms) & Role & Result \\
+\midrule
+No impulse & 4.028 & 5.416 & 0.0 & Required & Pass \\
+$+y$ active & 4.032 & 5.431 & 0.0 & Required & Pass \\
+$-y$ active & 4.131 & 5.565 & 1.5 & Required & Pass \\
+\midrule
+$+y$ frozen & 7.128 & 21.583 & 294.5 & Control & Fail \\
+$-y$ frozen & 7.620 & 25.357 & unavailable & Control & Fail \\
+\bottomrule
+\end{tabular}
+% Hold quantities are maxima on [0.9,1.0] s. Original bounds: 10 mm and 20 mm/s.
+% Recovery is the start of an evaluator-qualified continuous 100 ms hold after the pulse.
+% The controls are not required cases and are never relabelled as passes.
