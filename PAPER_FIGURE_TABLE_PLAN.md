@@ -1,102 +1,56 @@
-# Authoritative Figure and Table Plan — Phase 1
+# Phase-2 Figure and Table Plan
 
-## Manuscript narrative
+## Narrative
 
-The paper is organized around one scientific claim: physics-grounded agentic research makes the selection and revision of soft-robot co-design questions an explicit, evidence-driven process.
-
-The visual narrative is:
-1. Framework (Fig. 1).
-2. Breadth of physical task evidence (Fig. 2).
-3. A deep passive mechanism-design case (Fig. 3).
-4. Local mathematical consistency (Fig. 4).
-5. Evidence-guided research trajectories (Fig. 5).
-6. Full task-wise research-mode comparison (Fig. 6).
-7. Decision-level Reporter and Knowledge/Skill studies (Fig. 7).
-8. Context efficiency and evidence coverage (Fig. 8).
-
-Figure 1 is frozen. Do not redraw, recolor, relabel, or replace its editable source. Other figures follow its semantic hierarchy and the palette in PAPER_STYLE_GUIDE.md.
+The main paper should let the reader see the robot, understand how its structure or research route changed, and then inspect the physical evidence. Figure 1 remains frozen. Figures 2--4 use the actual MuJoCo renders and saved execution plots from the current task archive.
 
 ## Main figures
 
-### Figure 1 — Physics-Grounded Agentic Research Framework
-Keep the currently approved editable source and vector PDF unchanged.
+### Figure 1 — Framework
+Keep the approved Overleaf figure unchanged. Do not import or substitute the older GitHub TikZ drawing during Overleaf synchronization.
 
-### Figure 2 — Task Portfolio and Physical Coverage
-- One row for each of the eleven FULL cases: T01--T10 and PHS-2D-7S.
-- Show task family, active/passive regime, segment/tendon/actuator morphology, required-condition count, and one to three named task-specific physical outputs.
-- Show the 30 required conditions and keep T10's two frozen controls separate.
-- Never use a pooled raw-error axis across different task families.
-- Use exact model thumbnails only when the corresponding native render exists. The task matrix remains legible without thumbnails.
+### Figure 2 — Structural evolution
+- PHS-2D: initial diagnostic, intermediate candidate, accepted final structure.
+- T07: ellipse-root candidate and final round-root morphology.
+- Use only candidates with original physical models; do not fabricate missing T07 candidate renders.
+- Keep the same camera and scale within each task.
+- Use no card backgrounds, arrows over the robot, or dense annotations.
 
-### Figure 3 — Mechanism-Guided PHS-2D-9S Design
-- This is an independent nine-segment mechanism study, not the seven-segment FULL PHS-2D case.
-- The **Phase-1 vector figure already present** at `figures/fig03_phs2d_mechanism.pdf` / `.svg` plots actual stored x-z centerlines under ten signed loads, together with the loaded-point displacements, projected tip motions, and tip-to-point ratios from the physical evaluation. The left panel is labeled as stored physical centerlines; it is **not** a MuJoCo 3D render.
-- Final visual-completion step: render original Journal candidates (diagonal stay, dense tendon guidance, physical guide plates, final nine-segment structure) from their actual robot models at a common camera, scale, orientation, lighting, and material. Add 2–4 compact model panels only once these verified renders exist; otherwise retain the measured centerline panel and do not substitute invented robots.
-- Keep the ten load cases and exact physical results: 10/10 conditions; 11.155 mm minimum loaded-point displacement; 3.068 mm maximum projected tip displacement; 0.1093 maximum ratio.
-- Preserve actual load-direction/tendon identity and avoid conflating 7S and 9S data.
+### Figure 3 — Evidence-guided research trajectories
+- T04: incomplete GVS route, native equilibrium-point bank, tension feedforward, complete 22-s tracking.
+- T10: GVS/NMPC route, native tangent model/discrete LQR, bounded tension allocation, three required conditions.
+- Display the robot states and the task-specific tracking/control plots.
+- Keep frozen-input controls separate from the required T10 conditions.
+- Treat these as selected archived research records, not additional task trials.
 
-### Figure 4 — Local Mathematical Sensitivity Consistency
-- Panel (a): implicit derivative versus finite-difference derivative, faceted by the three metrics and their units.
-- Panel (b): relative discrepancy for six signed-loading branches and three metrics.
-- State that all 18 pairs follow one common normalized Young's-modulus direction across nine segments.
+### Figure 4 — Contact execution
+- T09: approach, maximum button travel, and joint depth/force holding states.
+- Pair the native renders with the recorded depth and contact-force curves.
+- Report the 0.5-s hold and task-specific maximum errors in the caption or nearby prose.
+
+### Figure 5 — Local mathematical sensitivity
+- Preserve the existing implicit-derivative versus finite-difference comparison.
+- State that 18 pairs represent six loading branches by three metrics along one common material-parameter direction.
 - Maximum relative discrepancy: 0.1191%.
-- Do not include an empirical M1/M2 panel until the matched physical replay is executed. The current 12 rows are NOT_EXECUTED/UNKNOWN and belong in the supplementary protocol only.
 
-### Figure 5 — Evidence-Guided Research Trajectories
-- Four rows: PHS-2D-9S, T04, T07, T10.
-- Each row follows observation → hypothesis → investigation → mathematical/physical evidence → structure/control action → recorded outcome.
-- Retain rejected candidates and changes in research route.
-- Label native finite-budget diagnostics separately from independent physical acceptance.
-- Use 2--4 evidence-backed nodes per row; complete node data remain supplementary.
+### Figure 6 — Architecture decision studies
+- Reporter six-pair OFF/ON comparison.
+- Original Knowledge/Skill utilization and supplemental four-checkpoint replay.
+- Keep decision-only results distinct from physical task success.
 
-### Figure 6 — Eleven-Task Research-Mode Comparison
-- Panel (a): 11×3 status matrix for A (LLM-only), B (Direct Mathematical Tools), and C (historical FULL).
-- Panel (b): task-wise normalized violation among evaluated cases; UNKNOWN and incomplete cases remain missing.
-- C passes all eleven FULL task cases.
-- Preserve A/B valid failures, incomplete evaluations, and qualification failures as different states.
-- Mark T03-B and T05-B as protocol-deviant direct-mathematical-only variants.
-- Do not describe the matrix as a randomized causal comparison or pool raw task errors.
-
-### Figure 7 — Research Architecture Decision Studies
-- Panel (a): six paired Reporter OFF/ON mean scores with connectors; annotate 3.433→3.733, +0.300, median paired difference 0, and 2/4/0 win--tie--loss.
-- Highlight M1-C (budget-boundary/unsupported initialization) and P3-A (missing directional tendon-ablation experiment) as two cases within the six pairs.
-- Panel (b): original T04/T07 K/S 2×2 utilization results (0/3/3/3), with the three saturated original quality dimensions shown separately.
-- Panel (c): four-checkpoint supplemental K/S results using the common five-dimensional review; retain the T07-074 K+S+ budget-exhausted cell.
-- Do not claim synergy, significance, or physical-success improvement.
-
-### Figure 8 — Hierarchical Context and Evidence Utilization
-- Panel (a): two historical actual-usage pairs, grouped by accounting scope: E2/C035 accepted-inference usage (675,802→78,785; 88.34%) and E2-R2/C037 cumulative accepted-request usage (877,197→174,298; 80.13%).
-- Panel (b): six new cross-task pairs showing blind decision quality and key-evidence recall on separate axes; preserve the failed Flat T08 session.
-- Panel (c): actual L0→L3 retrieval path for E2-R2/C037.
-- New Gateway Provider usage is UNKNOWN; do not plot local estimates as actual usage or claim measured cross-task token savings.
-- Local serialized-text estimates are supplementary only and must be labeled as estimates.
-
-### Figure 9 — Physical Robot Validation
-Not included in the current compiled manuscript. Add only when a complete hardware platform, protocol, trial count, and measured outcome package is available.
+### Figure 7 — Hierarchical context
+- Historical actual Provider-usage pairs and six cross-task decision/evidence pairs.
+- Keep unavailable Provider usage distinct from local text-token estimates.
 
 ## Main tables
 
-The completed Phase-1 main text uses **no duplicate 11-task summary table**. Figure 2 provides task identities, morphology, condition counts, and principal physical metrics in one integrated view. Detailed per-task metrics and protocol conventions remain in Appendix B. Full condition-level data, A/B/C matrix, and architecture review tables remain in the supplement.
+### Table I — Physical task portfolio
+Eleven rows grouped by active control, shared-morphology design, and passive mechanics. Each row reports the task's native metric and unit. Do not pool unlike errors or repeat all evaluator fields.
 
-Do not add a main table that repeats Figure 2 or the Figures 6–8 results. A future compact comparison table is acceptable only if it introduces a distinct, necessary scientific comparison not already visible in the figures.
+### Table II — A/B/FULL task comparison
+Use the same 11 task rows, grouped by task family. Columns are A, B, and FULL. Report Pass, valid failure with evaluated-constraint violation fraction, incomplete evaluation, or qualification failure. Bold passing results; mark the T03-B protocol variant with a dagger and one concise note.
+
+Both tables use booktabs, no vertical rules, no cell shading, compact but readable spacing, and bold best results. Avoid explanatory paragraphs inside cells.
 
 ## Supplementary material
-
-- Full task-specific thresholds, metrics, and condition-level values.
-- Complete A/B/C matrix and resource-scope records.
-- PHS-2D-7S and PHS-2D-9S data kept separate.
-- All 18 gradient pairs and their common perturbation direction.
-- Full 32-node research set and annotation records.
-- Six Reporter pairs and the two positive-case decision excerpts.
-- Original E1 four-dimensional scores, common five-dimensional reassessment, and all supplemental K/S cells.
-- E2/E2-R2 per-request usage, six cross-task Context decisions, key-evidence checklist, and retrieval path.
-- Local text-token estimates, clearly distinguished from Provider usage.
-- Prepared but unexecuted T07 M1/M2 protocol.
-
-## Figure build order
-
-1. Fig. 6 and Fig. 7: data-backed matrix and paired decision plots.
-2. Fig. 4 and Fig. 8: mathematical consistency and context trade-off.
-3. Fig. 2 and Fig. 5: task portfolio and research trajectories.
-4. Fig. 3: render the four actual PHS-2D-9S model stages and matched load cases.
-5. Compile the complete IEEEtran manuscript and adjust float placement/legibility.
+Retain the full condition-level metrics, complete A/B/FULL matrix, task-specific thresholds, all decision records, source indices, and detailed architecture/context protocols. Use PHS-2D as the reader-facing name while retaining exact study identifiers only in underlying source metadata.

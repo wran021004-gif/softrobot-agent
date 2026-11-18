@@ -1,21 +1,19 @@
 \section{Evidence Scope and Reporting Boundaries}
 \label{app:evidence-provenance}
 
-\subsection{FULL task portfolio and PHS-2D identities}
+\subsection{FULL task portfolio and PHS-2D}
 
-The archived FULL portfolio contains eleven task cases and 30 required conditions, all of which pass their task-specific evaluators. The two additional T10 frozen controls are reported separately. The PHS-2D task in this portfolio is seven-segment PHS-2D-7S.
+The archived FULL portfolio contains eleven task cases and 30 required conditions, all of which pass their task-specific evaluators. The two additional T10 frozen-input controls are reported separately. The PHS-2D case contributes ten required signed-loading conditions.
 
-PHS-2D-9S is an independent nine-segment, four-passive-tendon mechanism study with eight physical guide plates. It passes ten prescribed loading conditions, including independent-process reproduction, half-time-step evaluation, and initial-state perturbation checks. Its minimum loaded-point displacement is 11.155~mm, maximum projected tip displacement is 3.068~mm, and maximum displacement ratio is 0.1093. These values are not combined with the seven-segment FULL result.
+The selected PHS-2D structural sequence uses the initial diagnostic, intermediate candidate, and accepted final design shown in Fig.~\ref{fig:structure-evolution}. The accepted design has a minimum loaded-point displacement of 14.798~mm, maximum projected tip displacement of 4.347~mm, and maximum tip-to-point ratio of 0.15375. These values are reported for the selected ten-condition evaluation.
 
-\subsection{PHS-2D-9S local sensitivity audit}
+\subsection{PHS-2D local sensitivity audit}
 
-A fixed-topology audit compares KKT/IFT-based implicit derivatives with finite differences obtained by perturbing one common Young's-modulus direction and re-solving loaded and unloaded equilibria. Six loading branches and three metrics---loaded-point displacement, horizontal tip displacement, and their ratio---produce 18 derivative pairs. The maximum relative discrepancy is 0.1191223\%.
+A fixed-topology audit compares implicit derivatives with finite differences obtained by perturbing one common normalized material-parameter direction and re-solving loaded and unloaded equilibria. Six signed-loading branches and three metrics produce 18 derivative pairs. The maximum relative discrepancy is 0.1191223\%. The 18 pairs are not 18 independent parameter directions, and the discrepancy is not a global error bound. This audit is reported as a separate local sensitivity result and is not merged with the task-level metric summary.
 
-The audit covers one common normalized modulus direction across the nine segments. The 18 pairs are not 18 independent design-parameter directions, and the discrepancy is not a global error bound. The calculation supports local numerical consistency under the tested branches and perturbation.
+\subsection{A/B/FULL comparison scope}
 
-\subsection{A/B/C comparison scope}
-
-The 11-by-3 matrix contains 33 task--method records. C is the historical FULL reference. A and B begin from the task initial conditions and legal design spaces. T03-B and T05-B are protocol-deviant direct-mathematical-only variants. Qualification failures, incomplete evaluations, and valid physical failures remain distinct. The matrix is descriptive and is not a randomized estimate of causal superiority.
+The 11-by-3 matrix contains 33 task--method records. FULL is the historical reference. A and B begin from the task initial conditions and legal design spaces. T03-B is the marked direct-mathematical-only protocol variant. Qualification failures, incomplete evaluations, and valid physical failures remain distinct. The matrix is descriptive and is not a randomized estimate of causal superiority.
 
 \subsection{Architecture decision studies}
 

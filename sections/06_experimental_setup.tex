@@ -3,34 +3,32 @@
 
 \subsection{Task portfolio and physical evaluation}
 
-The FULL portfolio contains eleven task cases, T01--T10 and PHS-2D-7S, spanning active and passive designs, single- and multi-condition requirements, and distinct physical regimes. The task contracts retain their original initial states, targets or references, loads, horizons, observables, thresholds, and independent evaluators. The 30 required conditions all pass in the archived FULL results. T10 also contains two frozen control conditions, which are reported separately and are not included in the required-condition denominator. Figure~\ref{fig:task-portfolio} provides the canonical task identities, morphology counts and representative metrics; task-specific physical quantities are enumerated in Appendix~\ref{app:task-portfolio}.
+The FULL portfolio contains eleven task cases, T01--T10 and PHS-2D, spanning active manipulation, trajectory tracking, shared-morphology design, contact, passive stiffness, and tendon-constrained compliance. The task contracts retain their original initial conditions, targets or references, loads, horizons, observables, thresholds, and independent evaluators. All 30 required conditions pass. T10 also includes two frozen-input controls, which are reported separately and are not included in the required-condition count. Table~\ref{tab:physical-portfolio} summarizes the principal task-specific outcomes without pooling heterogeneous error measures.
 
-
-
-PHS-2D-9S denotes a separate nine-segment, four-passive-tendon mechanism study with eight physical guide plates. It is reported as an independent extension and is not substituted for the seven-segment PHS-2D-7S FULL case. For active multi-condition tasks, one morphology is shared while each condition may use its own control sequence. Passive tasks use fixed-payout structures and prescribed loading conditions.
+For active multi-condition tasks, one morphology is shared while each condition may use its own control sequence. T07 contains four required conditions and 35 original hard constraints. The PHS-2D study evaluates ten prescribed signed-loading conditions using a fixed-payout passive structure. Task-specific acceptance criteria remain unchanged throughout the studies.
 
 \subsection{Research-mode comparison}
 
-The task-wise research-mode comparison contains 33 task--method records across the eleven tasks and three methods:
+The task-wise comparison contains 33 task--method records across eleven tasks:
 \begin{itemize}[leftmargin=*]
 \item \textbf{A: LLM-only.} The agent proposes and revises structure and control using task information and physical-evaluation feedback. Optional mathematical diagnosis and automated mathematical optimization are not exposed.
-\item \textbf{B: Direct Mathematical Tools.} The agent has the A capabilities and may invoke supported bottom-level mathematical tools. It constructs the mathematical question and request itself; the high-level research-intent projection and mathematical research orchestration are not exposed.
-\item \textbf{C: \softrobotagent{} FULL.} C uses the archived FULL research record, including research-intent projection, \PPRP{} construction, M0--M3 semantics, differentiation routing, validity checks, and evidence feedback. C is a historical reference and is not re-run.
+\item \textbf{B: Direct Mathematical Tools.} The agent has the A capabilities and may invoke supported bottom-level mathematical tools. It constructs the mathematical question and request itself; high-level research-intent projection and mathematical research orchestration are not exposed.
+\item \textbf{FULL: \softrobotagent{}.} The archived FULL record includes research-intent projection, \PPRP{} construction, M0--M3 semantics, differentiation routing, validity checks, and evidence feedback. FULL is a historical reference and is not re-run.
 \end{itemize}
-A and B begin from the original task initial states and the legal design space rather than from intermediate FULL candidates. Two B entries, T03 and T05, were recorded under a direct-mathematical-only variant and are marked as protocol deviations; they are not treated as standard B runs. Qualification failures, incomplete evaluations, and valid physical failures remain distinct outcomes.
+A and B begin from the original task initial states and legal design spaces rather than from intermediate FULL candidates. T03-B is marked as a direct-mathematical-only protocol variant. Qualification failures, incomplete evaluations, and valid physical failures remain distinct outcomes; the task-wise results are summarized in Table~\ref{tab:abc-comparison}.
+
+\subsection{Representative research and execution records}
+
+Figures~\ref{fig:structure-evolution}--\ref{fig:physical-execution} use recorded candidate models and saved physical states to illustrate structural evolution, route changes, and task execution. The selected T04, T07, and T10 timelines are representative archived task-study records; they are not counted as additional independent task trials. Images are rendered from saved states without re-running the physical experiments.
 
 \subsection{Architecture-level decision studies}
 
-Architecture studies evaluate proposed research decisions at frozen checkpoints. They do not launch candidate search, mathematical workers, physical simulation, or hardware execution. Their outcomes are therefore decision-level measures, not additional robot task successes.
+Architecture studies evaluate proposed research decisions at frozen checkpoints. They do not launch candidate search, mathematical workers, physical simulation, or hardware execution. Their outcomes are decision-level measures, not additional robot task successes.
 
 The Reporter study contains six matched OFF/ON checkpoint pairs, twelve Main sessions, and six anonymous independent-model reviews. The ON condition receives the corresponding read-only Reporter interpretation; six previously generated reports are reused. The reviewer scores physical interpretation, evidence consistency, limitation recognition, research actionability, and Main decision quality on a 0--4 ordinal scale.
 
-The original Knowledge/Skill experiment is a $2\times2$ factorial replay at T04 and T07, with one Main decision per cell and eight decisions overall. A later decision-only extension evaluates the same four K/S conditions at four frozen checkpoints, producing sixteen sessions, fifteen valid decisions, and one request-budget-exhausted submission. A common five-dimensional assessment is reported separately from the original four-dimensional scores. The original and supplemental checkpoint identities are retained.
-
-The context studies comprise two historical PHS-2D checkpoint pairs and six additional cross-task checkpoint pairs at T01, T04, T07, T08, T09, and T10. The six-checkpoint extension contains twelve Main sessions, eleven valid decisions, one request-budget-exhausted session, and six anonymous paired reviews. The two historical pairs have Provider-reported usage under different accounting scopes. Provider usage was not returned for the six new Gateway pairs; their token usage is therefore unavailable.
+The original Knowledge/Skill experiment is a $2\times2$ factorial replay at T04 and T07, with one Main decision per cell and eight decisions overall. A later decision-only extension evaluates the same four K/S conditions at four frozen checkpoints, producing sixteen sessions, fifteen valid decisions, and one request-budget-exhausted submission. The context studies comprise two historical PHS-2D checkpoint pairs and six additional cross-task checkpoint pairs at T01, T04, T07, T08, T09, and T10.
 
 \subsection{Scoring and resource accounting}
 
-Decision reviews use anonymous outputs and frozen evidence. Scores are descriptive ordinal assessments. The samples do not support significance tests, population-level causal claims, or statistical noninferiority. Human verification of the independent-model assessments remains separate.
-
-For physical tasks, reporting retains required-condition completion, evaluation coverage, task-specific normalized violation, candidate count, mathematical calls, physical evaluations, integration steps, and recorded time. Raw errors from different task families are not averaged. Resource fields are compared only when their measurement populations and scopes match. Provider token counts are reported only when returned by the Provider; local text-token reconstructions are kept separately as estimates in the supplementary accounting.
+Decision reviews use frozen evidence and anonymous outputs. Scores are descriptive ordinal assessments; the samples do not support significance tests, population-level causal claims, or statistical noninferiority. Provider token counts are reported only when returned by the Provider. Local serialized-text token reconstructions are kept separate from Provider usage and are not used as measured billing or context consumption.

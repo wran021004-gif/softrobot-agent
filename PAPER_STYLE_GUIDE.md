@@ -1,6 +1,6 @@
 # Manuscript style and notation guide
 
-This file is the single manuscript-wide reference for task naming, mathematical notation, and visual semantics. Figure 1 is frozen and must not be edited. All subsequent figures should follow its conceptual hierarchy while using the publication palette below.
+This is the manuscript-wide reference for terminology, mathematical notation, and visual style. Figure 1 is frozen and must not be edited.
 
 ## Canonical task names
 
@@ -18,13 +18,13 @@ This file is the single manuscript-wide reference for task naming, mathematical 
 | T10 | Impact-Recovery Control |
 | PHS-2D | Passive Tendon-Constrained Compliance and Tip Suppression |
 
-PHS-2D-7S is the passive case inside the eleven-case FULL portfolio. PHS-2D-9S is a separate independent mechanism study. Never combine their candidate histories, morphology, or measurements.
+Use **PHS-2D** in all reader-facing text, tables, legends, and captions. Preserve exact study/candidate identifiers only in source metadata and supplementary provenance; do not expose segment-count suffixes in the manuscript.
 
 ## Canonical terms
 
 Use Physics-Grounded Agentic Research, Main Agent, Reporter, Research Intent, Parameterized Physical Research Problem (PPRP), Analysis Semantics, Mathematical Evidence, Physical Evidence, Research Decision, Design Candidate, Independent Physical Evaluation, and Structure--Control Co-design.
 
-Use Physics-Grounded, not Physics-Guided, for the proposed framework. M0--M3 are complementary analysis semantics, not a mandatory sequence. The Main Agent owns scientific decisions. The Reporter is read-only.
+Use Physics-Grounded, not Physics-Guided. M0--M3 are complementary analysis semantics, not a mandatory pipeline. The Main Agent owns scientific decisions. The Reporter is read-only.
 
 ## Mathematical notation
 
@@ -70,22 +70,23 @@ Passive-equilibrium response sensitivity is calculated through the equilibrium/K
 
 | Color | Hex | Fixed meaning |
 |---|---|---|
-| Deep Navy | #26384B | Main Agent / primary method |
-| Muted Teal | #527F7B | Mathematical Evidence |
-| Slate Blue | #70849A | Physical Evidence |
-| Muted Ochre | #B08A59 | Structure Modification |
-| Forest Green | #557663 | Verified Pass |
-| Muted Brick | #A35D55 | Failure / Constraint Violation |
-| Neutral Gray | #929BA4 | Baseline / Historical |
-| Light Gray | #D9DEE2 | Grid / Auxiliary |
+| Deep Navy | #26384B | Primary method / labels |
+| Muted Teal | #527F7B | Mathematical evidence |
+| Slate Blue | #70849A | Physical evidence |
+| Muted Ochre | #B08A59 | Structure modification |
+| Forest Green | #557663 | Verified pass |
+| Muted Brick | #A35D55 | Failure / constraint violation |
+| Neutral Gray | #929BA4 | Baseline / historical |
+| Light Gray | #D9DEE2 | Grid / auxiliary |
 
-## Figure styling
+## Figure and table styling
 
-- White background; straight edges; no shadows, gradients, rounded cards, or dashboard tiles.
-- Helvetica/Arial-style labels, 8--9 pt at final size; consistent line weights and axis styles.
-- Use panel labels (a), (b), (c) and concise legends.
-- Export vector PDF and SVG.
-- Keep Figure 1 unchanged. Use its conceptual colors and hierarchy for all other figures.
-- Show UNKNOWN as missing/hatched, never as zero.
+- White background; no rounded cards, drop shadows, gradients, dashboard tiles, or decorative color fills.
+- Use native MuJoCo renders for robot structure and state images.
+- Use restrained, consistent lighting and a fixed camera for candidate comparisons.
+- Use Helvetica/Arial-style labels, normally 8--9 pt at final print size.
+- Use booktabs for tables: no vertical rules, no colored cells, clear group separators, and boldface for the best result within each row.
+- Use concise captions; put protocol detail and source information in the supplement.
+- Show UNKNOWN as unavailable, never as zero.
 - Do not average raw errors across different task families.
 - Do not add unobserved confidence intervals, repetitions, significance markers, or physical outcomes.
