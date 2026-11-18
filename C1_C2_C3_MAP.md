@@ -15,6 +15,7 @@ Autonomous research is the organizing contribution. Structure–control decoupli
 - T04: task-specific initialization and tracking-route changes, culminating in a complete two-cycle execution.
 - T07: rejection of a longer shared morphology, routing revision, and condition-specific control initialization transfer.
 - T10: transition to a native state-feedback/LQR route for impact recovery.
+- Evidence-to-Action admission and execution: [C1 audit](paper_experiments/C1_EVIDENCE_TO_ACTION_AUDIT_20261118/AUDIT_REPORT.md). Keep actor-stratified observed execution distinct from role-level totals, and distinguish explicit archive links from evidence of causation.
 
 ## C2 — Task-conditioned composable mathematical research
 
@@ -27,6 +28,7 @@ Autonomous research is the organizing contribution. Structure–control decoupli
 - M3: closed-loop performance.
 - Mathematical basis: KKT and active-set analysis, implicit differentiation, envelope/dual sensitivity, analytic/automatic differentiation, finite differences, directional comparisons, and finite-scale interaction analysis.
 - Main evidence: nine-segment PHS-2D gradient audit; T01/T02/T07 structure–control cases; T04/T10 control-method changes.
+- [T07 matched validation](paper_experiments/T07_M1_M2_PAIRED_VALIDATION_20261118/RESULTS.md): one genuine M1 pair; four independently evaluated d1 endpoints but no reliable d0 M2 endpoint. No measured M2 structure effect is claimed.
 - PHS-2D sensitivity audit: six loading branches × three task metrics = 18 derivative pairs along one common Young's-modulus direction; maximum relative discrepancy 0.1191223%.
 - The contribution is the task-conditioned composition, validity-aware routing, and integration into agent-directed research—not a new KKT, IFT, envelope, or finite-difference theorem.
 

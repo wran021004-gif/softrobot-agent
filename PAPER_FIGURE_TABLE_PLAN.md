@@ -22,6 +22,7 @@ Keep the approved Overleaf figure unchanged. Do not import or substitute the old
 - T10: preimpact, pulse and postimpact MuJoCo states plus the actual route-comparison graph. Explain Agent decision to replace GVS/NMPC with native tangent-model LQR and bounded tension allocation; keep the same morphology throughout.
 - Use native visuals + agent output + executed action + physical evidence as one coherent trace. No colored cards, excessive explanatory footnotes or fabricated chain-of-thought passages.
 - Do not portray incomplete initial T04 work as a fully evaluated physical baseline.
+- C1 companion quantitative panel: [verified Evidence-to-Action audit](paper_experiments/C1_EVIDENCE_TO_ACTION_AUDIT_20261118/AUDIT_REPORT.md). Use the actor-stratified funnel and executed counts by task; do not relabel external Codex work as Main Agent observations.
 
 ### Figure 4 — Contact execution and task evidence
 - T09: native MuJoCo approach, maximum button displacement and held-contact states, plus recorded displacement/force curves.
@@ -32,6 +33,7 @@ Keep the approved Overleaf figure unchanged. Do not import or substitute the old
 - Preserve the existing implicit-derivative versus finite-difference comparison.
 - State that 18 pairs represent six loading branches by three metrics along one common material-parameter direction.
 - Maximum relative discrepancy: 0.1191%.
+- C2 companion audit: [T07 M1/M2 results](paper_experiments/T07_M1_M2_PAIRED_VALIDATION_20261118/RESULTS.md). Show the measured M1_B fixed-input contrast and unpaired d1 M2 endpoints. No M2 structure-effect line or claims from nonconverged controls.
 
 ### Figure 6 — Architecture decision studies
 - Reporter six-pair OFF/ON comparison.
