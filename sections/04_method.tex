@@ -44,9 +44,12 @@ Algorithm~\ref{alg:pprp} summarizes this research-level procedure. The semantic 
 
 
 
-\begin{algorithm}[t]
-\caption{PPRP construction and evidence-guided research}
+\begin{figure*}[t]
+\refstepcounter{algorithm}
 \label{alg:pprp}
+\noindent\rule{\textwidth}{0.4pt}\par
+\noindent\textbf{Algorithm \thealgorithm. PPRP construction and evidence-guided research}\par
+\vspace{2pt}
 \begin{algorithmic}[1]
 \Require Frozen task $\tau$, candidate $d_k$, research state $(\mathcal H_k,\mathcal E_k)$, registries $\mathcal R$, remaining budget $\mathcal B_k$
 \Ensure Updated candidate $d_{k+1}$ and scoped evidence $\mathcal E_{k+1}$
@@ -81,7 +84,8 @@ Algorithm~\ref{alg:pprp} summarizes this research-level procedure. The semantic 
 \EndIf
 \State \Return $(d_{k+1},\mathcal E_{k+1})$
 \end{algorithmic}
-\end{algorithm}
+\noindent\rule{\textwidth}{0.4pt}
+\end{figure*}
 
 The PPRP is the structured bridge between a physical hypothesis and a numerical investigation: it binds the frozen task, current candidate, selected parameters and observables, inner physical problem, analysis semantics, and budget. The numerical primitives routed through it (e.g., KKT/IFT sensitivity, envelope or dual sensitivity, automatic differentiation, and controlled finite differences) are established methods. The methodological contribution is their task-conditioned composition, validity-aware routing, and return as scoped evidence to the research agent.
 
