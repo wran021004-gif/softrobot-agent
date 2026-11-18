@@ -1,19 +1,25 @@
 \begin{figure*}[t]
 \centering
-\begin{minipage}[t]{0.315\textwidth}\centering
-\includegraphics[width=\linewidth]{figures/native/t09_approach.png}
-\par\footnotesize (a) Approach
+\noindent\textbf{T09: guided button contact and force regulation}\par\vspace{3pt}
+\begin{minipage}[t]{0.315\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/native/t09_approach.png}
+\par\small (a) Approach
 \end{minipage}\hfill
-\begin{minipage}[t]{0.315\textwidth}\centering
-\includegraphics[width=\linewidth]{figures/native/t09_maximum_depth.png}
-\par\footnotesize (b) Maximum button travel
+\begin{minipage}[t]{0.315\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/native/t09_maximum_depth.png}
+\par\small (b) Maximum travel
 \end{minipage}\hfill
-\begin{minipage}[t]{0.315\textwidth}\centering
-\includegraphics[width=\linewidth]{figures/native/t09_hold.png}
-\par\footnotesize (c) Joint depth/force hold
+\begin{minipage}[t]{0.315\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/native/t09_hold.png}
+\par\small (c) Contact hold
 \end{minipage}
+\par\vspace{3pt}
+\noindent\small
+\textcolor{TraceNavy}{\textbf{Agent observation:}} The initial interaction exhibited unintended contacts.
+\quad\textcolor{TraceTeal}{\textbf{Action:}} Retain the actual guide geometry and correct the contact-execution setup.
+\quad\textbf{Outcome:} 0 unexpected collisions and 0.50 s joint depth/force hold.
 \par\vspace{4pt}
-\includegraphics[width=0.88\textwidth]{figures/native/t09_contact_curves.png}
-\caption{Native MuJoCo states and measured contact response for T09. The recorded sequence shows approach, maximum button travel, and the joint depth/force hold. The accepted execution maintains the required 0.5-s hold, with maximum depth and contact-force errors of 0.0528~mm and 0.00247~N, respectively.}
+\includegraphics[width=0.84\textwidth]{figures/native/t09_contact_curves.png}
+\caption{Recorded T09 execution. The MuJoCo sequence shows approach, maximum button displacement and steady contact; measured depth and force traces confirm the prescribed holding interval. Maximum depth and contact-force errors are 0.0528 mm and 0.00247 N.}
 \label{fig:physical-execution}
 \end{figure*}
