@@ -1,39 +1,79 @@
-# Codex task: synchronize revised TRO manuscript and visually review agent traces
+# Codex: synchronize evidence-guided TRO manuscript to the existing Overleaf project
 
-Authoritative GitHub branch: origin/paper/manuscript-phase2-revision-20261118.
-Existing Overleaf Git remote: overleaf (latex.ustc.edu.cn), main. The previously verified Overleaf commit was 1f158b9d14d3bd7bd98f8bf798ffef032181080a. Fetch and check the actual current remote HEAD first; do not assume it is still that commit.
+## Authoritative sources and destination
 
-## Goal
-Synchronize the new publication-style manuscript and its source-backed figures into the EXISTING Overleaf project. This revision is not a generic plot swap: it uses integrated Agent Observation / Decision / Action / Native MuJoCo Structure / Quantitative Evidence traces. The main results are now:
-- Fig. 1: existing approved framework (frozen, preserve original Overleaf PDF, SVG, entire figure environment/caption/label verbatim).
-- Fig. 2: native structure evolution PHS-2D and T07, with short hypothesis/action/outcome annotations.
-- Fig. 3: native T04/T10 research traces with agent decision excerpts, action, physical states and quantitative curves.
-- Fig. 4: native T09 contact execution and force/depth curves.
-- Fig. 5: original gradient validation vector PDF.
-- Fig. 6: Reporter and K/S vector PDF.
-- Fig. 7: Context vector PDF.
-- Table I: physical task portfolio (booktabs, grouped task rows).
-- Table II: 11-task A/B/FULL comparison (booktabs, grouped task rows).
+- GitHub repository: wran021004-gif/softrobot-agent
+- Source branch: origin/paper/manuscript-phase2-revision-20261118
+- Source HEAD: fetch and record the current branch head; do not rely on an old commit.
+- Local Windows working repository: D:\softrobot-agent
+- Existing Overleaf Git remote: overleaf; target branch main.
+- Last known successful Overleaf deployment: 1f158b9d14d3bd7bd98f8bf798ffef032181080a. Always fetch the actual current remote HEAD.
 
-## Safe synchronization
-1. Inspect local git status, worktrees, GitHub branch HEAD, existing Overleaf main HEAD and diff. Protect uncommitted work. No force-push, reset, clean or destructive overwrite.
-2. Fetch the source branch and selectively reconcile the compiled sections and appendices, two table TeX files, three new figure TeX files, 16 original native PNGs under figures/native/, and three renamed vector PDF/SVG pairs.
-3. Preserve the approved Overleaf Figure 1 PDF/SVG byte-for-byte and its full existing figure environment. Do not use the GitHub older TikZ Figure 1.
-4. In the compiled reader-facing manuscript use PHS-2D, not 7S/9S suffixes. Keep exact study identities only in internal source metadata. Do not merge distinct studies' numeric metrics.
-5. Keep existing archives and unused files intact. Do not upload the whole runs/ directory, source Store or large video archive.
-6. Maintain a strict IEEEtran / TRO style: Times-like IEEE body, booktabs tables with no vertical rules or shading, no card backgrounds, readable 8-9 pt figure labels at final width, concise captions, no overlapping labels.
+Execute the actual synchronization, compilation, visual review and normal fast-forward push when access is available. Never claim deployment before verifying overleaf/main.
 
-## Mandatory visual inspection
-- The new Figure 3 trace is the priority. Its three-column tabularx layout has text inside cells; verify no row-break parsing errors, no overflow, and no unintended text compression. If needed, replace the trace layout with aligned minipages or a two-figure arrangement. Preserve exact scientific content and agent/action/physical result correspondence. Do not revert to a simple two-photo montage.
-- Verify T04's early route is not falsely shown as a complete physically accepted baseline. Verify T10's three robot images are states of one fixed morphology, not different designs.
-- Figure 2 must show the actual PHS and T07 native renders, with a consistent camera within each study. Keep action/evidence labels visually legible; remove any annotation that cannot be grounded in archived decisions.
-- Figure 4 should clearly show the button contact and depth/force curve at publication print size.
-- Table I is wide: if needed abbreviate long task names to canonical task IDs plus a short task descriptor, or use tabularx p-columns and slightly smaller font; avoid resizebox shrinkage below readable print size.
-- Table II: compare status categories correctly. Distinguish valid failures, incomplete, qualification failure. Mark T03-B protocol variant. Do not imply repeated randomized trials or confidence intervals.
-- Review all captions and references, including renumbered Figure 2-7 labels. Ensure no old Figure 2-8 results PDF remains compiled accidentally.
-- Validate 30 required conditions, T04 RMSE 0.688 mm, T07 4/4, T09 0.5 s hold, T10 3/3, PHS-2D 10/10, and mathematical audit 18 pairs/0.1191%. Keep each metric tied to its correct study.
-- Compile pdfLaTeX + BibTeX + repeated pdfLaTeX. Inspect every page and figure at 100% and 200%. Fix missing graphics, undefined references, overfull boxes, float placement, table overflow, and inconsistent fonts. Report the final page count.
-- The current GitHub revision was authored remotely and has NOT been compiled here; you must actually compile it locally before claiming success.
+## 1. Safe preparation
 
-## Delivery
-After local compilation and visual review, commit only the intended changes on the existing Overleaf main history, push by normal fast-forward and verify with git ls-remote. Report GitHub source SHA, Overleaf commit SHA, compile result, pages, any remaining visual issues, and confirmation that approved Figure 1 was preserved.
+1. Inspect the local worktrees, modified files and remotes. Preserve all unrelated uncommitted work; do not reset, clean or force-push.
+2. Fetch the source branch and Overleaf main. Work in a dedicated clean worktree cloned from the current Overleaf main, not by clobbering the local paper branch.
+3. Compare the current Overleaf source with the GitHub Phase-2 revision. Existing Overleaf-specific layout fixes may be ahead of GitHub. Reconcile rather than blindly replacing them.
+
+## 2. Synchronize the current manuscript
+
+Import the intended updated publication source:
+- main.tex, including the restrained TraceNavy / TraceTeal / TraceSlate color definitions.
+- Eight active sections selected by main.tex, four appendices, references.bib and valid cited references.
+- tables/table1_physical_portfolio.tex and tables/table2_abc_comparison.tex.
+- figures/fig02_structure_evolution.tex, fig03_research_trajectory.tex, fig04_physical_execution.tex.
+- Existing quantitative vector figures used by Results: fig05_gradient_validation.pdf (and SVG), fig06_architecture_ablation.pdf (and SVG), fig07_context_comparison.pdf (and SVG).
+- The 16 original selected native MuJoCo PNG assets under figures/native/ already tracked on the source branch.
+- Style guidance and paper plan can be retained as editorial sources outside the compiled TeX inputs.
+
+Do not upload the full 188-image / 25-video archive, experimental SQLite Stores, intermediate XML database, or unrelated report directories.
+
+## 3. Absolute Figure-1 preservation
+
+Preserve the approved Figure 1 that already exists on Overleaf:
+- figures/fig01_research_framework.pdf and .svg byte-for-byte.
+- Its existing complete LaTeX figure environment, inclusion path, dimensions, placement, caption and label.
+Do not replace the approved Figure 1 with the old GitHub TikZ source; do not regenerate the diagram.
+
+## 4. Reader-facing narrative
+
+The central evidence story is:
+- Figure 2: PHS-2D and T07 native morphology evolution, with succinct evidence-grounded Agent finding, actual action and physical outcome.
+- Figure 3: T04 and T10 trace panels combine Agent output, action, native MuJoCo states and quantitative curves.
+- Figure 4: T09 actual contact-state sequence + force/depth trace + contact-execution decision.
+- Figure 5: local mathematical derivative check.
+- Figure 6: Reporter / Knowledge-Skill decision evaluation.
+- Figure 7: hierarchical context costs and evidence quality.
+- Table I: eleven-task physical results grouped like a conventional IEEE benchmark table.
+- Table II: eleven-task A/B/FULL outcomes grouped by task family.
+
+No dashboard cards, rounded blocks, tinted table cells, gradient fills, extensive footnotes in plots, or oversized in-figure titles. Keep captions concise. Source-data identifiers are not displayed as visual metadata.
+
+All reader-visible PHS task labels use PHS-2D, without segment-count suffixes. The PHS physical portfolio metrics (14.798 mm loaded-point minimum, 4.347 mm max tip displacement, max ratio 0.1538) are from one selected ten-condition study, while the 18-pair gradient audit is from a separate PHS-2D study. Keep internal Study sources distinct and do not imply these were one continuous candidate or directly comparable paired experiment.
+
+A/B/FULL task portfolio: FULL satisfies all 30 required conditions. The T03-B direct-mathematical-only variant is indicated by a dagger, explained in the Table II caption. Report valid physical failures, incomplete and qualification failures distinctly. The two T10 frozen-input controls are outside its three required cases.
+
+Agent output text is an extracted or concise paraphrased public research decision, not invented raw internal thinking. The T04 all-4 N inadmissible initialization and 0.20 to 0.21 N restart are from archived decisions. T10 morphology stays fixed during its control-route change. Avoid creating unrecorded experiment/structure transitions.
+
+## 5. Compile and visually inspect
+
+1. Compile with the existing project IEEEtran pdfLaTeX + BibTeX + pdfLaTeX passes until references settle.
+2. Inspect PDF pages with Figures 2–4 at 100% and 200% zoom. In particular, confirm:
+   - Three native PHS images, two T07 images and their Agent/action statements are aligned without text wrapping over images.
+   - T04 earlier and final MuJoCo snapshots plus tracking plot, followed by readable agent observation/action/result.
+   - T10 preimpact/pulse/recovery sequence and control comparison plot are correctly aligned, not presenting different robot structures.
+   - T09 native contact sequence and force/depth plot remain legible at final double-column width.
+3. Check Tables I/II for booktabs-only horizontal grouping, no vertical lines or shading, accurate numbers, no overfull rows/columns. Prefer natural font sizes and better column widths; do not force full-page resize into tiny fonts.
+4. Check all floats, captions, references, equations, missing graphics, missing fonts, overfull hboxes and page/column balance. Reuse the previous successful Overleaf Figure 1 verbatim.
+5. If layout adjustments are needed, edit the Overleaf local copy with the same scientific content; commit those layout corrections. Do not rewrite data, modify thresholds, or add fabricated diagram elements.
+6. Verify no Figures 2–4 are compiled from the obsolete old PDFs. Figure 5–7 should still use the accurate quantitative vector files.
+7. A final reader-facing terminology scan should find PHS-2D without 7S/9S suffixes in active TeX and figure labels; source archives may retain exact Study IDs.
+
+## 6. Push and report
+
+Commit only the scoped manuscript, table and figure changes to the fetched Overleaf main history.
+Push by a normal fast-forward, never force. If remote main advanced, fetch and reconcile then recompile before pushing.
+Confirm the remote commit with git ls-remote overleaf refs/heads/main.
+Return: GitHub source SHA, Overleaf commit SHA, page count, compile warnings, figure/table layout review, confirmation that Figure 1 was untouched, and any missing data/asset blockers. Do not state synchronization succeeded until remote verification completes.
