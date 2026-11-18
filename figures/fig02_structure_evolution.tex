@@ -1,26 +1,43 @@
 \begin{figure*}[t]
 \centering
-\begin{minipage}[t]{0.315\textwidth}\centering
-\includegraphics[width=\linewidth]{figures/native/phs2d_initial.png}
-\par\footnotesize (a) Initial diagnostic
+\setlength{\tabcolsep}{3pt}
+\noindent\textbf{(a) PHS-2D: from mechanism diagnosis to a passive tendon design}\par\vspace{2pt}
+\begin{minipage}[t]{0.315\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/native/phs2d_initial.png}
+\par\small Initial diagnostic
 \end{minipage}\hfill
-\begin{minipage}[t]{0.315\textwidth}\centering
-\includegraphics[width=\linewidth]{figures/native/phs2d_intermediate.png}
-\par\footnotesize (b) Intermediate candidate
+\begin{minipage}[t]{0.315\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/native/phs2d_intermediate.png}
+\par\small Intermediate routing
 \end{minipage}\hfill
-\begin{minipage}[t]{0.315\textwidth}\centering
-\includegraphics[width=\linewidth]{figures/native/phs2d_final.png}
-\par\footnotesize (c) Accepted design
+\begin{minipage}[t]{0.315\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/native/phs2d_final.png}
+\par\small Accepted mechanism
 \end{minipage}
-\par\vspace{5pt}
-\begin{minipage}[t]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth]{figures/native/t07_ellipse_root.png}
-\par\footnotesize (d) Elliptical root candidate
+\par\vspace{3pt}
+\noindent\small
+\textcolor{TraceNavy}{\textbf{Agent hypothesis:}} Reduce transmitted tip motion while retaining local compliance.
+\quad \(\longrightarrow\) \textcolor{TraceTeal}{\textbf{Action:}} Revise passive tendon guidance.
+\quad \(\longrightarrow\) \textbf{Outcome:} 10/10 load cases; maximum tip-to-point ratio 0.1538.
+\par\vspace{7pt}
+\noindent\textbf{(b) T07: structure revision under a shared four-task contract}\par\vspace{2pt}
+\begin{minipage}[t]{0.325\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/native/t07_ellipse_root.png}
+\par\small Elliptical root
 \end{minipage}\hfill
-\begin{minipage}[t]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth]{figures/native/t07_round_root.png}
-\par\footnotesize (e) Final rounded-root morphology
+\begin{minipage}[t]{0.325\textwidth}
+\centering\includegraphics[width=\linewidth]{figures/native/t07_round_root.png}
+\par\small Rounded root
+\end{minipage}\hfill
+\begin{minipage}[t]{0.325\textwidth}
+\small
+\textcolor{TraceNavy}{\textbf{Agent observation}}\par
+\emph{The historical geometry still violates condition A despite control refinement.}\par\vspace{3pt}
+\textcolor{TraceTeal}{\textbf{Research action}}\par
+Test an isotropic root; refine the tendon route and re-optimize control.\par\vspace{3pt}
+\textbf{Validated outcome}\par
+One morphology passes \textbf{4/4} conditions (35 original hard constraints).
 \end{minipage}
-\caption{Structural evolution in PHS-2D and T07. The upper sequence shows the initial diagnostic, an intermediate candidate, and the accepted passive design. The lower pair compares the recorded elliptical-root candidate with the final rounded-root morphology. Each task uses a consistent MuJoCo camera and rendering setup; only candidates with corresponding physical models are shown.}
+\caption{Evidence-guided structural evolution. Actual MuJoCo views show three stages of passive PHS-2D design and two physically instantiated T07 morphologies. Agent findings motivate changes in tendon guidance or root geometry; the resulting designs are evaluated under their respective task contracts.}
 \label{fig:structure-evolution}
 \end{figure*}
