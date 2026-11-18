@@ -1,6 +1,6 @@
 \begin{table*}[t]
 \centering
-\caption{Task-wise comparison of LLM-only (A), direct mathematical tools (B), and the FULL framework. F denotes a valid physical failure (fraction of evaluated constraints violated); I and Q denote incomplete evaluation and qualification failure, respectively.}
+\caption{Task-wise comparison of LLM-only (A), direct mathematical tools (B), and the FULL framework. F denotes a valid physical failure (fraction of evaluated constraints violated); I and Q denote incomplete evaluation and qualification failure. $\dagger$ marks a direct-mathematical-only B variant.}
 \label{tab:abc-comparison}
 \small
 \setlength{\tabcolsep}{5pt}
@@ -9,22 +9,22 @@
 \toprule
 Category & Task & A & B & FULL \\
 \midrule
-\multirow{4}{*}{\emph{Reach / tracking}}
+\multirow{4}{=}{\emph{Reach / tracking}}
 & T01 Multi-target Reach-and-Hold & F (44.4\%) & F (55.6\%) & \textbf{Pass} \\
 & T02 Load-Conditioned Hold & I (1/3) & I (0/3) & \textbf{Pass} \\
 & T03 Fast Target Reaching & F (44.4\%) & \textbf{Pass}$^\dagger$ & \textbf{Pass} \\
 & T04 Figure-Eight Trajectory Tracking & F (16.7\%) & Q & \textbf{Pass} \\
 \midrule
-\multirow{3}{*}{\emph{Pose / contact}}
+\multirow{3}{=}{\emph{Pose / contact}}
 & T05 End-Effector Position and Tool-Axis Alignment & F (37.5\%) & \textbf{Pass} & \textbf{Pass} \\
 & T06 Loaded Time-Indexed Pose Scanning & F (33.3\%) & F (44.4\%) & \textbf{Pass} \\
 & T09 Guided Spring-Button Contact Manipulation & F (31.6\%) & F (31.6\%) & \textbf{Pass} \\
 \midrule
-\multirow{2}{*}{\emph{Co-design}}
+\multirow{2}{=}{\emph{Co-design}}
 & T07 Shared-Morphology Multi-Task Design & F (42.9\%) & F (40.0\%) & \textbf{Pass} \\
 & T10 Impact-Recovery Control & I (1/3) & F (57.1\%) & \textbf{Pass} \\
 \midrule
-\multirow{2}{*}{\emph{Passive}}
+\multirow{2}{=}{\emph{Passive}}
 & T08 Passive Progressive-Stiffness Response & I (0/2) & Q & \textbf{Pass} \\
 & PHS-2D Passive Tendon-Constrained Compliance and Tip Suppression & Q & Q & \textbf{Pass} \\
 \bottomrule
