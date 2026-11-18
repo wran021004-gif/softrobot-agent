@@ -14,7 +14,9 @@ Figure~\ref{fig:task-portfolio} organizes the eleven FULL task cases into four f
 
 Figure~\ref{fig:structure-evolution} presents two complementary structural-design cases. The PHS-2D mechanism study progresses from an initial tendon arrangement through an intermediate routing revision to a guide-plate-constrained passive design. Its ten signed-loading conditions yield a minimum loaded-point displacement of 11.155~mm, a maximum projected tip displacement of 3.068~mm, and a maximum tip-to-point ratio of 0.1093. Independent-process reproduction, half-time-step evaluation, and initial-state perturbation checks retain the same ten-condition outcome.
 
-T07 illustrates a different design objective: one morphology must satisfy a shared four-condition task contract. The recorded refinement changes the root from an anisotropic elliptical section to a rounded section and adjusts the routing radius from 14.1 to 14.0~mm. The resulting morphology satisfies all four conditions and 35 original hard constraints, with M5 position and directed-axis errors of 7.920~mm and 0.05184~rad. The PHS-2D mechanism study and the PHS-2D portfolio entry in Fig.~\ref{fig:task-portfolio} are separate design records and their numerical results are not pooled.
+T07 illustrates a different design objective: one morphology must satisfy a shared four-condition task contract. The recorded refinement changes the root from an anisotropic elliptical section to a rounded section and adjusts the routing radius from 14.1 to 14.0~mm. With control re-optimized on the modified morphology $d_1$, all four required conditions pass, while the archived design also satisfies the 35 original hard constraints; its M5 position and directed-axis errors are 7.920~mm and 0.05184~rad.
+
+A matched T07-M1\_B replay separates structural response from control adaptation. Under the same archived tension sequence, changing $d_0$ to $d_1$ reduces maximum geometric tendon speed from 74.924 to 45.381~mm/s, but increases the maximum holding/terminal position error from 8.089 to 31.169~mm. The worst normalized violation consequently rises from 1.996961 to 2.116883, with the active bottleneck shifting from tendon speed to position. Re-optimizing control on $d_1$ then gives $g_{\max}=-0.010000$ and an independent PASS. The $d_0$ M2 attempts did not reliably converge, so these data establish neither a cross-structure M2 improvement nor infeasibility of $d_0$; they show why fixed-input structural response (M1) and re-optimized task capability (M2) must remain distinct. The PHS-2D mechanism study and the PHS-2D portfolio entry in Fig.~\ref{fig:task-portfolio} are separate design records and their numerical results are not pooled.
 
 \input{figures/fig02_structure_evolution}
 
@@ -27,19 +29,16 @@ T07 demonstrates evidence-guided refinement under a shared-morphology requiremen
 
 T10 demonstrates a change in control formulation while retaining the robot morphology. After GVS/NMPC trials exposed recovery and tendon-limit conflicts, the research route adopted a native tangent model, discrete LQR, and bounded tension allocation. The common feedback recipe satisfies all three required impact conditions; the two frozen-input controls fail their corresponding recovery requirements. These panels show discrete research-route changes, not a convergence curve.
 
+To quantify how research evidence moves into concrete operations, we audited the archived evidence-to-action trace. Of 220 evidence-linked proposals, 205 were dispatched, 160 have confirmed execution records with inspectable outputs, and 10 were later linked to independent passing evaluations. This corresponds to a 72.73\% proposal-to-execution conversion; the 10/160 later-validation linkage is 6.25\%, not a general task success rate. These archive-level counts complement the three cases by measuring traceable progression from evidence to operation and subsequent validation.
+
 \input{figures/fig04_process_dissection}
 
 \subsection{Local mathematical sensitivity consistency}
 \label{subsec:gradient-validation}
 
-A fixed-topology PHS-2D audit compares implicit derivatives with finite differences obtained by perturbing one common normalized material-parameter direction and re-solving the loaded and unloaded equilibria. Six signed-loading branches are evaluated for three task metrics, yielding 18 derivative pairs. The maximum relative discrepancy is 0.1191\%. The 18 pairs represent six loading branches by three metrics, not 18 independent parameter directions. This result supports local numerical consistency for the tested equilibrium responses; it is not a global error bound.
+A fixed-topology PHS-2D-9S audit checks the numerical consistency of the implicit equilibrium-sensitivity calculation. Around a nominal Young's modulus of 8~MPa, one normalized material-parameter direction is perturbed by $\Delta u=0.001$ (13~kPa) and compared with central finite differences obtained by re-solving the loaded and unloaded equilibria. The audit covers six signed-loading branches ($s\in\{0.3,0.5,0.7\}$ and $f=\pm0.1$~N) and three observables: loaded-point displacement, projected tip displacement, and their ratio. All 18 derivative pairs agree in sign; the median relative discrepancy is 0.0260\% and the maximum is 0.1191\%. In the tested local direction, increasing modulus reduces all three displacement-based measures, so the lower tip-to-point ratio must be interpreted alongside the concurrent reduction in local compliance. These results validate the tested local equilibrium derivative, not a global error bound, step-size convergence, all design parameters, or the M2 envelope sensitivity.
 
-\begin{figure}[t]
-\centering
-\includeplot{figures/fig05_gradient_validation.pdf}{\columnwidth}
-\caption{Local PHS-2D equilibrium-sensitivity consistency. Implicit derivatives are compared with finite differences across six signed-loading branches and three metrics along one common material-parameter direction. The maximum relative discrepancy is 0.1191\%.}
-\label{fig:gradient-validation}
-\end{figure}
+\input{figures/fig05_gradient_validation}
 
 \subsection{Research-mode comparison}
 \label{subsec:research-mode-comparison}

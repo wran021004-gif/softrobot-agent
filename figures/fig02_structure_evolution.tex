@@ -19,36 +19,45 @@
 \quad
 \textcolor{TraceTeal}{\textbf{Design response:}} inspect finite-load slack and revise the passive tendon guidance.
 \par\vspace{7pt}
-\noindent\textbf{(b) T07: root geometry and routing refinement for a shared morphology}\par\vspace{3pt}
-\begin{minipage}[t]{0.245\textwidth}
+\noindent\textbf{(b) T07: shared-morphology refinement and structure--control trade-off}\par\vspace{3pt}
+\begin{minipage}[t]{0.205\textwidth}
 \centering
 \includegraphics[width=\linewidth]{figures/native/t07_ellipse_root.png}
 \par\scriptsize Anisotropic elliptical root
 \end{minipage}\hfill
-\begin{minipage}[t]{0.245\textwidth}
+\begin{minipage}[t]{0.205\textwidth}
 \centering
 \includegraphics[width=\linewidth]{figures/native/t07_round_root.png}
 \par\scriptsize Rounded root
 \end{minipage}\hfill
-\begin{minipage}[t]{0.205\textwidth}
+\begin{minipage}[t]{0.18\textwidth}
 \centering
 \scriptsize Root-section outlines (schematic)
-\begin{tikzpicture}[scale=.78]
+\begin{tikzpicture}[scale=.72]
 \draw[TraceNavy,line width=1.1pt] (0.0,0.35) ellipse (0.58 and 0.27);
 \node[font=\scriptsize] at (0.0,-0.05) {Elliptical};
 \draw[TraceTeal,line width=1.1pt] (1.45,0.35) circle (0.31);
 \node[font=\scriptsize] at (1.45,-0.05) {Rounded};
 \end{tikzpicture}
 \end{minipage}\hfill
-\begin{minipage}[t]{0.265\textwidth}
-\small
-\textcolor{TraceNavy}{\textbf{Research finding}}\par
-The initial root geometry constrained the shared task set.\par\vspace{3pt}
-\textcolor{TraceTeal}{\textbf{Structural action}}\par
-Round the root, refine tendon routing (14.1 to 14.0~mm), and re-optimize control.\par\vspace{3pt}
-\textbf{Validated outcome}\par
-4/4 conditions; 35 original hard constraints.
+\begin{minipage}[t]{0.36\textwidth}
+\scriptsize
+\textbf{M1\_B fixed-input replay ($d_0\rightarrow d_1$)}
+\begin{tabularx}{\linewidth}{@{}Xrr@{}}
+\toprule
+\textbf{Metric} & \textbf{$d_0$} & \textbf{$d_1$}\\
+\midrule
+Max. tendon speed (mm/s) & 74.9 & 45.4\\
+Max. position error (mm) & 8.09 & 31.17\\
+Worst $g_{\max}$ & 1.997 & 2.117\\
+\bottomrule
+\end{tabularx}
+\textcolor{TraceTeal}{Tendon speed decreases}; position error and worst violation increase.\\[2pt]
+\textbf{M2 on $d_1$:} re-optimized control passes 4/4 conditions ($g_{\max}=-0.010$).
 \end{minipage}
-\caption{Mechanism-guided structural evolution. (a) Recorded PHS-2D design stages and signed-load responses from a dedicated passive mechanism study. (b) T07 root-shape and routing refinement under a shared four-condition contract. The PHS-2D mechanism study is distinct from the portfolio PHS-2D result in Fig.~\ref{fig:task-portfolio}.}
+\par\vspace{3pt}
+\noindent\scriptsize
+The rounded-root design uses a 14.0~mm routing radius (from 14.1~mm) and satisfies 35 original hard constraints. The baseline $d_0$ M2 solves did not reliably converge; no cross-structure M2 improvement or $d_0$ infeasibility is inferred.
+\caption{Mechanism-guided structural evolution. (a) Three recorded PHS-2D design stages and the ten-condition signed-load response from a dedicated nine-segment, four-tendon passive-mechanism study. (b) T07 root and routing refinement. The matched M1\_B replay shows that the structural change redistributes the active constraint under fixed input, while re-optimized control on $d_1$ satisfies the four required conditions. The PHS-2D mechanism study is distinct from the PHS-2D portfolio result in Fig.~\ref{fig:task-portfolio}.}
 \label{fig:structure-evolution}
 \end{figure*}
