@@ -21,7 +21,7 @@ Update the existing Overleaf manuscript to match the GitHub source branch. This 
    - \`sections/09_discussion.tex\`
    - the three Figure 3--5 SVG masters and their LaTeX wrappers
    - the updated figure README and figure plan where appropriate.
-4. Preserve the existing approved Figure 1 architecture SVG, its filename, its editable vector content, and its current Overleaf inclusion path byte-for-byte. Do not overwrite it with the older GitHub TikZ file \`figures/fig01_research_framework.tex\`. Do not rename or move the existing architecture asset.
+4. Preserve the existing approved Figure 1 architecture SVG, its filename, its editable vector content, and its current Overleaf inclusion statement in `main.tex`, and any package/configuration lines required by that inclusion byte-for-byte. When synchronizing `main.tex`, merge the Abstract and section-input changes from GitHub but retain the Overleaf-side Figure 1 inclusion path and package settings. Do not overwrite it with the older GitHub TikZ file \`figures/fig01_research_framework.tex\`. Do not rename or move the existing architecture asset.
 5. Keep Figure 2, Figure 6, and Figure 7 assets unchanged unless a path update is strictly required by the synchronized source. Do not regenerate their data.
 6. Export the three new SVG masters to PDF for pdfLaTeX using Inkscape or another installed vector-preserving converter:
    - \`figures/fig03_agent_directed_research.svg\` → \`figures/fig03_agent_directed_research.pdf\`
