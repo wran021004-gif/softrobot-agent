@@ -172,7 +172,7 @@ Algorithm~\ref{alg:agent-research} summarizes the complete research-level orches
 \noindent\textbf{Algorithm \thealgorithm. Agent-directed research and structure--control refinement}\par
 \vspace{2pt}
 \begin{algorithmic}[1]
-\Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$, registries $\mathcal R$, research budget $\mathcal B_0$
+\Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$ (possibly empty), registries $\mathcal R$, research budget $\mathcal B_0$
 \Ensure Validated candidate $d^\star$, accumulated evidence $\mathcal E^\star$, research trace $\mathcal T$
 \State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and trace $\mathcal T_0$
 \While{$\mathcal B_k>0 \land \text{research process is active}$}
@@ -186,9 +186,9 @@ Algorithm~\ref{alg:agent-research} summarizes the complete research-level orches
         \If{$\mathcal P_k$ is valid and applicable}
             \State $\sigma_k \gets \operatorname{SelectApplicableView}(\mathcal P_k)$
             \State $m_k \gets \operatorname{RouteMethod}(\mathcal P_k,\sigma_k)$
-            \State $e_k^{\mathrm{math}} \gets \operatorname{ExecuteAndValidate}(m_k,\mathcal P_k)$
+            \State $e_k \gets \operatorname{ExecuteAndValidate}(m_k,\mathcal P_k)$
         \Else
-            \State $e_k^{\mathrm{math}} \gets \operatorname{ReturnTypedStatus}(\mathcal P_k)$
+            \State $e_k \gets \operatorname{ReturnTypedStatus}(\mathcal P_k)$
         \EndIf
     \EndIf
     \State $\mathcal E_k \gets \operatorname{StoreEvidence}(\mathcal E_k,e_k)$
@@ -207,7 +207,7 @@ Algorithm~\ref{alg:agent-research} summarizes the complete research-level orches
         \State $e_k^{\mathrm{phys}} \gets \operatorname{EvaluatePhysics}(\tau,d_k,U_k)$
         \State $\mathcal E_k \gets \operatorname{StoreEvidence}(\mathcal E_k,e_k^{\mathrm{phys}})$
     \EndIf
-    \State Update hypotheses, research trace, and remaining budget from the returned evidence
+    \State Update hypotheses, research trace, and remaining budget from the returned evidence; set $k\gets k+1$
 \EndWhile
 \State $d^\star \gets \operatorname{SelectValidatedCandidate}(\mathcal E_k)$
 \State \Return $(d^\star,\mathcal E_k,\mathcal T_k)$
