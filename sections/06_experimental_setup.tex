@@ -1,34 +1,34 @@
 \section{Experimental Setup}
 \label{sec:experimental-setup}
 
-\subsection{Task portfolio and physical evaluation}
+\subsection{Standardized multi-task benchmark suite}
 
-The physical portfolio contains eleven task cases, T01--T10 and PHS-2D, organized into four functional families: reaching and dynamic motion (T01--T04), pose and contact interaction (T05, T06, and T09), shared-morphology and control co-design (T07 and T10), and passive mechanics (T08 and PHS-2D). This organization exposes the range of physical capabilities covered by the benchmark while retaining the native task definition of each case. Figure~\ref{fig:task-portfolio} provides the visual task-space overview, and Table~\ref{tab:family-portfolio} summarizes the four families. Detailed task metrics and reporting conventions are listed in Appendix~\ref{app:task-portfolio}.
+The evaluation uses a standardized benchmark suite of eleven tendon-driven soft-robot task cases, T01--T10 and PHS-2D. The tasks span four functional families: reaching and dynamic motion (T01--T04), pose and contact interaction (T05, T06, and T09), shared-morphology and control co-design (T07 and T10), and passive mechanics (T08 and PHS-2D). Each task is defined by a frozen contract containing its initial condition, target or reference, loads, required observables, tolerances, execution horizon, and independent acceptance procedure. Figure~\ref{fig:task-portfolio} summarizes the benchmark coverage, and Table~\ref{tab:family-portfolio} reports the four functional families.
 
-The FULL portfolio satisfies all 30 required physical conditions. T10 also includes two frozen-input controls, which are separate from its three required impact conditions. T07 evaluates one shared morphology across four required conditions and 35 original hard constraints. The portfolio PHS-2D case evaluates ten prescribed signed-loading conditions. A separate PHS-2D mechanism-design study is presented in Section~\ref{subsec:structural-evolution}; its response metrics are kept distinct from the portfolio entry.
+The benchmark contains thirty required physical conditions. T10 additionally includes two frozen-input control conditions, which are reported separately from its three required impact-recovery conditions. T07 evaluates one shared morphology across four required conditions and its original hard constraints. PHS-2D evaluates passive tendon-constrained compliance under ten prescribed signed-loading conditions. All task outcomes are assessed using their task-specific physical evaluators; physical quantities retain their native units and are not averaged across unlike tasks.
 
 \subsection{Research-mode comparison}
 
-The task-wise comparison spans the same eleven task cases and contrasts three research modes:
+The task-wise comparison spans the same eleven benchmark cases and contrasts three research modes:
 \begin{itemize}[leftmargin=*]
 \item \textbf{A: LLM-only.} The agent proposes and revises structure and control using task information and physical-evaluation feedback. Dedicated mathematical diagnosis and automated mathematical optimization are not exposed.
 \item \textbf{B: Direct Mathematical Tools.} The agent has the A capabilities and may invoke supported bottom-level mathematical operations. It constructs the mathematical question and request itself, without the high-level research-intent projection and mathematical orchestration.
-\item \textbf{FULL: \softrobotagent{}.} The complete research framework exposes research-intent projection, \PPRP{} construction, complementary M0--M3 analysis semantics, differentiation routing, validity checks, and evidence feedback.
+\item \textbf{FULL: \softrobotagent{}.} The complete framework exposes research-intent projection, \PPRP{} construction, complementary M0--M3 analysis semantics, differentiation routing, validity checks, structure--control refinement, and evidence feedback.
 \end{itemize}
-A and B begin from the corresponding task initial states and admissible design spaces; FULL denotes the complete-framework task records. Every outcome is assessed against the required conditions and task-specific physical evaluator. Valid physical failures, incomplete evaluations, and qualification failures are retained as distinct evaluation states. The task-wise results are summarized in Table~\ref{tab:abc-comparison} and Figure~\ref{fig:abc-matrix}.
+A and B begin from the corresponding task initial states and admissible design spaces; FULL denotes the complete-framework task records. Every outcome is assessed against the required conditions and task-specific physical evaluator. The task-wise results are summarized in Table~\ref{tab:abc-comparison} and Fig.~\ref{fig:abc-matrix}.
 
-\subsection{Representative research and execution records}
+\subsection{Representative research cases}
 
-Figures~\ref{fig:structure-evolution} and~\ref{fig:process-dissection} present complementary views of the research process. The structural-evolution figure emphasizes physical design changes and their measured consequences. The process-dissection figure reconstructs three archived research cases---T04, T07, and T10---as observation, hypothesis, investigation, action, and validated outcome. These are representative research records, not additional independent task trials.
+Figures~\ref{fig:agent-directed-research} and~\ref{fig:structural-research-outcomes} present representative research cases that connect Agent decisions to structural and control outcomes. Figure~\ref{fig:agent-directed-research} reconstructs T04, T07, and T10 as observation, hypothesis, investigation, action, and validated outcome. Figure~\ref{fig:structural-research-outcomes} links the PHS-2D mechanism-design sequence and T07 shared-morphology refinement to their physical responses.
+
+\subsection{Mathematical and physical validation}
+
+The mathematical validation uses eighteen implicit-equilibrium derivative/finite-difference pairs, formed by six signed-loading branches and three physical metrics along one common normalized Young's-modulus direction. The physical validation summarizes ten PHS-2D signed-loading conditions under independent-process reproduction, half-time-step evaluation, and initial-state perturbation. The corresponding evidence is presented in Fig.~\ref{fig:evidence-validation}.
 
 \subsection{Architecture-level decision studies}
 
-Architecture studies evaluate proposed research decisions at frozen checkpoints. They do not launch candidate search, mathematical workers, physical simulation, or hardware execution. Their outcomes are decision-level measures, not additional robot task successes.
-
-The Reporter study contains six matched OFF/ON checkpoint pairs, twelve Main sessions, and six anonymous independent-model reviews. The ON condition receives the corresponding read-only Reporter interpretation; six previously generated reports are reused. The reviewer scores physical interpretation, evidence consistency, limitation recognition, research actionability, and Main decision quality on a 0--4 ordinal scale.
-
-The original Knowledge/Skill experiment is a $2\times2$ factorial replay at T04 and T07, with one Main decision per cell and eight decisions overall. A later decision-only extension evaluates the same four K/S conditions at four frozen checkpoints, producing sixteen sessions, fifteen valid decisions, and one request-budget-exhausted submission. The context studies comprise two historical PHS-2D checkpoint pairs and six additional cross-task checkpoint pairs at T01, T04, T07, T08, T09, and T10.
+Architecture studies evaluate proposed research decisions at frozen checkpoints. The Reporter study contains six matched OFF/ON checkpoint pairs, twelve Main sessions, and six anonymous independent-model reviews. The original Knowledge/Skill experiment is a $2\times2$ factorial replay at T04 and T07, with one Main decision per cell and eight decisions overall. The context studies include two historical PHS-2D checkpoint pairs and six cross-task checkpoint pairs at T01, T04, T07, T08, T09, and T10. These studies assess decision behavior and evidence access; their results are reported separately from physical task completion.
 
 \subsection{Scoring and resource accounting}
 
-Decision reviews use frozen evidence and anonymous outputs. Scores are descriptive ordinal assessments; the samples do not support significance tests, confidence intervals, or population-level causal claims. Provider token counts are reported only when returned by the Provider. Local serialized-text token reconstructions are kept separate from Provider usage and are not used as measured billing or context consumption.
+Decision reviews use frozen evidence and anonymous outputs. Scores are descriptive ordinal assessments on a 0--4 scale. Provider token counts are reported when returned by the Provider; local serialized-text estimates are kept separate from Provider usage. Physical task metrics, benchmark completion, mathematical consistency, and architecture decision measures are reported as distinct evidence categories.
