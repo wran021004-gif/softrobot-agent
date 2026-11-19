@@ -175,11 +175,12 @@ Algorithm~\ref{alg:agent-research} summarizes the complete research-level orches
 \Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$, registries $\mathcal R$, research budget $\mathcal B_0$
 \Ensure Validated candidate $d^\star$, accumulated evidence $\mathcal E^\star$, research trace $\mathcal T$
 \State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and trace $\mathcal T_0$
-\While{$\mathcal B_k>0$ and the research process is active}
+\While{$\mathcal B_k>0 \land \text{research process is active}$}
     \State Assemble current decision context from task state, candidate, findings, and budget
+    \State $U_k \gets \operatorname{RetainOrInitializeControl}(d_k,\tau)$
     \State $I_k \gets \operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$
     \If{$I_k$ selects a direct physical investigation}
-        \State $e_k^{\mathrm{phys}} \gets \operatorname{EvaluatePhysics}(\tau,d_k)$
+        \State $e_k \gets \operatorname{EvaluatePhysics}(\tau,d_k,U_k)$
     \Else
         \State $\mathcal P_k \gets \operatorname{CompilePPRP}(I_k,\tau,d_k,\mathcal R,\mathcal B_k)$
         \If{$\mathcal P_k$ is valid and applicable}
