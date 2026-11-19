@@ -175,6 +175,7 @@ Algorithm~\ref{alg:agent-research} summarizes the complete research-level orches
 \Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$ (possibly empty), registries $\mathcal R$, research budget $\mathcal B_0$
 \Ensure Validated candidate $d^\star$, accumulated evidence $\mathcal E^\star$, research trace $\mathcal T$
 \State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and trace $\mathcal T_0$
+\State $k\gets0$
 \While{$\mathcal B_k>0 \land \text{research process is active}$}
     \State Assemble current decision context from task state, candidate, findings, and budget
     \State $U_k \gets \operatorname{RetainOrInitializeControl}(d_k,\tau)$
