@@ -179,7 +179,7 @@ Algorithm~\ref{alg:agent-research} summarizes the C1/C2 research cycle: the Main
 \vspace{2pt}
 \begin{algorithmic}[1]
 \Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$, registries $\mathcal R$, budget $\mathcal B_0$
-\Ensure Validated candidate $d^\star$, separate evidence $\mathcal E^\star=(\EvidMath^\star,\EvidPhys^\star)$
+\Ensure Validated candidate $d^\star$, separate evidence $\mathcal E^\star=(\mathcal E_{\mathrm{math}}^\star,\mathcal E_{\mathrm{phys}}^\star)$
 \State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and $k\gets0$
 \While{$\mathcal B_k>0$ and research remains active}
     \State $\mathcal I_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$ \Comment{C1: hypothesis, investigation, and semantic view $\sigma_k$}
