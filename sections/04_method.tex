@@ -49,9 +49,17 @@ At the agent--tool boundary, the Main Agent does not emit solver calls or execut
 r_k=(h_k,\tau,d_k,\Iparam_k,\mathcal O_k,\sigma_k,\mathcal B_k),
 \qquad \sigma_k\in\{M_0,M_1,M_2,M_3\}.
 \label{eq:research-intent}
-\end{equation} The schema validates field types, required fields, and admissible request structure; it does not decide the physical meaning of the request or select a numerical solver.
+\end{equation}
+The schema validates field types, required fields, and admissible request structure; it does not decide the physical meaning of the request or select a numerical solver.
 
-The PPRP compiler then resolves the registered identifiers and binds the intent to the frozen task contract, candidate-specific physical model, parameter paths and bounds, observable definitions, inner physical problem, and budget. It checks whether the requested semantic view is applicable to that model and operating point, and emits a canonical PPRP. Thus, the Main Agent chooses \emph{what physical question and analysis semantics} to investigate; the compiler makes that intent a well-defined physical problem. The PPRP is a typed semantic contract, not a prompt wrapper or a free-form expression supplied to an optimizer.
+The PPRP compiler then resolves the registered identifiers and binds the intent to the frozen task contract, candidate-specific physical model, parameter paths and bounds, observable definitions, inner physical problem, and budget. It checks whether the requested semantic view is applicable to that model and operating point, and emits a canonical PPRP. Thus, the Main Agent chooses \emph{what physical question and analysis semantics} to investigate; the compiler makes that intent a well-defined physical problem. The PPRP is a typed semantic contract, not a prompt wrapper or a free-form expression supplied to an optimizer. Its compilation and routing boundary can be summarized as
+\begin{equation}
+\mathcal P_k=\operatorname{CompilePPRP}(r_k,\mathcal R),
+\qquad
+m_k=\operatorname{DifferentiationRouter}(\mathcal P_k),
+\label{eq:pprp-router}
+\end{equation}
+where $m_k$ identifies the registered numerical implementation used to execute the requested semantic view.
 
 The Differentiation Router consumes this compiled PPRP. It does not infer or replace M0--M3: those are predefined research semantics carried by $\sigma_k$. Instead, the router selects the registered numerical implementation compatible with the semantic view, model class, parameter type, solver structure, and validity conditions. For example, explicit models may use analytic or automatic derivatives, regular implicit equilibria use KKT/IFT sensitivity, re-optimized value functions use envelope or dual sensitivity, and perturbation questions use controlled finite differences or directional comparisons. Discrete topology changes are handled by paired candidate evaluation rather than by pretending they are differentiable. The resulting fixed program returns typed evidence with its physical scope, operating point, residuals, solver status, validity flags, and computational cost. The LLM therefore coordinates the research question and semantic choice, while deterministic code resolves, routes, and executes the numerical operation.
 
