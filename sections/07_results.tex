@@ -3,67 +3,40 @@
 
 \subsection{Multi-task benchmark coverage}
 \label{subsec:portfolio-results}
-
-Figure~\ref{fig:task-portfolio} organizes the eleven benchmark cases into four functional families and reports the principal physical outcome for each task. The suite spans reaching and dynamic motion, pose and contact interaction, shared-morphology co-design, and passive mechanics. Across these families, the FULL portfolio satisfies all thirty required physical conditions. The family-level view makes the task breadth explicit while retaining each task's native physical metric.
+Figure~\ref{fig:task-portfolio} organizes the eleven benchmark cases into four functional families and shows their physical task settings and outcomes. Across the FULL portfolio, all thirty required physical conditions satisfy their task-specific evaluators. The family-level summary retains the different physical meanings and native units of each task.
 
 \input{figures/fig02_task_portfolio}
 \input{tables/table1_family_summary}
 
-\subsection{Agent-directed research process}
+\subsection{Agent-directed research trajectories}
 \label{subsec:process-dissection}
+Figure~\ref{fig:agent-directed-research} illustrates how the Main Agent turns physical observations into hypotheses, selects discriminating mathematical or physical investigations, and adapts the subsequent structure or control route. T04 demonstrates task-conditioned initialization research: an inadmissible all-4~N reference initialization led the Agent to return to time-zero equilibrium, adjust boundary tensions, and construct an equilibrium reference bank before the final figure-eight tracking solution. T07 demonstrates shared-morphology refinement through root-section and tendon-routing changes followed by task-specific control adaptation. T10 demonstrates a change from GVS/NMPC trials to a native tangent-model LQR route with bounded tension allocation while retaining the morphology.
 
-Figure~\ref{fig:agent-directed-research} shows how the Main Agent converts observations into research hypotheses, selects mathematical or physical investigations, and adapts subsequent actions. T04 demonstrates task-conditioned initialization research: an all-4~N reference initialization produced an inadmissible optimizer trial, after which the research route returned to the time-zero equilibrium, shifted boundary tensions from 0.20 to 0.21~N, and constructed an 89-point equilibrium bank. The resulting two-cycle, 22-s figure-eight has an RMSE of 0.688~mm and a maximum tracking error of 1.021~mm.
-
-T07 demonstrates research decisions for a shared-morphology task. The Main Agent investigated the root geometry and tendon-routing configuration, separated fixed-input structural response from control re-optimization, and refined the common candidate before evaluating all four required conditions. Figure~\ref{fig:structural-research-outcomes} presents the corresponding structural and M1/M2 evidence.
-
-T10 demonstrates control-route adaptation while retaining the robot morphology. Following GVS/NMPC trials, the research route adopted a native tangent model, discrete LQR, and bounded tension allocation. The resulting common feedback recipe satisfies all three required impact conditions. Together, these cases show that the Agent can change the research question, structural representation, or control formulation according to the physical bottleneck.
-
-The archived evidence-to-action trace further shows how research findings are translated into executable operations. Of 220 evidence-linked proposals, 205 were dispatched and 160 have confirmed execution records with inspectable outputs. This corresponds to a 72.73\% proposal-to-execution conversion across the archived research trace.
+The C1 evidence-to-action audit quantifies the transition from research decisions to recorded operations. Across 220 evidence-linked proposals, 205 were dispatched, 160 had inspectable successful execution records, and 10 were subsequently independently validated. The overall proposal-to-execution conversion is 72.73\%. Actor identity is retained: Main Agent actions account for 88 proposals, 73 dispatches, 46 executions, and one independent validation; external Codex actions account for 132 proposals, 132 dispatches, 114 executions, and nine validations. These counts are archive-level trace evidence, not an autonomy rate across all studies; actions without a verified evidence-to-execution link are excluded from the denominator.
 
 \input{figures/fig03_agent_directed_research}
 
-\subsection{Mathematical and physical evidence validation}
+\subsection{Mathematical evidence and structure--control validation}
 \label{subsec:evidence-validation}
+The first three panels of Fig.~\ref{fig:evidence-validation} validate the mathematical and physical evidence paths in the independent PHS-2D structural-design study. Across six signed-loading branches and three observables, all eighteen implicit-equilibrium derivative/central-finite-difference pairs agree in sign. The median relative discrepancy is 0.0260\%, and the maximum is 0.1191\%. Along the tested common Young's-modulus direction, all eighteen derivatives are negative: increasing modulus reduces loaded-point displacement, projected tip displacement, and their ratio. The independent physical panel retains all ten signed-load conditions under process reproduction, half-time-step evaluation, and initial-state perturbation.
 
-Figure~\ref{fig:evidence-validation} combines numerical consistency of implicit equilibrium sensitivities with physical robustness checks from the independent PHS-2D structural-design study. This study is distinct from the benchmark PHS-2D instance and is outside the thirty-condition FULL denominator. Across six signed-loading branches and three observables, all eighteen implicit-derivative/central-finite-difference pairs agree in sign. The median relative discrepancy is 0.0260\%, and the maximum is 0.1191\%. All eighteen signed derivatives are negative: increasing Young's modulus reduces loaded-point displacement, projected tip displacement, and their ratio along the tested direction.
-
-The physical validation panel summarizes the ten prescribed signed-loading conditions under three complementary checks: independent-process reproduction, half-time-step evaluation, and initial-state perturbation. The ten-condition evaluation outcome is retained across these checks. Together, the mathematical and physical panels show how the framework validates numerical evidence and physical conclusions through distinct evidence paths.
+Panel D adds the T07 paired structure--control audit. For the only complete fixed-input pair, M1$_B$, applying the same archived tension sequence to $d_0$ and $d_1$ yields $g_{\max}=1.996961$ and $2.116883$, respectively; both fail, and $\Delta M1=+0.119921$ shows that the structural modification alone worsens the worst constraint under this input. On $d_1$, the re-optimized controls pass all four required conditions, with physical $g_{\max}$ values close to $-0.01$. However, all four $d_0$ optimizer attempts terminate without a reliable converged endpoint (three iteration limits and one line-search failure). We therefore do not report $\Delta M2$ and do not infer that $d_0$ is infeasible. The M1$_B$ within-$d_1$ reduction of 2.126883 isolates the benefit of control adaptation on the modified structure; it is not a measured M2 structure effect.
 
 \input{figures/fig04_evidence_validation}
 
-\subsection{Agent-guided structural research and physical outcomes}
-\label{subsec:structural-evolution}
-
-Figure~\ref{fig:structural-research-outcomes} links two representative design studies to their physical outcomes. In the independent PHS-2D structural-design study, the structural sequence progresses from an initial two-tendon concept through a four-tendon routing design to a guided structure with eight physical guide plates. Under ten prescribed signed-loading conditions, the final design retains a minimum loaded-point displacement of 11.155~mm, limits the maximum projected tip displacement to 3.068~mm, and achieves a maximum tip-to-point ratio of 0.1093. All ten conditions satisfy the physical evaluator.
-
-T07 illustrates shared-morphology structure--control refinement. The root section changes from an ellipse with semi-axes 9.5 by 7.6~mm to a circle of radius 8~mm, while the tendon-routing radius changes from 14.1 to 14.0~mm. The vector cross-sections and tendon-route view expose the geometric modification and the distinct routing roles of the four tendons.
-
-The T07 M1 comparison applies the same archived tension sequence to both structures. The structural change reduces maximum geometric tendon speed from 74.924 to 45.381~mm/s, while the maximum position error changes from 8.089 to 31.169~mm. This fixed-input comparison reveals the structural response trade-off that motivates a separate control-adaptation question. Under M2, four task-specific control solutions on the modified shared morphology satisfy all four required conditions. Their position errors are 9.900, 9.895, 9.898, and 7.920~mm; the inspection-probe condition additionally achieves a directed-axis error of 0.05184~rad. Thus one shared morphology supports four task-specific control solutions.
-
-\input{figures/fig05_structural_research_outcomes}
-
-\subsection{Research-mode comparison}
-\label{subsec:research-mode-comparison}
-
-Table~\ref{tab:abc-comparison} and Fig.~\ref{fig:abc-matrix} compare LLM-only, Direct Tools, and Ours (FULL) across the eleven benchmark cases. Ours satisfies all thirty required physical conditions. Table~\ref{tab:abc-comparison} reports the maximum known normalized constraint violation, outcome state, and condition coverage; Fig.~\ref{fig:abc-matrix} provides the corresponding task-wise completion matrix.
+\subsection{Unified task-level method and Knowledge/Skill ablations}
+\label{subsec:task-ablation}
+Table~\ref{tab:task-violation-matrix} places the LLM-only baseline, Direct Tools, historical Ours (GPT-6 Astra), and the four Knowledge/Skill settings in one method-by-task matrix. The two Ours configurations each pass all eleven tasks. Within the GPT-5.6 Sol factorial, K$-$S$-$ passes 3/11 tasks, either single resource (K$+$S$-$ or K$-$S$+$) passes 6/11, and the joint K$+$S$+$ configuration passes 11/11. The matrix reports only the maximum known task-level normalized violation; incomplete K/S records with no complete task-level maximum remain marked as budget exhausted rather than being assigned zero. The two Direct Tools passes are retained with their documented protocol-variant qualification.
 
 \input{tables/table2_abc_comparison}
-\input{figures/fig06_abc_comparison}
 
-\subsection{Architecture-component ablations}
+\subsection{Architecture and research-resource ablations}
 \label{subsec:architecture-ablation}
+Decision-level component studies support the mechanisms that sustain the research loop. Across six matched Reporter OFF/ON pairs, the five-dimensional blind-review mean increases from 3.433 to 3.733 (paired mean difference $+0.300/4$), with two wins, four ties, and no losses; unsupported conclusions decrease from two to zero. In the original eight-decision Knowledge/Skill replay, historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$, while the original quality, evidence-consistency, and actionability scores are saturated at 4. The separate supplemental replay contains sixteen sessions and fifteen valid decisions; its one budget-exhausted submission is retained, and the small decision-level sample is not used to claim a universal synergy effect.
 
-Figure~\ref{fig:research-continuity} summarizes the decision-level evidence for the read-only Reporter and reusable Knowledge/Skill resources. Across six matched Reporter OFF/ON pairs, the five-dimensional mean increases from 3.433 to 3.733, with a paired mean difference of +0.300/4. The paired comparison records two wins, four ties, and no losses; unsupported conclusions in the blind review decrease from two to zero.
+The context study evaluates information access rather than physical task performance. At historical checkpoint C035, hierarchical context reduces accepted-inference input from 675,802 to 78,785 tokens (88.34\%), with blind score 4.0 to 3.8 and no additional evidence reads. At C037, cumulative accepted-request input decreases from 877,197 to 174,298 tokens (80.13\%), while the blind score changes from 3.4 to 3.6 and key-evidence coverage changes from 5/5 to 3/5. Provider usage is unavailable for the six newer cross-task Gateway pairs, so local text estimates are not presented as measured token savings. In the system, the compact context brief and on-demand retrieval are complemented by Knowledge (reusable evidence-linked findings), Skill (reusable procedures), Store/Trace (persistent research provenance), and the read-only Reporter.
 
-In the original Knowledge/Skill replay, historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$ across T04 and T07. Decision quality, evidence consistency, and actionability remain at 4/4 in every cell, so the original replay supports increased use of historical experience but not a measured improvement in those saturated quality scores. The separate four-checkpoint supplement contains sixteen sessions and fifteen valid decisions; its five-dimensional scores vary across checkpoints, and the failed T07-074 K$+$S$+$ submission is retained rather than replaced.
+Figure~\ref{fig:resource-ablation} compares the per-task distribution of mathematical operations, physical launches, Core request records, and token consumption across the four K/S settings and the two FULL model snapshots. The values are normalized independently within each task and resource type; Table~\ref{tab:resource-ablation} reports the corresponding raw eleven-task totals. The historical Astra profile and current Sol profile are descriptive snapshots rather than a controlled model-only comparison.
 
-\input{figures/fig07_research_continuity}
-
-\subsection{Hierarchical context management}
-\label{subsec:context-management}
-
-Figure~\ref{fig:context-comparison} compares Flat and hierarchical context delivery using two historical PHS-2D checkpoints and six cross-task decision checkpoints. At C035, accepted-inference input decreases from 675.8k to 78.8k tokens (88.34\%), while the blind score changes from 4.0 to 3.8. At C037, cumulative accepted-request input decreases from 877.2k to 174.3k tokens (80.13\%); the blind score changes from 3.4 to 3.6, while key-evidence coverage changes from 5/5 to 3/5. The cross-task replay reports decision quality and evidence recall separately; Provider usage was unavailable and is not replaced by local token estimates.
-
-\input{figures/fig08_context_comparison}
-
-A descriptive workload profile comparing the historical GPT-6 Astra FULL snapshot with the current GPT-5.6 Sol FULL/K+S+ snapshot is provided in Supplementary Fig.~\ref{fig:cross-model-resource}. It is reported as a resource profile rather than as an isolated model effect.
+\input{figures/fig05_architecture_resource_ablation}
+\input{tables/table3_resource_ablation}

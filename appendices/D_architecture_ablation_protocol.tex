@@ -15,6 +15,10 @@ The five scored dimensions are physical interpretation, evidence consistency, li
 
 Main Provider usage is unavailable. Local visible-context token counts are estimates and are not verified against the model tokenizer, hidden reasoning, or billing. The current ON/OFF sessions issue no new Reporter-generation requests.
 
+\subsection{Task-level Knowledge/Skill factorial ablation}
+
+The task-level K/S study evaluates four resource settings (K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$) on each of the eleven benchmark tasks, giving 44 task--configuration records. Knowledge and Skill are independently enabled or withheld while the current GPT-5.6 Sol execution setup and each task's frozen contract are retained. A task passes only when its complete required protocol satisfies the independent evaluator. Where a run exhausts its budget or does not complete the required protocol, its task-level maximum violation remains unavailable; known partial violations are retained in the source data but are not substituted for a complete task-level maximum. The four configurations are reported together in Table~\ref{tab:task-violation-matrix}; their resource totals and task-normalized profiles are reported in Table~\ref{tab:resource-ablation} and Fig.~\ref{fig:resource-ablation}. The study contains one recorded run per task and configuration and is interpreted descriptively rather than as a multi-seed statistical estimate.
+
 \subsection{Original Knowledge/Skill factorial replay}
 
 The original experiment is a $2\times2$ factorial design with Knowledge (K) and Skill (S) as binary factors. For each task, the four conditions are K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$. One Main decision is collected per cell for T04 and T07, giving eight decisions and two joint blind reviews.

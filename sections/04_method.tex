@@ -44,6 +44,12 @@ where $\Iparam_k$ is the selected parameter group, $\mathcal O_k$ the selected o
 
 The frozen task contract $\tau$ retains targets, loads, constraints, scoring windows, and acceptance semantics; $\mathcal F_k$ binds the current candidate, physical model, and operating point. The projection is staged: the Main Agent supplies the scientific intent; schemas constrain request fields; registries resolve parameter and observable identifiers; and the compiler binds the task, candidate, physical problem, analysis semantics, and budget. This separation lets the Agent formulate the scientific question while ensuring that numerical execution uses registered physical quantities and the original task definition.
 
+At the agent--tool boundary, the Main Agent does not emit solver calls or executable mathematical code. It emits a typed \emph{research intent} conforming to a request schema. The intent contains the physical hypothesis, task and candidate identifiers, selected parameter and observable groups, the requested analysis semantics $\sigma_k$, and the allocated budget. The schema validates field types, required fields, and admissible request structure; it does not decide the physical meaning of the request or select a numerical solver.
+
+The PPRP compiler then resolves the registered identifiers and binds the intent to the frozen task contract, candidate-specific physical model, parameter paths and bounds, observable definitions, inner physical problem, and budget. It checks whether the requested semantic view is applicable to that model and operating point, and emits a canonical PPRP. Thus, the Main Agent chooses \emph{what physical question and analysis semantics} to investigate; the compiler makes that intent a well-defined physical problem. The PPRP is a typed semantic contract, not a prompt wrapper or a free-form expression supplied to an optimizer.
+
+The Differentiation Router consumes this compiled PPRP. It does not infer or replace M0--M3: those are predefined research semantics carried by $\sigma_k$. Instead, the router selects the registered numerical implementation compatible with the semantic view, model class, parameter type, solver structure, and validity conditions. For example, explicit models may use analytic or automatic derivatives, regular implicit equilibria use KKT/IFT sensitivity, re-optimized value functions use envelope or dual sensitivity, and perturbation questions use controlled finite differences or directional comparisons. Discrete topology changes are handled by paired candidate evaluation rather than by pretending they are differentiable. The resulting fixed program returns typed evidence with its physical scope, operating point, residuals, solver status, validity flags, and computational cost. The LLM therefore coordinates the research question and semantic choice, while deterministic code resolves, routes, and executes the numerical operation.
+
 \subsection{Task-conditioned mathematical research}
 \label{subsec:mathematical-research}
 
@@ -136,7 +142,7 @@ and the sensitivity of a passive task metric follows by
 \end{equation}
 Loaded and unloaded equilibria are both differentiated when a response is defined relative to an unloaded reference. Active-set transitions are handled through mode-specific or directional analysis. This passive-equilibrium sensitivity is distinct from M2, which concerns re-optimized active control.
 
-The differentiation router selects a numerical route according to parameter type, physical model, inner solver, and regularity conditions. Explicit models use analytic derivatives or automatic differentiation; regular implicit equilibria use KKT/IFT sensitivity; re-optimized value functions use envelope or dual sensitivity; perturbation analysis uses controlled finite differences or directional comparisons. Discrete morphology is handled through paired candidate comparison rather than continuous differentiation. Method-specific checks include solver status, residuals, active-set and regularity conditions, and finite-difference consistency where applicable. Each returned result is accompanied by its model scope, operating point, validity information, and computational cost.
+The Main Agent specifies the requested semantic object in $\sigma_k$; the PPRP compiler checks that it is applicable; and the Differentiation Router selects the numerical implementation. This separation is important: M0--M3 are not four solver names and are not generated as code by the LLM. They are predefined, registered mathematical views. The router maps each compiled view to a fixed implementation according to parameter type, physical model, inner solver, and regularity conditions. Explicit models use analytic derivatives or automatic differentiation; regular implicit equilibria use KKT/IFT sensitivity; re-optimized value functions use envelope or dual sensitivity; and perturbation questions use controlled finite differences or directional comparisons. Discrete morphology is handled through paired candidate evaluation rather than continuous differentiation. Method-specific checks include solver status, residuals, active-set and regularity conditions, and finite-difference consistency where applicable. Each fixed program returns typed evidence with its model scope, operating point, validity information, and computational cost.
 
 \subsection{Structure and control refinement}
 \label{subsec:structure-control-refinement}
@@ -172,42 +178,33 @@ Algorithm~\ref{alg:agent-research} summarizes the C1/C2 research cycle: the Main
 \noindent\textbf{Algorithm \thealgorithm. Agent-directed mathematical research and co-design}\par
 \vspace{2pt}
 \begin{algorithmic}[1]
-\Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$ (possibly empty), registries $\mathcal R$, budget $\mathcal B_0$
-\Ensure Validated candidate $d^\star$, separate mathematical/physical evidence $\mathcal E^\star$, research trace $\mathcal T$
-\State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and trace $\mathcal T_0$
-\State $k\gets0$
-\While{$\mathcal B_k>0 \land \text{research process is active}$}
-    \State $e_k^{\mathrm{math}}\gets\bot$; $e_k^{\mathrm{phys}}\gets\bot$
-    \State $I_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$ \Comment{C1: form a hypothesis and select an investigation}
-    \If{$I_k$ requests mathematical investigation}
-        \State $\mathcal P_k\gets\operatorname{CompilePPRP}(I_k,\tau,d_k,\mathcal R,\mathcal B_k)$ \Comment{C2: compile the physical research problem}
+\Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$, registries $\mathcal R$, budget $\mathcal B_0$
+\Ensure Validated candidate $d^\star$, separate evidence $\mathcal E^\star=(\EvidMath^\star,\EvidPhys^\star)$
+\State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and $k\gets0$
+\While{$\mathcal B_k>0$ and research remains active}
+    \State $\mathcal I_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$ \Comment{C1: hypothesis, investigation, and semantic view $\sigma_k$}
+    \State $\EvidMath_k\gets\bot$; $\EvidPhys_k\gets\bot$
+    \If{$\mathcal I_k$ requests mathematical investigation}
+        \State $\mathcal P_k\gets\operatorname{CompilePPRP}(\mathcal I_k,\mathcal R)$ \Comment{C2: schema validation and physical binding}
         \If{$\mathcal P_k$ is valid and applicable}
-            \State $\sigma_k\gets\operatorname{SelectApplicableView}(\mathcal P_k)$ \Comment{select one of the complementary M0--M3 views}
-            \State $e_k^{\mathrm{math}}\gets\operatorname{ExecuteAndValidate}(\operatorname{RouteMethod}(\mathcal P_k,\sigma_k),\mathcal P_k)$
+            \State $\EvidMath_k\gets\operatorname{ExecuteAndValidate}(\operatorname{DiffRouter}(\mathcal P_k),\mathcal P_k)$ \Comment{C2: fixed numerical implementation}
         \Else
-            \State $e_k^{\mathrm{math}}\gets\operatorname{ReturnTypedStatus}(\mathcal P_k)$
+            \State $\EvidMath_k\gets\operatorname{ReturnTypedStatus}(\mathcal P_k)$
         \EndIf
-    \Else
-        \State $e_k^{\mathrm{phys}}\gets\operatorname{DirectPhysicalTest}(\tau,d_k,I_k)$
     \EndIf
-    \State $a_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,e_k^{\mathrm{math}},e_k^{\mathrm{phys}},\mathcal B_k)$ \Comment{C1: choose the next design or control action}
-    \State $d_{k+1}\gets d_k$; retain $U_k$ when a control sequence is defined
-    \If{$a_k$ requests a discrete morphology or topology change}
-        \State $d_{k+1}\gets\operatorname{GenerateAndCompileStructure}(a_k,\Dspace)$
+    \If{$\mathcal I_k$ requests a direct physical test}
+        \State $\EvidPhys_k\gets\operatorname{IndependentPhysicalTest}(\tau,d_k,\mathcal I_k)$
     \EndIf
-    \If{$a_k$ requests continuous structural refinement}
-        \State $d_{k+1}\gets\operatorname{OptimizeSelectedParameters}(d_{k+1},a_k,\tau)$
+    \State $a_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\EvidMath_k,\EvidPhys_k,\mathcal B_k)$ \Comment{C1: select the next research action}
+    \State $d_{k+1}\gets\operatorname{RefineStructureOrParameters}(d_k,a_k,\tau)$
+    \State $U_{k+1}\gets\operatorname{ReoptimizeControlIfRequested}(d_{k+1},a_k,\tau)$
+    \If{candidate changed or physical validation is requested}
+        \State $\EvidPhys_{k+1}\gets\operatorname{IndependentPhysicalEvaluation}(\tau,d_{k+1},U_{k+1})$
     \EndIf
-    \If{$a_k$ requests control refinement or $d_{k+1}\neq d_k$}
-        \State $U_{k+1}\gets\operatorname{OptimizeTaskSpecificControl}(d_{k+1},a_k,\tau)$
-    \EndIf
-    \If{the candidate changes or physical validation is requested}
-        \State $e_{k+1}^{\mathrm{phys}}\gets\operatorname{IndependentPhysicalEvaluation}(\tau,d_{k+1},U_{k+1})$
-    \EndIf
-    \State Update hypotheses, separate evidence paths, trace, and budget; set $k\gets k+1$
+    \State Update hypotheses, separate evidence paths, research trace, and budget; set $k\gets k+1$
 \EndWhile
 \State $d^\star\gets\operatorname{SelectValidatedCandidate}(\mathcal E_k)$
-\State \Return $(d^\star,\mathcal E_k,\mathcal T_k)$
+\State \Return $(d^\star,\mathcal E_k)$
 \end{algorithmic}
 \noindent\rule{\textwidth}{0.4pt}
 \end{figure*}
@@ -215,55 +212,9 @@ Algorithm~\ref{alg:agent-research} summarizes the C1/C2 research cycle: the Main
 \subsection{Deterministic capability interface}
 \label{subsec:research-tools}
 
-The research interface exposes a compact set of typed tool families. Each family has a deterministic execution contract, while the Main Agent chooses when and why it is used. The interface is organized around research actions rather than a flat list of software APIs.
-
-\begin{table*}[t]
-\centering
-\caption{Capability-level interface between the Main Agent and deterministic robot tools.}
-\label{tab:tool-action-taxonomy}
-\small
-\setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\textwidth}{@{}p{0.19\textwidth} X X@{}}
-\toprule
-Capability & Deterministic execution & Main Agent decision \\
-\midrule
-Structure and modeling & Compile discrete morphology changes and continuous design candidates against the admissible design space & Select the physical mechanism, topology, and parameter group \\
-Mathematical research & Execute registered M0--M3 analyses, validity checks, and numerical optimization & Select the research question, observables, analysis semantics, and budget \\
-Control and trajectory & Solve task-specific actuation, initialization, trajectory, and feedback-control problems & Select the control formulation and decide when control should be re-optimized \\
-Physical evaluation & Execute active dynamics or passive equilibrium and apply the frozen task evaluator & Select direct physical tests and interpret the resulting physical evidence \\
-\bottomrule
-\end{tabularx}
-\end{table*}
-
-The task, parameter, and observable registries provide deterministic bindings for the research interface. They resolve the frozen task contract, legal design variables and bounds, and registered physical quantities with their units and model scope. Before execution, the compiler checks identifiers, units, admissible ranges, and analysis applicability. Each capability returns typed evidence tied to its candidate, model, operating point, validity status, and computational cost. The Main Agent therefore selects research actions at the capability level without managing solver-specific APIs.
+The Main Agent interacts with four deterministic capability families: (i) structure and modeling tools for compiling discrete morphology changes and continuous design candidates; (ii) mathematical research tools for executing registered M0--M3 analyses, validity checks, and numerical optimization; (iii) control and trajectory tools for initialization, actuation, trajectory planning, and feedback-control refinement; and (iv) physical-evaluation tools for active dynamics, passive equilibrium, and frozen-task acceptance. The Agent selects the research question and capability to invoke; registered software owns parameter binding, numerical execution, candidate compilation, and evaluation. The interface is therefore exposed at the level of research actions rather than as a flat list of APIs.
 
 \subsection{Evidence management and research continuity}
 \label{subsec:research-continuity-method}
 
-Long-horizon research requires the Agent to preserve the full research record while presenting only the information needed for the current decision. \softrobotagent{} separates persistent evidence from the compact context delivered to the Main Agent. The complete history remains in Store/Trace; a hierarchical context interface exposes concise state summaries and retrieves detailed resources on demand.
-
-\begin{table}[t]
-\centering
-\caption{Hierarchical research context and retrieval policy.}
-\label{tab:context-hierarchy}
-\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\columnwidth}{@{}p{0.12\columnwidth}p{0.24\columnwidth}X@{}}
-\toprule
-Level & Contents & Access policy \\
-\midrule
-L0 & Current task, candidate, validated findings, research focus, available actions, and remaining budget & Automatically assembled for each Main Agent decision \\
-L1 & Method details, parameter/observable registries, tool descriptions, and request schemas & Retrieved when the current research intent requires method or interface details \\
-L2 & Numerical evidence, solver outputs, physical metrics, and validity records & Retrieved to inspect or compare specific mathematical/physical findings \\
-L3 & Original trajectories, execution logs, and source provenance & Retrieved when a decision requires raw evidence or audit-level detail \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-Knowledge and Skill provide two complementary forms of reusable experience. Knowledge stores evidence-linked physical findings, candidate comparisons, and conclusions together with their applicability conditions. Skill stores reusable research procedures, including the situations in which a procedure is appropriate and the expected inputs and outputs. They are independently retrievable resources: a Main Agent can reuse a physical finding without loading the full procedure, or retrieve a procedure while checking its evidence and validity scope.
-
-Store/Trace links research intents, PPRP requests, candidate identities, mathematical results, physical evaluations, and subsequent decisions. It retains both successful and unsuccessful investigations so that later decisions can distinguish validated findings from exploratory attempts. The L0 brief is assembled from this persistent record, while L1--L3 remain available through targeted retrieval. This arrangement preserves long-term research continuity without requiring the full history to occupy every decision context.
-
-The Reporter operates on completed evidence records. It summarizes physical interpretation, relevant evidence, and open questions using the values and validity flags supplied by deterministic tools. It cannot alter records, invoke tools, or select the next action. The Main Agent reviews the interpretation, decides whether it is relevant to the current hypothesis, and retains full authority over the subsequent research decision.
+Long-horizon research is supported by compact context assembly over a persistent Store/Trace record. The context manager automatically supplies the current task, candidate, validated findings, research focus, available actions, and remaining budget, while retrieving method details and original evidence only when needed. Three reusable components complement this mechanism: \emph{Knowledge} stores evidence-linked physical findings and their applicability conditions; \emph{Skill} stores reusable research procedures with their expected inputs, outputs, and use conditions; and the read-only \Reporter{} interprets completed evidence, identifies gaps, and summarizes physical meaning without selecting actions or invoking tools. Store/Trace links research intents, PPRP instances, candidate identities, mathematical results, physical evaluations, and subsequent decisions. These mechanisms preserve research continuity, but scientific authority remains with the Main Agent and the C2 mathematical semantics remain explicit in the PPRP--router interface.

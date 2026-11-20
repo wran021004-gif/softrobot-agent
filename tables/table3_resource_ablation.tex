@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\centering
+\caption{Aggregate research workload across eleven tasks for the Knowledge/Skill ablations and FULL model snapshots.}
+\label{tab:resource-ablation}
+\small
+\setlength{\tabcolsep}{8pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{@{}Xrrrr@{}}
+\toprule
+Method & Mathematical operations & Physical operations & Core request records & Total tokens (M) \\
+\midrule
+Ours (GPT-6 Astra) & 322 & 93 & 895 & 105.135$^{\dagger}$ \\
+K$-$S$-$ & 282 & 271 & 2,848 & 473.262 \\
+K$+$S$-$ & 725 & 274 & 5,127 & 563.419$^{\ddagger}$ \\
+K$-$S$+$ & 289 & 295 & 2,722 & 452.212 \\
+Ours (GPT-5.6 Sol; K$+$S$+$) & \textbf{388} & \textbf{267} & \textbf{3,050} & \textbf{286.019$^{c}$} \\
+\bottomrule
+\end{tabularx}
+\vspace{3pt}
+
+\noindent\scriptsize
+Mathematical operations are charged mathematical evaluations; physical operations are physical execution launches, including unsuccessful starts. Core request records include evidence reads, decisions, failed requests, and tool interactions, rather than Provider inference calls alone. $\dagger$ Historical Astra tokens are estimated from same-task request ratios. $\ddagger$ K$+$S$-$ includes an imputed T06 token count. $c$ GPT-5.6 Sol usage is the recorded lower bound. These totals are descriptive workload measures, not normalized performance scores.
+\end{table*}

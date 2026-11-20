@@ -2,37 +2,21 @@
 
 ## Contribution hierarchy
 
-- **C1 — Agent-directed scientific research.** The Main Agent forms physical hypotheses, chooses what to investigate, and decides whether to change morphology, refine continuous structure parameters, re-optimize control, diagnose, or run a direct physical test.
-- **C2 — Intent-parameterized mathematical research.** PPRP converts a research intent into a typed, validity-checked physical optimization problem. M0--M3 are complementary analysis semantics, not a sequential pipeline. The mathematical layer routes each request to an applicable derivative, equilibrium, optimization, or comparison method and returns scoped evidence.
-- **C3 — Long-horizon research continuity.** L0--L3 context organization, Knowledge, Skill, Store/Trace, and the read-only Reporter preserve and interpret evidence without taking decision authority away from the Main Agent.
-
-C1 organizes the paper's research narrative; C2 is its principal technical mechanism; C3 supports reliable multi-step use.
+- **C1 — Agent-directed scientific research.** The Main Agent forms physical hypotheses, chooses the research question, and decides whether to investigate a mechanism, change discrete morphology, optimize continuous structural parameters, re-optimize control, or run a direct physical test. Figure 3 shows representative research trajectories; the Evidence-to-Action audit separately reports verified proposal, dispatch, execution, and validation counts with Main Agent and external Codex actors kept distinct.
+- **C2 — Intent-parameterized mathematical research.** The Main Agent selects an M0--M3 analysis semantic through a typed research-intent schema. The PPRP compiler resolves registered task, candidate, parameter, observable, and model references and checks physical applicability. The Differentiation Router maps the compiled semantic object to a registered numerical implementation. Figure 4 includes local derivative consistency, independent physical validation, and the T07 fixed-input/control-adaptation audit. C2 is the principal technical contribution.
+- **C3 — Evidence-grounded research continuity.** Compact context assembly and on-demand retrieval are supported by Knowledge (evidence-linked findings), Skill (reusable procedures), Store/Trace (persistent provenance), and a read-only Reporter. Decision-level Reporter, K/S, and context studies support these components without being treated as physical task-success measurements.
 
 ## Benchmark boundary
 
-The standardized FULL portfolio contains eleven benchmark cases: T01--T10 and the **benchmark PHS-2D instance**, with thirty required physical conditions. The independent PHS-2D structural-design study used for the gradient audit and structural-evolution analysis is a separate study and is not included in this eleven-case denominator.
+The standardized FULL portfolio contains eleven benchmark cases: T01--T10 and the benchmark PHS-2D instance, with thirty required physical conditions. The independent PHS-2D structural-design study used for gradient and passive-mechanism validation is separate from this eleven-case denominator.
 
-## C1 evidence
+## Evidence map
 
-- Figure 3: Agent-directed research process and representative decisions.
-- Figure 5: structural-design refinement and T07 shared-morphology outcomes.
-- Figure 6: task-wise comparison of LLM-only, Direct Tools, and Ours (FULL).
+- **C1:** Figure 3 and the actor-stratified Evidence-to-Action audit in Results 5.2.
+- **C2:** typed ResearchIntent--Schema--PPRP--Differentiation Router contract in Method; M0--M3; Figure 4; unified task-level Table II.
+- **C3:** concise context/Knowledge/Skill/Reporter description in Method; Reporter, decision-level K/S, and context results in Results 5.5.
+- **Resource evidence:** Figure 5 and Table III compare five resource profiles across eleven tasks.
 
-## C2 evidence
+## Scope boundaries
 
-- PPRP: binds research intent, task/candidate scope, parameter and observable selections, analysis semantics, and budget.
-- M0--M3: complementary mechanism, fixed-input, re-optimized task-capability, and closed-loop sensitivity views.
-- Figure 4: eighteen implicit-equilibrium derivative/finite-difference pairs and independent physical robustness checks.
-- Figure 5: M1 fixed-input response versus M2 task-specific control re-optimization on a shared morphology.
-- Table II: maximum known normalized constraint violation, outcome state, required-condition coverage, and total task pass rate.
-
-## C3 evidence
-
-- Reporter: six matched OFF/ON decisions; read-only interpretation.
-- Knowledge/Skill: original eight-decision 2x2 replay, plus a separate sixteen-session supplement with fifteen valid decisions.
-- Context: two historical checkpoint pairs and six cross-task decision checkpoints.
-- Figures 7--8: architecture-component and hierarchical-context studies.
-
-## Supplementary evidence
-
-Supplementary Figure S1 compares the historical GPT-6 Astra FULL snapshot with the current GPT-5.6 Sol FULL/K+S+ snapshot across the eleven task identifiers. It reports resource profiles and final outcomes; it is descriptive and does not isolate a causal model-only effect.
+The T07 audit contains one complete M1 fixed-input pair and four d1 re-optimized endpoints. The d0 optimizers did not reliably converge; no paired M2 structure effect or d0 infeasibility conclusion is claimed. The cross-model resource comparison is descriptive, not a model-only causal ablation.

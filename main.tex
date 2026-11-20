@@ -45,7 +45,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Soft-robot co-design requires coordinated decisions about morphology, tendon routing, material properties, and control under coupled physical constraints. This paper presents \softrobotagent{}, a physics-grounded agentic research framework that turns these decisions into an adaptive scientific process. The Main Agent formulates physical research intents; a parameterized physical research problem (\PPRP{}) binds each intent to a frozen task, candidate design, selected parameters and observables, an inner physical model, analysis semantics, and computational budget. Complementary M0--M3 views organize mechanism sensitivity, fixed-input response, re-optimized task capability, and closed-loop performance. Deterministic tools execute structure generation, mathematical analysis, control refinement, and independent physical evaluation, while evidence management preserves research continuity through structured context, Knowledge, Skill, and a read-only Reporter. The framework is evaluated on a standardized eleven-task benchmark suite spanning thirty required physical conditions, all of which are satisfied by the FULL portfolio. A passive tendon-constrained design further demonstrates ten-condition bidirectional compliance and tip suppression, while an 18-pair implicit-sensitivity audit agrees with central finite differences to a maximum relative discrepancy of 0.1191\%. Representative research trajectories show how evidence guides structural and control decisions across reaching, shared-morphology design, and impact recovery.
+Soft-robot co-design requires coordinated decisions about morphology, tendon routing, material properties, and control under coupled physical constraints. This paper presents \softrobotagent{}, a physics-grounded agentic research framework that turns physical hypotheses into task-conditioned mathematical investigations. The Main Agent selects the scientific question and M0--M3 analysis semantics through a typed research-intent schema; a deterministic compiler binds the intent into a parameterized physical research problem (PPRP), and a separate Differentiation Router selects a valid fixed numerical implementation. This semantic--computational separation connects mechanism analysis, fixed-input structural response, re-optimized task capability, and closed-loop performance to evidence-guided structure--control refinement. The framework is evaluated on eleven tendon-driven soft-robot tasks spanning thirty required physical conditions, all satisfied by the FULL portfolio. A T07 matched audit shows that a structural change alone can worsen the fixed-input worst constraint, while re-optimized control on the modified structure yields four accepted endpoints; the baseline optimizations did not provide valid paired M2 endpoints. An independent passive-design study reports eighteen implicit-sensitivity/finite-difference pairs with a maximum relative discrepancy of 0.1191\% and ten signed-load physical conditions. Task-level Knowledge/Skill ablations and architecture/resource studies further characterize research performance and workload.
 \end{abstract}
 \begin{IEEEkeywords}
 Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic research, scientific reasoning, sensitivity analysis, physical evidence.
@@ -56,6 +56,7 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \input{sections/04_method}
 \input{sections/06_experimental_setup}
 \input{sections/07_results}
+\input{sections/08_real_world_experiments}
 \input{sections/09_discussion}
 \input{sections/10_conclusion}
 \appendices
@@ -63,7 +64,6 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \input{appendices/B_additional_task_portfolio}
 \input{appendices/C_evidence_provenance}
 \input{appendices/D_architecture_ablation_protocol}
-\input{appendices/E_cross_model_resource_profile}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 \end{document}
