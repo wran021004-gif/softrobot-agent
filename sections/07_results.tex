@@ -25,7 +25,7 @@ The archived evidence-to-action trace further shows how research findings are tr
 \subsection{Mathematical and physical evidence validation}
 \label{subsec:evidence-validation}
 
-Figure~\ref{fig:evidence-validation} combines numerical consistency of implicit equilibrium sensitivities with physical robustness checks of the PHS-2D design. Across six signed-loading branches and three observables, all eighteen implicit-derivative/central-finite-difference pairs agree in sign. The median relative discrepancy is 0.0260\%, and the maximum is 0.1191\%. All eighteen signed derivatives are negative: increasing Young's modulus reduces loaded-point displacement, projected tip displacement, and their ratio along the tested direction.
+Figure~\ref{fig:evidence-validation} combines numerical consistency of implicit equilibrium sensitivities with physical robustness checks from the independent PHS-2D structural-design study. This study is distinct from the benchmark PHS-2D instance and is outside the thirty-condition FULL denominator. Across six signed-loading branches and three observables, all eighteen implicit-derivative/central-finite-difference pairs agree in sign. The median relative discrepancy is 0.0260\%, and the maximum is 0.1191\%. All eighteen signed derivatives are negative: increasing Young's modulus reduces loaded-point displacement, projected tip displacement, and their ratio along the tested direction.
 
 The physical validation panel summarizes the ten prescribed signed-loading conditions under three complementary checks: independent-process reproduction, half-time-step evaluation, and initial-state perturbation. The ten-condition evaluation outcome is retained across these checks. Together, the mathematical and physical panels show how the framework validates numerical evidence and physical conclusions through distinct evidence paths.
 
@@ -34,7 +34,7 @@ The physical validation panel summarizes the ten prescribed signed-loading condi
 \subsection{Agent-guided structural research and physical outcomes}
 \label{subsec:structural-evolution}
 
-Figure~\ref{fig:structural-research-outcomes} links two representative design studies to their physical outcomes. In PHS-2D, the structural sequence progresses from an initial two-tendon concept through a four-tendon routing design to a nine-segment structure with eight physical guide plates. Under ten prescribed signed-loading conditions, the final design retains a minimum loaded-point displacement of 11.155~mm, limits the maximum projected tip displacement to 3.068~mm, and achieves a maximum tip-to-point ratio of 0.1093. All ten conditions satisfy the physical evaluator.
+Figure~\ref{fig:structural-research-outcomes} links two representative design studies to their physical outcomes. In the independent PHS-2D structural-design study, the structural sequence progresses from an initial two-tendon concept through a four-tendon routing design to a guided structure with eight physical guide plates. Under ten prescribed signed-loading conditions, the final design retains a minimum loaded-point displacement of 11.155~mm, limits the maximum projected tip displacement to 3.068~mm, and achieves a maximum tip-to-point ratio of 0.1093. All ten conditions satisfy the physical evaluator.
 
 T07 illustrates shared-morphology structure--control refinement. The root section changes from an ellipse with semi-axes 9.5 by 7.6~mm to a circle of radius 8~mm, while the tendon-routing radius changes from 14.1 to 14.0~mm. The vector cross-sections and tendon-route view expose the geometric modification and the distinct routing roles of the four tendons.
 
@@ -45,18 +45,25 @@ The T07 M1 comparison applies the same archived tension sequence to both structu
 \subsection{Research-mode comparison}
 \label{subsec:research-mode-comparison}
 
-Table~\ref{tab:abc-comparison} and Fig.~\ref{fig:abc-matrix} compare LLM-only, direct-mathematical, and FULL research modes across the eleven benchmark cases. FULL satisfies all thirty required physical conditions. The task-wise matrix reports physical completion, evaluation coverage, and known normalized violation separately, allowing the comparison to retain the distinct requirements of each task family.
+Table~\ref{tab:abc-comparison} and Fig.~\ref{fig:abc-matrix} compare LLM-only, Direct Tools, and Ours (FULL) across the eleven benchmark cases. Ours satisfies all thirty required physical conditions. Table~\ref{tab:abc-comparison} reports the maximum known normalized constraint violation, outcome state, and condition coverage; Fig.~\ref{fig:abc-matrix} provides the corresponding task-wise completion matrix.
 
 \input{tables/table2_abc_comparison}
 \input{figures/fig06_abc_comparison}
 
-\subsection{Research continuity and architecture studies}
-\label{subsec:research-continuity}
+\subsection{Architecture-component ablations}
+\label{subsec:architecture-ablation}
 
-Figure~\ref{fig:research-continuity} summarizes the decision-level evidence for Reporter interpretation, Knowledge/Skill reuse, and hierarchical context delivery. Across six matched Reporter OFF/ON pairs, the five-dimensional mean increases from 3.433 to 3.733, with a paired mean difference of +0.300/4. The paired comparison records two wins, four ties, and no losses; unsupported conclusions in the blind review decrease from two to zero.
+Figure~\ref{fig:research-continuity} summarizes the decision-level evidence for the read-only Reporter and reusable Knowledge/Skill resources. Across six matched Reporter OFF/ON pairs, the five-dimensional mean increases from 3.433 to 3.733, with a paired mean difference of +0.300/4. The paired comparison records two wins, four ties, and no losses; unsupported conclusions in the blind review decrease from two to zero.
 
-In the original Knowledge/Skill replay, historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+ across T04 and T07. The replay shows that either reusable resource promotes the use of historical experience in the next research decision.
-
-The two historical context comparisons show lower accepted-request input under hierarchical delivery: 675.8k to 78.8k tokens at C035 and 877.2k to 174.3k tokens at C037. The accompanying decision scores and evidence-coverage measures are shown together in Fig.~\ref{fig:research-continuity}, illustrating the relationship between context organization, evidence retrieval, and decision quality.
+In the original Knowledge/Skill replay, historical-experience utilization is 0/3/3/3 for K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$ across T04 and T07. Decision quality, evidence consistency, and actionability remain at 4/4 in every cell, so the original replay supports increased use of historical experience but not a measured improvement in those saturated quality scores. The separate four-checkpoint supplement contains sixteen sessions and fifteen valid decisions; its five-dimensional scores vary across checkpoints, and the failed T07-074 K$+$S$+$ submission is retained rather than replaced.
 
 \input{figures/fig07_research_continuity}
+
+\subsection{Hierarchical context management}
+\label{subsec:context-management}
+
+Figure~\ref{fig:context-comparison} compares Flat and hierarchical context delivery using two historical PHS-2D checkpoints and six cross-task decision checkpoints. At C035, accepted-inference input decreases from 675.8k to 78.8k tokens (88.34\%), while the blind score changes from 4.0 to 3.8. At C037, cumulative accepted-request input decreases from 877.2k to 174.3k tokens (80.13\%); the blind score changes from 3.4 to 3.6, while key-evidence coverage changes from 5/5 to 3/5. The cross-task replay reports decision quality and evidence recall separately; Provider usage was unavailable and is not replaced by local token estimates.
+
+\input{figures/fig08_context_comparison}
+
+A descriptive workload profile comparing the historical GPT-6 Astra FULL snapshot with the current GPT-5.6 Sol FULL/K+S+ snapshot is provided in Supplementary Fig.~\ref{fig:cross-model-resource}. It is reported as a resource profile rather than as an isolated model effect.
