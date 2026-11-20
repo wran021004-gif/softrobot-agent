@@ -177,6 +177,7 @@ Algorithm~\ref{alg:agent-research} summarizes the C1/C2 research cycle: the Main
 \State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and trace $\mathcal T_0$
 \State $k\gets0$
 \While{$\mathcal B_k>0 \land \text{research process is active}$}
+    \State $e_k^{\mathrm{math}}\gets\bot$; $e_k^{\mathrm{phys}}\gets\bot$
     \State $I_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$ \Comment{C1: form a hypothesis and select an investigation}
     \If{$I_k$ requests mathematical investigation}
         \State $\mathcal P_k\gets\operatorname{CompilePPRP}(I_k,\tau,d_k,\mathcal R,\mathcal B_k)$ \Comment{C2: compile the physical research problem}
@@ -189,8 +190,8 @@ Algorithm~\ref{alg:agent-research} summarizes the C1/C2 research cycle: the Main
     \Else
         \State $e_k^{\mathrm{phys}}\gets\operatorname{DirectPhysicalTest}(\tau,d_k,I_k)$
     \EndIf
-    \State $a_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,e_k,\mathcal B_k)$ \Comment{C1: choose the next design or control action}
-    \State $d_{k+1}\gets d_k$; $U_{k+1}\gets U_k$
+    \State $a_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,e_k^{\mathrm{math}},e_k^{\mathrm{phys}},\mathcal B_k)$ \Comment{C1: choose the next design or control action}
+    \State $d_{k+1}\gets d_k$; retain $U_k$ when a control sequence is defined
     \If{$a_k$ requests a discrete morphology or topology change}
         \State $d_{k+1}\gets\operatorname{GenerateAndCompileStructure}(a_k,\Dspace)$
     \EndIf
