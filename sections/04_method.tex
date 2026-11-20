@@ -31,7 +31,7 @@ Fig.~\ref{fig:research-framework} summarizes the system. Mathematical and physic
 \subsection{Research intent and parameterized physical research problem}
 \label{subsec:pprp}
 
-A research intent begins with a physical hypothesis and a proposed investigation. For example, observed coupling between tip and mid-region motion may motivate the hypothesis that tendon-routing geometry shapes the local motion-transfer mechanism. The Main Agent identifies the parameter group, physical observables, intended analysis semantics, and computational budget needed to examine the hypothesis. These choices are expressed through a schema-constrained research decision rather than an unrestricted mathematical expression.
+A research intent begins with a physical hypothesis and a proposed investigation. For example, observed coupling between tip and mid-region motion may motivate the hypothesis that tendon-routing geometry shapes the local motion-transfer mechanism. The Main Agent identifies the parameter group, physical observables, intended analysis semantics, and computational budget needed to examine the hypothesis. These choices are expressed through a schema-constrained research decision rather than an unrestricted mathematical expression. This intent-to-problem projection is the central C2 abstraction: it exposes a reusable mathematical problem definition without exposing solver-specific operations to the Main Agent.
 
 The deterministic projection resolves the request against registered capabilities. It binds the frozen task and current candidate; resolves parameter paths, units, and bounds; checks that the requested observables are registered; identifies the inner physical problem; and verifies that the requested analysis is applicable. The resulting \PPRP{} is
 \begin{equation}
@@ -163,87 +163,79 @@ Mathematical and physical evidence remain separate:
 \end{equation}
 The Main Agent uses both evidence paths to decide whether to accept the candidate, refine its structure or control, or investigate a different physical mechanism.
 
-Algorithm~\ref{alg:agent-research} summarizes the complete research-level orchestration. It makes the structure-generation, parameter-optimization, control-optimization, and physical-evaluation decisions explicit while leaving solver-specific numerical details to the deterministic tools.
+Algorithm~\ref{alg:agent-research} summarizes the C1/C2 research cycle: the Main Agent selects a scientific investigation, PPRP compiles it into a valid mathematical problem, and the resulting evidence guides structural or control refinement. Context assembly and individual tool calls are omitted because they support, rather than define, the research algorithm.
 
 \begin{figure*}[t]
 \refstepcounter{algorithm}
 \label{alg:agent-research}
 \noindent\rule{\textwidth}{0.4pt}\par
-\noindent\textbf{Algorithm \thealgorithm. Agent-directed research and structure--control refinement}\par
+\noindent\textbf{Algorithm \thealgorithm. Agent-directed mathematical research and co-design}\par
 \vspace{2pt}
 \begin{algorithmic}[1]
-\Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$ (possibly empty), registries $\mathcal R$, research budget $\mathcal B_0$
-\Ensure Validated candidate $d^\star$, accumulated evidence $\mathcal E^\star$, research trace $\mathcal T$
+\Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$ (possibly empty), registries $\mathcal R$, budget $\mathcal B_0$
+\Ensure Validated candidate $d^\star$, separate mathematical/physical evidence $\mathcal E^\star$, research trace $\mathcal T$
 \State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and trace $\mathcal T_0$
 \State $k\gets0$
 \While{$\mathcal B_k>0 \land \text{research process is active}$}
-    \State Assemble current decision context from task state, candidate, findings, and budget
-    \State $U_k \gets \operatorname{RetainOrInitializeControl}(d_k,\tau)$
-    \State $I_k \gets \operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$
-    \If{$I_k$ selects a direct physical investigation}
-        \State $e_k \gets \operatorname{EvaluatePhysics}(\tau,d_k,U_k)$
-    \Else
-        \State $\mathcal P_k \gets \operatorname{CompilePPRP}(I_k,\tau,d_k,\mathcal R,\mathcal B_k)$
+    \State $I_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$ \Comment{C1: form a hypothesis and select an investigation}
+    \If{$I_k$ requests mathematical investigation}
+        \State $\mathcal P_k\gets\operatorname{CompilePPRP}(I_k,\tau,d_k,\mathcal R,\mathcal B_k)$ \Comment{C2: compile the physical research problem}
         \If{$\mathcal P_k$ is valid and applicable}
-            \State $\sigma_k \gets \operatorname{SelectApplicableView}(\mathcal P_k)$
-            \State $m_k \gets \operatorname{RouteMethod}(\mathcal P_k,\sigma_k)$
-            \State $e_k \gets \operatorname{ExecuteAndValidate}(m_k,\mathcal P_k)$
+            \State $\sigma_k\gets\operatorname{SelectApplicableView}(\mathcal P_k)$ \Comment{select one of the complementary M0--M3 views}
+            \State $e_k^{\mathrm{math}}\gets\operatorname{ExecuteAndValidate}(\operatorname{RouteMethod}(\mathcal P_k,\sigma_k),\mathcal P_k)$
         \Else
-            \State $e_k \gets \operatorname{ReturnTypedStatus}(\mathcal P_k)$
+            \State $e_k^{\mathrm{math}}\gets\operatorname{ReturnTypedStatus}(\mathcal P_k)$
         \EndIf
+    \Else
+        \State $e_k^{\mathrm{phys}}\gets\operatorname{DirectPhysicalTest}(\tau,d_k,I_k)$
     \EndIf
-    \State $\mathcal E_k \gets \operatorname{StoreEvidence}(\mathcal E_k,e_k)$
-    \State $r_k \gets \operatorname{Reporter}(\mathcal E_k)$ \Comment{optional, read-only interpretation}
-    \State $a_k \gets \operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,r_k,\mathcal B_k)$
-    \If{$a_k$ requests structure generation or discrete refinement}
-        \State $d_k \gets \operatorname{GenerateAndCompileStructure}(a_k,\Dspace)$
+    \State $a_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,e_k,\mathcal B_k)$ \Comment{C1: choose the next design or control action}
+    \State $d_{k+1}\gets d_k$; $U_{k+1}\gets U_k$
+    \If{$a_k$ requests a discrete morphology or topology change}
+        \State $d_{k+1}\gets\operatorname{GenerateAndCompileStructure}(a_k,\Dspace)$
     \EndIf
-    \If{$a_k$ requests continuous structural optimization}
-        \State $d_k \gets \operatorname{OptimizeSelectedParameters}(d_k,a_k,\tau)$
+    \If{$a_k$ requests continuous structural refinement}
+        \State $d_{k+1}\gets\operatorname{OptimizeSelectedParameters}(d_{k+1},a_k,\tau)$
     \EndIf
-    \If{$a_k$ requests control refinement or re-optimization}
-        \State $U_k \gets \operatorname{OptimizeTaskSpecificControl}(d_k,a_k,\tau)$
+    \If{$a_k$ requests control refinement or $d_{k+1}\neq d_k$}
+        \State $U_{k+1}\gets\operatorname{OptimizeTaskSpecificControl}(d_{k+1},a_k,\tau)$
     \EndIf
-    \If{$a_k$ modifies the candidate or requests physical validation}
-        \State $e_k^{\mathrm{phys}} \gets \operatorname{EvaluatePhysics}(\tau,d_k,U_k)$
-        \State $\mathcal E_k \gets \operatorname{StoreEvidence}(\mathcal E_k,e_k^{\mathrm{phys}})$
+    \If{the candidate changes or physical validation is requested}
+        \State $e_{k+1}^{\mathrm{phys}}\gets\operatorname{IndependentPhysicalEvaluation}(\tau,d_{k+1},U_{k+1})$
     \EndIf
-    \State Update hypotheses, research trace, and remaining budget from the returned evidence; set $k\gets k+1$
+    \State Update hypotheses, separate evidence paths, trace, and budget; set $k\gets k+1$
 \EndWhile
-\State $d^\star \gets \operatorname{SelectValidatedCandidate}(\mathcal E_k)$
+\State $d^\star\gets\operatorname{SelectValidatedCandidate}(\mathcal E_k)$
 \State \Return $(d^\star,\mathcal E_k,\mathcal T_k)$
 \end{algorithmic}
 \noindent\rule{\textwidth}{0.4pt}
 \end{figure*}
 
-\subsection{Research tools and deterministic execution}
+\subsection{Deterministic capability interface}
 \label{subsec:research-tools}
 
 The research interface exposes a compact set of typed tool families. Each family has a deterministic execution contract, while the Main Agent chooses when and why it is used. The interface is organized around research actions rather than a flat list of software APIs.
 
 \begin{table*}[t]
 \centering
-\caption{Tool and action taxonomy in \softrobotagent{}. The Main Agent selects the scientific action; deterministic tools execute and validate the corresponding operation.}
+\caption{Capability-level interface between the Main Agent and deterministic robot tools.}
 \label{tab:tool-action-taxonomy}
 \small
 \setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{1.16}
-\begin{tabularx}{\textwidth}{@{}p{0.17\textwidth} X X p{0.23\textwidth}@{}}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{@{}p{0.19\textwidth} X X@{}}
 \toprule
-Tool family & Representative operations & Deterministic responsibility & Main Agent authority \\
+Capability & Deterministic execution & Main Agent decision \\
 \midrule
-Design and modeling & Generate morphology; modify topology, geometry, tendon routing, guide layout, and assembly; compile robot models & Resolve design grammar, instantiate candidate models, and check admissible parameters & Choose the structural hypothesis and candidate changes \\
-Mathematical research & Inspect; differentiate; optimize; compare; interact; evaluate equilibrium and task-capability problems & Resolve registered parameters and observables, route numerical methods, execute calculations, and return validity-scoped results & Select the physical question, parameter group, observables, analysis semantics, and budget \\
-Control and trajectory & Construct reference trajectories and equilibrium initializations; optimize actuation sequences; configure feedback controllers & Execute trajectory/control solvers and return candidate-specific control records & Select the control formulation and decide when re-optimization is needed \\
-Physical execution and evaluation & MuJoCo dynamics; passive equilibrium; load replay; closed-loop execution; independent task evaluation & Execute the physical model and apply the frozen task contract and acceptance rules & Select the physical test and interpret the resulting evidence \\
-Evidence and continuity & Retrieve records; Store/Trace; Knowledge; Skill; Reporter & Preserve provenance, expose requested context, and generate read-only evidence summaries & Select relevant history and determine the next research action \\
+Structure and modeling & Compile discrete morphology changes and continuous design candidates against the admissible design space & Select the physical mechanism, topology, and parameter group \\
+Mathematical research & Execute registered M0--M3 analyses, validity checks, and numerical optimization & Select the research question, observables, analysis semantics, and budget \\
+Control and trajectory & Solve task-specific actuation, initialization, trajectory, and feedback-control problems & Select the control formulation and decide when control should be re-optimized \\
+Physical evaluation & Execute active dynamics or passive equilibrium and apply the frozen task evaluator & Select direct physical tests and interpret the resulting physical evidence \\
 \bottomrule
 \end{tabularx}
 \end{table*}
 
-Three registries provide the deterministic interface. The task registry stores initial conditions, targets, loads, observables, units, thresholds, time windows, and acceptance rules. The parameter registry exposes legal design variables, ranges, dependencies, affected model components, and supported analysis routes. The observable registry provides the physical quantities that may be requested by a mathematical problem. A schema-constrained request is compiled against these registries and bound to the selected candidate and inner physical problem. Requests that reference unavailable quantities or conflict with the frozen task contract are rejected before numerical execution.
-
-The same interface connects candidate generation, mathematical analysis, control solvers, active/passive physical backends, and independent evaluation. Each execution returns typed outputs with values, units, candidate identity, model and operating-point scope, solver status, validity information, and computational cost. This provides a consistent boundary between Agent-level research decisions and deterministic robot computation.
+The task, parameter, and observable registries provide deterministic bindings for the research interface. They resolve the frozen task contract, legal design variables and bounds, and registered physical quantities with their units and model scope. Before execution, the compiler checks identifiers, units, admissible ranges, and analysis applicability. Each capability returns typed evidence tied to its candidate, model, operating point, validity status, and computational cost. The Main Agent therefore selects research actions at the capability level without managing solver-specific APIs.
 
 \subsection{Evidence management and research continuity}
 \label{subsec:research-continuity-method}
