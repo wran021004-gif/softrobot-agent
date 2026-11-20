@@ -1,72 +1,70 @@
 \begin{figure*}[t]
 \centering
 \small
-\noindent\textbf{Task-wise research-mode matrix: outcome, evaluation coverage, and known violation}\par\vspace{2pt}
+\noindent\textbf{Eleven-task research-mode matrix: outcome state and required-condition coverage}\par\vspace{3pt}
 \begin{tabularx}{\textwidth}{@{}p{0.19\textwidth}*{3}{>{\centering\arraybackslash}X}@{}}
 \toprule
-\textbf{Task} & \textbf{A: LLM-only} & \textbf{B: Direct mathematical tools} & \textbf{FULL}\\
+\textbf{Task} & \textbf{LLM-only (A)} & \textbf{Direct Tools (B)} & \textbf{Ours (FULL)}\\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Reach and dynamic motion}}\\
 T01 Multi-target reach and hold &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 3/3; $v=0.44$ &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 3/3; $v=0.56$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 3/3; $v=0.00$\\
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 3/3 &
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 3/3 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 3/3\\
 T02 Load-conditioned hold &
-\textcolor{TraceSlate}{\textbf{I}}\\[-2pt]\scriptsize 1/3; $v_{\rm partial}=0.44$ &
-\textcolor{TraceSlate}{\textbf{I}}\\[-2pt]\scriptsize 0/3; $v=\text{--}$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 3/3; $v=0.00$\\
+\textcolor{TraceSlate}{\textbf{I}}\\[-2pt]\scriptsize 1/3 &
+\textcolor{TraceSlate}{\textbf{I}}\\[-2pt]\scriptsize 0/3 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 3/3\\
 T03 Fast target reaching &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 1/1; $v=0.44$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 1/1; $v=0.00$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 1/1; $v=0.00$\\
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceGreen}{\textbf{P$^\dagger$}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 1/1\\
 T04 Figure-eight tracking &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 1/1; $v=0.17$ &
-\textcolor{orange!75!black}{\textbf{Q}}\\[-2pt]\scriptsize 0/1; $v=\text{--}$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 1/1; $v=0.00$\\
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceOchre}{\textbf{Q}}\\[-2pt]\scriptsize 0/1 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 1/1\\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Pose and contact interaction}}\\
 T05 Position and tool-axis alignment &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 1/1; $v=0.38$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 1/1; $v=0.00$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 1/1; $v=0.00$\\
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceGreen}{\textbf{P$^\dagger$}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 1/1\\
 T06 Loaded time-indexed pose scan &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 1/1; $v=0.33$ &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 1/1; $v=0.44$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 1/1; $v=0.00$\\
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 1/1\\
 T09 Guided spring-button contact &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 1/1; $v=0.32$ &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 1/1; $v=0.32$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 1/1; $v=0.00$\\
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 1/1 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 1/1\\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Shared morphology and control}}\\
 T07 Shared-morphology multi-task design &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 4/4; $v=0.43$ &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 4/4; $v=0.40$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 4/4; $v=0.00$\\
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 4/4 &
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 4/4 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 4/4\\
 T10 Impact-recovery control &
-\textcolor{TraceSlate}{\textbf{I}}\\[-2pt]\scriptsize 1/3; $v_{\rm partial}=0.57$ &
-\textcolor{red!70!black}{\textbf{F}}\\[-2pt]\scriptsize 3/3; $v=0.57$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 3/3; $v=0.00$\\
+\textcolor{TraceSlate}{\textbf{I}}\\[-2pt]\scriptsize 1/3 &
+\textcolor{TraceBrick}{\textbf{F}}\\[-2pt]\scriptsize 3/3 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 3/3\\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Passive mechanics}}\\
 T08 Passive progressive-stiffness response &
-\textcolor{TraceSlate}{\textbf{I}}\\[-2pt]\scriptsize 0/2; $v=\text{--}$ &
-\textcolor{orange!75!black}{\textbf{Q}}\\[-2pt]\scriptsize 0/2; $v=\text{--}$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 2/2; $v=0.00$\\
+\textcolor{TraceSlate}{\textbf{I}}\\[-2pt]\scriptsize 0/2 &
+\textcolor{TraceOchre}{\textbf{Q}}\\[-2pt]\scriptsize 0/2 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 2/2\\
 PHS-2D Passive tendon-constrained compliance &
-\textcolor{orange!75!black}{\textbf{Q}}\\[-2pt]\scriptsize 0/10; $v=\text{--}$ &
-\textcolor{orange!75!black}{\textbf{Q}}\\[-2pt]\scriptsize 0/10; $v=\text{--}$ &
-\textcolor{TraceTeal}{\textbf{PASS}}\\[-2pt]\scriptsize 10/10; $v=0.00$\\
+\textcolor{TraceOchre}{\textbf{Q}}\\[-2pt]\scriptsize 0/10 &
+\textcolor{TraceOchre}{\textbf{Q}}\\[-2pt]\scriptsize 0/10 &
+\textcolor{TraceGreen}{\textbf{P}}\\[-2pt]\scriptsize 10/10\\
+\midrule
+\textbf{Task pass rate} & \textbf{0/11} & \textbf{2/11$^\dagger$} & \textbf{11/11}\\
 \bottomrule
 \end{tabularx}
 \vspace{3pt}
 
 \noindent\scriptsize
-\textcolor{TraceTeal}{\textbf{PASS}}: all required conditions pass;\quad
-\textcolor{red!70!black}{\textbf{F}}: valid physical failure;\quad
-\textcolor{TraceSlate}{\textbf{I}}: incomplete evaluation;\quad
-\textcolor{orange!75!black}{\textbf{Q}}: qualification failure.
-Coverage is evaluated/required conditions. $v$ is the known normalized violation fraction; $v_{\rm partial}$ is computed only over evaluated conditions. Unavailable values are shown as --.
-\caption{Eleven-task comparison across LLM-only, direct-mathematical, and FULL research modes. The matrix reports outcome state, evaluation coverage, and known normalized task violation without pooling task-specific physical units.}
+\textcolor{TraceGreen}{\textbf{P}}: pass; \textcolor{TraceBrick}{\textbf{F}}: valid physical failure; \textcolor{TraceSlate}{\textbf{I}}: incomplete evaluation; \textcolor{TraceOchre}{\textbf{Q}}: qualification failure. Coverage is evaluated/required conditions. $^\dagger$Direct Tools passes for T03 and T05 use documented protocol variants; the strict frozen-protocol pass count is 0/11.
+\caption{Task-wise comparison of LLM-only, Direct Tools, and Ours (FULL). The matrix emphasizes physical outcome and required-condition coverage; Table~\ref{tab:abc-comparison} reports the corresponding maximum known normalized constraint violation.}
 \label{fig:abc-matrix}
 \end{figure*}
