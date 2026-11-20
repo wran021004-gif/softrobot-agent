@@ -1,5 +1,10 @@
 # Figure plan
 
-This file is retained as a compatibility pointer. The authoritative Phase-2 figure and table specification is PAPER_FIGURE_TABLE_PLAN.md. It defines Figures 1--7, the two main-text booktabs tables, supplementary allocation, and figure sequence.
+The current manuscript figure numbering and evidence mapping are maintained in \`PAPER_FIGURE_TABLE_PLAN.md\`.
 
-Figure 1 remains frozen and must not be modified. Reader-facing PHS naming is PHS-2D only. The manuscript-wide task names, notation, palette, and typography are defined in PAPER_STYLE_GUIDE.md.
+- Main Figures 1--8: architecture, benchmark, research process, mathematical/physical validation, structural outcomes, research-mode comparison, architecture ablations, and context management.
+- Supplementary Figure S1: cross-model research workload profile.
+- Table I: benchmark portfolio and required-condition coverage.
+- Table II: maximum known normalized constraint violation, outcome status, coverage, and total task pass rate.
+
+The original handoff figure-data IDs are not always identical to manuscript figure numbers; see \`paper_handoff/figure_manifest.md\` for the explicit mapping.
