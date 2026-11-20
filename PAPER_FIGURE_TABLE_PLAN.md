@@ -7,11 +7,11 @@ The main narrative retains Figures 1--3 unchanged and concentrates the remaining
 | Figure | Main message | Main-text location |
 |---|---|---|
 | 1 | Softrobot-Agent architecture, Main Agent decision authority, PPRP, mathematical and physical evidence paths | Method overview |
-| 2 | Eleven-task benchmark portfolio and four task families | Results 5.1 |
-| 3 | Agent-directed research trajectories, including hypotheses, investigations, structure/control changes, and outcomes | Results 5.2 |
-| 4 | Mathematical evidence and physical validation: implicit/FD consistency, independent passive checks, and the T07 M1/M2 structure--control audit | Results 5.3 |
-| 5 | Architecture and resource ablation: four task-normalized heatmaps for mathematical operations, physical launches, Core requests, and token consumption | Results 5.5 |
-| 6 | Real-world hardware experiments | Reserved in Section VIII |
+| 2 | Eleven-task benchmark portfolio and four task families | Results 6.1 |
+| 3 | Agent-directed research trajectories, including hypotheses, investigations, structure/control changes, and outcomes | Results 6.2 |
+| 4 | Mathematical evidence and physical validation: implicit/FD consistency, independent passive checks, and the T07 M1/M2 structure--control audit | Results 6.3 |
+| 5 | Architecture and resource ablation: four task-normalized heatmaps for mathematical operations, physical launches, Core requests, and token consumption | Results 6.5 |
+| 6 | Real-world hardware experiments | Reserved in Section VII |
 
 ## Main tables
 
@@ -25,8 +25,8 @@ The main narrative retains Figures 1--3 unchanged and concentrates the remaining
 - Each of the four panels uses the same eleven task columns and five method rows: historical GPT-6 Astra FULL, K−S−, K+S−, K−S+, and current GPT-5.6 Sol FULL (K+S+).
 - Normalize each resource independently within each task by the largest value across the five methods. These are resource profiles, not performance scores.
 - Raw eleven-task totals remain in Table III. Historical Astra tokens are estimates; current Sol tokens are a recorded lower bound; the K+S− T06 token entry is imputed.
-- Do not use radar charts or pool unlike resource units.
+- Use discrete solid-color swatches rather than gradients. Do not use radar charts or pool unlike resource units.
 
 ## Reserved real-world material
 
-Section VIII and Figure 6 are reserved for hardware platform, calibration, real-world task execution, quantitative measurements, and repeatability. No simulation result is substituted for a hardware result.
+Section VII and Figure 6 are reserved for hardware platform, calibration, real-world task execution, quantitative measurements, and repeatability. No simulation result is substituted for a hardware result.

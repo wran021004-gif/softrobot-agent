@@ -12,9 +12,9 @@ The standardized FULL portfolio contains eleven benchmark cases: T01--T10 and th
 
 ## Evidence map
 
-- **C1:** Figure 3 and the actor-stratified Evidence-to-Action audit in Results 5.2.
+- **C1:** Figure 3 and the actor-stratified Evidence-to-Action audit in Results 6.2.
 - **C2:** typed ResearchIntent--Schema--PPRP--Differentiation Router contract in Method; M0--M3; Figure 4; unified task-level Table II.
-- **C3:** concise context/Knowledge/Skill/Reporter description in Method; Reporter, decision-level K/S, and context results in Results 5.5.
+- **C3:** concise context/Knowledge/Skill/Reporter description in Method; Reporter, decision-level K/S, and context results in Results 6.5.
 - **Resource evidence:** Figure 5 and Table III compare five resource profiles across eleven tasks.
 
 ## Scope boundaries
