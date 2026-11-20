@@ -44,7 +44,12 @@ where $\Iparam_k$ is the selected parameter group, $\mathcal O_k$ the selected o
 
 The frozen task contract $\tau$ retains targets, loads, constraints, scoring windows, and acceptance semantics; $\mathcal F_k$ binds the current candidate, physical model, and operating point. The projection is staged: the Main Agent supplies the scientific intent; schemas constrain request fields; registries resolve parameter and observable identifiers; and the compiler binds the task, candidate, physical problem, analysis semantics, and budget. This separation lets the Agent formulate the scientific question while ensuring that numerical execution uses registered physical quantities and the original task definition.
 
-At the agent--tool boundary, the Main Agent does not emit solver calls or executable mathematical code. It emits a typed \emph{research intent} conforming to a request schema. The intent contains the physical hypothesis, task and candidate identifiers, selected parameter and observable groups, the requested analysis semantics $\sigma_k$, and the allocated budget. The schema validates field types, required fields, and admissible request structure; it does not decide the physical meaning of the request or select a numerical solver.
+At the agent--tool boundary, the Main Agent does not emit solver calls or executable mathematical code. It emits a typed \emph{research intent} conforming to a request schema. The intent contains the physical hypothesis, task and candidate identifiers, selected parameter and observable groups, the requested analysis semantics $\sigma_k$, and the allocated budget:
+\begin{equation}
+r_k=(h_k,\tau,d_k,\Iparam_k,\mathcal O_k,\sigma_k,\mathcal B_k),
+\qquad \sigma_k\in\{M_0,M_1,M_2,M_3\}.
+\label{eq:research-intent}
+\end{equation} The schema validates field types, required fields, and admissible request structure; it does not decide the physical meaning of the request or select a numerical solver.
 
 The PPRP compiler then resolves the registered identifiers and binds the intent to the frozen task contract, candidate-specific physical model, parameter paths and bounds, observable definitions, inner physical problem, and budget. It checks whether the requested semantic view is applicable to that model and operating point, and emits a canonical PPRP. Thus, the Main Agent chooses \emph{what physical question and analysis semantics} to investigate; the compiler makes that intent a well-defined physical problem. The PPRP is a typed semantic contract, not a prompt wrapper or a free-form expression supplied to an optimizer.
 
@@ -142,7 +147,7 @@ and the sensitivity of a passive task metric follows by
 \end{equation}
 Loaded and unloaded equilibria are both differentiated when a response is defined relative to an unloaded reference. Active-set transitions are handled through mode-specific or directional analysis. This passive-equilibrium sensitivity is distinct from M2, which concerns re-optimized active control.
 
-The Main Agent specifies the requested semantic object in $\sigma_k$; the PPRP compiler checks that it is applicable; and the Differentiation Router selects the numerical implementation. This separation is important: M0--M3 are not four solver names and are not generated as code by the LLM. They are predefined, registered mathematical views. The router maps each compiled view to a fixed implementation according to parameter type, physical model, inner solver, and regularity conditions. Explicit models use analytic derivatives or automatic differentiation; regular implicit equilibria use KKT/IFT sensitivity; re-optimized value functions use envelope or dual sensitivity; and perturbation questions use controlled finite differences or directional comparisons. Discrete morphology is handled through paired candidate evaluation rather than continuous differentiation. Method-specific checks include solver status, residuals, active-set and regularity conditions, and finite-difference consistency where applicable. Each fixed program returns typed evidence with its model scope, operating point, validity information, and computational cost.
+The Main Agent specifies the requested semantic object in $\sigma_k$; the PPRP compiler checks that it is applicable; and the Differentiation Router selects the numerical implementation. This separation is important: M0--M3 are not four solver names and are not generated as code by the LLM. They are predefined, registered mathematical views. Each semantic view maps to a registered, fixed analysis executor; the router then selects the numerical backend compatible with parameter type, physical model, inner solver, and regularity conditions. Explicit models use analytic derivatives or automatic differentiation; regular implicit equilibria use KKT/IFT sensitivity; re-optimized value functions use envelope or dual sensitivity; and perturbation questions use controlled finite differences or directional comparisons. Discrete morphology is handled through paired candidate evaluation rather than continuous differentiation. Method-specific checks include solver status, residuals, active-set and regularity conditions, and finite-difference consistency where applicable. Each fixed program returns typed evidence with its model scope, operating point, validity information, and computational cost.
 
 \subsection{Structure and control refinement}
 \label{subsec:structure-control-refinement}
@@ -187,7 +192,7 @@ Algorithm~\ref{alg:agent-research} summarizes the C1/C2 research cycle: the Main
     \If{$\mathcal I_k$ requests mathematical investigation}
         \State $\mathcal P_k\gets\operatorname{CompilePPRP}(\mathcal I_k,\mathcal R)$ \Comment{C2: schema validation and physical binding}
         \If{$\mathcal P_k$ is valid and applicable}
-            \State $\EvidMath_k\gets\operatorname{ExecuteAndValidate}(\operatorname{DiffRouter}(\mathcal P_k),\mathcal P_k)$ \Comment{C2: fixed numerical implementation}
+            \State $\EvidMath_k\gets\operatorname{ExecuteAndValidate}(\operatorname{DifferentiationRouter}(\mathcal P_k),\mathcal P_k)$ \Comment{C2: fixed numerical implementation}
         \Else
             \State $\EvidMath_k\gets\operatorname{ReturnTypedStatus}(\mathcal P_k)$
         \EndIf
