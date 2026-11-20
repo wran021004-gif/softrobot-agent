@@ -1,0 +1,196 @@
+{
+  "source_path": "episodes_full_corrected/T10/K1S1/CORE_CALLS.jsonl",
+  "source_line": 16,
+  "original_call": {
+    "request_id": "T10-K1S1-fullparity-v2-core-16",
+    "tool": "experience_retrieve",
+    "arguments": {
+      "event": {
+        "decision_type": "D6",
+        "research_question": "Which convergence diagnostics should guide the next legal intervention after repeated iteration-limit NMPC failure?",
+        "hypothesis": "The general diagnostic-convergence resource may distinguish whether to alter structure, initialization, or solver/control settings without treating finite failure as impossibility.",
+        "selected_action": "Full-read exact authorized entry diagnostic-convergence@2.",
+        "next_research_step": "Immediately assess applicability and disposition on the next Core call before adopting any intervention.",
+        "decision_outcome": "The T10-specific exact-metadata search returned no entries; only general context resources are available."
+      },
+      "query": {
+        "operation": "read",
+        "entry_id": "diagnostic-convergence",
+        "revision": "2",
+        "detail": "full"
+      }
+    },
+    "started_at": "2026-11-17T23:46:39.568273+00:00",
+    "started_unix": 1794959199.5682738,
+    "status": "completed",
+    "wall_s": 0.1598538999678567,
+    "result": {
+      "reference": {
+        "artifact_id": "4dbb7e7422a041d02a1eefa90b4060230a0965b3047ff6783ed1436e4d6feacb",
+        "media_type": "application/json"
+      },
+      "query": {
+        "operation": "read",
+        "key": null,
+        "entry_id": "diagnostic-convergence",
+        "revision": "2",
+        "task": null,
+        "structure": null,
+        "failure_type": null,
+        "version": null,
+        "kind": null,
+        "knowledge_type": null,
+        "limit": null
+      },
+      "results": [
+        {
+          "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+          "applicable_tasks": [
+            "reach_and_hold",
+            "tracking",
+            "position_tool_axis",
+            "oriented_tracking",
+            "multicondition_reach_tool_axis",
+            "passive_force_response",
+            "passive_head_stabilization",
+            "passive_progressive_stiffness",
+            "soft_robot_research"
+          ],
+          "authored_language": "en",
+          "benchmark_sensitive": false,
+          "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+          "content_key": "diagnostic-convergence@2",
+          "disclosure": "answer_isolated",
+          "entry_id": "diagnostic-convergence",
+          "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+          "failure_type": "research_method",
+          "id": "diagnostic-convergence",
+          "introduced_in": "typed_knowledge_v1",
+          "kind": "procedure",
+          "knowledge_refs": [
+            "p3-case@3",
+            "validation-qualification@2"
+          ],
+          "language_origin": {
+            "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed.",
+            "kind": "authored_english"
+          },
+          "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+          "path": "memory/knowledge/research_organized_v2.json",
+          "related_skills": [
+            "skill-parameter-model@4",
+            "skill-matched-comparison@4",
+            "skill-local-to-experiment@4"
+          ],
+          "resource_category": "Dynamic and Contact Diagnostics",
+          "resource_role": "knowledge",
+          "revision": "2",
+          "source_refs": [
+            "diagnostic-convergence@1",
+            "p3-case@3:source_catalog"
+          ],
+          "status": "public_procedural_guidance; generalization_unverified",
+          "structure": "tendon_robot_family",
+          "summary": "Keep time refinement, initial perturbation and spatial refinement as different evidence.",
+          "task": "passive_response",
+          "trigger": [
+            "convergence",
+            "numerical physical",
+            "residual",
+            "invalid"
+          ],
+          "type": "diagnostic",
+          "version": "2",
+          "key": "diagnostic-convergence@2",
+          "exact_key": "diagnostic-convergence@2",
+          "knowledge_type": "knowledge",
+          "original_evidence_references": [],
+          "read_query": {
+            "operation": "read",
+            "entry_id": "diagnostic-convergence",
+            "revision": "2"
+          },
+          "content_role": "knowledge",
+          "historical_task_type": "passive_response",
+          "current_task_type": "task.reach",
+          "content": {
+            "id": "diagnostic-convergence",
+            "entry_id": "diagnostic-convergence",
+            "revision": "2",
+            "type": "diagnostic",
+            "resource_role": "knowledge",
+            "summary": "Keep time refinement, initial perturbation and spatial refinement as different evidence.",
+            "trigger": [
+              "convergence",
+              "numerical physical",
+              "residual",
+              "invalid"
+            ],
+            "source_refs": [
+              "diagnostic-convergence@1",
+              "p3-case@3:source_catalog"
+            ],
+            "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+            "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+            "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+            "related_skills": [
+              "skill-parameter-model@4",
+              "skill-matched-comparison@4",
+              "skill-local-to-experiment@4"
+            ],
+            "symptom": "Solver convergence and physical qualification disagree.",
+            "hypotheses": [
+              "Termination without feasibility",
+              "Scaled versus physical residual mismatch",
+              "Between-sample excursions",
+              "Model/discretization mismatch"
+            ],
+            "discriminating_evidence": [
+              "Termination, exact residual units/scales and physical gates",
+              "Per-timestep maxima and identity-matched replay/refinement"
+            ],
+            "diagnostic_action": [
+              "Keep computation, mathematical qualification, physical validity and task predicates separate",
+              "Read authoritative failed gates rather than equating solver success with validity"
+            ],
+            "interpretation": [
+              "Convergence establishes only the stated numerical criterion. Valid task failure is a measured miss; invalid runs have unqualified performance."
+            ],
+            "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+            "knowledge_refs": [
+              "p3-case@3",
+              "validation-qualification@2"
+            ],
+            "physical_explanation": [
+              "A finer spatial model that is INVALID at fixed timestep is neither a settled comparison nor proof that the original structure is invalid. Constraint compliance and time discretization can interact.",
+              "Report independent saved-state Replay, independent execution, timestep sensitivity, initial-state sensitivity and spatial convergence separately; an invalid arm supports no paired mechanism estimate."
+            ],
+            "parameter_reference_semantics": "IDs/patterns refer to the current candidate Parameter Registry; unavailable coordinates are not granted by this document.",
+            "observable_ids": [
+              "constraint_slack_set",
+              "constraint_active_set",
+              "constraint_tension_margin",
+              "constraint_length_residual",
+              "re_equilibrated_position_response",
+              "finite_time_task_violation",
+              "constraint_multiplier"
+            ]
+          }
+        }
+      ],
+      "supplied_startup_context": false,
+      "matched_count": 1,
+      "evidence_role": "context_only",
+      "reader": "agent",
+      "scientific_evidence": false,
+      "scope": "Historical decision pattern or conditional method; not current evidence or authorization. Do not transfer historical task values or controls. Cross-task validity is unverified."
+    },
+    "new_references": [
+      {
+        "artifact_id": "4dbb7e7422a041d02a1eefa90b4060230a0965b3047ff6783ed1436e4d6feacb",
+        "media_type": "application/json"
+      }
+    ],
+    "_line": 16
+  }
+}

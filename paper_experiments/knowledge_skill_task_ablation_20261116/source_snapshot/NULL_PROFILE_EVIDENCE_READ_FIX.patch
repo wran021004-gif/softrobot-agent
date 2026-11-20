@@ -1,0 +1,75 @@
+diff --git a/tests/test_null_execution_profile.py b/tests/test_null_execution_profile.py
+new file mode 100644
+index 0000000..576860b
+--- /dev/null
++++ b/tests/test_null_execution_profile.py
+@@ -0,0 +1,55 @@
++"""A failed execution must not block protected reads of a later passing replay."""
++from copy import deepcopy
++from types import SimpleNamespace
++import unittest
++from unittest.mock import Mock, patch
++
++from tools.platform_store import plain
++from tools.research.core import read_evidence
++from tools.research.state import readable_results
++
++
++def ref(letter):
++    return dict(artifact_id=letter * 64, media_type='application/json')
++
++
++class NullExecutionProfile(unittest.TestCase):
++    def fixture(self, profile):
++        failed, passing, foreign, motion = map(ref, 'abcf')
++        failed_result=dict(status='execution_incomplete', execution_id='failed-before-profile')
++        if profile != 'missing':
++            failed_result['profile']=profile
++        passing_result=dict(status='evaluated', acceptance=dict(accepted=True))
++        values={failed['artifact_id']:failed_result, passing['artifact_id']:passing_result,
++            foreign['artifact_id']:dict(status='not_registered')}
++        study=dict(spec={}, results=[failed], physical_replays=[passing])
++        store=Mock()
++        store.session.return_value=dict(state=study)
++        store.artifact.side_effect=lambda reference, **kwargs:deepcopy(values[plain(reference)['artifact_id']])
++        return SimpleNamespace(store=store,run_id='same-study'),study,passing,foreign,motion,values
++
++    def test_passing_replay_remains_readable_after_failed_execution(self):
++        for profile in (None, 'missing', {}, dict(motion=ref('f'))):
++            with self.subTest(profile=profile):
++                host,study,passing,foreign,motion,values=self.fixture(profile)
++                before=deepcopy(values)
++                with patch('extensions.tendon_family.control_evidence.ControlEvidence.resolve',side_effect=ValueError('no complete execution')):
++                    readable=readable_results(study,host)
++                    self.assertIn(passing,readable)
++                    if isinstance(profile,dict) and profile.get('motion'):
++                        self.assertIn(motion,readable)
++                    with patch('tools.research.core.protected',return_value=True):
++                        result=read_evidence(host,dict(reference=passing,view='full'),record_read=False)
++                self.assertEqual(result,values[passing['artifact_id']])
++                self.assertEqual(values,before)
++
++    def test_null_profile_does_not_admit_unregistered_protected_evidence(self):
++        host,study,passing,foreign,motion,values=self.fixture(None)
++        with patch('extensions.tendon_family.control_evidence.ControlEvidence.resolve',side_effect=ValueError('no complete execution')):
++            with patch('tools.research.core.protected',return_value=True):
++                with self.assertRaisesRegex(ValueError,'PROTECTED_EVIDENCE_READ_REQUIRES_NEW_RESULT'):
++                    read_evidence(host,dict(reference=foreign,view='full'),record_read=False)
++
++
++if __name__=='__main__':
++    unittest.main()
+diff --git a/tools/research/state.py b/tools/research/state.py
+index 11f47b5..0632165 100644
+--- a/tools/research/state.py
++++ b/tools/research/state.py
+@@ -41,7 +41,8 @@ def readable_results(s, host=None):
+         from extensions.tendon_family.control_evidence import ControlEvidence
+         for ref in s.get('results',[]):
+             result=host.store.artifact(ref)
+-            if result.get('profile',{}).get('motion'):linked.append(result['profile']['motion'])
++            profile=result.get('profile') or {}
++            if profile.get('motion'):linked.append(profile['motion'])
+             try:linked.extend(ControlEvidence(host.store).resolve(result['execution_id'])['files'].values())
+             except (ValueError,KeyError):pass
+         for ref in s.get('mechanics_results',[]):

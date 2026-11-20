@@ -1,0 +1,282 @@
+{
+  "source_store": "episodes/T05/K0S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "a7aa2b61c590dec43f89c0ec63feb08fe08b8fd4dd483e5762e38c629dab1bc7",
+    "media_type": "application/json"
+  },
+  "projection_paths": [
+    "acceptance",
+    "candidate",
+    "profile metadata",
+    "task_gap",
+    "episodes"
+  ],
+  "document": {
+    "candidate": {
+      "artifact_id": "ce47499d84f13babd0f85748352e7f03603f40f12485bc0b0ac89f48ed1d6e9a",
+      "media_type": "application/json"
+    },
+    "status": "evaluated",
+    "route": "fixed_tension",
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:geometric_stroke_max": {
+          "limit": 0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.00947315535197335
+        },
+        "evaluator:geometric_stroke_min": {
+          "limit": -0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": -0.011076180629227605
+        },
+        "evaluator:geometric_tendon_speed": {
+          "limit": 0.025,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.06879181470962596
+        },
+        "evaluator:solver_errors": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:tension_max": {
+          "limit": 8.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 0.1099999999999999
+        },
+        "evaluator:tension_min": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": -0.0
+        },
+        "evaluator:tool_axis_direction": {
+          "limit": 0.05235987755982988,
+          "passed": false,
+          "reason": null,
+          "unit": "rad",
+          "value": 0.2139768159144097
+        },
+        "evaluator:tool_position": {
+          "limit": 0.008,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.04849508460362638
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "constraint_margins": {
+        "geometric_stroke_max": {
+          "direction": "maximum",
+          "limit": 0.015,
+          "margin": 0.005526844648026649,
+          "observed": 0.00947315535197335,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_stroke_min": {
+          "direction": "minimum",
+          "limit": -0.015,
+          "margin": 0.003923819370772394,
+          "observed": -0.011076180629227605,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_tendon_speed": {
+          "direction": "maximum",
+          "limit": 0.025,
+          "margin": -0.04379181470962596,
+          "observed": 0.06879181470962596,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "solver_errors": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "tension_max": {
+          "direction": "maximum",
+          "limit": 8.0,
+          "margin": 7.89,
+          "observed": 0.1099999999999999,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "tension_min": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.0,
+          "observed": -0.0,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "tool_axis_direction": {
+          "direction": "maximum",
+          "limit": 0.05235987755982988,
+          "margin": -0.16161693835457983,
+          "observed": 0.2139768159144097,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "rad"
+        },
+        "tool_position": {
+          "direction": "maximum",
+          "limit": 0.008,
+          "margin": -0.04049508460362638,
+          "observed": 0.04849508460362638,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "92d4a1e51d41a99c9393e233342257d4da13280af404d15ade94fe6ed2469a77",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": null,
+          "source": {
+            "artifact_id": "acc1dfd710a959cc38bf41553aa446519b99c34277d0886909f00a97950780fd",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null
+        },
+        "profile": {
+          "artifact_id": "89e34ddb1ff7055add74f16f2d0b2aae5578290c3f8a0c23e0c5684c6dc01d30",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "92d4a1e51d41a99c9393e233342257d4da13280af404d15ade94fe6ed2469a77",
+            "media_type": "application/json"
+          },
+          "execution_id": "13f0c9b044ff4c259d03f1866bfa0ba8",
+          "simulation": {
+            "artifact_id": "acc1dfd710a959cc38bf41553aa446519b99c34277d0886909f00a97950780fd",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "acc1dfd710a959cc38bf41553aa446519b99c34277d0886909f00a97950780fd",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "13f0c9b044ff4c259d03f1866bfa0ba8",
+      "issues": [],
+      "metrics": {
+        "geometric_stroke_max_m": 0.00947315535197335,
+        "geometric_stroke_min_m": -0.011076180629227605,
+        "geometric_tendon_speed_max_m_s": 0.06879181470962596,
+        "max_position_error": 0.04849508460362638,
+        "max_tool_axis_angle_error": 0.2139768159144097
+      },
+      "missing": [],
+      "protocol_id": "offline_frozen_task_v1",
+      "source_status": null,
+      "sources": {
+        "evaluation": {
+          "artifact_id": "92d4a1e51d41a99c9393e233342257d4da13280af404d15ade94fe6ed2469a77",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "89e34ddb1ff7055add74f16f2d0b2aae5578290c3f8a0c23e0c5684c6dc01d30",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.position_tool_axis",
+      "task_identity": "c57bb71c282650c2a16aa2703296a5a61ca5b0730bea2c4bf9e891f40ddef18b",
+      "timing": {
+        "control_period_s": 0.02,
+        "duration_s": 0.6,
+        "sample_period_s": 0.02,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "version": "1.0.0",
+      "worst_constraint": "tool_position"
+    },
+    "profile": {
+      "complete": true
+    },
+    "physical_launches": 1,
+    "actual_resource_consumption": {
+      "forward_evaluations": 662,
+      "kernel_wall_s": 0.2846887999912724,
+      "model_builds": 1,
+      "physics_step_attempts": 600,
+      "physics_steps": 600,
+      "rollouts": 1
+    },
+    "boundary": {
+      "elapsed_s": 1.929041600000346,
+      "returncode": 0,
+      "termination_confirmed": true,
+      "worker_started": true
+    }
+  }
+}

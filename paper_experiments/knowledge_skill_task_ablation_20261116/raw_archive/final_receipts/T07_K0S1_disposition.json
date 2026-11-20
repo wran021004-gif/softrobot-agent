@@ -1,0 +1,154 @@
+{
+  "source_store": "episodes_full_corrected/T07/K0S1/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "282f2ee44b25af6506e2f9e54453174fbca474aeb6875255534226b5116dfd9f",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "admitted": 1,
+      "confirmation_launch_reserve": 0,
+      "internal_launches": 1,
+      "numerical_reservation_s": 0.0,
+      "per_execution_s": null,
+      "remaining_activity_s": null,
+      "remaining_numerical_s": null,
+      "requested": 1
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [
+        {
+          "artifact_id": "95c1bece8a496ce7612944a6fe148c52edb1e9fd17e4d923683e13796937dfcd",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "533d7c7ba4f493abd291a6e7a21f0f4e0c0dea6308909a119b7f59be78967545",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "fe8b558b6568891697fa889884fc18679a8403cb9d889dc12c088400a30060e2",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "88cf8ac2252eaad1a9db36b4281e5ebb48838e0cdcb6337c2bb5e198f64d275b",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "e26111d10a9db036420b319e3cabc016a131733a33905d7b192041e3d82f3d92",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "d798bf49766b5f2d0aa75a726ff70d5d189b1ef2eac2efcdd47e8fe955008f2c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "9955277c04d920725d61de226a6fd051395c8eaeb561093d0869e2bf055bc7da",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "047dfe610ceb3e494d4921ce7eeede7e306cc35ee86b700d0acaa42daec78456",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "3b959336506b5d08f66ffad5ab5e1ce2c7b37d126a453c1eab3700588a1d0396",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "10aaa54cec63841b05f7cb86aa57fdea915e43c140121344abb15aa927d52907",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1787e2b0f58addabad6b422316a29ecce32da0ad1e73aff3075dc6d687921167",
+          "media_type": "application/json"
+        }
+      ],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "stop",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "T07_investigated_route_closure",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": null,
+        "selected_method": "evidence_based_scientific_route_closure",
+        "selected_variables": [],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "No additional local retuning of the tested candidates is expected to simultaneously close the observed multi-factor position, hold-speed, and tendon-speed gaps under the frozen protocol.",
+      "experience_disposition": {},
+      "fixed_conditions": "All T07 frozen tasks M1_A/M1_B/M1_C/M5, common structure, seed 17, zero initial tension, four channels, rigid tool, gravity, timing, actuator limits, reach-hold and tool-axis evaluators remain unchanged.",
+      "hypothesis": "Within the investigated two- and three-segment quadrature/depth-separated routes, increased compliance improves bending authority but violates motion limits or numerical stability, while increased stiffness improves stroke stability but leaves reach and hold-speed errors far outside limits.",
+      "interpretation": "Considered alternatives: (1) more H1 local callbacks—declined because 48 actual rollouts improved hold error only to 0.0727 m and speed to 0.215 m/s, then independent replay still violated position, hold speed, and tendon speed by large factors; finite failure is not impossibility. (2) more H3/H4 tuning—declined because the compliant H3 became numerically unstable and the stiff H4 remained around 0.136 m error and 0.691 m/s hold speed; its optimizer was contact-blocked. (3) H5 optimization—pursued through exact capability/schema reads and explicit source adaptation, but the diagnose path repeatedly failed with actual_tension_n KeyError; H5 physics still had 0.151 m hold error and 0.452 m/s speed. (4) immediate M1_B/M1_C/M5 testing—declined because no structure passed or approached the prerequisite M1_A coupled constraints; those tests cannot establish common-structure acceptance and would have low decision value. (5) further new topologies—legally possible and the continuous domain is not exhausted, so global feasibility remains open, but after four regimes spanning compliance, stiffness, modal complexity, route depth, and length, another unguided design would be a new research program rather than a justified local continuation. Uncertainty remains substantial outside tested designs and in the blocked H5 optimizer.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": "stop",
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": null,
+      "stopping_condition": "Stop because investigated routes are scientifically closed after actual optimization and independent physics; task acceptance was not achieved and no global impossibility is claimed.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "95c1bece8a496ce7612944a6fe148c52edb1e9fd17e4d923683e13796937dfcd",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "533d7c7ba4f493abd291a6e7a21f0f4e0c0dea6308909a119b7f59be78967545",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "fe8b558b6568891697fa889884fc18679a8403cb9d889dc12c088400a30060e2",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "88cf8ac2252eaad1a9db36b4281e5ebb48838e0cdcb6337c2bb5e198f64d275b",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "e26111d10a9db036420b319e3cabc016a131733a33905d7b192041e3d82f3d92",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "d798bf49766b5f2d0aa75a726ff70d5d189b1ef2eac2efcdd47e8fe955008f2c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "9955277c04d920725d61de226a6fd051395c8eaeb561093d0869e2bf055bc7da",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "047dfe610ceb3e494d4921ce7eeede7e306cc35ee86b700d0acaa42daec78456",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "3b959336506b5d08f66ffad5ab5e1ce2c7b37d126a453c1eab3700588a1d0396",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "10aaa54cec63841b05f7cb86aa57fdea915e43c140121344abb15aa927d52907",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1787e2b0f58addabad6b422316a29ecce32da0ad1e73aff3075dc6d687921167",
+          "media_type": "application/json"
+        }
+      ],
+      "weakening_observation": "A new, structurally distinct legal design or a repaired H5 nonlinear interface producing an independently replayed schedule near all M1_A limits would reopen the route."
+    },
+    "request_id": "T07-K0S1-fullparity-v2-core-67",
+    "scientific_preflight": null
+  }
+}

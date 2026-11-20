@@ -1,0 +1,129 @@
+{
+  "source_store": "episodes_full_corrected/T10/K1S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "5133b912b2e1ef23e22c54dc038f0da3109f0eca9de5accb3802ca0a4d08f5de",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "scope": "selection without execution or numerical reservation"
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [
+        {
+          "artifact_id": "d17198198e2b4d85c0ad87584cfdcc87c229250ef9d9023cdfb94dfa9d64a25c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "ad47461bbfa8c1c3f93a6bc6993c9c3efd4cdf80f4494c672f6855ced348b3f5",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "33ec462b42ee36d6fed2e55d4523bf55b6cf6bf36318a36718ba6171d4b54435",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1e4d01ef670094925b62b201c6fe9ccb8000ee7057ad6fbb6e00eca35766a1d7",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "b4344228f4db142c60a00c449263e13e879b717ca503605aabfb344d009368ff",
+          "media_type": "application/json"
+        }
+      ],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "select",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "T10-H-feedback-bidirectional-recovery-v1",
+        "requested_budget": 0,
+        "research_intent": "SELECT",
+        "selected_candidate": {
+          "artifact_id": "354b43124ef5188450e6ca04d1bf6fa62510c13bdbc87663c758df3f635cdee9",
+          "media_type": "application/json"
+        },
+        "selected_method": "native_joint_required_control_selection",
+        "selected_variables": [
+          "positive_y required",
+          "negative_y required",
+          "no_impulse required",
+          "positive_y_frozen control",
+          "negative_y_frozen control"
+        ],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "Native joint admission selects the common structure, reports task_passed=true, and requires zero extra confirmations because all required conditions pass and both controls have complete valid records.",
+      "experience_disposition": {},
+      "fixed_conditions": "Original frozen T10 task, seed 17, 1.0 s grid including initial state, six independent channels, target [0.29,-0.035,0.19] m, original controller and all thresholds unchanged; positive_y, negative_y and no_impulse are required, while positive_y_frozen and negative_y_frozen are controls.",
+      "hypothesis": "Distributed antagonistic six-tendon routing and anisotropic two-segment compliance give bidirectional reach authority, while active feedback supplies the damping and correction needed for robust signed-impact recovery; frozen controls isolate this feedback contribution.",
+      "interpretation": "The three active-feedback required cases pass every frozen acceptance component. Both frozen-input controls are complete; the negative_y_frozen speed failure is preserved and contrasts with active recovery, so it does not invalidate the common candidate under the corrected protocol roles.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": "stop",
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": [
+        {
+          "artifact_id": "d17198198e2b4d85c0ad87584cfdcc87c229250ef9d9023cdfb94dfa9d64a25c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "ad47461bbfa8c1c3f93a6bc6993c9c3efd4cdf80f4494c672f6855ced348b3f5",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "33ec462b42ee36d6fed2e55d4523bf55b6cf6bf36318a36718ba6171d4b54435",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1e4d01ef670094925b62b201c6fe9ccb8000ee7057ad6fbb6e00eca35766a1d7",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "b4344228f4db142c60a00c449263e13e879b717ca503605aabfb344d009368ff",
+          "media_type": "application/json"
+        }
+      ],
+      "stopping_condition": "Stop only if native selection returns selected=true, task_passed=true, and required_extra_confirmations=0; otherwise correct only schema/read completeness while preserving all scientific inputs.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "d17198198e2b4d85c0ad87584cfdcc87c229250ef9d9023cdfb94dfa9d64a25c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "ad47461bbfa8c1c3f93a6bc6993c9c3efd4cdf80f4494c672f6855ced348b3f5",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "33ec462b42ee36d6fed2e55d4523bf55b6cf6bf36318a36718ba6171d4b54435",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1e4d01ef670094925b62b201c6fe9ccb8000ee7057ad6fbb6e00eca35766a1d7",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "b4344228f4db142c60a00c449263e13e879b717ca503605aabfb344d009368ff",
+          "media_type": "application/json"
+        }
+      ],
+      "weakening_observation": "Selection rejection for a missing required pass, incomplete control, structure mismatch, unread acceptance evidence, or a nonzero frozen confirmation requirement would weaken or block the claim."
+    },
+    "request_id": "T10-K1S0-fullparity-v2-core-308",
+    "scientific_preflight": null
+  }
+}

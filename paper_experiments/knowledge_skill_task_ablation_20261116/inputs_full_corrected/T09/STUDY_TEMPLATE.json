@@ -1,0 +1,287 @@
+{
+  "defaults": "DEFAULTS.json",
+  "study_id": "codex-expert-T09-20261113",
+  "base_commit": "e12bcb688cbd411ebb7c5702ae5b706a4850a514",
+  "authorization": "User full 11-task Knowledge/Skill ablation request authorizes autonomous fresh Core research, mathematics, optimization, original physical evaluations, and authenticated Codex execution; historical outcomes are excluded.",
+  "mode": "engineering_numerical",
+  "start_mode": "family_space",
+  "family_space": "FAMILY_SPACE.json",
+  "candidate_initialization": "all_candidate_dofs_zero_v1",
+  "runtime": "RUNTIME.json",
+  "control": "CONTROL_default.json",
+  "initial_structure_strategy": "agent_choice",
+  "knowledge": {
+    "organization": "typed_knowledge_v1",
+    "include_entry_ids": [
+      "skill-finite-search",
+      "skill-parameter-model",
+      "skill-matched-comparison",
+      "skill-local-to-experiment",
+      "skill-continue-or-stop",
+      "skill-witness-replay",
+      "passive-structure-mechanics",
+      "general-routing",
+      "general-material-inertia",
+      "diagnostic-slack",
+      "diagnostic-static-dynamic",
+      "diagnostic-convergence",
+      "validation-qualification",
+      "validation-replay",
+      "phs2d-research-process",
+      "mechanism-research-process",
+      "research-action-selection-and-stopping",
+      "research-strict-near-tolerance-principle",
+      "research-timed-tracking-principle",
+      "research-stable-start-principle",
+      "research-contact-causality-principle",
+      "research-bounded-continuation-principle",
+      "research-witness-and-cost-principle",
+      "passive-force-response-research-principle",
+      "model-physics-comparison-principle"
+    ],
+    "include_entry_revisions": {
+      "skill-finite-search": [
+        "3"
+      ],
+      "skill-parameter-model": [
+        "4"
+      ],
+      "skill-matched-comparison": [
+        "4"
+      ],
+      "skill-local-to-experiment": [
+        "4"
+      ],
+      "skill-continue-or-stop": [
+        "3"
+      ],
+      "skill-witness-replay": [
+        "3"
+      ],
+      "passive-structure-mechanics": [
+        "3"
+      ],
+      "general-routing": [
+        "3"
+      ],
+      "general-material-inertia": [
+        "3"
+      ],
+      "diagnostic-slack": [
+        "2"
+      ],
+      "diagnostic-static-dynamic": [
+        "2"
+      ],
+      "diagnostic-convergence": [
+        "2"
+      ],
+      "validation-qualification": [
+        "2"
+      ],
+      "validation-replay": [
+        "2"
+      ],
+      "phs2d-research-process": [
+        "2"
+      ],
+      "mechanism-research-process": [
+        "2"
+      ],
+      "research-action-selection-and-stopping": [
+        "1"
+      ],
+      "research-strict-near-tolerance-principle": [
+        "1"
+      ],
+      "research-timed-tracking-principle": [
+        "1"
+      ],
+      "research-stable-start-principle": [
+        "1"
+      ],
+      "research-contact-causality-principle": [
+        "1"
+      ],
+      "research-bounded-continuation-principle": [
+        "1"
+      ],
+      "research-witness-and-cost-principle": [
+        "1"
+      ],
+      "passive-force-response-research-principle": [
+        "1"
+      ],
+      "model-physics-comparison-principle": [
+        "1"
+      ]
+    },
+    "allowed_resource_roles": [
+      "knowledge",
+      "skill"
+    ]
+  },
+  "evidence_destination": "D:\\softrobot-agent\\.worktrees\\knowledge-skill-task-archive\\paper_experiments\\knowledge_skill_task_ablation_20261116\\inputs_full_corrected\\T09\\UNUSED_EXPORT",
+  "capabilities": [
+    "analysis",
+    "mathematics",
+    "nmpc",
+    "physical_replay",
+    "control_correction"
+  ],
+  "allowed_plan_actions": [
+    "generate",
+    "propose",
+    "diagnose",
+    "initialize_control",
+    "execute",
+    "physical_replay",
+    "select",
+    "stop"
+  ],
+  "budgets": {
+    "provider_requests": 0,
+    "protected_provider_requests": 0,
+    "public_operations": 500,
+    "protected_public_operations": 4,
+    "physical_launches": 20,
+    "local_solves": 0,
+    "local_solve_s": null,
+    "offline_nlp": 0,
+    "bdf_replays": 0,
+    "mathematical_evaluations": 300,
+    "numerical_s": null,
+    "activity_s": null,
+    "delivery_reserve_s": null
+  },
+  "nmpc_limits": {
+    "executions": 20
+  },
+  "confirmation": {
+    "fresh_independent_repetitions": 0,
+    "configuration": "Fresh Core physical evidence in every frozen case; no historical acceptance transfer."
+  },
+  "physical_replay_limit": 20,
+  "physical_worker_watchdog_s": 14400,
+  "mathematical_worker_watchdog_s": 3600,
+  "family_execution": {
+    "backend": {
+      "extension_id": "backend.family_mujoco",
+      "version": "1.5.0",
+      "parameters": {
+        "contract": "family.mujoco_parameters",
+        "version": "1.0.0",
+        "data": {
+          "integrator": "implicitfast",
+          "timestep_source": "task.timing.timestep_s",
+          "contact_model": "mujoco_convex_native",
+          "friction": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "dynamics_model": {
+      "extension_id": "model.serial_bending_cells",
+      "version": "1.0.0",
+      "parameters": {
+        "contract": "family.dynamics_model",
+        "version": "1.0.0",
+        "data": {}
+      }
+    }
+  },
+  "registry_tools": {
+    "research.dispatch": "1.0.0",
+    "research.math": "1.0.0",
+    "trace.decision": "1.0.0",
+    "trace.replay_export": "1.0.0",
+    "task.protocol.inspect": "1.0.0",
+    "task.protocol.bind": "1.0.0",
+    "task.protocol.evaluate": "1.0.0",
+    "task.protocol.aggregate": "1.0.0",
+    "task.initial_state.qualify": "1.0.0",
+    "reference.generate": "1.0.0",
+    "task.initial_state.construct": "1.0.0"
+  },
+  "mathematical_methods": {
+    "mujoco-nonlinear-task-capability-v1": "User authorizes the existing bounded registered method in this independent surrogate Study.",
+    "mechanism_structure_v1": "User authorizes the existing bounded registered method in this independent surrogate Study.",
+    "sampled-affine-conic-minimax-v1": "User authorizes the existing registered conic capability method when applicable."
+  },
+  "family_sensitivity_variables": {
+    "version": "family_sensitivity_v2",
+    "variables": [
+      "*"
+    ]
+  },
+  "analysis_protocol": {
+    "protocol_id": "task-local-v2",
+    "input_scale_n": 8.0,
+    "output_scale_m": 0.01,
+    "windows_s": [
+      0.1,
+      2.0
+    ],
+    "samples_s": [
+      0.0,
+      1.0,
+      2.0
+    ],
+    "frequency_rad_s": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "rank_atol": 1e-12,
+    "rank_rtol": 1e-09,
+    "comparison_atol": 1e-08,
+    "comparison_rtol": 2e-06,
+    "derivative_atol": 2e-05,
+    "derivative_rtol": 0.0002,
+    "derivative_step": 1e-05,
+    "equilibrium_normalized_residual": 1e-05,
+    "static_force_tolerance": 1e-10,
+    "static_max_iterations": 20,
+    "pole_margin_s_inv": 1e-07,
+    "authority_threshold": null,
+    "authority_reason": "No independently justified task-required MIMO gain threshold; usable bandwidth undefined.",
+    "authority_rule": "Smallest singular value >= threshold, connected grid band starting at lowest frequency; no extrapolation.",
+    "candidate_rule": "initial_target_equilibrium_halfway",
+    "endpoint_max_iterations": 100,
+    "construction_max_iterations": 20,
+    "horizon_alignment_atol_s": 1e-12,
+    "endpoint_check_atol": 1e-08
+  },
+  "scoring_window_s": 2.0,
+  "task": "TASK_default.json",
+  "reference_parameters": {
+    "holding_tip_speed_weight": 0.0,
+    "terminal_tip_speed_weight": 0.0
+  },
+  "topology_scope": {
+    "segment_counts": [
+      2
+    ],
+    "tendon_counts": [
+      4
+    ],
+    "cells_per_segment": 12
+  },
+  "length_constraint": {
+    "aggregate_bounds_m": [
+      0.26,
+      0.28
+    ]
+  },
+  "research_decisions": {
+    "version": "research_decision_v1",
+    "history": [],
+    "mathematics": [],
+    "control_seeds": []
+  },
+  "supplied_evidence": []
+}

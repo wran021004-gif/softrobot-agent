@@ -1,0 +1,21 @@
+{
+  "core_commit": "52b3b787525a372c61c941db6bfdd2ad5e672793",
+  "base_commit": "e634b025448c5d5f8b22c4bfe0f5b81d4dbe3c25",
+  "branch": "codex/knowledge-skill-evidence-read-fix-20261116",
+  "patch_sha256": "3fecf620b949ea8b4784ff5fc43a6dec65894bde5c14868333a83827dad1e59e",
+  "source_zip_sha256": "351ebd5cf21b6456a7a6aaf260e964116eb2cdea2deff7a87f46781f3d8cd41a",
+  "changed_runtime_files": [
+    "tools/research/state.py"
+  ],
+  "changed_scientific_files": [],
+  "regression_tests": {
+    "command": "python -m unittest tests.test_null_execution_profile -v",
+    "test_count": 2,
+    "result": "passed",
+    "checks": [
+      "Passing replay remains readable after earlier failed execution with null, missing or populated profile",
+      "Unregistered protected evidence remains rejected",
+      "Original artifacts are unchanged by navigation"
+    ]
+  }
+}

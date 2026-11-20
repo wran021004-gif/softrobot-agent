@@ -1,0 +1,156 @@
+{
+  "source_store": "episodes/T08/K0S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "22bc1b4929d927c82bbe2e64b3c5ea5006917575076a865b7cd20eba14a04cfa",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "admitted": 0,
+      "confirmation_launch_reserve": 0,
+      "internal_launches": 0,
+      "numerical_reservation_s": 0.0,
+      "per_execution_s": null,
+      "remaining_activity_s": null,
+      "remaining_numerical_s": null,
+      "requested": 1
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [
+        {
+          "artifact_id": "06523e1313b6ca6dec0ed1ba7aa75cd34fbc04d6e8f7aa6e94b39b2d8b09db92",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "e439880b31922b716c8a0f40c768b8a4d8d5ce577b811f86a4f6ab321e6fa151",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1c892784b06b3831b82b38858e8d8da6c0b565d6e5b6a9e3410aa672838825bb",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "be9f71830829985da5ee25d4f22fe67002539114217c3a73239acca44eb3bbb0",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "85a6f85a4dd5938a5d6d1a56f02395588a772406abd336c1d894ecc7fd078100",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "6eec6aaf36e623b6012e8a7ee878d8eb202005284b83f8e75e39c429d09f50af",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "4b037121db5d14fd58decb82fcf0685b3e33f5d54f94849268f8edda6ae061b2",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "7b88e8f9ef74e12318a50090992ab65a0651bcda0d2502b53f6db51f479d9c65",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "cebc3ff310f6944729360be86e3bcb34e7c8f774afcb310f847b807097a42970",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "0caa68bbe4e456ebfa86eeb9e2bd8111e67a97219cbac7cd835b87f418cc5b94",
+          "media_type": "application/json"
+        }
+      ],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "stop",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "H7_slack_to_taut_symmetric_progressive_stiffness",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": {
+          "artifact_id": "1383177b845733ab2145dcf8db89349c7f51953e4047c6e8d40ed34a358e3d7a",
+          "media_type": "application/json"
+        },
+        "selected_method": "scientifically_justified_route_closure",
+        "selected_variables": [
+          "passive_structure",
+          "payout_offsets",
+          "section_radius",
+          "material_stiffness",
+          "density",
+          "viscosity"
+        ],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "A selectable result would require all force-response constraints, all five stage qualifications in both directions, registered evaluator admission, and independent numerical confirmation within the remaining budget.",
+      "experience_disposition": {},
+      "fixed_conditions": "All original T08 task quantities, solver settings, force programs, directions, seed, timestep, confirmation rules, and budgets remained frozen throughout.",
+      "hypothesis": "The strongest supported mechanism is a symmetric four-tendon structure whose direction-selective tendons remain slack at 0.05 N and become taut by 0.2 N; high E, low density, maximum bending viscosity, 6.5 mm sections, 22 mm routing, and 1.8 mm opposing payout produce the best executed force-response tradeoff.",
+      "interpretation": "The best executed bound result 7b88e8f9ef74e12318a50090992ab65a0651bcda0d2502b53f6db51f479d9c65 passes symmetric low/high/residual, slack-to-taut, stiffness-ratio, tension, and no-contact metrics: low 0.007493969 m, high 0.023165207 m, residual 4.34972e-5 m, ratio 1.75210. It fails low static balance and recovery speed/static balance (0.001435687 m/s). The 6.7 mm/1.6 mm adaptation cebc3ff310f6944729360be86e3bcb34e7c8f774afcb310f847b807097a42970 preserves force-response bounds but worsens recovery to 0.001680884 m/s. The 6.1 mm/1.6 mm reversal 0caa68bbe4e456ebfa86eeb9e2bd8111e67a97219cbac7cd835b87f418cc5b94 improves recovery to 0.001230956 m/s but still fails stability and also violates high displacement (0.026471611 m) and ratio (1.334929). Registered task.protocol.evaluate remained blocked by TASK_PROTOCOL_EVIDENCE_BINDING_MISMATCH for both outer and underlying simulation evidence. Mathematical passive kernels were unavailable and the registered mechanism study required an unavailable explicit frozen grant; no mathematical computation was counted. This finite route closure does not prove impossibility.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": "stop",
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": null,
+      "stopping_condition": "Stop when no tested candidate is acceptance-eligible and the remaining four backend solves are the full confirmation reserve, so another two-solve design trial could not also complete the mandated confirmation scope.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "06523e1313b6ca6dec0ed1ba7aa75cd34fbc04d6e8f7aa6e94b39b2d8b09db92",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "e439880b31922b716c8a0f40c768b8a4d8d5ce577b811f86a4f6ab321e6fa151",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "1c892784b06b3831b82b38858e8d8da6c0b565d6e5b6a9e3410aa672838825bb",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "be9f71830829985da5ee25d4f22fe67002539114217c3a73239acca44eb3bbb0",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "85a6f85a4dd5938a5d6d1a56f02395588a772406abd336c1d894ecc7fd078100",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "6eec6aaf36e623b6012e8a7ee878d8eb202005284b83f8e75e39c429d09f50af",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "4b037121db5d14fd58decb82fcf0685b3e33f5d54f94849268f8edda6ae061b2",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "7b88e8f9ef74e12318a50090992ab65a0651bcda0d2502b53f6db51f479d9c65",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "cebc3ff310f6944729360be86e3bcb34e7c8f774afcb310f847b807097a42970",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "0caa68bbe4e456ebfa86eeb9e2bd8111e67a97219cbac7cd835b87f418cc5b94",
+          "media_type": "application/json"
+        }
+      ],
+      "weakening_observation": "The executed best design already shows low-stage static-balance failure and recovery speed 0.0014357 m/s > 0.001 m/s; H9 and H10 did not remove those failures, and H10 additionally lost high-displacement and stiffness-ratio constraints."
+    },
+    "request_id": "T08-K0S0-core-138",
+    "scientific_preflight": null
+  }
+}

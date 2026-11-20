@@ -1,0 +1,345 @@
+{
+  "source_store": "episodes_full_corrected/T04/K0S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "110dea1ad9ff7ff209de569b8548f3dae465567534e7aef14b8857dcc3ab189d",
+    "media_type": "application/json"
+  },
+  "projection_paths": [
+    "acceptance",
+    "candidate",
+    "profile metadata",
+    "task_gap",
+    "episodes"
+  ],
+  "document": {
+    "candidate": {
+      "artifact_id": "794b2c48490032c64db3ffec5e61267566fc269cebb8b0a30780241456ce122f",
+      "media_type": "application/json"
+    },
+    "status": "evaluated",
+    "route": "fixed_tension",
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:actual_two_lobes_each_cycle": {
+          "limit": 1.0,
+          "passed": false,
+          "reason": null,
+          "unit": "predicate (1=true, 0=false)",
+          "value": 0.0
+        },
+        "evaluator:contacts": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:cycle_1_lobe_clearance": {
+          "limit": 0.0,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": -0.018085356785900737
+        },
+        "evaluator:cycle_2_lobe_clearance": {
+          "limit": 0.0,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": -0.018077333368630828
+        },
+        "evaluator:cycle_count_error": {
+          "limit": 1e-06,
+          "passed": true,
+          "reason": null,
+          "unit": "cycles",
+          "value": 0.0
+        },
+        "evaluator:cycle_drift": {
+          "limit": 0.002,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 5.2618618529252546e-05
+        },
+        "evaluator:no_saturation": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 1.9377821856476394
+        },
+        "evaluator:speed": {
+          "limit": 0.03,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 1.2986915431929207e-05
+        },
+        "evaluator:stroke": {
+          "limit": 0.03,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 1.4978416143507367e-05
+        },
+        "evaluator:tracking_max": {
+          "limit": 0.006,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.020181704280630226
+        },
+        "evaluator:tracking_rmse": {
+          "limit": 0.003,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.01464675182841446
+        },
+        "evaluator:warnings": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "constraint_margins": {
+        "actual_two_lobes_each_cycle": {
+          "direction": "minimum",
+          "limit": 1.0,
+          "margin": -1.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "predicate (1=true, 0=false)"
+        },
+        "contacts": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "cycle_1_lobe_clearance": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.018085356785900737,
+          "observed": -0.018085356785900737,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "cycle_2_lobe_clearance": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.018077333368630828,
+          "observed": -0.018077333368630828,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "cycle_count_error": {
+          "direction": "maximum",
+          "limit": 1e-06,
+          "margin": 1e-06,
+          "observed": 0.0,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "cycles"
+        },
+        "cycle_drift": {
+          "direction": "maximum",
+          "limit": 0.002,
+          "margin": 0.0019473813814707476,
+          "observed": 5.2618618529252546e-05,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "no_saturation": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": 1.9377821856476394,
+          "observed": 1.9377821856476394,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "N"
+        },
+        "speed": {
+          "direction": "maximum",
+          "limit": 0.03,
+          "margin": 0.02998701308456807,
+          "observed": 1.2986915431929207e-05,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "stroke": {
+          "direction": "maximum",
+          "limit": 0.03,
+          "margin": 0.02998502158385649,
+          "observed": 1.4978416143507367e-05,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "tracking_max": {
+          "direction": "maximum",
+          "limit": 0.006,
+          "margin": -0.014181704280630225,
+          "observed": 0.020181704280630226,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "tracking_rmse": {
+          "direction": "maximum",
+          "limit": 0.003,
+          "margin": -0.011646751828414459,
+          "observed": 0.01464675182841446,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "warnings": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "a137d3484c88562a10e6083f9ad78ee7111b8f885ca331bb02fa09af8db57778",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": null,
+          "source": {
+            "artifact_id": "86d4f9ff608e224584b1a95f9c7c75e75e60b789bddaaf971fac33c96d566570",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null
+        },
+        "profile": {
+          "artifact_id": "3a8ce93a78648e5de88dce56e8e4e645a03abeb93f92e140311dda324ff89002",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "a137d3484c88562a10e6083f9ad78ee7111b8f885ca331bb02fa09af8db57778",
+            "media_type": "application/json"
+          },
+          "execution_id": "a967d1ace5a64efd89f60b6b7461b8b9",
+          "simulation": {
+            "artifact_id": "86d4f9ff608e224584b1a95f9c7c75e75e60b789bddaaf971fac33c96d566570",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "86d4f9ff608e224584b1a95f9c7c75e75e60b789bddaaf971fac33c96d566570",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "a967d1ace5a64efd89f60b6b7461b8b9",
+      "issues": [],
+      "metrics": {
+        "cycle_phase_matched_max_difference_m": 5.2618618529252546e-05,
+        "max_error_m": 0.020181704280630226,
+        "terminal_speed_m_s": 5.652945581489665e-05,
+        "tracking_rmse_m": 0.01464675182841446
+      },
+      "missing": [],
+      "protocol_id": "offline_frozen_task_v1",
+      "source_status": null,
+      "sources": {
+        "evaluation": {
+          "artifact_id": "a137d3484c88562a10e6083f9ad78ee7111b8f885ca331bb02fa09af8db57778",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "3a8ce93a78648e5de88dce56e8e4e645a03abeb93f92e140311dda324ff89002",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.tracking",
+      "task_identity": "e96fa429c4d4d82761aa8479756ac70814cb7f0f4e9a86fbec0d953c83865d98",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 22.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "version": "1.0.0",
+      "worst_constraint": "cycle_1_lobe_clearance"
+    },
+    "profile": {
+      "complete": true
+    },
+    "physical_launches": 1,
+    "actual_resource_consumption": {
+      "forward_evaluations": 26402,
+      "kernel_wall_s": 315.8591708000167,
+      "model_builds": 1,
+      "physics_step_attempts": 22000,
+      "physics_steps": 22000,
+      "rollouts": 1
+    },
+    "boundary": {
+      "elapsed_s": 321.70067009999184,
+      "returncode": 0,
+      "termination_confirmed": true,
+      "worker_started": true
+    }
+  }
+}

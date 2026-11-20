@@ -1,0 +1,69 @@
+{
+  "source_store": "episodes_full_corrected/T09/K0S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "6da5f56703d30a33f0aa5732c7d7010815abcf8cf72c0a3d1e15f6906c71dd3d",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "scope": "selection without execution or numerical reservation"
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "select",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "T09-H29-H30-near-touch-release",
+        "requested_budget": 1,
+        "research_intent": "SELECT",
+        "selected_candidate": {
+          "artifact_id": "011e35d4657d2a85f55654f8b14a91b20c2178e1242038820e0c474da16c6886",
+          "media_type": "application/json"
+        },
+        "selected_method": "native complete physical acceptance plus non-equivalent same-structure robustness validation",
+        "selected_variables": [
+          "axis_decoupled_tendon_routing",
+          "anisotropic_cross_sections",
+          "centered_hold_tensions",
+          "near_touch_release_tension",
+          "release_endpoint_time"
+        ],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "Native selection should retain H29 as the best accepted execution while recognizing H30 as independent complete robustness evidence on the identical structure.",
+      "experience_disposition": {},
+      "fixed_conditions": "Frozen T09 task, seed 17, original 2.0 s horizon, unchanged evaluator and hard checks, common candidate 011e35d4657d2a85f55654f8b14a91b20c2178e1242038820e0c474da16c6886.",
+      "hypothesis": "The H29 common physical structure with axis-decoupled tendon routing, anisotropic stiff sections, centered constant hold, and a slow 0.72 N near-touch release is the strongest accepted design; H30's 10 ms release-endpoint perturbation independently confirms that acceptance is not confined to one exact schedule.",
+      "interpretation": "H29 and H30 both pass all original hard checks. H30 perturbs the release endpoint from 1.70 s to 1.69 s and therefore independently tests local timing robustness. Exact identical replay was not launched because Core required an absent explicit replication grant.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": null,
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": {
+        "artifact_id": "5c246173ce5664e84ab7be88b0497fef5b79f781f72f68ec526b66bdff720cbe",
+        "media_type": "application/json"
+      },
+      "stopping_condition": "Select only because H29 and H30 both have complete accepted physical evidence on the same structure; do not infer broader guarantees.",
+      "supporting_evidence": [],
+      "weakening_observation": "Selection would be weakened if either H29 or H30 failed any original hard check, used a different physical structure, or lacked complete physical evaluation."
+    },
+    "request_id": "T09-K0S0-fullparity-v2-core-447",
+    "scientific_preflight": null
+  }
+}

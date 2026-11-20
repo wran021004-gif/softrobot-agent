@@ -1,0 +1,129 @@
+{
+  "source_path": "episodes_full_corrected/T04/K1S1/CORE_CALLS.jsonl",
+  "source_line": 254,
+  "original_call": {
+    "request_id": "T04-K1S1-fullparity-v2-core-254",
+    "tool": "experience_retrieve",
+    "arguments": {
+      "event": {
+        "decision_type": "D6",
+        "research_question": "Is the exact native equilibrium-reference-bank procedure available as an authorized resource?",
+        "hypothesis": "The named success trace resources `native-equilibrium-reference` and `native-equilibrium-reference-bank` may be indexed by key rather than task tag.",
+        "selected_action": "Search authorized resources by exact equilibrium reference bank structure phrase.",
+        "next_research_step": "Fully read any exact matching entries and assess whether they change the feedforward reconstruction action.",
+        "evidence_references": [
+          {
+            "artifact_id": "2c061d9e0590fc5313756839cc9b5b0422d74de2ba046b9a80e80fbfadc68b57",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "56d98a482dca80a3e9cacee0b43808332a842691888767c7945c94a05f93519f",
+            "media_type": "application/json"
+          }
+        ],
+        "decision_outcome": "Native trace inspection shows the latest candidate/replay branch was NMPC-based (controller horizon 4/max iterations 8), so it cannot be retried under the latest method restriction; a new feedforward action is required."
+      },
+      "query": {
+        "operation": "search",
+        "structure": "native equilibrium reference bank",
+        "limit": 20,
+        "detail": "summary"
+      }
+    },
+    "started_at": "2026-11-18T04:47:11.569682+00:00",
+    "started_unix": 1794977231.5696826,
+    "status": "completed",
+    "wall_s": 1.1538615999743342,
+    "result": {
+      "reference": {
+        "artifact_id": "6722c23727be16545c2a6baa7ea099f5f81c0222881a7337a5618fb3d9b34c63",
+        "media_type": "application/json"
+      },
+      "query": {
+        "operation": "search",
+        "key": null,
+        "entry_id": null,
+        "revision": null,
+        "task": null,
+        "structure": "native equilibrium reference bank",
+        "failure_type": null,
+        "version": null,
+        "kind": null,
+        "knowledge_type": null,
+        "limit": 20,
+        "detail": "summary"
+      },
+      "results": [],
+      "supplied_startup_context": false,
+      "matched_count": 0,
+      "evidence_role": "context_only",
+      "reader": "agent",
+      "scientific_evidence": false,
+      "scope": "Historical decision pattern or conditional method; not current evidence or authorization. Do not transfer historical task values or controls. Cross-task validity is unverified.",
+      "read_guidance": "Execute an entry read_query exactly; the retrieval receipt reference.artifact_id is not a Knowledge entry_id.",
+      "empty_search_recovery": {
+        "available_task_tags": [
+          "oriented_tracking",
+          "passive_force_response",
+          "passive_response",
+          "position_tool_axis",
+          "soft_robot_research",
+          "tracking"
+        ],
+        "search_query": {
+          "operation": "search"
+        },
+        "exact_reads": [
+          {
+            "operation": "read",
+            "entry_id": "phs2d-research-process",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "passive-structure-mechanics",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "general-routing",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "general-material-inertia",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-slack",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-static-dynamic",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-convergence",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "validation-qualification",
+            "revision": "2"
+          }
+        ],
+        "reason": "Filters are exact metadata matches. Version and revision are distinct fields. Cross-task entries are context_only; applicability unverified."
+      }
+    },
+    "new_references": [
+      {
+        "artifact_id": "6722c23727be16545c2a6baa7ea099f5f81c0222881a7337a5618fb3d9b34c63",
+        "media_type": "application/json"
+      }
+    ],
+    "_line": 254
+  }
+}

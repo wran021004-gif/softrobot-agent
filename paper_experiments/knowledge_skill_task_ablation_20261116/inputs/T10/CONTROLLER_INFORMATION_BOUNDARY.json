@@ -1,0 +1,37 @@
+{
+  "scope": "Read-only code and configuration identity audit; original per-episode runtime evidence remains in Core Store.",
+  "core_commit": "74f97bbb329a8df8970e7602010a492b0540bdd1",
+  "controller_default_hashes": {
+    "CONTROL_negative_y.json": "d65d133f6d486160e74002e2fad96287ba8428683e2e06f3b5df1f331bde76d9",
+    "CONTROL_negative_y_frozen.json": "d65d133f6d486160e74002e2fad96287ba8428683e2e06f3b5df1f331bde76d9",
+    "CONTROL_no_impulse.json": "d65d133f6d486160e74002e2fad96287ba8428683e2e06f3b5df1f331bde76d9",
+    "CONTROL_positive_y.json": "d65d133f6d486160e74002e2fad96287ba8428683e2e06f3b5df1f331bde76d9",
+    "CONTROL_positive_y_frozen.json": "d65d133f6d486160e74002e2fad96287ba8428683e2e06f3b5df1f331bde76d9"
+  },
+  "all_five_parameter_files_identical": true,
+  "source_sha256": {
+    "D:\\softrobot-agent\\.worktrees\\core-ten-task-interfaces-20261112\\extensions\\tendon_family\\environment.py": "8919a500d03a0c448cf8b7fc6a7702e2470f5496f525085ce682bf2824cdb533",
+    "D:\\softrobot-agent\\.worktrees\\core-ten-task-interfaces-20261112\\extensions\\tendon_family\\gvs_nmpc.py": "61059ee53aea03b236405e9f5b011aea363f41b23c8b6f1c896b24b8e89e0183",
+    "D:\\softrobot-agent\\.worktrees\\core-ten-task-interfaces-20261112\\extensions\\tendon_family\\gvs_profile.py": "3c92abf7261677bf113b9edb5c59dad7c08110a857dddb87f5de1331d1909d23"
+  },
+  "observed_implementation": {
+    "controller_task": "Removes acceptance, environment external_forces, wrenches and input_freeze_after_s; replaces impact case ID/name/source with a common blind fixed-target description.",
+    "reference_clock": "Core clips the impact controller reference clock to the end of the original approach window.",
+    "input_freeze": "Physical environment freezes the actual pre-impulse control in the two original control-role cases.",
+    "force_application": "Original positive/negative half-sine world COM force belongs to the native physical environment; no future force descriptor is supplied as a controller recipe."
+  },
+  "actual_common_binding_verified": true,
+  "observed_initial_parameter_mismatch": {
+    "first_generated_positive_speed_weights": [
+      0.1,
+      0.1
+    ],
+    "frozen_condition_speed_weights": [
+      0.0,
+      0.0
+    ],
+    "correction": "Explicit allowed control-domain weights0 at generator017; positive exact protocol binding018 and original other-condition aliases have identical actual controllers. The baseline-positive alias019 restores canonical defaults and is not executed. All preflight attempts retained; no physical evaluation on mismatched final candidates."
+  },
+  "final_core_commit": "00d74dbe7e3ed5263e4a48a6eef08b2d63ac51ff",
+  "final_binding_proof": "FINAL_COMMON_CONTROLLER_BINDINGS.json"
+}

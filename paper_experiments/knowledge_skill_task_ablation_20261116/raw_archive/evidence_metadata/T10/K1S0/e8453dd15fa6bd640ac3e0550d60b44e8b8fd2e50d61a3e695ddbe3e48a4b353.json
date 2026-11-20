@@ -1,0 +1,370 @@
+{
+  "source_store": "episodes_full_corrected/T10/K1S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "e8453dd15fa6bd640ac3e0550d60b44e8b8fd2e50d61a3e695ddbe3e48a4b353",
+    "media_type": "application/json"
+  },
+  "projection_paths": [
+    "acceptance",
+    "candidate",
+    "profile metadata",
+    "task_gap",
+    "episodes"
+  ],
+  "document": {
+    "candidate": {
+      "artifact_id": "841f710c5aecc1d5098a091b1ff4e95eb92fdae272d210816b4bbd78cce7f689",
+      "media_type": "application/json"
+    },
+    "status": "evaluated",
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:actual_speed_limit": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.018246058117224236
+        },
+        "evaluator:final_hold_all_timesteps": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "predicate (1=true, 0=false)",
+          "value": 1.0
+        },
+        "evaluator:final_hold_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0034531346295492166
+        },
+        "evaluator:final_hold_speed": {
+          "limit": 0.02,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.00635633208559042
+        },
+        "evaluator:finite_no_warning": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:force_off_after_pulse": {
+          "limit": 1e-12,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 1.3114412061970439e-14
+        },
+        "evaluator:no_unexpected_collision": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:pre_impact_hold_all_timesteps": {
+          "limit": 1.0,
+          "passed": false,
+          "reason": null,
+          "unit": "predicate (1=true, 0=false)",
+          "value": 0.0
+        },
+        "evaluator:pre_impact_hold_position": {
+          "limit": 0.01,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.010514044201764033
+        },
+        "evaluator:pre_impact_hold_speed": {
+          "limit": 0.02,
+          "passed": true,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.01949528290175731
+        },
+        "evaluator:recovery_within_0p35s_with_100ms_hold": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "predicate (1=true, 0=false)",
+          "value": 1.0
+        },
+        "evaluator:stroke_limit": {
+          "limit": 0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0047722540285178305
+        },
+        "evaluator:tension_max": {
+          "limit": 8.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 7.572428601439993
+        },
+        "evaluator:tension_min": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": -0.0
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "constraint_margins": {
+        "actual_speed_limit": {
+          "direction": "maximum",
+          "limit": 0.025,
+          "margin": 0.006753941882775765,
+          "observed": 0.018246058117224236,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "m/s"
+        },
+        "final_hold_all_timesteps": {
+          "direction": "minimum",
+          "limit": 1.0,
+          "margin": 0.0,
+          "observed": 1.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "predicate (1=true, 0=false)"
+        },
+        "final_hold_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.006546865370450784,
+          "observed": 0.0034531346295492166,
+          "strict": false,
+          "tolerance": 1e-12,
+          "units": "m"
+        },
+        "final_hold_speed": {
+          "direction": "maximum",
+          "limit": 0.02,
+          "margin": 0.013643667914409581,
+          "observed": 0.00635633208559042,
+          "strict": false,
+          "tolerance": 1e-12,
+          "units": "m/s"
+        },
+        "finite_no_warning": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "force_off_after_pulse": {
+          "direction": "maximum",
+          "limit": 1e-12,
+          "margin": 9.868855879380296e-13,
+          "observed": 1.3114412061970439e-14,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "N"
+        },
+        "no_unexpected_collision": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "pre_impact_hold_all_timesteps": {
+          "direction": "minimum",
+          "limit": 1.0,
+          "margin": -1.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "predicate (1=true, 0=false)"
+        },
+        "pre_impact_hold_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": -0.0005140442017640325,
+          "observed": 0.010514044201764033,
+          "strict": false,
+          "tolerance": 1e-12,
+          "units": "m"
+        },
+        "pre_impact_hold_speed": {
+          "direction": "maximum",
+          "limit": 0.02,
+          "margin": 0.00050471709824269,
+          "observed": 0.01949528290175731,
+          "strict": false,
+          "tolerance": 1e-12,
+          "units": "m/s"
+        },
+        "recovery_within_0p35s_with_100ms_hold": {
+          "direction": "minimum",
+          "limit": 1.0,
+          "margin": 0.0,
+          "observed": 1.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "predicate (1=true, 0=false)"
+        },
+        "stroke_limit": {
+          "direction": "maximum",
+          "limit": 0.015,
+          "margin": 0.010227745971482169,
+          "observed": 0.0047722540285178305,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "m"
+        },
+        "tension_max": {
+          "direction": "maximum",
+          "limit": 8.0,
+          "margin": 0.4275713985600067,
+          "observed": 7.572428601439993,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "N"
+        },
+        "tension_min": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.0,
+          "observed": -0.0,
+          "strict": false,
+          "tolerance": 1e-09,
+          "units": "N"
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "e3dda868f02ea742730914468b7408d2d6e50e25bda3214019b73a0463802d75",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "4c8be7837d5f42e68e4bf76ab817d8dc",
+          "source": {
+            "artifact_id": "86684489a65e9c065e0f1a692ff4af05672f318f4edbd30ab8305f587973bbca",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "4c8be7837d5f42e68e4bf76ab817d8dc"
+        },
+        "profile": {
+          "artifact_id": "ff8a12f2a54f6ff5b052acb6955f9f8a5b73af06d9adc17727e06de56912d615",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "e3dda868f02ea742730914468b7408d2d6e50e25bda3214019b73a0463802d75",
+            "media_type": "application/json"
+          },
+          "execution_id": "4c8be7837d5f42e68e4bf76ab817d8dc",
+          "simulation": {
+            "artifact_id": "86684489a65e9c065e0f1a692ff4af05672f318f4edbd30ab8305f587973bbca",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "86684489a65e9c065e0f1a692ff4af05672f318f4edbd30ab8305f587973bbca",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "4c8be7837d5f42e68e4bf76ab817d8dc",
+      "issues": [],
+      "metrics": {
+        "continuous_post_pulse_valid_s": 0.44999999999995044,
+        "final_hold_max_error_m": 0.0034531346295492166,
+        "final_hold_max_speed_m_s": 0.00635633208559042,
+        "max_tendon_speed_m_s": 0.018246058117224236,
+        "max_tendon_stroke_m": 0.0047722540285178305,
+        "pre_hold_max_error_m": 0.010514044201764033,
+        "pre_hold_max_speed_m_s": 0.01949528290175731,
+        "recovery_time_after_pulse_s": 0
+      },
+      "missing": [],
+      "protocol_id": "offline_frozen_task_v1",
+      "source_status": null,
+      "sources": {
+        "evaluation": {
+          "artifact_id": "e3dda868f02ea742730914468b7408d2d6e50e25bda3214019b73a0463802d75",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "ff8a12f2a54f6ff5b052acb6955f9f8a5b73af06d9adc17727e06de56912d615",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "aeb9193fad5b1a8219080e89fbfd72210bc3d15f699fdd8473d007f86b4df1dd",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 1.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.0005
+      },
+      "version": "1.0.0",
+      "worst_constraint": "pre_impact_hold_all_timesteps"
+    },
+    "profile": {
+      "complete": true,
+      "solver_status": "completed",
+      "last_valid_time_s": 1.0,
+      "valid_complete_execution": true,
+      "evaluation_validity": "valid"
+    },
+    "numerical_s": 9.106147999991663
+  }
+}

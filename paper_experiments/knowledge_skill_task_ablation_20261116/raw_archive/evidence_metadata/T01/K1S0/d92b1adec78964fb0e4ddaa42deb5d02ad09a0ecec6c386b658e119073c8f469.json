@@ -1,0 +1,288 @@
+{
+  "source_store": "episodes_full_corrected/T01/K1S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "d92b1adec78964fb0e4ddaa42deb5d02ad09a0ecec6c386b658e119073c8f469",
+    "media_type": "application/json"
+  },
+  "projection_paths": [
+    "acceptance",
+    "candidate",
+    "profile metadata",
+    "task_gap",
+    "episodes"
+  ],
+  "document": {
+    "candidate": {
+      "artifact_id": "6833cf12a21a15a45517af14e77922b9b3a67c4b4def26f556f555e3bde364ac",
+      "media_type": "application/json"
+    },
+    "status": "evaluated",
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:geometric_stroke_max": {
+          "limit": 0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.0067456393366445155
+        },
+        "evaluator:geometric_stroke_min": {
+          "limit": -0.015,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": -0.009297972758206707
+        },
+        "evaluator:geometric_tendon_speed": {
+          "limit": 0.025,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.18114893844481328
+        },
+        "evaluator:holding_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.005215157711067082
+        },
+        "evaluator:holding_speed": {
+          "limit": 0.03,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.06477085369054361
+        },
+        "evaluator:solver_errors": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:tension_max": {
+          "limit": 8.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": 7.999073920051855
+        },
+        "evaluator:tension_min": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "N",
+          "value": -0.0
+        },
+        "evaluator:terminal_position": {
+          "limit": 0.01,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.005215157711067082
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "constraint_margins": {
+        "geometric_stroke_max": {
+          "direction": "maximum",
+          "limit": 0.015,
+          "margin": 0.008254360663355484,
+          "observed": 0.0067456393366445155,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_stroke_min": {
+          "direction": "minimum",
+          "limit": -0.015,
+          "margin": 0.005702027241793292,
+          "observed": -0.009297972758206707,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "geometric_tendon_speed": {
+          "direction": "maximum",
+          "limit": 0.025,
+          "margin": -0.15614893844481328,
+          "observed": 0.18114893844481328,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "holding_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.0047848422889329185,
+          "observed": 0.005215157711067082,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "holding_speed": {
+          "direction": "maximum",
+          "limit": 0.03,
+          "margin": -0.03477085369054361,
+          "observed": 0.06477085369054361,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "solver_errors": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "tension_max": {
+          "direction": "maximum",
+          "limit": 8.0,
+          "margin": 0.0009260799481447535,
+          "observed": 7.999073920051855,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "tension_min": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.0,
+          "observed": -0.0,
+          "strict": false,
+          "tolerance": 1e-08,
+          "units": "N"
+        },
+        "terminal_position": {
+          "direction": "maximum",
+          "limit": 0.01,
+          "margin": 0.0047848422889329185,
+          "observed": 0.005215157711067082,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "m"
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "83b517a485052682616ad1fc26091973eb1d0bda183af0085dca2323d5c06640",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": "037f0d98370c407aa2bd8157016b99a5",
+          "source": {
+            "artifact_id": "eec40d55587e737e603b2679b4c48901256a7dd4c97aa33a0653afe76903532f",
+            "media_type": "application/json"
+          },
+          "source_execution_id": "037f0d98370c407aa2bd8157016b99a5"
+        },
+        "profile": {
+          "artifact_id": "312b7aa21f423012440ef0debfb0ef2205e20fc6bf60388a3320c864823b1d1d",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "83b517a485052682616ad1fc26091973eb1d0bda183af0085dca2323d5c06640",
+            "media_type": "application/json"
+          },
+          "execution_id": "037f0d98370c407aa2bd8157016b99a5",
+          "simulation": {
+            "artifact_id": "eec40d55587e737e603b2679b4c48901256a7dd4c97aa33a0653afe76903532f",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "eec40d55587e737e603b2679b4c48901256a7dd4c97aa33a0653afe76903532f",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "037f0d98370c407aa2bd8157016b99a5",
+      "issues": [],
+      "metrics": {
+        "geometric_stroke_max_m": 0.0067456393366445155,
+        "geometric_stroke_min_m": -0.009297972758206707,
+        "geometric_tendon_speed_max_m_s": 0.18114893844481328,
+        "holding_max_error_m": 0.005215157711067082,
+        "holding_max_speed_m_s": 0.06477085369054361,
+        "terminal_error_m": 0.005215157711067082
+      },
+      "missing": [],
+      "protocol_id": "offline_frozen_task_v1",
+      "source_status": null,
+      "sources": {
+        "evaluation": {
+          "artifact_id": "83b517a485052682616ad1fc26091973eb1d0bda183af0085dca2323d5c06640",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "312b7aa21f423012440ef0debfb0ef2205e20fc6bf60388a3320c864823b1d1d",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.reach",
+      "task_identity": "43a68300d9e225ba4ec9b68c5e6dceea835f59414233ebf21116372f41f3d370",
+      "timing": {
+        "control_period_s": 0.02,
+        "duration_s": 0.6,
+        "sample_period_s": 0.02,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "version": "1.0.0",
+      "worst_constraint": "geometric_tendon_speed"
+    },
+    "profile": {
+      "complete": true,
+      "solver_status": "completed",
+      "last_valid_time_s": 0.6,
+      "valid_complete_execution": true,
+      "evaluation_validity": "valid"
+    },
+    "numerical_s": 3028.2219143999973
+  }
+}

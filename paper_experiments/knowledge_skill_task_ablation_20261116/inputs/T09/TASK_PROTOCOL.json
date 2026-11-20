@@ -1,0 +1,790 @@
+{
+  "version": "core_task_protocol_v1",
+  "task_id": "T09",
+  "name": "Spring Button Press v1.2",
+  "source_repository": "wran021004-gif/softrobot-demo-showcase",
+  "source_commit": "2e5d1088746df0916e2a7ec60f4780998c6ba004",
+  "source_status": "historical_development",
+  "cases": [
+    {
+      "condition_id": "default",
+      "role": "required",
+      "task": {
+        "actuator_channels": [
+          "actuator_commands"
+        ],
+        "contract_version": "1.0.0",
+        "environment": {
+          "contract": "experiment.assembly",
+          "data": {
+            "environment": {
+              "coordinate_frame": "world_base_x_forward_yz_cross_section",
+              "environment_id": "reach_free",
+              "gravity_m_s2": [
+                0.0,
+                0.0,
+                -9.81
+              ],
+              "gravity_source": "main@245a785 reach_free environment; Human-owned benchmark gravity",
+              "lights": [
+                {
+                  "direction": [
+                    0.0,
+                    0.0,
+                    -1.0
+                  ],
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    2.0
+                  ]
+                }
+              ],
+              "objects": [
+                {
+                  "conaffinity": 1,
+                  "contype": 0,
+                  "half_size_m": [
+                    2.0,
+                    2.0,
+                    0.1
+                  ],
+                  "kind": "plane",
+                  "name": "floor",
+                  "position_m": [
+                    0.0,
+                    0.0,
+                    -0.02
+                  ]
+                }
+              ],
+              "schema_version": "1",
+              "truth_status": "HUMAN_OWNED",
+              "units": "SI"
+            },
+            "external_forces": [],
+            "floor_id": "floor",
+            "mount": {
+              "position_m": [
+                0.0,
+                0.0,
+                0.15
+              ],
+              "quaternion_wxyz": [
+                1.0,
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "version": "1.0.0"
+        },
+        "evaluator": {
+          "extension_id": "evaluate.tracking",
+          "version": "1.0.0",
+          "parameters": {
+            "contract": "reference.tracking_evaluation",
+            "version": "1.0.0",
+            "data": {
+              "max_error_m": 0.002,
+              "geometry_step_m": 0.001
+            }
+          }
+        },
+        "failure_policy": "retain_invalid_and_constraint_failures",
+        "family": "task.tracking",
+        "goal": {
+          "contract": "reference.parametric_tracking_goal",
+          "version": "1.0.0",
+          "data": {
+            "reference": {
+              "kind": "quintic_nodes",
+              "center_m": [
+                0.29549999999999993,
+                0.020999999999999963,
+                0.15
+              ],
+              "duration_s": 2.0,
+              "times_s": [
+                0,
+                0.5,
+                0.9,
+                1.4,
+                1.8,
+                2.0
+              ],
+              "positions_m": [
+                [
+                  0.29549999999999993,
+                  0.020999999999999963,
+                  0.15
+                ],
+                [
+                  0.29549999999999993,
+                  0.025999999999999964,
+                  0.15
+                ],
+                [
+                  0.29549999999999993,
+                  0.027999999999999962,
+                  0.15
+                ],
+                [
+                  0.29549999999999993,
+                  0.027999999999999962,
+                  0.15
+                ],
+                [
+                  0.29549999999999993,
+                  0.020999999999999963,
+                  0.15
+                ],
+                [
+                  0.29549999999999993,
+                  0.020999999999999963,
+                  0.15
+                ]
+              ]
+            },
+            "time_requirement": "timed"
+          }
+        },
+        "initializer": {
+          "extension_id": "initialize.family",
+          "parameters": {
+            "contract": "family.initial",
+            "data": {
+              "qpos_rad": {
+                "segment_0_cell_0_y": 0.0,
+                "segment_0_cell_0_z": 0.0,
+                "segment_0_cell_10_y": 0.0,
+                "segment_0_cell_10_z": 0.0,
+                "segment_0_cell_11_y": 0.0,
+                "segment_0_cell_11_z": 0.0,
+                "segment_0_cell_1_y": 0.0,
+                "segment_0_cell_1_z": 0.0,
+                "segment_0_cell_2_y": 0.0,
+                "segment_0_cell_2_z": 0.0,
+                "segment_0_cell_3_y": 0.0,
+                "segment_0_cell_3_z": 0.0,
+                "segment_0_cell_4_y": 0.0,
+                "segment_0_cell_4_z": 0.0,
+                "segment_0_cell_5_y": 0.0,
+                "segment_0_cell_5_z": 0.0,
+                "segment_0_cell_6_y": 0.0,
+                "segment_0_cell_6_z": 0.0,
+                "segment_0_cell_7_y": 0.0,
+                "segment_0_cell_7_z": 0.0,
+                "segment_0_cell_8_y": 0.0,
+                "segment_0_cell_8_z": 0.0,
+                "segment_0_cell_9_y": 0.0,
+                "segment_0_cell_9_z": 0.0,
+                "segment_1_cell_0_y": 0.0,
+                "segment_1_cell_0_z": 0.0,
+                "segment_1_cell_10_y": 0.0,
+                "segment_1_cell_10_z": 0.0,
+                "segment_1_cell_11_y": 0.0,
+                "segment_1_cell_11_z": 0.0,
+                "segment_1_cell_1_y": 0.0,
+                "segment_1_cell_1_z": 0.0,
+                "segment_1_cell_2_y": 0.0,
+                "segment_1_cell_2_z": 0.0,
+                "segment_1_cell_3_y": 0.0,
+                "segment_1_cell_3_z": 0.0,
+                "segment_1_cell_4_y": 0.0,
+                "segment_1_cell_4_z": 0.0,
+                "segment_1_cell_5_y": 0.0,
+                "segment_1_cell_5_z": 0.0,
+                "segment_1_cell_6_y": 0.0,
+                "segment_1_cell_6_z": 0.0,
+                "segment_1_cell_7_y": 0.0,
+                "segment_1_cell_7_z": 0.0,
+                "segment_1_cell_8_y": 0.0,
+                "segment_1_cell_8_z": 0.0,
+                "segment_1_cell_9_y": 0.0,
+                "segment_1_cell_9_z": 0.0
+              },
+              "qvel_rad_s": {
+                "segment_0_cell_0_y": 0.0,
+                "segment_0_cell_0_z": 0.0,
+                "segment_0_cell_10_y": 0.0,
+                "segment_0_cell_10_z": 0.0,
+                "segment_0_cell_11_y": 0.0,
+                "segment_0_cell_11_z": 0.0,
+                "segment_0_cell_1_y": 0.0,
+                "segment_0_cell_1_z": 0.0,
+                "segment_0_cell_2_y": 0.0,
+                "segment_0_cell_2_z": 0.0,
+                "segment_0_cell_3_y": 0.0,
+                "segment_0_cell_3_z": 0.0,
+                "segment_0_cell_4_y": 0.0,
+                "segment_0_cell_4_z": 0.0,
+                "segment_0_cell_5_y": 0.0,
+                "segment_0_cell_5_z": 0.0,
+                "segment_0_cell_6_y": 0.0,
+                "segment_0_cell_6_z": 0.0,
+                "segment_0_cell_7_y": 0.0,
+                "segment_0_cell_7_z": 0.0,
+                "segment_0_cell_8_y": 0.0,
+                "segment_0_cell_8_z": 0.0,
+                "segment_0_cell_9_y": 0.0,
+                "segment_0_cell_9_z": 0.0,
+                "segment_1_cell_0_y": 0.0,
+                "segment_1_cell_0_z": 0.0,
+                "segment_1_cell_10_y": 0.0,
+                "segment_1_cell_10_z": 0.0,
+                "segment_1_cell_11_y": 0.0,
+                "segment_1_cell_11_z": 0.0,
+                "segment_1_cell_1_y": 0.0,
+                "segment_1_cell_1_z": 0.0,
+                "segment_1_cell_2_y": 0.0,
+                "segment_1_cell_2_z": 0.0,
+                "segment_1_cell_3_y": 0.0,
+                "segment_1_cell_3_z": 0.0,
+                "segment_1_cell_4_y": 0.0,
+                "segment_1_cell_4_z": 0.0,
+                "segment_1_cell_5_y": 0.0,
+                "segment_1_cell_5_z": 0.0,
+                "segment_1_cell_6_y": 0.0,
+                "segment_1_cell_6_z": 0.0,
+                "segment_1_cell_7_y": 0.0,
+                "segment_1_cell_7_z": 0.0,
+                "segment_1_cell_8_y": 0.0,
+                "segment_1_cell_8_z": 0.0,
+                "segment_1_cell_9_y": 0.0,
+                "segment_1_cell_9_z": 0.0
+              },
+              "unspecified": "zero"
+            },
+            "version": "1.0.0"
+          },
+          "version": "1.0.0"
+        },
+        "name": "Spring Button Press v1.2",
+        "objectives": [
+          {
+            "metric": "max_position_error",
+            "direction": "minimize",
+            "units": "m"
+          }
+        ],
+        "observations": [
+          {
+            "dimension": 3,
+            "entity": "tip",
+            "frame": "world",
+            "missing": "unsupported",
+            "name": "tip_position",
+            "phase": "post_step",
+            "units": "m"
+          }
+        ],
+        "robot_families": [
+          "tendon_robot_family"
+        ],
+        "sampling": {
+          "aggregation": "per_instance",
+          "seeds": [
+            17
+          ],
+          "split": "development",
+          "window_s": [
+            0.01,
+            2.0
+          ]
+        },
+        "source": "BF7 Codex-organized candidate frozen before science; independent targets, same physical structure and zero initializer.",
+        "status": "development_valid",
+        "task_id": "spring-button-contact-v1-2",
+        "task_version": "1.0.0",
+        "timing": {
+          "control_period_s": 0.01,
+          "duration_s": 2.0,
+          "sample_period_s": 0.01,
+          "termination": [
+            "duration",
+            "numerical_failure"
+          ],
+          "timestep_s": 0.001
+        }
+      },
+      "acceptance": {
+        "version": "task_acceptance_v1",
+        "evaluator": "contact_press",
+        "parameters": {
+          "version": "spring_button_press_v1.0",
+          "label": "Codex-assisted engineering design; not Main autonomous Study",
+          "contact_pair": [
+            "probe",
+            "button_cap"
+          ],
+          "contact_evidence": "mj_contactForce normal component AND slide q > 0.1 mm",
+          "contact_time_window_s": [
+            0.35,
+            0.6
+          ],
+          "hold_window_s": [
+            0.9,
+            1.4
+          ],
+          "required_continuous_hold_s": 0.4,
+          "hold_depth_m": [
+            0.00175,
+            0.00225
+          ],
+          "hold_normal_contact_force_n": [
+            0.08,
+            0.12
+          ],
+          "lateral_xz_error_max_m": 0.002,
+          "max_button_travel_m": 0.003,
+          "button_negative_tolerance_m": 1e-06,
+          "actuator_tension_n": [
+            0.2,
+            8
+          ],
+          "actuator_stroke_from_initial_m": [
+            -0.015,
+            0.015
+          ],
+          "rope_speed_limit_m_s": 0.025,
+          "release_check_times_s": [
+            1.8,
+            2.0
+          ],
+          "release_residual_travel_max_m": 0.0001,
+          "release_normal_force_max_n": 0.01,
+          "release_probe_speed_max_m_s": 0.01,
+          "unexpected_penetrating_contact_allowed": false,
+          "collision_check": "native self/environment contact enabled; only probe-cap is allowed",
+          "force_crosscheck": "contact normal separate from k*q and c*qdot; additionally project contact force onto Y and check m*qacc balance",
+          "actuation_scope": "Core ideal-tension family, actual tendon geometric stroke and analytical speed; no spool or energy model",
+          "all_hard_checks_required": true,
+          "observation_site": "probe_center",
+          "initial_tension_n": 0.2,
+          "button_center_unpressed_m": [
+            0.29549999999999993,
+            0.030499999999999965,
+            0.15
+          ],
+          "rigid_tool": {
+            "body": "payload",
+            "mass_kg": 0.01,
+            "com_local_m": [
+              0.00891362131821644,
+              0.003924300139726615,
+              0.0
+            ],
+            "inertia_com_local_kg_m2": [
+              [
+                5.831808953329032e-07,
+                -1.9960476571625708e-07,
+                0.0
+              ],
+              [
+                -1.9960476571625708e-07,
+                2.629155789109792e-07,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                7.604437299693285e-07
+              ]
+            ]
+          },
+          "independent_channels": 4
+        },
+        "source_files": [
+          {
+            "path": "spring_button_press/task.json",
+            "sha256": "44663aa542206bbddf9320420091d07199dd32e6632f3d1d082758ca61e9f661"
+          },
+          {
+            "path": "spring_button_press/environment.json",
+            "sha256": "a8d3057f7eed403f5d9268a244085be7995a2a1324c5d237b5490f3eda5e55be"
+          },
+          {
+            "path": "spring_button_press/evaluation.json",
+            "sha256": "4c023ff611d8efafc111f7b7dd4d6e92a45b6856c6630f842917084f45b56e9f"
+          },
+          {
+            "path": "spring_button_press/evaluator.py",
+            "sha256": "451cbbb3c1239c1dd6ef0bab29ac6130470687cc64895542be56ed8180032b5e"
+          }
+        ],
+        "required_signals": [
+          "time_s",
+          "qpos",
+          "qvel",
+          "button_q_m",
+          "button_qdot_m_s",
+          "contact_force_n",
+          "contact_pairs",
+          "lateral_error_m",
+          "tension_n",
+          "tendon_length_m",
+          "tendon_speed_m_s",
+          "tip_speed_m_s",
+          "unexpected_contact_count",
+          "warnings",
+          "external_force_max"
+        ],
+        "grid": "physics_including_initial",
+        "historical_status": null,
+        "task_id": "T09"
+      },
+      "environment_extension": {
+        "version": "physical_environment_v1",
+        "bodies": [
+          {
+            "name": "button_slider",
+            "position_m": [
+              0.29549999999999993,
+              0.030499999999999965,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mass_kg": 0.005,
+            "com_local_m": [
+              0.0,
+              0.0023076923076923075,
+              0.0
+            ],
+            "inertia_com_local_kg_m2": [
+              [
+                1.136612426035503e-07,
+                0.0,
+                0.0
+              ],
+              [
+                0.0,
+                6.538461538461539e-08,
+                0.0
+              ],
+              [
+                0.0,
+                0.0,
+                1.136612426035503e-07
+              ]
+            ],
+            "joint_name": "button_slide",
+            "joint_kind": "slide",
+            "axis_local": [
+              0.0,
+              1.0,
+              0.0
+            ],
+            "joint_range": [
+              0.0,
+              0.003
+            ],
+            "stiffness": 50.0,
+            "damping": 0.2,
+            "spring_reference": 0.0,
+            "initial_position": 0.0,
+            "initial_velocity": 0.0
+          }
+        ],
+        "geometries": [
+          {
+            "name": "tool_block",
+            "body": "payload",
+            "kind": "box",
+            "position_m": [
+              0.007,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.007,
+              0.004,
+              0.004
+            ],
+            "contype": 1,
+            "conaffinity": 13
+          },
+          {
+            "name": "tool_bracket",
+            "body": "payload",
+            "kind": "box",
+            "position_m": [
+              0.014,
+              0.011,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.002,
+              0.007,
+              0.002
+            ],
+            "contype": 1,
+            "conaffinity": 13
+          },
+          {
+            "name": "probe",
+            "body": "payload",
+            "kind": "sphere",
+            "position_m": [
+              0.014,
+              0.021,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.003
+            ],
+            "contype": 1,
+            "conaffinity": 13
+          },
+          {
+            "name": "button_cap",
+            "body": "button_slider",
+            "kind": "cylinder",
+            "position_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              0.7071067811865476,
+              0.7071067811865476,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.006,
+              0.0015
+            ],
+            "contype": 4,
+            "conaffinity": 1
+          },
+          {
+            "name": "button_rod",
+            "body": "button_slider",
+            "kind": "cylinder",
+            "position_m": [
+              0.0,
+              0.0075,
+              0.0
+            ],
+            "quaternion_wxyz": [
+              0.7071067811865476,
+              0.7071067811865476,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.002,
+              0.006
+            ],
+            "contype": 4,
+            "conaffinity": 1
+          },
+          {
+            "name": "housing_rail_0",
+            "body": "world",
+            "kind": "box",
+            "position_m": [
+              0.2864999999999999,
+              0.04149999999999997,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.002,
+              0.01,
+              0.011
+            ],
+            "contype": 8,
+            "conaffinity": 1
+          },
+          {
+            "name": "housing_rail_1",
+            "body": "world",
+            "kind": "box",
+            "position_m": [
+              0.30449999999999994,
+              0.04149999999999997,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.002,
+              0.01,
+              0.011
+            ],
+            "contype": 8,
+            "conaffinity": 1
+          },
+          {
+            "name": "housing_rail_2",
+            "body": "world",
+            "kind": "box",
+            "position_m": [
+              0.29549999999999993,
+              0.04149999999999997,
+              0.141
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.007,
+              0.01,
+              0.002
+            ],
+            "contype": 8,
+            "conaffinity": 1
+          },
+          {
+            "name": "housing_rail_3",
+            "body": "world",
+            "kind": "box",
+            "position_m": [
+              0.29549999999999993,
+              0.04149999999999997,
+              0.159
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.007,
+              0.01,
+              0.002
+            ],
+            "contype": 8,
+            "conaffinity": 1
+          },
+          {
+            "name": "mount_plate",
+            "body": "world",
+            "kind": "box",
+            "position_m": [
+              0.29549999999999993,
+              0.05649999999999997,
+              0.15
+            ],
+            "quaternion_wxyz": [
+              1.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "size_m": [
+              0.018,
+              0.003,
+              0.018
+            ],
+            "contype": 8,
+            "conaffinity": 1
+          }
+        ],
+        "contact_pairs": [
+          {
+            "geom1": "probe",
+            "geom2": "button_cap",
+            "condim": 1,
+            "friction": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "solref": [
+              0.003,
+              1.0
+            ],
+            "solimp": [
+              0.98,
+              0.995,
+              0.0001
+            ]
+          }
+        ],
+        "wrenches": [],
+        "replace_robot_geometries": [
+          "payload_shape"
+        ],
+        "sites": [
+          {
+            "name": "probe_center",
+            "body": "payload",
+            "position_m": [
+              0.014,
+              0.021,
+              0.0
+            ]
+          }
+        ],
+        "collision_policy": "self_environment_frictionless",
+        "solver_iterations": 100,
+        "solver_tolerance": 1e-10,
+        "input_freeze_after_s": null,
+        "robot_hinge_range_rad": null,
+        "actuator_min_tension_n": null
+      },
+      "independent_channels": 4,
+      "initial_state_source": "original zero robot qpos/qvel, zero button state, 0.20 N initial tension",
+      "structure_sources": [
+        {
+          "path": "C1_four_tendons/design.json",
+          "sha256": "be41cf1d6c2e2703b67d11b56c7af9fc950f65ca13f9057c89224dac1f330f3c"
+        }
+      ]
+    }
+  ],
+  "reference": null,
+  "algorithm_bindings": [
+    "candidate.family@6.0.0",
+    "model.serial_bending_cells@1.0.0",
+    "controller.gvs_nmpc@12.0.0",
+    "backend.family_mujoco@1.5.0"
+  ],
+  "restrictions": [
+    "No Provider, optimization, candidate search, research Study or physics integration during interface validation.",
+    "Historical evidence is regression data, never a default candidate or a new Study result.",
+    "Preserve all source windows, units and physical meanings."
+  ]
+}

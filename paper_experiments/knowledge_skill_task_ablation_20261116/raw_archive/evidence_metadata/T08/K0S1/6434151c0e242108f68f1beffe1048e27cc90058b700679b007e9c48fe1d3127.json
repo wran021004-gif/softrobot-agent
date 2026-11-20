@@ -1,0 +1,2949 @@
+{
+  "source_store": "episodes/T08/K0S1/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "6434151c0e242108f68f1beffe1048e27cc90058b700679b007e9c48fe1d3127",
+    "media_type": "application/json"
+  },
+  "projection_paths": [
+    "acceptance",
+    "candidate",
+    "profile metadata",
+    "task_gap",
+    "episodes"
+  ],
+  "document": {
+    "candidate": {
+      "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+      "media_type": "application/json"
+    },
+    "status": "evaluated",
+    "route": "passive_protocol",
+    "acceptance": {
+      "accepted": null,
+      "components": {
+        "actual_constraints": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "all_load_cases": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "dynamic_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": "incomplete"
+        },
+        "evaluator:minus_x_high_maximum": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.019124046833413486
+        },
+        "evaluator:minus_x_low_minimum": {
+          "limit": 0.006,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.006146421341940002
+        },
+        "evaluator:minus_x_paired_mechanism": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:minus_x_residual_maximum": {
+          "limit": 0.002,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 7.088768789398872e-09
+        },
+        "evaluator:minus_x_slack_to_taut": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:minus_x_stiffness_ratio": {
+          "limit": 1.5,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.673938097586712
+        },
+        "evaluator:no_contact": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:plus_x_high_maximum": {
+          "limit": 0.025,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.019124046833409774
+        },
+        "evaluator:plus_x_low_minimum": {
+          "limit": 0.006,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.006146421341939968
+        },
+        "evaluator:plus_x_paired_mechanism": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:plus_x_residual_maximum": {
+          "limit": 0.002,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 7.088768758508224e-09
+        },
+        "evaluator:plus_x_slack_to_taut": {
+          "limit": 1.0,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.0
+        },
+        "evaluator:plus_x_stiffness_ratio": {
+          "limit": 1.5,
+          "passed": true,
+          "reason": null,
+          "unit": "1",
+          "value": 1.673938097590076
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "initial_qualification": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "physical_source": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "solver_errors": {
+          "limit": 0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0
+        },
+        "stage_program": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_bounds": {
+          "limit": null,
+          "passed": null,
+          "reason": "Every frozen dynamic bound; no active tension-command substitute",
+          "unit": null,
+          "value": [
+            "minus_x_high_maximum",
+            "minus_x_low_minimum",
+            "minus_x_paired_mechanism",
+            "minus_x_residual_maximum",
+            "minus_x_slack_to_taut",
+            "minus_x_stiffness_ratio",
+            "no_contact",
+            "plus_x_high_maximum",
+            "plus_x_low_minimum",
+            "plus_x_paired_mechanism",
+            "plus_x_residual_maximum",
+            "plus_x_slack_to_taut",
+            "plus_x_stiffness_ratio"
+          ]
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": null,
+          "reason": null,
+          "unit": null,
+          "value": null
+        }
+      },
+      "constraint_observations": [
+        {
+          "bound": 0.006,
+          "bound_type": "lower",
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_low_minimum",
+          "frame": "world",
+          "load_condition": "plus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "normalization_scale": 0.006,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.02440355698999459,
+          "observed_value": 0.006146421341939968,
+          "passed": true,
+          "signal": "material_displacement",
+          "signed_violation": -0.00014642134193996754,
+          "source_pointer": "/acceptance/components/evaluator:plus_x_low_minimum",
+          "time_window": [
+            7.75,
+            8.0
+          ],
+          "unit": "m"
+        },
+        {
+          "bound": 0.025,
+          "bound_type": "upper",
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_high_maximum",
+          "frame": "world",
+          "load_condition": "plus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "normalization_scale": 0.025,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.2350381266636091,
+          "observed_value": 0.019124046833409774,
+          "passed": true,
+          "signal": "material_displacement",
+          "signed_violation": -0.0058759531665902275,
+          "source_pointer": "/acceptance/components/evaluator:plus_x_high_maximum",
+          "time_window": [
+            15.75,
+            16.0
+          ],
+          "unit": "m"
+        },
+        {
+          "bound": 0.002,
+          "bound_type": "upper",
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_residual_maximum",
+          "frame": "world",
+          "load_condition": "plus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "normalization_scale": 0.002,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.9999964556156207,
+          "observed_value": 7.088768758508224e-09,
+          "passed": true,
+          "signal": "material_displacement",
+          "signed_violation": -0.0019999929112312414,
+          "source_pointer": "/acceptance/components/evaluator:plus_x_residual_maximum",
+          "time_window": [
+            19.75,
+            20.0
+          ],
+          "unit": "m"
+        },
+        {
+          "bound": 0.006,
+          "bound_type": "lower",
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_low_minimum",
+          "frame": "world",
+          "load_condition": "minus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "normalization_scale": 0.006,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.024403556990000373,
+          "observed_value": 0.006146421341940002,
+          "passed": true,
+          "signal": "material_displacement",
+          "signed_violation": -0.00014642134194000223,
+          "source_pointer": "/acceptance/components/evaluator:minus_x_low_minimum",
+          "time_window": [
+            7.75,
+            8.0
+          ],
+          "unit": "m"
+        },
+        {
+          "bound": 0.025,
+          "bound_type": "upper",
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_high_maximum",
+          "frame": "world",
+          "load_condition": "minus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "normalization_scale": 0.025,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.2350381266634606,
+          "observed_value": 0.019124046833413486,
+          "passed": true,
+          "signal": "material_displacement",
+          "signed_violation": -0.005875953166586515,
+          "source_pointer": "/acceptance/components/evaluator:minus_x_high_maximum",
+          "time_window": [
+            15.75,
+            16.0
+          ],
+          "unit": "m"
+        },
+        {
+          "bound": 0.002,
+          "bound_type": "upper",
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_residual_maximum",
+          "frame": "world",
+          "load_condition": "minus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "normalization_scale": 0.002,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.9999964556156052,
+          "observed_value": 7.088768789398872e-09,
+          "passed": true,
+          "signal": "material_displacement",
+          "signed_violation": -0.0019999929112312106,
+          "source_pointer": "/acceptance/components/evaluator:minus_x_residual_maximum",
+          "time_window": [
+            19.75,
+            20.0
+          ],
+          "unit": "m"
+        },
+        {
+          "bound": 1.5,
+          "bound_type": "lower",
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_stiffness_ratio",
+          "measurement_status": "PASS",
+          "normalization_scale": 1.5,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.11595873172671729,
+          "observed_value": 1.673938097590076,
+          "passed": true,
+          "signal": "stiffness_ratio",
+          "signed_violation": -0.17393809759007595,
+          "source_pointer": "/acceptance/components/evaluator:plus_x_stiffness_ratio",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1,
+          "bound_type": "lower",
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_slack_to_taut",
+          "measurement_status": "PASS",
+          "normalization_scale": 1,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 0.0,
+          "observed_value": 1.0,
+          "passed": true,
+          "signal": "slack_to_taut",
+          "signed_violation": 0.0,
+          "source_pointer": "/acceptance/components/evaluator:plus_x_slack_to_taut",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1,
+          "bound_type": "lower",
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_paired_mechanism",
+          "measurement_status": "PASS",
+          "normalization_scale": 1,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 0.0,
+          "observed_value": 1.0,
+          "passed": true,
+          "signal": "paired_mechanism",
+          "signed_violation": 0.0,
+          "source_pointer": "/acceptance/components/evaluator:plus_x_paired_mechanism",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1.5,
+          "bound_type": "lower",
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_stiffness_ratio",
+          "measurement_status": "PASS",
+          "normalization_scale": 1.5,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.11595873172447464,
+          "observed_value": 1.673938097586712,
+          "passed": true,
+          "signal": "stiffness_ratio",
+          "signed_violation": -0.17393809758671197,
+          "source_pointer": "/acceptance/components/evaluator:minus_x_stiffness_ratio",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1,
+          "bound_type": "lower",
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_slack_to_taut",
+          "measurement_status": "PASS",
+          "normalization_scale": 1,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 0.0,
+          "observed_value": 1.0,
+          "passed": true,
+          "signal": "slack_to_taut",
+          "signed_violation": 0.0,
+          "source_pointer": "/acceptance/components/evaluator:minus_x_slack_to_taut",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1,
+          "bound_type": "lower",
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_paired_mechanism",
+          "measurement_status": "PASS",
+          "normalization_scale": 1,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 0.0,
+          "observed_value": 1.0,
+          "passed": true,
+          "signal": "paired_mechanism",
+          "signed_violation": 0.0,
+          "source_pointer": "/acceptance/components/evaluator:minus_x_paired_mechanism",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 0,
+          "bound_type": "upper",
+          "condition_id": "all_load_conditions",
+          "constraint_id": "evaluator:no_contact",
+          "measurement_status": "PASS",
+          "normalization_scale": null,
+          "normalization_source": null,
+          "normalized_violation": null,
+          "observed_value": 0.0,
+          "passed": true,
+          "signal": "maximum_contacts",
+          "signed_violation": 0.0,
+          "source_pointer": "/acceptance/components/evaluator:no_contact",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "count"
+        }
+      ],
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evaluator_tension_channels": null,
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "f85ac2f2e0fb5ae206f87630f36297f3a65368ab34ebb01d5629f9b8e9f89496",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": null,
+          "source": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null
+        },
+        "profile": {
+          "artifact_id": "c26a98e541a7538bff45ce750a91f867d81211416c8fba4a77db607c15f5fec1",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "f85ac2f2e0fb5ae206f87630f36297f3a65368ab34ebb01d5629f9b8e9f89496",
+            "media_type": "application/json"
+          },
+          "execution_id": "472da732544949e2a74f8426d499680f",
+          "simulation": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "472da732544949e2a74f8426d499680f",
+      "issues": [],
+      "metrics": {
+        "minus_x_high_maximum": 0.019124046833413486,
+        "minus_x_low_minimum": 0.006146421341940002,
+        "minus_x_paired_mechanism": 1.0,
+        "minus_x_residual_maximum": 7.088768789398872e-09,
+        "minus_x_slack_to_taut": 1.0,
+        "minus_x_stiffness_ratio": 1.673938097586712,
+        "no_contact": 0.0,
+        "plus_x_high_maximum": 0.019124046833409774,
+        "plus_x_low_minimum": 0.006146421341939968,
+        "plus_x_paired_mechanism": 1.0,
+        "plus_x_residual_maximum": 7.088768758508224e-09,
+        "plus_x_slack_to_taut": 1.0,
+        "plus_x_stiffness_ratio": 1.673938097590076
+      },
+      "missing": [
+        "task_evaluator",
+        "task_bounds"
+      ],
+      "protocol_id": "offline_passive_response_v2",
+      "sources": {
+        "evaluation": {
+          "artifact_id": "f85ac2f2e0fb5ae206f87630f36297f3a65368ab34ebb01d5629f9b8e9f89496",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "c26a98e541a7538bff45ce750a91f867d81211416c8fba4a77db607c15f5fec1",
+          "media_type": "application/json"
+        }
+      },
+      "status": "incomplete",
+      "task_family": "task.passive_response",
+      "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+      "timing": {
+        "control_period_s": 0.01,
+        "deadline_misses": null,
+        "duration_s": 20.0,
+        "mean_update_s": null,
+        "real_time_demonstrated": null,
+        "real_time_required": false,
+        "sample_period_s": 0.01,
+        "simulation_wall_s": 793.4397245,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.000125
+      },
+      "version": "1.0.0"
+    },
+    "profile": {
+      "physics_steps": 320000,
+      "complete": true,
+      "valid_complete_execution": false,
+      "evaluation_validity": "incomplete"
+    },
+    "physical_launches": 2,
+    "actual_resource_consumption": {
+      "KKT_solves": 0,
+      "QP_calls": 0,
+      "attempted_steps": 320000,
+      "constraint_calls": 0,
+      "constraint_jacobian_calls": 0,
+      "constraint_observations": 320002,
+      "episodes_completed": 2,
+      "episodes_started": 2,
+      "equilibrium_solves": 0,
+      "gradient_calls": 0,
+      "hessian_columns": 0,
+      "integration_state_restores": 0,
+      "integration_state_saves": 12,
+      "material_point_jacobian_calls": 1186300,
+      "model_builds": 1,
+      "multiplier_fits": 0,
+      "native_forward_calls": 367508,
+      "native_position_attempts": 0,
+      "native_position_calls": 0,
+      "objective_calls": 0,
+      "optimizer_iterations": 0,
+      "physics_steps": 320000,
+      "route_checked_poses": 320002,
+      "route_segment_body_checks": 138240864,
+      "static_balance_forwards": 47504,
+      "tendon_jacobian_extractions": 320002
+    },
+    "boundary": {
+      "elapsed_s": 856.4222183999955,
+      "returncode": 0,
+      "termination_confirmed": true,
+      "worker_started": true
+    },
+    "diagnostic_task_gap": {
+      "accepted": null,
+      "candidate_identity": {
+        "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+        "media_type": "application/json"
+      },
+      "comparable": false,
+      "constraints": [
+        {
+          "aggregation": "mean_state",
+          "bound": 0.006,
+          "bound_type": "lower",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_low_minimum",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "frame": "world",
+          "load_condition": "plus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 0.006,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.02440355698999459,
+          "observed_value": 0.006146421341939968,
+          "passed": true,
+          "reference_reduction": "mean",
+          "reference_window": "unloaded",
+          "sample_time": null,
+          "signal": "material_displacement",
+          "signed_violation": -0.00014642134193996754,
+          "source_pointer": "/episodes/0",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            7.75,
+            8.0
+          ],
+          "unit": "m"
+        },
+        {
+          "aggregation": "mean_state",
+          "bound": 0.025,
+          "bound_type": "upper",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_high_maximum",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "frame": "world",
+          "load_condition": "plus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 0.025,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.2350381266636091,
+          "observed_value": 0.019124046833409774,
+          "passed": true,
+          "reference_reduction": "mean",
+          "reference_window": "unloaded",
+          "sample_time": null,
+          "signal": "material_displacement",
+          "signed_violation": -0.0058759531665902275,
+          "source_pointer": "/episodes/0",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            15.75,
+            16.0
+          ],
+          "unit": "m"
+        },
+        {
+          "aggregation": "mean_state",
+          "bound": 0.002,
+          "bound_type": "upper",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_residual_maximum",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "frame": "world",
+          "load_condition": "plus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 0.002,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.9999964556156207,
+          "observed_value": 7.088768758508224e-09,
+          "passed": true,
+          "reference_reduction": "mean",
+          "reference_window": "unloaded",
+          "sample_time": null,
+          "signal": "material_displacement",
+          "signed_violation": -0.0019999929112312414,
+          "source_pointer": "/episodes/0",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            19.75,
+            20.0
+          ],
+          "unit": "m"
+        },
+        {
+          "aggregation": "mean_state",
+          "bound": 0.006,
+          "bound_type": "lower",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_low_minimum",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "frame": "world",
+          "load_condition": "minus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 0.006,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.024403556990000373,
+          "observed_value": 0.006146421341940002,
+          "passed": true,
+          "reference_reduction": "mean",
+          "reference_window": "unloaded",
+          "sample_time": null,
+          "signal": "material_displacement",
+          "signed_violation": -0.00014642134194000223,
+          "source_pointer": "/episodes/1",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            7.75,
+            8.0
+          ],
+          "unit": "m"
+        },
+        {
+          "aggregation": "mean_state",
+          "bound": 0.025,
+          "bound_type": "upper",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_high_maximum",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "frame": "world",
+          "load_condition": "minus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 0.025,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.2350381266634606,
+          "observed_value": 0.019124046833413486,
+          "passed": true,
+          "reference_reduction": "mean",
+          "reference_window": "unloaded",
+          "sample_time": null,
+          "signal": "material_displacement",
+          "signed_violation": -0.005875953166586515,
+          "source_pointer": "/episodes/1",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            15.75,
+            16.0
+          ],
+          "unit": "m"
+        },
+        {
+          "aggregation": "mean_state",
+          "bound": 0.002,
+          "bound_type": "upper",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_residual_maximum",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "frame": "world",
+          "load_condition": "minus_x",
+          "material_s": 0.7,
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 0.002,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.9999964556156052,
+          "observed_value": 7.088768789398872e-09,
+          "passed": true,
+          "reference_reduction": "mean",
+          "reference_window": "unloaded",
+          "sample_time": null,
+          "signal": "material_displacement",
+          "signed_violation": -0.0019999929112312106,
+          "source_pointer": "/episodes/1",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            19.75,
+            20.0
+          ],
+          "unit": "m"
+        },
+        {
+          "bound": 1.5,
+          "bound_type": "lower",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_stiffness_ratio",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 1.5,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.11595873172671729,
+          "observable": {
+            "denominator_floor_m": 1e-06,
+            "denominator_m": [
+              0.005912930797793688,
+              0.007064694693676399
+            ],
+            "denominator_valid": true,
+            "displacement_m": [
+              0.006146421341939971,
+              0.01205935213973366,
+              0.01912404683341006
+            ],
+            "force_n": [
+              0.05,
+              0.1,
+              0.2
+            ],
+            "interval_stiffness_n_m": [
+              8.456043493466332,
+              14.154893358591972
+            ],
+            "reason": null,
+            "stiffness_ratio": 1.673938097590076,
+            "uncertainty_m": 6.036019280492182e-08,
+            "valid": true
+          },
+          "observed_value": 1.673938097590076,
+          "passed": true,
+          "sample_time": null,
+          "signal": "stiffness_ratio",
+          "signed_violation": -0.17393809759007595,
+          "source_pointer": "/episodes/0",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1,
+          "bound_type": "lower",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_slack_to_taut",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 1,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 0.0,
+          "observable": {
+            "denominator_floor_m": 1e-06,
+            "denominator_m": [
+              0.005912930797793688,
+              0.007064694693676399
+            ],
+            "denominator_valid": true,
+            "displacement_m": [
+              0.006146421341939971,
+              0.01205935213973366,
+              0.01912404683341006
+            ],
+            "force_n": [
+              0.05,
+              0.1,
+              0.2
+            ],
+            "interval_stiffness_n_m": [
+              8.456043493466332,
+              14.154893358591972
+            ],
+            "reason": null,
+            "slack_to_taut": true,
+            "stiffness_ratio": 1.673938097590076,
+            "tendon_transitions": [
+              {
+                "classification": "no_high_engagement",
+                "conditions": {
+                  "high_active": {
+                    "margin": -1.0,
+                    "passed": false,
+                    "signed_violation": 1.0,
+                    "threshold": 1.0,
+                    "unit": "1",
+                    "value": 0.0
+                  },
+                  "high_length": {
+                    "margin": -0.0014814813627653746,
+                    "passed": false,
+                    "signed_violation": 0.0014814813627653746,
+                    "threshold": 5e-05,
+                    "unit": "m",
+                    "value": 0.0015314813627653745
+                  },
+                  "high_tension": {
+                    "margin": -0.05,
+                    "passed": false,
+                    "signed_violation": 0.05,
+                    "threshold": 0.05,
+                    "unit": "N",
+                    "value": 0.0
+                  },
+                  "low_slack": {
+                    "margin": 0.0015026014888137901,
+                    "passed": true,
+                    "signed_violation": -0.0015026014888137901,
+                    "threshold": 1e-07,
+                    "unit": "m",
+                    "value": 0.0015027014888137902
+                  },
+                  "low_tension": {
+                    "margin": 0.005,
+                    "passed": true,
+                    "signed_violation": -0.005,
+                    "threshold": 0.005,
+                    "unit": "N",
+                    "value": 0.0
+                  }
+                },
+                "high": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015314813627653745,
+                  "signed_length_residual_max_m": -0.0015314813627648471,
+                  "signed_length_residual_min_m": -0.0015314813627653745,
+                  "slack_gap_min_m": 0.0015314813627648471,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    15.75,
+                    16.0
+                  ]
+                },
+                "low": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015027015070859795,
+                  "signed_length_residual_max_m": -0.0015027014888137902,
+                  "signed_length_residual_min_m": -0.0015027015070859795,
+                  "slack_gap_min_m": 0.0015027014888137902,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "middle": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015104188148775122,
+                  "signed_length_residual_max_m": -0.0015104188148767905,
+                  "signed_length_residual_min_m": -0.0015104188148775122,
+                  "slack_gap_min_m": 0.0015104188148767905,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    11.75,
+                    12.0
+                  ]
+                },
+                "slack_to_taut": false,
+                "tendon": "tendon_0"
+              },
+              {
+                "classification": "no_high_engagement",
+                "conditions": {
+                  "high_active": {
+                    "margin": -1.0,
+                    "passed": false,
+                    "signed_violation": 1.0,
+                    "threshold": 1.0,
+                    "unit": "1",
+                    "value": 0.0
+                  },
+                  "high_length": {
+                    "margin": -0.00361437500393893,
+                    "passed": false,
+                    "signed_violation": 0.00361437500393893,
+                    "threshold": 5e-05,
+                    "unit": "m",
+                    "value": 0.00366437500393893
+                  },
+                  "high_tension": {
+                    "margin": -0.05,
+                    "passed": false,
+                    "signed_violation": 0.05,
+                    "threshold": 0.05,
+                    "unit": "N",
+                    "value": 0.0
+                  },
+                  "low_slack": {
+                    "margin": 0.002744456139547605,
+                    "passed": true,
+                    "signed_violation": -0.002744456139547605,
+                    "threshold": 1e-07,
+                    "unit": "m",
+                    "value": 0.002744556139547605
+                  },
+                  "low_tension": {
+                    "margin": 0.005,
+                    "passed": true,
+                    "signed_violation": -0.005,
+                    "threshold": 0.005,
+                    "unit": "N",
+                    "value": 0.0
+                  }
+                },
+                "high": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.00366437500393893,
+                  "signed_length_residual_max_m": -0.0036643750039283274,
+                  "signed_length_residual_min_m": -0.00366437500393893,
+                  "slack_gap_min_m": 0.0036643750039283274,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    15.75,
+                    16.0
+                  ]
+                },
+                "low": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0027445601053221746,
+                  "signed_length_residual_max_m": -0.002744556139547605,
+                  "signed_length_residual_min_m": -0.0027445601053221746,
+                  "slack_gap_min_m": 0.002744556139547605,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "middle": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.00362088762037982,
+                  "signed_length_residual_max_m": -0.003620887620369745,
+                  "signed_length_residual_min_m": -0.00362088762037982,
+                  "slack_gap_min_m": 0.003620887620369745,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    11.75,
+                    12.0
+                  ]
+                },
+                "slack_to_taut": false,
+                "tendon": "tendon_1"
+              },
+              {
+                "classification": "no_high_engagement",
+                "conditions": {
+                  "high_active": {
+                    "margin": -1.0,
+                    "passed": false,
+                    "signed_violation": 1.0,
+                    "threshold": 1.0,
+                    "unit": "1",
+                    "value": 0.0
+                  },
+                  "high_length": {
+                    "margin": -0.0014814813627653746,
+                    "passed": false,
+                    "signed_violation": 0.0014814813627653746,
+                    "threshold": 5e-05,
+                    "unit": "m",
+                    "value": 0.0015314813627653745
+                  },
+                  "high_tension": {
+                    "margin": -0.05,
+                    "passed": false,
+                    "signed_violation": 0.05,
+                    "threshold": 0.05,
+                    "unit": "N",
+                    "value": 0.0
+                  },
+                  "low_slack": {
+                    "margin": 0.0015026014888137901,
+                    "passed": true,
+                    "signed_violation": -0.0015026014888137901,
+                    "threshold": 1e-07,
+                    "unit": "m",
+                    "value": 0.0015027014888137902
+                  },
+                  "low_tension": {
+                    "margin": 0.005,
+                    "passed": true,
+                    "signed_violation": -0.005,
+                    "threshold": 0.005,
+                    "unit": "N",
+                    "value": 0.0
+                  }
+                },
+                "high": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015314813627653745,
+                  "signed_length_residual_max_m": -0.0015314813627648471,
+                  "signed_length_residual_min_m": -0.0015314813627653745,
+                  "slack_gap_min_m": 0.0015314813627648471,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    15.75,
+                    16.0
+                  ]
+                },
+                "low": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015027015070859795,
+                  "signed_length_residual_max_m": -0.0015027014888137902,
+                  "signed_length_residual_min_m": -0.0015027015070859795,
+                  "slack_gap_min_m": 0.0015027014888137902,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "middle": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015104188148775122,
+                  "signed_length_residual_max_m": -0.0015104188148767905,
+                  "signed_length_residual_min_m": -0.0015104188148775122,
+                  "slack_gap_min_m": 0.0015104188148767905,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    11.75,
+                    12.0
+                  ]
+                },
+                "slack_to_taut": false,
+                "tendon": "tendon_2"
+              },
+              {
+                "classification": "valid_transition",
+                "conditions": {
+                  "high_active": {
+                    "margin": 0.0,
+                    "passed": true,
+                    "signed_violation": -0.0,
+                    "threshold": 1.0,
+                    "unit": "1",
+                    "value": 1.0
+                  },
+                  "high_length": {
+                    "margin": 4.858129920032868e-05,
+                    "passed": true,
+                    "signed_violation": -4.858129920032868e-05,
+                    "threshold": 5e-05,
+                    "unit": "m",
+                    "value": 1.4187007996713241e-06
+                  },
+                  "high_tension": {
+                    "margin": 0.23078970876994365,
+                    "passed": true,
+                    "signed_violation": -0.23078970876994365,
+                    "threshold": 0.05,
+                    "unit": "N",
+                    "value": 0.28078970876994364
+                  },
+                  "low_slack": {
+                    "margin": 0.0008607428751155362,
+                    "passed": true,
+                    "signed_violation": -0.0008607428751155362,
+                    "threshold": 1e-07,
+                    "unit": "m",
+                    "value": 0.0008608428751155361
+                  },
+                  "low_tension": {
+                    "margin": 0.005,
+                    "passed": true,
+                    "signed_violation": -0.005,
+                    "threshold": 0.005,
+                    "unit": "N",
+                    "value": 0.0
+                  }
+                },
+                "high": {
+                  "active_fraction": 1.0,
+                  "length_excess_max_m": 1.4187007996713241e-06,
+                  "length_residual_max_m": 1.4187007996713241e-06,
+                  "signed_length_residual_max_m": 1.4187007996713241e-06,
+                  "signed_length_residual_min_m": 1.4187007888744052e-06,
+                  "slack_gap_min_m": -1.4187007996713241e-06,
+                  "tension_max_n": 0.2807897088268438,
+                  "tension_min_n": 0.28078970876994364,
+                  "window_s": [
+                    15.75,
+                    16.0
+                  ]
+                },
+                "low": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0008608468043464212,
+                  "signed_length_residual_max_m": -0.0008608428751155361,
+                  "signed_length_residual_min_m": -0.0008608468043464212,
+                  "slack_gap_min_m": 0.0008608428751155361,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "middle": {
+                  "active_fraction": 1.0,
+                  "length_excess_max_m": 5.051628390595475e-08,
+                  "length_residual_max_m": 5.051628390595475e-08,
+                  "signed_length_residual_max_m": 5.051628390595475e-08,
+                  "signed_length_residual_min_m": 5.051627316454699e-08,
+                  "slack_gap_min_m": -5.051628390595475e-08,
+                  "tension_max_n": 0.009998197562068954,
+                  "tension_min_n": 0.009998197505532798,
+                  "window_s": [
+                    11.75,
+                    12.0
+                  ]
+                },
+                "slack_to_taut": true,
+                "tendon": "tendon_3"
+              }
+            ],
+            "transition_tendons": [
+              "tendon_3"
+            ],
+            "uncertainty_m": 6.036019280492182e-08,
+            "valid": true
+          },
+          "observed_value": 1.0,
+          "passed": true,
+          "sample_time": null,
+          "signal": "slack_to_taut",
+          "signed_violation": 0.0,
+          "source_pointer": "/episodes/0",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1,
+          "bound_type": "lower",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "plus_x",
+          "constraint_id": "evaluator:plus_x_paired_mechanism",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 1,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 0.0,
+          "observed_value": 1.0,
+          "passed": true,
+          "sample_time": null,
+          "signal": "paired_mechanism",
+          "signed_violation": 0.0,
+          "source_pointer": "/episodes/0",
+          "source_pointers": [
+            "/episodes/0",
+            "/paired_ablation/ablation/episodes/0"
+          ],
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1.5,
+          "bound_type": "lower",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_stiffness_ratio",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 1.5,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": -0.11595873172447464,
+          "observable": {
+            "denominator_floor_m": 1e-06,
+            "denominator_m": [
+              0.005912930797788689,
+              0.0070646946936846235
+            ],
+            "denominator_valid": true,
+            "displacement_m": [
+              0.006146421341940004,
+              0.012059352139728693,
+              0.019124046833413316
+            ],
+            "force_n": [
+              0.05,
+              0.1,
+              0.2
+            ],
+            "interval_stiffness_n_m": [
+              8.456043493473482,
+              14.154893358575494
+            ],
+            "reason": null,
+            "stiffness_ratio": 1.673938097586712,
+            "uncertainty_m": 6.036019276811002e-08,
+            "valid": true
+          },
+          "observed_value": 1.673938097586712,
+          "passed": true,
+          "sample_time": null,
+          "signal": "stiffness_ratio",
+          "signed_violation": -0.17393809758671197,
+          "source_pointer": "/episodes/1",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1,
+          "bound_type": "lower",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_slack_to_taut",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 1,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 0.0,
+          "observable": {
+            "denominator_floor_m": 1e-06,
+            "denominator_m": [
+              0.005912930797788689,
+              0.0070646946936846235
+            ],
+            "denominator_valid": true,
+            "displacement_m": [
+              0.006146421341940004,
+              0.012059352139728693,
+              0.019124046833413316
+            ],
+            "force_n": [
+              0.05,
+              0.1,
+              0.2
+            ],
+            "interval_stiffness_n_m": [
+              8.456043493473482,
+              14.154893358575494
+            ],
+            "reason": null,
+            "slack_to_taut": true,
+            "stiffness_ratio": 1.673938097586712,
+            "tendon_transitions": [
+              {
+                "classification": "no_high_engagement",
+                "conditions": {
+                  "high_active": {
+                    "margin": -1.0,
+                    "passed": false,
+                    "signed_violation": 1.0,
+                    "threshold": 1.0,
+                    "unit": "1",
+                    "value": 0.0
+                  },
+                  "high_length": {
+                    "margin": -0.0014814813627654023,
+                    "passed": false,
+                    "signed_violation": 0.0014814813627654023,
+                    "threshold": 5e-05,
+                    "unit": "m",
+                    "value": 0.0015314813627654023
+                  },
+                  "high_tension": {
+                    "margin": -0.05,
+                    "passed": false,
+                    "signed_violation": 0.05,
+                    "threshold": 0.05,
+                    "unit": "N",
+                    "value": 0.0
+                  },
+                  "low_slack": {
+                    "margin": 0.0015026014888137346,
+                    "passed": true,
+                    "signed_violation": -0.0015026014888137346,
+                    "threshold": 1e-07,
+                    "unit": "m",
+                    "value": 0.0015027014888137347
+                  },
+                  "low_tension": {
+                    "margin": 0.005,
+                    "passed": true,
+                    "signed_violation": -0.005,
+                    "threshold": 0.005,
+                    "unit": "N",
+                    "value": 0.0
+                  }
+                },
+                "high": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015314813627654023,
+                  "signed_length_residual_max_m": -0.001531481362764875,
+                  "signed_length_residual_min_m": -0.0015314813627654023,
+                  "slack_gap_min_m": 0.001531481362764875,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    15.75,
+                    16.0
+                  ]
+                },
+                "low": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015027015070859795,
+                  "signed_length_residual_max_m": -0.0015027014888137347,
+                  "signed_length_residual_min_m": -0.0015027015070859795,
+                  "slack_gap_min_m": 0.0015027014888137347,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "middle": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015104188148775122,
+                  "signed_length_residual_max_m": -0.001510418814876846,
+                  "signed_length_residual_min_m": -0.0015104188148775122,
+                  "slack_gap_min_m": 0.001510418814876846,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    11.75,
+                    12.0
+                  ]
+                },
+                "slack_to_taut": false,
+                "tendon": "tendon_0"
+              },
+              {
+                "classification": "valid_transition",
+                "conditions": {
+                  "high_active": {
+                    "margin": 0.0,
+                    "passed": true,
+                    "signed_violation": -0.0,
+                    "threshold": 1.0,
+                    "unit": "1",
+                    "value": 1.0
+                  },
+                  "high_length": {
+                    "margin": 4.858129920202177e-05,
+                    "passed": true,
+                    "signed_violation": -4.858129920202177e-05,
+                    "threshold": 5e-05,
+                    "unit": "m",
+                    "value": 1.418700797978234e-06
+                  },
+                  "high_tension": {
+                    "margin": 0.23078970876560023,
+                    "passed": true,
+                    "signed_violation": -0.23078970876560023,
+                    "threshold": 0.05,
+                    "unit": "N",
+                    "value": 0.2807897087656002
+                  },
+                  "low_slack": {
+                    "margin": 0.0008607428751155362,
+                    "passed": true,
+                    "signed_violation": -0.0008607428751155362,
+                    "threshold": 1e-07,
+                    "unit": "m",
+                    "value": 0.0008608428751155361
+                  },
+                  "low_tension": {
+                    "margin": 0.005,
+                    "passed": true,
+                    "signed_violation": -0.005,
+                    "threshold": 0.005,
+                    "unit": "N",
+                    "value": 0.0
+                  }
+                },
+                "high": {
+                  "active_fraction": 1.0,
+                  "length_excess_max_m": 1.418700797978234e-06,
+                  "length_residual_max_m": 1.418700797978234e-06,
+                  "signed_length_residual_max_m": 1.418700797978234e-06,
+                  "signed_length_residual_min_m": 1.4187007903732063e-06,
+                  "slack_gap_min_m": -1.418700797978234e-06,
+                  "tension_max_n": 0.28078970882508275,
+                  "tension_min_n": 0.2807897087656002,
+                  "window_s": [
+                    15.75,
+                    16.0
+                  ]
+                },
+                "low": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0008608468043463657,
+                  "signed_length_residual_max_m": -0.0008608428751155361,
+                  "signed_length_residual_min_m": -0.0008608468043463657,
+                  "slack_gap_min_m": 0.0008608428751155361,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "middle": {
+                  "active_fraction": 1.0,
+                  "length_excess_max_m": 5.051628212959791e-08,
+                  "length_residual_max_m": 5.051628212959791e-08,
+                  "signed_length_residual_max_m": 5.051628212959791e-08,
+                  "signed_length_residual_min_m": 5.0516272220857417e-08,
+                  "slack_gap_min_m": -5.051628212959791e-08,
+                  "tension_max_n": 0.009998197558079151,
+                  "tension_min_n": 0.009998197512841107,
+                  "window_s": [
+                    11.75,
+                    12.0
+                  ]
+                },
+                "slack_to_taut": true,
+                "tendon": "tendon_1"
+              },
+              {
+                "classification": "no_high_engagement",
+                "conditions": {
+                  "high_active": {
+                    "margin": -1.0,
+                    "passed": false,
+                    "signed_violation": 1.0,
+                    "threshold": 1.0,
+                    "unit": "1",
+                    "value": 0.0
+                  },
+                  "high_length": {
+                    "margin": -0.0014814813627654023,
+                    "passed": false,
+                    "signed_violation": 0.0014814813627654023,
+                    "threshold": 5e-05,
+                    "unit": "m",
+                    "value": 0.0015314813627654023
+                  },
+                  "high_tension": {
+                    "margin": -0.05,
+                    "passed": false,
+                    "signed_violation": 0.05,
+                    "threshold": 0.05,
+                    "unit": "N",
+                    "value": 0.0
+                  },
+                  "low_slack": {
+                    "margin": 0.0015026014888137346,
+                    "passed": true,
+                    "signed_violation": -0.0015026014888137346,
+                    "threshold": 1e-07,
+                    "unit": "m",
+                    "value": 0.0015027014888137347
+                  },
+                  "low_tension": {
+                    "margin": 0.005,
+                    "passed": true,
+                    "signed_violation": -0.005,
+                    "threshold": 0.005,
+                    "unit": "N",
+                    "value": 0.0
+                  }
+                },
+                "high": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015314813627654023,
+                  "signed_length_residual_max_m": -0.001531481362764875,
+                  "signed_length_residual_min_m": -0.0015314813627654023,
+                  "slack_gap_min_m": 0.001531481362764875,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    15.75,
+                    16.0
+                  ]
+                },
+                "low": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015027015070859795,
+                  "signed_length_residual_max_m": -0.0015027014888137347,
+                  "signed_length_residual_min_m": -0.0015027015070859795,
+                  "slack_gap_min_m": 0.0015027014888137347,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "middle": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0015104188148775122,
+                  "signed_length_residual_max_m": -0.001510418814876846,
+                  "signed_length_residual_min_m": -0.0015104188148775122,
+                  "slack_gap_min_m": 0.001510418814876846,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    11.75,
+                    12.0
+                  ]
+                },
+                "slack_to_taut": false,
+                "tendon": "tendon_2"
+              },
+              {
+                "classification": "no_high_engagement",
+                "conditions": {
+                  "high_active": {
+                    "margin": -1.0,
+                    "passed": false,
+                    "signed_violation": 1.0,
+                    "threshold": 1.0,
+                    "unit": "1",
+                    "value": 0.0
+                  },
+                  "high_length": {
+                    "margin": -0.0036143750039373756,
+                    "passed": false,
+                    "signed_violation": 0.0036143750039373756,
+                    "threshold": 5e-05,
+                    "unit": "m",
+                    "value": 0.0036643750039373757
+                  },
+                  "high_tension": {
+                    "margin": -0.05,
+                    "passed": false,
+                    "signed_violation": 0.05,
+                    "threshold": 0.05,
+                    "unit": "N",
+                    "value": 0.0
+                  },
+                  "low_slack": {
+                    "margin": 0.0027444561395475494,
+                    "passed": true,
+                    "signed_violation": -0.0027444561395475494,
+                    "threshold": 1e-07,
+                    "unit": "m",
+                    "value": 0.0027445561395475493
+                  },
+                  "low_tension": {
+                    "margin": 0.005,
+                    "passed": true,
+                    "signed_violation": -0.005,
+                    "threshold": 0.005,
+                    "unit": "N",
+                    "value": 0.0
+                  }
+                },
+                "high": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.0036643750039373757,
+                  "signed_length_residual_max_m": -0.003664375003929965,
+                  "signed_length_residual_min_m": -0.0036643750039373757,
+                  "slack_gap_min_m": 0.003664375003929965,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    15.75,
+                    16.0
+                  ]
+                },
+                "low": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.002744560105322119,
+                  "signed_length_residual_max_m": -0.0027445561395475493,
+                  "signed_length_residual_min_m": -0.002744560105322119,
+                  "slack_gap_min_m": 0.0027445561395475493,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    7.75,
+                    8.0
+                  ]
+                },
+                "middle": {
+                  "active_fraction": 0.0,
+                  "length_excess_max_m": 0.0,
+                  "length_residual_max_m": 0.003620887620378377,
+                  "signed_length_residual_max_m": -0.003620887620368357,
+                  "signed_length_residual_min_m": -0.003620887620378377,
+                  "slack_gap_min_m": 0.003620887620368357,
+                  "tension_max_n": 0.0,
+                  "tension_min_n": 0.0,
+                  "window_s": [
+                    11.75,
+                    12.0
+                  ]
+                },
+                "slack_to_taut": false,
+                "tendon": "tendon_3"
+              }
+            ],
+            "transition_tendons": [
+              "tendon_1"
+            ],
+            "uncertainty_m": 6.036019276811002e-08,
+            "valid": true
+          },
+          "observed_value": 1.0,
+          "passed": true,
+          "sample_time": null,
+          "signal": "slack_to_taut",
+          "signed_violation": 0.0,
+          "source_pointer": "/episodes/1",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 1,
+          "bound_type": "lower",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "minus_x",
+          "constraint_id": "evaluator:minus_x_paired_mechanism",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": 1,
+          "normalization_source": "absolute_frozen_bound",
+          "normalized_violation": 0.0,
+          "observed_value": 1.0,
+          "passed": true,
+          "sample_time": null,
+          "signal": "paired_mechanism",
+          "signed_violation": 0.0,
+          "source_pointer": "/episodes/1",
+          "source_pointers": [
+            "/episodes/1",
+            "/paired_ablation/ablation/episodes/1"
+          ],
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "1"
+        },
+        {
+          "bound": 0,
+          "bound_type": "upper",
+          "candidate_identity": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "condition_id": "all_load_conditions",
+          "constraint_id": "evaluator:no_contact",
+          "definition_pointer": "/configuration/task/evaluator/parameters/data",
+          "definition_reference": {
+            "artifact_id": "92ba1241c52adf110718d060495e3c72ba6bed09b9257be6dda1c3c72aecdd2a",
+            "media_type": "application/json"
+          },
+          "measurement_status": "PASS",
+          "missing_reason": null,
+          "normalization_scale": null,
+          "normalization_source": null,
+          "normalized_violation": null,
+          "observed_value": 0,
+          "passed": true,
+          "sample_time": null,
+          "signal": "maximum_contacts",
+          "signed_violation": 0,
+          "source_pointer": "",
+          "source_reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          },
+          "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+          "time_window": [
+            0.0,
+            20.0
+          ],
+          "unit": "count"
+        }
+      ],
+      "coverage": {
+        "execution_profile": null,
+        "measured": [
+          "evaluator:plus_x_low_minimum",
+          "evaluator:plus_x_high_maximum",
+          "evaluator:plus_x_residual_maximum",
+          "evaluator:minus_x_low_minimum",
+          "evaluator:minus_x_high_maximum",
+          "evaluator:minus_x_residual_maximum",
+          "evaluator:plus_x_stiffness_ratio",
+          "evaluator:plus_x_slack_to_taut",
+          "evaluator:plus_x_paired_mechanism",
+          "evaluator:minus_x_stiffness_ratio",
+          "evaluator:minus_x_slack_to_taut",
+          "evaluator:minus_x_paired_mechanism",
+          "evaluator:no_contact"
+        ],
+        "unmeasured": []
+      },
+      "interpretation": "Diagnostic observations only. Original qualification, formal acceptance, normalization and ranking eligibility remain unchanged.",
+      "missing_reason": null,
+      "normalized_gap": null,
+      "qualification": {
+        "category": "incomplete_acceptance_evidence",
+        "diagnostic_options": [
+          {
+            "cost_entry": "mechanism_research.operation_admission",
+            "effect_semantics": "mechanism_effect",
+            "prerequisites": [
+              "Frozen load and re_equilibrated point; actual static qualification is checked separately.",
+              "Smooth sensitivities also require unchanged active set, numerical consistency and original parameter authorization."
+            ],
+            "status": "conditional_not_yet_evaluated",
+            "targets": [
+              "constraint_length_residual",
+              "constraint_multiplier",
+              "constraint_kkt_residual",
+              "tangent_stiffness"
+            ]
+          },
+          {
+            "effect_semantics": "saved_stage_comparison",
+            "new_physics_steps": 0,
+            "status": "read_only"
+          }
+        ],
+        "failed_qualifications": [],
+        "invalidated_conclusions": [
+          "complete_task_signed_gap",
+          "ordinary_task_gradient",
+          "structural_descent",
+          "qualified_mechanism_certificate"
+        ],
+        "measurements": [
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 2.3509150028141267e-17,
+            "load_condition": "plus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 5e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 0.0
+              },
+              "monitor_speed": {
+                "margin": 0.001,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.5278769908960967e-21
+              },
+              "qvel": {
+                "margin": 0.01,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 8.753856572930503e-22
+              },
+              "static_balance": {
+                "margin": 1e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 3.819725592653529e-23
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 3.245443441993416e-56
+              },
+              "tip_speed": {
+                "margin": 0.001,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.6690215871988699e-21
+              }
+            },
+            "normalized_static_balance": 1.6247825157784033e-06,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 3.245443441993416e-56,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                3.75,
+                4.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              3.75,
+              4.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/0",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/0",
+            "stage": "unloaded",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 0.007692973447795512,
+            "load_condition": "plus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 5e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 0.0
+              },
+              "monitor_speed": {
+                "margin": 0.0009997364740005985,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 2.6352599940157686e-07
+              },
+              "qvel": {
+                "margin": 0.009999844828049973,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 1.5517195002642453e-07
+              },
+              "static_balance": {
+                "margin": 9.984446648075479e-06,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 1.5553351924522257e-08
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 3.64802754278e-08
+              },
+              "tip_speed": {
+                "margin": 0.0009997122116973483,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 2.877883026516538e-07
+              }
+            },
+            "normalized_static_balance": 2.021760770405259e-06,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 3.64802754278e-08,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              7.75,
+              8.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/0",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/0",
+            "stage": "low",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 0.015345899351451059,
+            "load_condition": "plus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 4.994948371609405e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 5.051628390595475e-08
+              },
+              "monitor_speed": {
+                "margin": 0.0009999999989597358,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.0402642972210943e-12
+              },
+              "qvel": {
+                "margin": 0.009999999992000517,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 7.999482433280111e-12
+              },
+              "static_balance": {
+                "margin": 9.999999731731168e-06,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 2.6826883271248436e-13
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 1.3764048174068223e-14
+              },
+              "tip_speed": {
+                "margin": 0.000999999998342198,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.6578019401160055e-12
+              }
+            },
+            "normalized_static_balance": 1.748146697489714e-11,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 1.3764048174068223e-14,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                11.75,
+                12.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              11.75,
+              12.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/0",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/0",
+            "stage": "middle",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 0.03053249213350744,
+            "load_condition": "plus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 4.858129920032868e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 1.4187007996713241e-06
+              },
+              "monitor_speed": {
+                "margin": 0.0009999999986912123,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.308787759534304e-12
+              },
+              "qvel": {
+                "margin": 0.009999999991598337,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 8.401663896817696e-12
+              },
+              "static_balance": {
+                "margin": 9.999999775812145e-06,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 2.2418785577960065e-13
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 2.572427660102467e-14
+              },
+              "tip_speed": {
+                "margin": 0.0009999999982193118,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.7806882460140266e-12
+              }
+            },
+            "normalized_static_balance": 7.342599313521778e-12,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 2.572427660102467e-14,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                15.75,
+                16.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              15.75,
+              16.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/0",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/0",
+            "stage": "high",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 5.5562712138476374e-08,
+            "load_condition": "plus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 5e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 0.0
+              },
+              "monitor_speed": {
+                "margin": 0.0009989269060348017,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.073093965198402e-06
+              },
+              "qvel": {
+                "margin": 0.009999368156660126,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 6.318433398753106e-07
+              },
+              "static_balance": {
+                "margin": 9.920696526031264e-06,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 7.930347396873602e-08
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 1.7390051877432675e-07
+              },
+              "tip_speed": {
+                "margin": 0.000998828126090319,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.1718739096810868e-06
+              }
+            },
+            "normalized_static_balance": 1.505239715734549,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 1.7390051877432675e-07,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                19.75,
+                20.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              19.75,
+              20.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/0",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/0",
+            "stage": "recovery",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 2.3509150028141267e-17,
+            "load_condition": "minus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 5e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 0.0
+              },
+              "monitor_speed": {
+                "margin": 0.001,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.5278769908960967e-21
+              },
+              "qvel": {
+                "margin": 0.01,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 8.753856572930503e-22
+              },
+              "static_balance": {
+                "margin": 1e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 3.819725592653529e-23
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 3.245443441993416e-56
+              },
+              "tip_speed": {
+                "margin": 0.001,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.6690215871988699e-21
+              }
+            },
+            "normalized_static_balance": 1.6247825157784033e-06,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 3.245443441993416e-56,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                3.75,
+                4.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              3.75,
+              4.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/1",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/1",
+            "stage": "unloaded",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 0.007692973447795512,
+            "load_condition": "minus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 5e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 0.0
+              },
+              "monitor_speed": {
+                "margin": 0.000999736474000606,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 2.6352599939408337e-07
+              },
+              "qvel": {
+                "margin": 0.009999844828049954,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 1.5517195004660718e-07
+              },
+              "static_balance": {
+                "margin": 9.98444664806984e-06,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 1.555335193016011e-08
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 3.6480275437454624e-08
+              },
+              "tip_speed": {
+                "margin": 0.0009997122116973565,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 2.877883026434407e-07
+              }
+            },
+            "normalized_static_balance": 2.0217607711381163e-06,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 3.6480275437454624e-08,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                7.75,
+                8.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              7.75,
+              8.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/1",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/1",
+            "stage": "low",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 0.015345899351451099,
+            "load_condition": "minus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 4.9949483717870404e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 5.051628212959791e-08
+              },
+              "monitor_speed": {
+                "margin": 0.0009999999988585487,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.1414513965169147e-12
+              },
+              "qvel": {
+                "margin": 0.009999999993874594,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 6.125405595982895e-12
+              },
+              "static_balance": {
+                "margin": 9.99999973951639e-06,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 2.6048361059273495e-13
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 2.5534255590192588e-14
+              },
+              "tip_speed": {
+                "margin": 0.000999999998302073,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.6979269768521988e-12
+              }
+            },
+            "normalized_static_balance": 1.697415085471057e-11,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 2.5534255590192588e-14,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                11.75,
+                12.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              11.75,
+              12.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/1",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/1",
+            "stage": "middle",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 0.030532492133507384,
+            "load_condition": "minus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 4.858129920202177e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 1.418700797978234e-06
+              },
+              "monitor_speed": {
+                "margin": 0.0009999999990116856,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 9.883144505668665e-13
+              },
+              "qvel": {
+                "margin": 0.009999999991754337,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 8.245662552850922e-12
+              },
+              "static_balance": {
+                "margin": 9.999999696264665e-06,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 3.037353354939931e-13
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 2.5216762446011184e-14
+              },
+              "tip_speed": {
+                "margin": 0.0009999999984633555,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.5366445484370586e-12
+              }
+            },
+            "normalized_static_balance": 9.94793789402698e-12,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 2.5216762446011184e-14,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                15.75,
+                16.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              15.75,
+              16.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/1",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/1",
+            "stage": "high",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          },
+          {
+            "complete_requested_grid": true,
+            "frozen_qualification_coverage": true,
+            "generalized_force_scale_nm": 5.556271217473925e-08,
+            "load_condition": "minus_x",
+            "measurements": {
+              "length_excess": {
+                "margin": 5e-05,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 5e-05,
+                "unit": "m",
+                "value": 0.0
+              },
+              "monitor_speed": {
+                "margin": 0.0009989269060348051,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.0730939651949611e-06
+              },
+              "qvel": {
+                "margin": 0.009999368156660134,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.01,
+                "unit": "rad/s",
+                "value": 6.318433398659238e-07
+              },
+              "static_balance": {
+                "margin": 9.920696526044105e-06,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 1e-05,
+                "unit": "N*m",
+                "value": 7.930347395589636e-08
+              },
+              "tail_drift": {
+                "role": "qualification",
+                "threshold": 0.0005,
+                "unit": "m",
+                "value": 1.7390051870812049e-07
+              },
+              "tip_speed": {
+                "margin": 0.0009988281260903224,
+                "passed": true,
+                "role": "qualification",
+                "threshold": 0.001,
+                "unit": "m/s",
+                "value": 1.1718739096776893e-06
+              }
+            },
+            "normalized_static_balance": 1.5052397266616593,
+            "qualification": {
+              "checks": {
+                "length_excess": true,
+                "monitor_speed": true,
+                "no_contacts": true,
+                "no_warnings": true,
+                "qvel": true,
+                "static_balance": true,
+                "tail_drift": true,
+                "tip_speed": true
+              },
+              "drift_m": 1.7390051870812049e-07,
+              "passed": true,
+              "sampling": "every_physics_step",
+              "scope": "Measured finite unloaded/stage window; no general stability proof",
+              "window_s": [
+                19.75,
+                20.0
+              ]
+            },
+            "sample_count": 2001,
+            "sampled_window_s": [
+              19.75,
+              20.0
+            ],
+            "sampling_period_s": 0.000125,
+            "source": {
+              "pointer": "/episodes/1",
+              "reference": {
+                "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+                "media_type": "application/json"
+              }
+            },
+            "source_pointer": "/episodes/1",
+            "stage": "recovery",
+            "static_balance_calibration": "incomplete; absolute frozen threshold retained"
+          }
+        ],
+        "new_physics_steps": 0,
+        "reason": "INDEPENDENT_NUMERICAL_CONFIRMATION_REQUIRED",
+        "scope": "Observed qualification is not a failure cause. Main may diagnose, redesign, generate or stop; no route is prescribed.",
+        "source": {
+          "pointer": "",
+          "reference": {
+            "artifact_id": "fc17477dab5af83e157a2e40c45572cbf140630b5e15ea826f6fab940c29a812",
+            "media_type": "application/json"
+          }
+        },
+        "validity": "incomplete"
+      },
+      "signed_task_gap": null,
+      "status": "complete",
+      "task_identity": "c278d6365cbf9410c21240b9cca4888dcf41a0a9610eadeaa77e76d33b4c1507",
+      "valid_complete": false,
+      "version": "diagnostic_task_gap_v2"
+    }
+  }
+}

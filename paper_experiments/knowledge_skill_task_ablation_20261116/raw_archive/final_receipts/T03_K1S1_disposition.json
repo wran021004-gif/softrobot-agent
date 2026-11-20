@@ -1,0 +1,101 @@
+{
+  "source_store": "episodes/T03/K1S1/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "0edc64fa8ec2de2d1a638686d29e9ff8e95aa000ed32f957f5a9c8dddcf615d1",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "scope": "selection without execution or numerical reservation"
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [
+        {
+          "artifact_id": "96cc18c4d4c8fc63f8b76c4fcda014e58511aa1a07bc8d218f01fc2fdbf40e75",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "a3217f667ab8bca79a7e4b258475b7630085b0e5bbe74e440388a484c85a14b8",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "ddaa2aecb98a5ce7314ca7bbdbf9935f9e1af6e1973d820fdbb226518410f030",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "c8cc7248212d0e20e0245701381d7467f20fb375a07e256f663642b464b7391f",
+          "media_type": "application/json"
+        }
+      ],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "select",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "D2-split-span-stiff-circular-fast-braking",
+        "requested_budget": 0,
+        "research_intent": "SELECT",
+        "selected_candidate": {
+          "artifact_id": "96cc18c4d4c8fc63f8b76c4fcda014e58511aa1a07bc8d218f01fc2fdbf40e75",
+          "media_type": "application/json"
+        },
+        "selected_method": "fresh_independent_original_task_acceptance",
+        "selected_variables": [
+          "candidate",
+          "optimized control schedule",
+          "accepted replay"
+        ],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "Core binds the candidate to the exact accepted current-study replay without transferring historical acceptance.",
+      "experience_disposition": {},
+      "fixed_conditions": "Frozen T03 task, common candidate 96cc18c4..., seed 17, zero initializer, original rigid payload/environment/timing/evaluator and all actuator limits.",
+      "hypothesis": "The split 3+3 tendon-span, 12 MPa circular two-segment mechanism with its freshly optimized tension schedule is a valid T03 solution because its independent original-task replay passes every frozen requirement.",
+      "interpretation": "Selection is based only on fresh owned equilibrium, nonlinear optimization and full physical replay; historical FULL materials were advisory context and are not cited as scientific evidence.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": "stop",
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": {
+        "artifact_id": "c8cc7248212d0e20e0245701381d7467f20fb375a07e256f663642b464b7391f",
+        "media_type": "application/json"
+      },
+      "stopping_condition": "After successful selection, issue a native STOP as solved and preserve all previous failed and passing evidence.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "96cc18c4d4c8fc63f8b76c4fcda014e58511aa1a07bc8d218f01fc2fdbf40e75",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "a3217f667ab8bca79a7e4b258475b7630085b0e5bbe74e440388a484c85a14b8",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "ddaa2aecb98a5ce7314ca7bbdbf9935f9e1af6e1973d820fdbb226518410f030",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "c8cc7248212d0e20e0245701381d7467f20fb375a07e256f663642b464b7391f",
+          "media_type": "application/json"
+        }
+      ],
+      "weakening_observation": "Any identity mismatch, missing acceptance component, non-independent execution, or failed frozen constraint would reject selection."
+    },
+    "request_id": "T03-K1S1-core-170",
+    "scientific_preflight": null
+  }
+}

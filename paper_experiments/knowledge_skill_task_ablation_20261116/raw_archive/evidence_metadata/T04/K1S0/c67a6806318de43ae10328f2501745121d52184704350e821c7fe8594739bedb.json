@@ -1,0 +1,345 @@
+{
+  "source_store": "episodes_full_corrected/T04/K1S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "c67a6806318de43ae10328f2501745121d52184704350e821c7fe8594739bedb",
+    "media_type": "application/json"
+  },
+  "projection_paths": [
+    "acceptance",
+    "candidate",
+    "profile metadata",
+    "task_gap",
+    "episodes"
+  ],
+  "document": {
+    "candidate": {
+      "artifact_id": "b6c3a7cf60174379943bdaa67698f5e5114ddf05601c8656bb29d3eedfe7b5c7",
+      "media_type": "application/json"
+    },
+    "status": "evaluated",
+    "route": "fixed_tension",
+    "acceptance": {
+      "accepted": false,
+      "components": {
+        "all_frozen_constraints": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        },
+        "evaluation_validity": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "evaluator:actual_two_lobes_each_cycle": {
+          "limit": 1.0,
+          "passed": false,
+          "reason": null,
+          "unit": "predicate (1=true, 0=false)",
+          "value": 0.0
+        },
+        "evaluator:contacts": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "evaluator:cycle_1_lobe_clearance": {
+          "limit": 0.0,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": -0.017905359101121135
+        },
+        "evaluator:cycle_2_lobe_clearance": {
+          "limit": 0.0,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": -0.0779129206432503
+        },
+        "evaluator:cycle_count_error": {
+          "limit": 1e-06,
+          "passed": true,
+          "reason": null,
+          "unit": "cycles",
+          "value": 0.0
+        },
+        "evaluator:cycle_drift": {
+          "limit": 0.002,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.05005162649172586
+        },
+        "evaluator:no_saturation": {
+          "limit": 0.0,
+          "passed": false,
+          "reason": null,
+          "unit": "N",
+          "value": -9.999999999998899e-05
+        },
+        "evaluator:speed": {
+          "limit": 0.03,
+          "passed": false,
+          "reason": null,
+          "unit": "m/s",
+          "value": 0.2116467910841493
+        },
+        "evaluator:stroke": {
+          "limit": 0.03,
+          "passed": true,
+          "reason": null,
+          "unit": "m",
+          "value": 0.020075228621253882
+        },
+        "evaluator:tracking_max": {
+          "limit": 0.006,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.08208923904802433
+        },
+        "evaluator:tracking_rmse": {
+          "limit": 0.003,
+          "passed": false,
+          "reason": null,
+          "unit": "m",
+          "value": 0.07281192239973647
+        },
+        "evaluator:warnings": {
+          "limit": 0.0,
+          "passed": true,
+          "reason": null,
+          "unit": "count",
+          "value": 0.0
+        },
+        "execution_complete": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "protocol_sampling": {
+          "limit": null,
+          "passed": true,
+          "reason": null,
+          "unit": null,
+          "value": true
+        },
+        "task_evaluator": {
+          "limit": null,
+          "passed": false,
+          "reason": null,
+          "unit": null,
+          "value": false
+        }
+      },
+      "constraint_margins": {
+        "actual_two_lobes_each_cycle": {
+          "direction": "minimum",
+          "limit": 1.0,
+          "margin": -1.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "predicate (1=true, 0=false)"
+        },
+        "contacts": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        },
+        "cycle_1_lobe_clearance": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.017905359101121135,
+          "observed": -0.017905359101121135,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "cycle_2_lobe_clearance": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -0.0779129206432503,
+          "observed": -0.0779129206432503,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "cycle_count_error": {
+          "direction": "maximum",
+          "limit": 1e-06,
+          "margin": 1e-06,
+          "observed": 0.0,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "cycles"
+        },
+        "cycle_drift": {
+          "direction": "maximum",
+          "limit": 0.002,
+          "margin": -0.04805162649172586,
+          "observed": 0.05005162649172586,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "no_saturation": {
+          "direction": "minimum",
+          "limit": 0.0,
+          "margin": -9.999999999998899e-05,
+          "observed": -9.999999999998899e-05,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "N"
+        },
+        "speed": {
+          "direction": "maximum",
+          "limit": 0.03,
+          "margin": -0.1816467910841493,
+          "observed": 0.2116467910841493,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m/s"
+        },
+        "stroke": {
+          "direction": "maximum",
+          "limit": 0.03,
+          "margin": 0.009924771378746117,
+          "observed": 0.020075228621253882,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "tracking_max": {
+          "direction": "maximum",
+          "limit": 0.006,
+          "margin": -0.07608923904802432,
+          "observed": 0.08208923904802433,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "tracking_rmse": {
+          "direction": "maximum",
+          "limit": 0.003,
+          "margin": -0.06981192239973646,
+          "observed": 0.07281192239973647,
+          "strict": true,
+          "tolerance": 0.0,
+          "units": "m"
+        },
+        "warnings": {
+          "direction": "maximum",
+          "limit": 0.0,
+          "margin": 0.0,
+          "observed": 0.0,
+          "strict": false,
+          "tolerance": 0.0,
+          "units": "count"
+        }
+      },
+      "continuous_time_guarantee": false,
+      "contract": "research.task_acceptance",
+      "evidence_binding": {
+        "evaluation": {
+          "artifact_id": "bae2a84230c2d8ad6a1a8e881a2d4a562c527dd9c51e3aabd0b4388fdf2615ec",
+          "media_type": "application/json"
+        },
+        "evaluation_binding": {
+          "original_execution_id": null,
+          "source": {
+            "artifact_id": "c7e04993b986775e9c4ff76d026ab3b8a89038e911ad5dccc60589e3a60e0872",
+            "media_type": "application/json"
+          },
+          "source_execution_id": null
+        },
+        "profile": {
+          "artifact_id": "3be18fa89e48f01dee54dd410ed6eec18a28d2896807bb8570be23e168cd84f2",
+          "media_type": "application/json"
+        },
+        "profile_binding": {
+          "evaluation": {
+            "artifact_id": "bae2a84230c2d8ad6a1a8e881a2d4a562c527dd9c51e3aabd0b4388fdf2615ec",
+            "media_type": "application/json"
+          },
+          "execution_id": "33ed10ff65404b1a97660fea1b3fa862",
+          "simulation": {
+            "artifact_id": "c7e04993b986775e9c4ff76d026ab3b8a89038e911ad5dccc60589e3a60e0872",
+            "media_type": "application/json"
+          }
+        },
+        "simulation": {
+          "artifact_id": "c7e04993b986775e9c4ff76d026ab3b8a89038e911ad5dccc60589e3a60e0872",
+          "media_type": "application/json"
+        }
+      },
+      "execution_id": "33ed10ff65404b1a97660fea1b3fa862",
+      "issues": [],
+      "metrics": {
+        "cycle_phase_matched_max_difference_m": 0.05005162649172586,
+        "max_error_m": 0.08208923904802433,
+        "terminal_speed_m_s": 0.0,
+        "tracking_rmse_m": 0.07281192239973647
+      },
+      "missing": [],
+      "protocol_id": "offline_frozen_task_v1",
+      "source_status": null,
+      "sources": {
+        "evaluation": {
+          "artifact_id": "bae2a84230c2d8ad6a1a8e881a2d4a562c527dd9c51e3aabd0b4388fdf2615ec",
+          "media_type": "application/json"
+        },
+        "profile": {
+          "artifact_id": "3be18fa89e48f01dee54dd410ed6eec18a28d2896807bb8570be23e168cd84f2",
+          "media_type": "application/json"
+        }
+      },
+      "status": "valid_failure",
+      "task_family": "task.tracking",
+      "task_identity": "8d4df8bf5eddac54c144b47d12d79bc359d6d5a2df274310c52370fa7727b33d",
+      "timing": {
+        "control_period_s": 0.01,
+        "duration_s": 22.0,
+        "sample_period_s": 0.01,
+        "termination": [
+          "duration",
+          "numerical_failure"
+        ],
+        "timestep_s": 0.001
+      },
+      "version": "1.0.0",
+      "worst_constraint": "no_saturation"
+    },
+    "profile": {
+      "complete": true
+    },
+    "physical_launches": 1,
+    "actual_resource_consumption": {
+      "forward_evaluations": 26402,
+      "kernel_wall_s": 336.218229399994,
+      "model_builds": 1,
+      "physics_step_attempts": 22000,
+      "physics_steps": 22000,
+      "rollouts": 1
+    },
+    "boundary": {
+      "elapsed_s": 342.2793116000248,
+      "returncode": 0,
+      "termination_confirmed": true,
+      "worker_started": true
+    }
+  }
+}

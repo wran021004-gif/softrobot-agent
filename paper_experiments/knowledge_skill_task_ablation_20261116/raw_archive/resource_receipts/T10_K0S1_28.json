@@ -1,0 +1,122 @@
+{
+  "source_path": "episodes_full_corrected/T10/K0S1/CORE_CALLS.jsonl",
+  "source_line": 28,
+  "original_call": {
+    "request_id": "T10-K0S1-fullparity-v2-core-28",
+    "tool": "experience_retrieve",
+    "arguments": {
+      "query": {
+        "operation": "search",
+        "detail": "summary",
+        "task": "T10",
+        "failure_type": "NMPC_SUSTAINED_UNUSABLE_REPLANNING",
+        "knowledge_type": "skill",
+        "limit": 5
+      },
+      "event": {
+        "decision_type": "D6",
+        "research_question": "What authorized procedural guidance can help distinguish solver-budget failure from structural infeasibility after sustained unusable NMPC replanning?",
+        "hypothesis": "A permitted skill may recommend a controlled solver/controller adaptation that preserves task physics and reveals whether iteration limits dominate.",
+        "selected_action": "Search authorized skill summaries for this exact failure type; treat any guidance as context only.",
+        "next_research_step": "Read a directly applicable exact resource if available, assess it, then implement only a justified native adaptation.",
+        "decision_outcome": "Physical result 881c88ce... terminated at 0.04 s after five iteration-limit solves, three unusable plans, five deadline misses, and maximum plan violation 0.163976; it is incomplete rather than a task pass/fail.",
+        "evidence_references": [
+          {
+            "artifact_id": "881c88ceb9f278a6d51357de69f4f85f6e4d6d81935f8b5eaa7b35a885ba8819"
+          }
+        ]
+      }
+    },
+    "started_at": "2026-11-17T23:18:36.461299+00:00",
+    "started_unix": 1794957516.4612992,
+    "status": "completed",
+    "wall_s": 0.2669485999504104,
+    "result": {
+      "reference": {
+        "artifact_id": "dc399f098f11577a21b4d585b22ea04fa48f96261326459531954323464b109a",
+        "media_type": "application/json"
+      },
+      "query": {
+        "operation": "search",
+        "key": null,
+        "entry_id": null,
+        "revision": null,
+        "task": "T10",
+        "structure": null,
+        "failure_type": "NMPC_SUSTAINED_UNUSABLE_REPLANNING",
+        "version": null,
+        "kind": null,
+        "knowledge_type": "skill",
+        "limit": 5,
+        "detail": "summary"
+      },
+      "results": [],
+      "supplied_startup_context": false,
+      "matched_count": 0,
+      "evidence_role": "context_only",
+      "reader": "agent",
+      "scientific_evidence": false,
+      "scope": "Historical decision pattern or conditional method; not current evidence or authorization. Do not transfer historical task values or controls. Cross-task validity is unverified.",
+      "read_guidance": "Execute an entry read_query exactly; the retrieval receipt reference.artifact_id is not a Knowledge entry_id.",
+      "empty_search_recovery": {
+        "available_task_tags": [
+          "passive_response",
+          "soft_robot_research"
+        ],
+        "search_query": {
+          "operation": "search"
+        },
+        "exact_reads": [
+          {
+            "operation": "read",
+            "entry_id": "phs2d-research-process",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "skill-parameter-model",
+            "revision": "4"
+          },
+          {
+            "operation": "read",
+            "entry_id": "skill-matched-comparison",
+            "revision": "4"
+          },
+          {
+            "operation": "read",
+            "entry_id": "skill-local-to-experiment",
+            "revision": "4"
+          },
+          {
+            "operation": "read",
+            "entry_id": "skill-finite-search",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "skill-continue-or-stop",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "skill-witness-replay",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "mechanism-research-process",
+            "revision": "2"
+          }
+        ],
+        "reason": "Filters are exact metadata matches. Version and revision are distinct fields. Cross-task entries are context_only; applicability unverified."
+      }
+    },
+    "new_references": [
+      {
+        "artifact_id": "dc399f098f11577a21b4d585b22ea04fa48f96261326459531954323464b109a",
+        "media_type": "application/json"
+      }
+    ],
+    "_line": 28
+  }
+}

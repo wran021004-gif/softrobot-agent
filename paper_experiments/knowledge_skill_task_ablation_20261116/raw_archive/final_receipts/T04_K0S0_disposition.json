@@ -1,0 +1,157 @@
+{
+  "source_store": "episodes_full_corrected/T04/K0S0/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "2b5a269790aa33ae7cfe24f20b3409d3eade82b8867cea66116a84fbcfa3de92",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "admitted": 1,
+      "confirmation_launch_reserve": 0,
+      "internal_launches": 1,
+      "numerical_reservation_s": 0.0,
+      "per_execution_s": null,
+      "remaining_activity_s": null,
+      "remaining_numerical_s": null,
+      "requested": 1
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [
+        {
+          "artifact_id": "07737fb5ff523009ee225ab30e7af11b40d7a51b4cc4c65184477dd1168d5630",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "373116b9c127e90e33cebac9e50ad4f833831685fedc0184807fbc9d200c3cde",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "cd2a12841e5547c67de0e874c87f52eaa2399d74a6399473cf8f6a6f057f021c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "6d667c96098ffea8976f485db13c16947a34c802758fc9ea82e675935d71a2c4",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "110dea1ad9ff7ff209de569b8548f3dae465567534e7aef14b8857dcc3ab189d",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "fe2aba26fd1021fb93b86d2daf9a97e2ad83bdd40ad06a234e3992b220a02f2d",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "00d9583067005cb0ceb3c7b52f81dca6010c0cb6ee7e5399305c2e752743b549",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "877e17b597a7b517cbc525c5d002991933b1617c3e8cd3fc7c228ce8394965ad",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "b372e0a43892ad7fc2c3f930b79c9f40d03c75e88d54b6a5eefdc4bf9fbd7051",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "429d72a263e8ffad100d54236605c3e9bb3517f852adc2da6519287223304585",
+          "media_type": "application/json"
+        }
+      ],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "stop",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "T04-H-route-closure-controller-model-mismatch-v1",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": {
+          "artifact_id": "5e47d842cb48f0a8e617eafea86fbb8578c1655478492a6b3ea124a27c93d637",
+          "media_type": "application/json"
+        },
+        "selected_method": "evidence_based_scientific_route_closure",
+        "selected_variables": [
+          "tendon routing radius and transverse authority",
+          "segment discretization cells",
+          "qualified equilibrium pretension",
+          "NMPC projection residual",
+          "one-step tip prediction mismatch",
+          "online solver convergence",
+          "timed figure-eight physical acceptance"
+        ],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "Closure preserves every failed execution and reports no accepted candidate, while distinguishing failure of the finite investigated route from impossibility over the non-exhausted continuous family.",
+      "experience_disposition": {},
+      "fixed_conditions": "Frozen T04 task, seed 17, 22 s physics-including-initial grid, qualified-candidate equilibrium, 0.2-8 N tensions, four independent channels, rigid payload tool, original figure-eight reference, unchanged acceptance thresholds, and original analysis protocol task-local-v2.",
+      "hypothesis": "The high-radius four-tendon structure has transverse authority, evidenced by near-zero lobe clearance deficit, but the available frozen control route is dominated by model-prediction mismatch and iteration-limited optimization; controller/plant dimension matching is not the dominant remedy.",
+      "interpretation": "STOP is justified by route closure, not by absence of a passing witness or by finite optimizer failure. Considered alternatives: (1) replay, control_search, NMPC execute, baseline initialization, and mechanics for investigated candidates are explicitly unavailable in the frozen-domain action catalog; (2) direct and residual RL are explicitly not applicable to timed reference tracking; (3) mathematical_response initialization is not applicable because an endpoint-target seed is required; (4) the 16 ready trajectory-feasibility/task-capability/linearization/endpoint methods are on older candidates and can provide diagnostic or mathematical feasibility only, not repair the measured one-step mismatch or establish physical acceptance; (5) more continuous design sampling or intermediate cell counts remain conceptually possible, but four structures were explored and the exact 12-cell versus 2-cell intervention removed projection error while worsening physical prediction and execution, so another unvalidated sample has low discriminating value without an available applicable control/validation route; (6) increasing solver effort could test iteration limits, but the complete run also showed persistent 9.0 mm mean one-step mismatch, so more iterations would not isolate or repair the dominant model-fidelity defect and execute is currently unavailable. Remaining uncertainty is explicit: continuous family coverage is not exhausted or quantified, 12 backend/physical episodes and 194 mathematical evaluations remain, and no impossibility claim is made. Candidate 5e47d842... is retained only as the best measured failed candidate, not as accepted.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": "stop",
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": null,
+      "stopping_condition": "Scientific route closure after five complete fixed-tension replays, one complete 22 s NMPC execution, one dimension-matched early NMPC execution, an admitted native direct-control optimization attempt, exact opportunity audit, and no remaining applicable available action that addresses the measured mechanism.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "07737fb5ff523009ee225ab30e7af11b40d7a51b4cc4c65184477dd1168d5630",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "373116b9c127e90e33cebac9e50ad4f833831685fedc0184807fbc9d200c3cde",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "cd2a12841e5547c67de0e874c87f52eaa2399d74a6399473cf8f6a6f057f021c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "6d667c96098ffea8976f485db13c16947a34c802758fc9ea82e675935d71a2c4",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "110dea1ad9ff7ff209de569b8548f3dae465567534e7aef14b8857dcc3ab189d",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "fe2aba26fd1021fb93b86d2daf9a97e2ad83bdd40ad06a234e3992b220a02f2d",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "00d9583067005cb0ceb3c7b52f81dca6010c0cb6ee7e5399305c2e752743b549",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "877e17b597a7b517cbc525c5d002991933b1617c3e8cd3fc7c228ce8394965ad",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "b372e0a43892ad7fc2c3f930b79c9f40d03c75e88d54b6a5eefdc4bf9fbd7051",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "429d72a263e8ffad100d54236605c3e9bb3517f852adc2da6519287223304585",
+          "media_type": "application/json"
+        }
+      ],
+      "weakening_observation": "A native timed-tracking method that is applicable at the frozen 0.2 N lower tension bound and materially reduces one-step mismatch, or a fresh design/controller execution that passes the full physical acceptance protocol, would weaken this closure."
+    },
+    "request_id": "T04-K0S0-fullparity-v2-core-232",
+    "scientific_preflight": null
+  }
+}

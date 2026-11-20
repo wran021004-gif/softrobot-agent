@@ -1,0 +1,102 @@
+{
+  "source_store": "episodes_full_corrected/T01/K0S1/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "09110364b6bca206bb7674c53fccd66216895ce9d2bafc133a7c782c56204c24",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "scope": "selection without execution or numerical reservation"
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [
+        {
+          "artifact_id": "6a2cd968f005b381891e99fa75411a87d50530b882ded30aca8d3327bfaa19cb",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "25c92365d1c4ee3197709bed40433e6aa3218cffa50ba43114995ffe1b8c82a9",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "2d0e9713151704888f97e6785a84a720a2b68d05da2b78a5d1ed87ec85ec88ea",
+          "media_type": "application/json"
+        }
+      ],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "select",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "T01-opposed-phase-joint-select",
+        "requested_budget": 0,
+        "research_intent": "SELECT",
+        "selected_candidate": {
+          "artifact_id": "b94f9b0fbeab2b14da9d725394e0afc82a0daf2f9d077cff5bf5e77cbaf6cbf9",
+          "media_type": "application/json"
+        },
+        "selected_method": "joint_multi_condition_selection",
+        "selected_variables": [
+          "physical_design_identity",
+          "condition_specific_controls"
+        ],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "Core admits selection because the three accepted executions cover every frozen condition on one design identity.",
+      "experience_disposition": {},
+      "fixed_conditions": "Original T01 three conditions, seed 17, zero initializer, timing, payload, gravity, six channels, actuator limits, evaluator, and opposed-phase structure are fixed.",
+      "hypothesis": "Opposed phase rotations resolve the shared actuator-speed bottleneck while retaining reach-and-hold authority across all three targets.",
+      "interpretation": "Selection is justified by three complete independent physical replays, not by mathematical predictions.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": null,
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": [
+        {
+          "artifact_id": "6a2cd968f005b381891e99fa75411a87d50530b882ded30aca8d3327bfaa19cb",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "25c92365d1c4ee3197709bed40433e6aa3218cffa50ba43114995ffe1b8c82a9",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "2d0e9713151704888f97e6785a84a720a2b68d05da2b78a5d1ed87ec85ec88ea",
+          "media_type": "application/json"
+        }
+      ],
+      "stopping_condition": "Stop only after Core confirms the joint selection.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "6a2cd968f005b381891e99fa75411a87d50530b882ded30aca8d3327bfaa19cb",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "25c92365d1c4ee3197709bed40433e6aa3218cffa50ba43114995ffe1b8c82a9",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "2d0e9713151704888f97e6785a84a720a2b68d05da2b78a5d1ed87ec85ec88ea",
+          "media_type": "application/json"
+        }
+      ],
+      "weakening_observation": "Selection rejects due to any identity, condition-coverage, independence, or acceptance mismatch."
+    },
+    "request_id": "T01-K0S1-fullparity-v2-core-897",
+    "scientific_preflight": null
+  }
+}

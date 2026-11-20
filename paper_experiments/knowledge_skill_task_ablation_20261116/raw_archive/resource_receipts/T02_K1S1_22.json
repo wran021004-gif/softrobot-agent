@@ -1,0 +1,128 @@
+{
+  "source_path": "episodes/T02/K1S1/CORE_CALLS.jsonl",
+  "source_line": 22,
+  "original_call": {
+    "request_id": "T02-K1S1-core-22",
+    "tool": "experience_retrieve",
+    "arguments": {
+      "event": {
+        "decision_type": "D6",
+        "research_question": "Which authorized prior knowledge or skill addresses simultaneous reach, settling, and geometric tendon-speed/stroke violations in T02-like loaded tendon holds?",
+        "hypothesis": "A relevant resource may suggest whether stiffness/routing/control temporal shaping is the higher-information next intervention.",
+        "selected_action": "Search the authorized resource store for T02 holding-speed and actuator-geometry failure guidance.",
+        "decision_outcome": "Physical replay 868fbbb9… failed mainly on holding speed (0.37179 m/s) plus position, stroke, and tendon speed; NMPC execution 35ecd560… terminated incomplete at 0.07 s from sustained unusable replanning.",
+        "evidence_references": [
+          {
+            "artifact_id": "868fbbb9cf77e3bcb960ffccb7c120eb61375133b72e49d6fc796e19daab204c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "35ecd5609c9d12eae897984c45a2f968f43320418455c4ffe376e8d20fa04477",
+            "media_type": "application/json"
+          }
+        ],
+        "next_research_step": "If a relevant resource exists, read it exactly; otherwise proceed with a stiffer/smaller-radius smooth-control variant."
+      },
+      "query": {
+        "operation": "search",
+        "task": "T02",
+        "failure_type": "holding_speed",
+        "limit": 5
+      }
+    },
+    "started_at": "2026-11-17T17:33:10.098201+00:00",
+    "started_unix": 1794936790.098201,
+    "status": "completed",
+    "wall_s": 0.4767146999947727,
+    "result": {
+      "reference": {
+        "artifact_id": "067a9855388fa0130db3efbcd0fe9eb812e7f722ff57f069ba6e23d56597c50d",
+        "media_type": "application/json"
+      },
+      "query": {
+        "operation": "search",
+        "key": null,
+        "entry_id": null,
+        "revision": null,
+        "task": "T02",
+        "structure": null,
+        "failure_type": "holding_speed",
+        "version": null,
+        "kind": null,
+        "knowledge_type": null,
+        "limit": 5
+      },
+      "results": [],
+      "supplied_startup_context": false,
+      "matched_count": 0,
+      "evidence_role": "context_only",
+      "reader": "agent",
+      "scientific_evidence": false,
+      "scope": "Historical decision pattern or conditional method; not current evidence or authorization. Do not transfer historical task values or controls. Cross-task validity is unverified.",
+      "read_guidance": "Execute an entry read_query exactly; the retrieval receipt reference.artifact_id is not a Knowledge entry_id.",
+      "empty_search_recovery": {
+        "available_task_tags": [
+          "oriented_tracking",
+          "passive_force_response",
+          "passive_response",
+          "position_tool_axis",
+          "soft_robot_research",
+          "tracking"
+        ],
+        "search_query": {
+          "operation": "search"
+        },
+        "exact_reads": [
+          {
+            "operation": "read",
+            "entry_id": "phs2d-research-process",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "passive-structure-mechanics",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "general-routing",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "general-material-inertia",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-slack",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-static-dynamic",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-convergence",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "validation-qualification",
+            "revision": "2"
+          }
+        ],
+        "reason": "Filters are exact metadata matches. Version and revision are distinct fields. Cross-task entries are context_only; applicability unverified."
+      }
+    },
+    "new_references": [
+      {
+        "artifact_id": "067a9855388fa0130db3efbcd0fe9eb812e7f722ff57f069ba6e23d56597c50d",
+        "media_type": "application/json"
+      }
+    ],
+    "_line": 22
+  }
+}

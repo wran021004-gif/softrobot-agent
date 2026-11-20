@@ -1,0 +1,44 @@
+{
+  "source_path": "episodes_full_corrected/T10/K1S1/CORE_CALLS.jsonl",
+  "source_line": 152,
+  "original_call": {
+    "request_id": "T10-K1S1-fullparity-v2-core-152",
+    "tool": "experience_retrieve",
+    "arguments": {
+      "event": {
+        "decision_type": "D6",
+        "research_question": "What native interface action binds controller.native_state_feedback rather than merely labeling an NMPC execution?",
+        "hypothesis": "The expert native-feedback route resource documents the exact controller binding fields or ordered steps missing from the failed NMPC attempt.",
+        "selected_action": "Read expert-t10-native-feedback-route revision 2 in full.",
+        "next_research_step": "Assess the resource explicitly on the next call, then read the native-state-feedback replay skill if needed and apply only currently registered fields.",
+        "decision_outcome": "The first fresh physical run proved the inherited controller remained GVS-NMPC; the route must be changed before another launch.",
+        "evidence_references": [
+          {
+            "artifact_id": "a5b816ba5516405c68b2a531604d96cfce0fb918e978f96e93f3d366642763db",
+            "media_type": "application/json"
+          }
+        ]
+      },
+      "query": {
+        "operation": "read",
+        "entry_id": "expert-t10-native-feedback-route",
+        "revision": "2",
+        "detail": "full"
+      }
+    },
+    "started_at": "2026-11-18T03:24:19.941026+00:00",
+    "started_unix": 1794972259.941027,
+    "status": "failed",
+    "error_type": "ValueError",
+    "error": "EXACT_EXPERIENCE_READ_REQUIRES_ONE_ENTRY_AND_REVISION",
+    "traceback": "Traceback (most recent call last):\n  File \"D:\\softrobot-agent\\.worktrees\\knowledge-skill-task-archive\\paper_experiments\\knowledge_skill_task_ablation_20261116\\executor.py\", line 192, in call\n    result=retrieve(h,args['query'])\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\softrobot-agent\\.worktrees\\knowledge-skill-child-evidence-fix\\tools\\research\\experience.py\", line 370, in retrieve\n    if q.operation=='read' and len(rows)!=1:raise ValueError('EXACT_EXPERIENCE_READ_REQUIRES_ONE_ENTRY_AND_REVISION')\n                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: EXACT_EXPERIENCE_READ_REQUIRES_ONE_ENTRY_AND_REVISION\n",
+    "wall_s": 0.08211540000047535,
+    "result": {
+      "status": "failed",
+      "error": "EXACT_EXPERIENCE_READ_REQUIRES_ONE_ENTRY_AND_REVISION",
+      "error_type": "ValueError"
+    },
+    "new_references": [],
+    "_line": 152
+  }
+}

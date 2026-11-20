@@ -1,0 +1,177 @@
+{
+  "source_path": "episodes_full_corrected/T10/K0S1/CORE_CALLS.jsonl",
+  "source_line": 29,
+  "original_call": {
+    "request_id": "T10-K0S1-fullparity-v2-core-29",
+    "tool": "experience_retrieve",
+    "arguments": {
+      "query": {
+        "operation": "read",
+        "entry_id": "skill-parameter-model",
+        "revision": "4",
+        "detail": "full"
+      },
+      "event": {
+        "decision_type": "D6",
+        "research_question": "How should candidate/controller parameters be changed after model and physical failure without over-interpreting local evidence?",
+        "hypothesis": "A parameter-model skill may structure a matched intervention separating solver effort from physical design changes.",
+        "selected_action": "Read the exact authorized parameter-model skill as context only.",
+        "next_research_step": "Assess applicability explicitly on the next call, then choose a matched single-factor native intervention.",
+        "decision_outcome": "The exact failure search returned no direct match but exposed skill-parameter-model@4 as an authorized general resource."
+      }
+    },
+    "started_at": "2026-11-17T23:18:42.486465+00:00",
+    "started_unix": 1794957522.4864655,
+    "status": "completed",
+    "wall_s": 0.09767249994911253,
+    "result": {
+      "reference": {
+        "artifact_id": "048129d616a801b5fbf1971d9f94546f265d6c89f22487c7d545d662f1fa9d02",
+        "media_type": "application/json"
+      },
+      "query": {
+        "operation": "read",
+        "key": null,
+        "entry_id": "skill-parameter-model",
+        "revision": "4",
+        "task": null,
+        "structure": null,
+        "failure_type": null,
+        "version": null,
+        "kind": null,
+        "knowledge_type": null,
+        "limit": null
+      },
+      "results": [
+        {
+          "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+          "applicable_tasks": [
+            "reach_and_hold",
+            "tracking",
+            "position_tool_axis",
+            "oriented_tracking",
+            "multicondition_reach_tool_axis",
+            "passive_force_response",
+            "passive_head_stabilization",
+            "passive_progressive_stiffness",
+            "soft_robot_research"
+          ],
+          "authored_language": "en",
+          "benchmark_sensitive": false,
+          "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+          "content_key": "skill-parameter-model@4",
+          "disclosure": "answer_isolated",
+          "entry_id": "skill-parameter-model",
+          "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+          "failure_type": "research_method",
+          "id": "skill-parameter-model",
+          "introduced_in": "typed_knowledge_v1",
+          "kind": "procedure",
+          "knowledge_refs": [
+            "p3-case@3",
+            "validation-qualification@2"
+          ],
+          "language_origin": {
+            "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed.",
+            "kind": "authored_english"
+          },
+          "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+          "path": "memory/knowledge/research_organized_v2.json",
+          "related_skills": [
+            "skill-parameter-model@4",
+            "skill-matched-comparison@4",
+            "skill-local-to-experiment@4"
+          ],
+          "resource_category": "Parameter Modeling",
+          "resource_role": "skill",
+          "revision": "4",
+          "source_refs": [
+            "skill-parameter-model@3",
+            "p3-case@3:source_catalog"
+          ],
+          "status": "public_procedural_guidance; generalization_unverified",
+          "structure": "tendon_robot_family",
+          "summary": "Begin with a physical mechanism hypothesis and the observation that would distinguish it from a competitor; retrieve only relevant theory and scoped historical experience.",
+          "task": "soft_robot_research",
+          "version": "4",
+          "key": "skill-parameter-model@4",
+          "exact_key": "skill-parameter-model@4",
+          "knowledge_type": "skill",
+          "original_evidence_references": [],
+          "read_query": {
+            "operation": "read",
+            "entry_id": "skill-parameter-model",
+            "revision": "4"
+          },
+          "content_role": "skill",
+          "historical_task_type": "soft_robot_research",
+          "current_task_type": "task.reach",
+          "content": {
+            "id": "skill-parameter-model",
+            "entry_id": "skill-parameter-model",
+            "revision": "4",
+            "resource_role": "skill",
+            "summary": "Begin with a physical mechanism hypothesis and the observation that would distinguish it from a competitor; retrieve only relevant theory and scoped historical experience.",
+            "when_to_use": "A parameter change needs a checked model meaning.",
+            "inputs": [
+              "Parameter group/candidate",
+              "Generator/compiler and force law facts",
+              "Fixed/reoptimized input declaration"
+            ],
+            "workflow": [
+              "Begin with a physical mechanism hypothesis and the observation that would distinguish it from a competitor; retrieve only relevant theory and scoped historical experience.",
+              "Resolve exact parameter IDs and Observable IDs from the current candidate registries. Trace each parameter through geometry, constitutive laws, force mapping, state solution and the selected control treatment; explicit inputs may override defaults.",
+              "Identify parameters that jointly influence the same observable and confounding effects on other observables. State fixed conditions, reference state and competing coupling predictions.",
+              "Check continuity, legal perturbation domains, matched identities and qualified branches. Separate M0 mechanisms, M1 fixed input, M2 consistently reoptimized capability and genuinely implemented M3 closed loop.",
+              "If the current parameterization cannot express the hypothesized mechanism, propose an explicit versioned change rather than interpreting ineffective coordinates or silently changing the model. Main selects the next action."
+            ],
+            "outputs": [
+              "Main-owned falsifiable mechanism question, registered parameter/observable references, matched conditions and interpretation limits"
+            ],
+            "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+            "knowledge_refs": [
+              "p3-case@3",
+              "validation-qualification@2"
+            ],
+            "high_level_capabilities": [
+              "evidence_read",
+              "experience_retrieve",
+              "research_analysis",
+              "research_plan"
+            ],
+            "source_refs": [
+              "skill-parameter-model@3",
+              "p3-case@3:source_catalog"
+            ],
+            "overlap": "Shared evidence-reading steps are dependencies; the stated decision remains distinct from other workflows.",
+            "scientific_method": [
+              "Start with a physical phenomenon and competing mechanism hypotheses; retrieve relevant Knowledge on demand.",
+              "Trace a proposed registered parameter through generator, physical compiler and actual observable. Distinguish model derivation from historical observations."
+            ],
+            "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+            "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+            "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+            "related_skills": [
+              "skill-parameter-model@4",
+              "skill-matched-comparison@4",
+              "skill-local-to-experiment@4"
+            ]
+          }
+        }
+      ],
+      "supplied_startup_context": false,
+      "matched_count": 1,
+      "evidence_role": "context_only",
+      "reader": "agent",
+      "scientific_evidence": false,
+      "scope": "Historical decision pattern or conditional method; not current evidence or authorization. Do not transfer historical task values or controls. Cross-task validity is unverified."
+    },
+    "new_references": [
+      {
+        "artifact_id": "048129d616a801b5fbf1971d9f94546f265d6c89f22487c7d545d662f1fa9d02",
+        "media_type": "application/json"
+      }
+    ],
+    "_line": 29
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "source_store": "episodes/T06/K1S1/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "d4ea30109678dd0340f9a04d8fc9af9f1ffdc34d281af724422c1c5b7bafdf51",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "scope": "selection without execution or numerical reservation"
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [
+        {
+          "artifact_id": "66cdf832f66a82fd46e937280a5679b9afb247cc4dd918deeddcc799c29563ed",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "ffbf0589c5633b1509ba8fd132b61a68452d0e83468d543f8a603713ca7e5326",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "42f5e33e2aa340a54a8157d2fce4264ece281838a71e0f088b7402684afafe24",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "8396e2a9a6e19b2ae818408d72a6bcfd11b5f00098ffeb364c10d6feb11dd2f3",
+          "media_type": "application/json"
+        }
+      ],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "select",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "H2b_dense_knots_and_margin_close_residual_gap",
+        "requested_budget": 0,
+        "research_intent": "SELECT",
+        "selected_candidate": {
+          "artifact_id": "424b5ab832872631dd64e4e6adbdc848735e88e6e3de7677ee2f1dde6c674d77",
+          "media_type": "application/json"
+        },
+        "selected_method": "select independently replayed accepted execution",
+        "selected_variables": [
+          "candidate",
+          "control schedule",
+          "physical execution"
+        ],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "Core records candidate 424b5ab... and execution 8396e2... as the selected accepted solution.",
+      "experience_disposition": {},
+      "fixed_conditions": "Exact frozen task, candidate, schedule and publicly read physical result; no transfer to other seeds, tasks or continuous-time guarantees.",
+      "hypothesis": "The stiff 3+3 split-span candidate with the five-knot optimized schedule is an accepted solution to frozen T06 under the exact evaluated seed and protocol.",
+      "interpretation": "Replay 8396e2... has accepted=true, no missing/issues, and all frozen constraints passed. Its finite sampled physics supports task acceptance only for this frozen configuration.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": "stop",
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": {
+        "artifact_id": "8396e2a9a6e19b2ae818408d72a6bcfd11b5f00098ffeb364c10d6feb11dd2f3",
+        "media_type": "application/json"
+      },
+      "stopping_condition": "After successful selection, issue native stop citing the full evidence chain and remaining limitations.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "66cdf832f66a82fd46e937280a5679b9afb247cc4dd918deeddcc799c29563ed",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "ffbf0589c5633b1509ba8fd132b61a68452d0e83468d543f8a603713ca7e5326",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "42f5e33e2aa340a54a8157d2fce4264ece281838a71e0f088b7402684afafe24",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "8396e2a9a6e19b2ae818408d72a6bcfd11b5f00098ffeb364c10d6feb11dd2f3",
+          "media_type": "application/json"
+        }
+      ],
+      "weakening_observation": "Selection admission finds an identity mismatch, incomplete evidence, or non-passing acceptance."
+    },
+    "request_id": "T06-K1S1-core-30",
+    "scientific_preflight": null
+  }
+}

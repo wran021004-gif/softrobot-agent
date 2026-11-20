@@ -1,0 +1,127 @@
+{
+  "source_path": "episodes_full_corrected/T10/K1S1/CORE_CALLS.jsonl",
+  "source_line": 15,
+  "original_call": {
+    "request_id": "T10-K1S1-fullparity-v2-core-15",
+    "tool": "experience_retrieve",
+    "arguments": {
+      "event": {
+        "decision_type": "D6",
+        "research_question": "What authorized prior guidance is relevant to sustained unusable NMPC replanning caused by repeated iteration limits in T10-like impact recovery?",
+        "hypothesis": "The failure is numerical/control-conditioning rather than physical impossibility; guidance may identify legal high-information changes to geometry or controller weights.",
+        "selected_action": "Search the authorized experience manifest for diagnostics tied to NMPC_SUSTAINED_UNUSABLE_REPLANNING and iteration-limit failures.",
+        "next_research_step": "Read a promising exact entry only if its summary is directly applicable, then assess it before changing the experiment.",
+        "decision_outcome": "Physical result 2d1433d... terminated at 0.04 s after five iteration-limit updates, three unusable plans, maximum plan violation 0.163976, and no solver errors; this does not test impact recovery and does not prove structural infeasibility.",
+        "evidence_references": [
+          {
+            "artifact_id": "2d1433d97bbe4336f07bf8b00a53124055c7736524df676d63795c07088f00ff"
+          }
+        ]
+      },
+      "query": {
+        "operation": "search",
+        "task": "T10",
+        "failure_type": "NMPC_SUSTAINED_UNUSABLE_REPLANNING",
+        "type": "diagnostic",
+        "limit": 5,
+        "detail": "summary"
+      }
+    },
+    "started_at": "2026-11-17T23:46:33.661428+00:00",
+    "started_unix": 1794959193.6614282,
+    "status": "completed",
+    "wall_s": 0.5246782000176609,
+    "result": {
+      "reference": {
+        "artifact_id": "2a2ab6e7aa03358617043535d2ec257f8da9945606d7bf31d1c17c89c45a4c85",
+        "media_type": "application/json"
+      },
+      "query": {
+        "operation": "search",
+        "key": null,
+        "entry_id": null,
+        "revision": null,
+        "task": "T10",
+        "structure": null,
+        "failure_type": "NMPC_SUSTAINED_UNUSABLE_REPLANNING",
+        "version": null,
+        "kind": null,
+        "knowledge_type": null,
+        "limit": 5,
+        "type": "diagnostic",
+        "detail": "summary"
+      },
+      "results": [],
+      "supplied_startup_context": false,
+      "matched_count": 0,
+      "evidence_role": "context_only",
+      "reader": "agent",
+      "scientific_evidence": false,
+      "scope": "Historical decision pattern or conditional method; not current evidence or authorization. Do not transfer historical task values or controls. Cross-task validity is unverified.",
+      "read_guidance": "Execute an entry read_query exactly; the retrieval receipt reference.artifact_id is not a Knowledge entry_id.",
+      "empty_search_recovery": {
+        "available_task_tags": [
+          "oriented_tracking",
+          "passive_force_response",
+          "passive_response",
+          "position_tool_axis",
+          "soft_robot_research",
+          "tracking"
+        ],
+        "search_query": {
+          "operation": "search"
+        },
+        "exact_reads": [
+          {
+            "operation": "read",
+            "entry_id": "phs2d-research-process",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "passive-structure-mechanics",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "general-routing",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "general-material-inertia",
+            "revision": "3"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-slack",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-static-dynamic",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "diagnostic-convergence",
+            "revision": "2"
+          },
+          {
+            "operation": "read",
+            "entry_id": "validation-qualification",
+            "revision": "2"
+          }
+        ],
+        "reason": "Filters are exact metadata matches. Version and revision are distinct fields. Cross-task entries are context_only; applicability unverified."
+      }
+    },
+    "new_references": [
+      {
+        "artifact_id": "2a2ab6e7aa03358617043535d2ec257f8da9945606d7bf31d1c17c89c45a4c85",
+        "media_type": "application/json"
+      }
+    ],
+    "_line": 15
+  }
+}

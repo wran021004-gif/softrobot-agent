@@ -1,0 +1,206 @@
+{
+  "source_path": "episodes/T02/K1S1/CORE_CALLS.jsonl",
+  "source_line": 23,
+  "original_call": {
+    "request_id": "T02-K1S1-core-23",
+    "tool": "experience_retrieve",
+    "arguments": {
+      "event": {
+        "decision_type": "D6",
+        "research_question": "How should static reach authority be separated from dynamic settling and controller convergence when selecting the next intervention?",
+        "hypothesis": "The diagnostic-static-dynamic resource may provide a disciplined test split that prevents misattributing a finite optimizer or NMPC failure to the structure.",
+        "selected_action": "Read authorized resource diagnostic-static-dynamic revision 2 in full.",
+        "decision_outcome": "The exact T02/holding-speed search returned no matches, but the authorized recovery list includes diagnostic-static-dynamic@2.",
+        "evidence_references": [
+          {
+            "artifact_id": "868fbbb9cf77e3bcb960ffccb7c120eb61375133b72e49d6fc796e19daab204c",
+            "media_type": "application/json"
+          },
+          {
+            "artifact_id": "35ecd5609c9d12eae897984c45a2f968f43320418455c4ffe376e8d20fa04477",
+            "media_type": "application/json"
+          }
+        ],
+        "next_research_step": "Assess the resource on the very next call, then perform the resulting candidate/control intervention."
+      },
+      "query": {
+        "operation": "read",
+        "entry_id": "diagnostic-static-dynamic",
+        "revision": "2",
+        "detail": "full"
+      }
+    },
+    "started_at": "2026-11-17T17:33:17.958303+00:00",
+    "started_unix": 1794936797.9583035,
+    "status": "completed",
+    "wall_s": 0.09994669997831807,
+    "result": {
+      "reference": {
+        "artifact_id": "2adb52f6bb2d85b15d775b8e4322cb70155ed0fcf8d03210761438d55229a3f6",
+        "media_type": "application/json"
+      },
+      "query": {
+        "operation": "read",
+        "key": null,
+        "entry_id": "diagnostic-static-dynamic",
+        "revision": "2",
+        "task": null,
+        "structure": null,
+        "failure_type": null,
+        "version": null,
+        "kind": null,
+        "knowledge_type": null,
+        "limit": null
+      },
+      "results": [
+        {
+          "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+          "applicable_tasks": [
+            "reach_and_hold",
+            "tracking",
+            "position_tool_axis",
+            "oriented_tracking",
+            "multicondition_reach_tool_axis",
+            "passive_force_response",
+            "passive_head_stabilization",
+            "passive_progressive_stiffness",
+            "soft_robot_research"
+          ],
+          "authored_language": "en",
+          "benchmark_sensitive": false,
+          "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+          "content_key": "diagnostic-static-dynamic@2",
+          "disclosure": "answer_isolated",
+          "entry_id": "diagnostic-static-dynamic",
+          "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+          "failure_type": "research_method",
+          "id": "diagnostic-static-dynamic",
+          "introduced_in": "typed_knowledge_v1",
+          "kind": "procedure",
+          "knowledge_refs": [
+            "p3-case@3",
+            "validation-qualification@2"
+          ],
+          "language_origin": {
+            "basis": "Original-source-verified, answer-isolated synthesis; no new experiment or human review claimed.",
+            "kind": "authored_english"
+          },
+          "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+          "path": "memory/knowledge/research_organized_v2.json",
+          "related_skills": [
+            "skill-parameter-model@4",
+            "skill-matched-comparison@4",
+            "skill-local-to-experiment@4"
+          ],
+          "resource_category": "Dynamic and Contact Diagnostics",
+          "resource_role": "knowledge",
+          "revision": "2",
+          "source_refs": [
+            "diagnostic-static-dynamic@1",
+            "p3-case@3:source_catalog"
+          ],
+          "status": "public_procedural_guidance; generalization_unverified",
+          "structure": "tendon_robot_family",
+          "summary": "Static qualification, finite-time qualification and output availability are separate.",
+          "task": "passive_response",
+          "trigger": [
+            "static passes",
+            "dynamic invalid",
+            "static dynamic",
+            "ablation"
+          ],
+          "type": "diagnostic",
+          "version": "2",
+          "key": "diagnostic-static-dynamic@2",
+          "exact_key": "diagnostic-static-dynamic@2",
+          "knowledge_type": "knowledge",
+          "original_evidence_references": [],
+          "read_query": {
+            "operation": "read",
+            "entry_id": "diagnostic-static-dynamic",
+            "revision": "2"
+          },
+          "content_role": "knowledge",
+          "historical_task_type": "passive_response",
+          "current_task_type": "task.reach",
+          "content": {
+            "id": "diagnostic-static-dynamic",
+            "entry_id": "diagnostic-static-dynamic",
+            "revision": "2",
+            "type": "diagnostic",
+            "resource_role": "knowledge",
+            "summary": "Static qualification, finite-time qualification and output availability are separate.",
+            "trigger": [
+              "static passes",
+              "dynamic invalid",
+              "static dynamic",
+              "ablation"
+            ],
+            "source_refs": [
+              "diagnostic-static-dynamic@1",
+              "p3-case@3:source_catalog"
+            ],
+            "evidence_level": "conditional_model_derivation; verified_historical_observation; retrospective_diagnostic_interpretation",
+            "applicability": "Only within the current registered model, physical parameter domain and frozen task; ordinary derivatives require a regular fixed active set.",
+            "limitations": "Context only. No current evidence, task acceptance, universal stiffness/stability, global infeasibility or hardware/continuum convergence claim.",
+            "related_skills": [
+              "skill-parameter-model@4",
+              "skill-matched-comparison@4",
+              "skill-local-to-experiment@4"
+            ],
+            "symptom": "Static equilibrium passes but dynamic qualification fails.",
+            "hypotheses": [
+              "Weakly damped or unstable mode",
+              "Different branch/compliant force law",
+              "Initial-state inconsistency",
+              "Integration or constraint-resolution error"
+            ],
+            "discriminating_evidence": [
+              "Stationarity, curvature, constraint margins and model identities",
+              "Full-step excess length, velocity, residual and initialization"
+            ],
+            "diagnostic_action": [
+              "Compare static assumptions with the actual dynamic model",
+              "Separate numerical convergence, physical validity and task acceptance; use only valid stable ablation"
+            ],
+            "interpretation": [
+              "Static screening is not dynamic qualification. Invalid dynamics or ablation establish neither task success nor a unique mechanism explanation."
+            ],
+            "confidence": "Conditional on the stated model; historical transfer to a new structure remains unverified.",
+            "knowledge_refs": [
+              "p3-case@3",
+              "validation-qualification@2"
+            ],
+            "physical_explanation": [
+              "A qualified passive equilibrium does not certify a full trajectory, tail settling, contact/route safety or task acceptance.",
+              "A serialization failure leaves its original UNKNOWN receipt intact. Later read-only diagnostics may add scoped information but cannot become a replacement successful execution."
+            ],
+            "parameter_reference_semantics": "IDs/patterns refer to the current candidate Parameter Registry; unavailable coordinates are not granted by this document.",
+            "observable_ids": [
+              "constraint_slack_set",
+              "constraint_active_set",
+              "constraint_tension_margin",
+              "constraint_length_residual",
+              "re_equilibrated_position_response",
+              "finite_time_task_violation",
+              "constraint_multiplier"
+            ]
+          }
+        }
+      ],
+      "supplied_startup_context": false,
+      "matched_count": 1,
+      "evidence_role": "context_only",
+      "reader": "agent",
+      "scientific_evidence": false,
+      "scope": "Historical decision pattern or conditional method; not current evidence or authorization. Do not transfer historical task values or controls. Cross-task validity is unverified."
+    },
+    "new_references": [
+      {
+        "artifact_id": "2adb52f6bb2d85b15d775b8e4322cb70155ed0fcf8d03210761438d55229a3f6",
+        "media_type": "application/json"
+      }
+    ],
+    "_line": 23
+  }
+}

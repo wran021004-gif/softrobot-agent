@@ -1,0 +1,93 @@
+{
+  "source_store": "episodes/PHS2D/K0S1/STORE/platform.sqlite",
+  "reference": {
+    "artifact_id": "651755686b68c452582905389aac61057700ba4e82297973cd7f3ecf5ce380fa",
+    "media_type": "application/json"
+  },
+  "document": {
+    "admission": {
+      "admitted": 0,
+      "confirmation_launch_reserve": 0,
+      "internal_launches": 0,
+      "numerical_reservation_s": 0.0,
+      "per_execution_s": null,
+      "remaining_activity_s": null,
+      "remaining_numerical_s": null,
+      "requested": 1
+    },
+    "decision_admission": {
+      "claimed_inference": "empirical_search",
+      "prospective_guarantee": false,
+      "resolved_evidence": [
+        {
+          "artifact_id": "c9468a808bb9a2dc00179657197d4af255207167695915e7f83917b50449928c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "bf165c32c400678cebd0f685a83f75660cff28b6b75cedb7aef78bec756c5059",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "a43cefb4f372f991710790d2a701dace7e130ad50c4a1bd426a7155b7540c2d9",
+          "media_type": "application/json"
+        }
+      ],
+      "version": "research_decision_v1"
+    },
+    "experience_read_bindings": [],
+    "origin": "engineering",
+    "original_plan": {
+      "action": "stop",
+      "candidate": null,
+      "cross_replay": null,
+      "decision": {
+        "claimed_inference": "empirical_search",
+        "hypothesis_id": "H2_four_segment_anisotropic_tendon_brace",
+        "requested_budget": 0,
+        "research_intent": "STOP",
+        "selected_candidate": {
+          "artifact_id": "e447911acc898ecf4eba83e6a135f878e3c205f6342d11ed8f7e7694fa7b2dca",
+          "media_type": "application/json"
+        },
+        "selected_method": "frozen_backend_budget_exhausted",
+        "selected_variables": [],
+        "version": "research_decision_v1"
+      },
+      "diagnostic": null,
+      "expected_observation": "No additional science executes; Core records closure with zero backend solves remaining and preserves all invalid and incomplete results.",
+      "experience_disposition": {},
+      "fixed_conditions": "Frozen PHS2D task, unchanged evaluator/protocol, all generated candidates and results retained, no threshold relaxation, no claim of impossibility.",
+      "hypothesis": "Localized compliant modes require a topology that creates an interior deformation node while bracing the tip; the four-segment anisotropic tendon-brace design remains untested physically because its replay ended before episodes.",
+      "interpretation": "The default two-segment candidate produced ten-case dynamic diagnostic data but failed loaded static balance in s=.6/.7 and failed the core response mechanism: point displacement 0.000843–0.009882 m, tip displacement 0.003316–0.016083 m, and ratio 1.627–3.932 versus required >=0.01 m, <=0.005 m, and <=0.3. A six-evaluation distal-modulus optimization sampled 5.27–5.53 MPa and every record retained four loaded-stage qualification failures, so it yielded no valid candidate; this finite result does not prove impossibility. The four-segment anisotropic tendon-brace candidate was then generated and assigned the final ten-case physical replay. That replay consumed the remaining launch allocation but performed one model build, zero episodes, zero physics steps, and returned REQUIRED_LOAD_CASE_MISSING with incomplete acceptance; task_evaluator and task_bounds are absent, and no qualification failure was measured. Independent validation is therefore unavailable. With 80/80 backend solves used, further informative execution is impossible inside the frozen budget.",
+      "matched_state": null,
+      "mechanics": null,
+      "mechanics_source": null,
+      "next_step": "stop",
+      "nmpc_prediction_diagnostic": null,
+      "parameters": null,
+      "physical_replay": null,
+      "refinement": null,
+      "revise_selection": false,
+      "search": null,
+      "selected_execution": null,
+      "stopping_condition": "Stop because backend_solves remaining is exactly 0 after 7 mathematical evaluations and 10 reserved physical launches.",
+      "supporting_evidence": [
+        {
+          "artifact_id": "c9468a808bb9a2dc00179657197d4af255207167695915e7f83917b50449928c",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "bf165c32c400678cebd0f685a83f75660cff28b6b75cedb7aef78bec756c5059",
+          "media_type": "application/json"
+        },
+        {
+          "artifact_id": "a43cefb4f372f991710790d2a701dace7e130ad50c4a1bd426a7155b7540c2d9",
+          "media_type": "application/json"
+        }
+      ],
+      "weakening_observation": "A remaining backend solve allocation or a completed passing replay would invalidate budget-exhausted closure; current state reports zero remaining and no accepted execution."
+    },
+    "request_id": "PHS2D-K0S1-core-127",
+    "scientific_preflight": null
+  }
+}
