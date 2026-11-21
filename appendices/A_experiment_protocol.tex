@@ -16,10 +16,13 @@ C uses the archived FULL study and its original research record. It is not re-ru
 
 The comparison contains eleven task cases and 33 task--method records. A and B begin from the original task initial conditions and the legal design space rather than from intermediate FULL candidates. C is the corresponding historical FULL record. The FULL portfolio contains 30 required conditions; T10's two frozen controls are additional and are not part of the required-condition denominator. PHS-2D is one task in the eleven-case FULL portfolio. The separate local sensitivity audit is reported independently and its metrics are not merged with the task-level comparison.
 
-T03-B was recorded under a direct-mathematical-only protocol variant and is marked with a dagger. T05-B is retained as a standard B pass. Qualification failures, incomplete evaluations, and valid physical failures are reported separately. A missing physical evaluation is not assigned zero violation.
+T03-B was recorded under a direct-mathematical-only protocol variant and is marked with a dagger. T05-B is retained as a pass under a documented protocol variant. Qualification failures, incomplete evaluations, and valid physical failures are reported separately. A missing physical evaluation is not assigned zero violation.
 
 \subsection{Evaluation and resource accounting}
 
 The common task-wise fields are required-condition completion, evaluated-condition coverage, normalized constraint violation, maximum known violation, and protocol-deviation status. Raw errors from different task families are not pooled. Resource measures include candidate count, mathematical calls, physical evaluations, integration steps, Provider usage when returned, and recorded wall-clock or CPU cost. Resource records are compared only when their measurement populations and cost scopes match. Missing values remain unavailable rather than being replaced by local token estimates or zeros.
 
 The comparison is descriptive. The historical C column is not a newly randomized run, and the task matrix is not a multi-seed statistical benchmark.
+
+\subsection{Passive equilibrium sensitivity}
+For active set $\mathcal A$, let $w_{\mathcal A}=(q,\mu_{\mathcal A})$ satisfy $F(w_{\mathcal A},d;f)=0$. When the active set is unchanged and $F_w$ is nonsingular, the implicit-function theorem gives $\partial w^\star/\partial d=-F_w^{-1}F_d$. A task metric follows by the chain rule. Loaded and unloaded equilibria are both differentiated for a response relative to an unloaded reference. Active-set transitions require directional or mode-specific analysis. This inner equilibrium calculation is not an additional M0--M3 analysis semantic.

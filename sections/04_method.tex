@@ -1,7 +1,7 @@
 \section{Method: Physics-Grounded Agentic Research}
 \label{sec:method}
 
-\subsection{Overall research framework and decision authority}
+\subsection{Overall Framework and Research Decision}
 \label{subsec:overall-framework}
 
 \softrobotagent{} organizes soft-robot co-design as an agent-directed research loop in which scientific decisions, deterministic execution, and physical validation have explicit responsibilities. At iteration $k$, the research state is
@@ -28,7 +28,7 @@ Fig.~\ref{fig:research-framework} summarizes the system. Mathematical and physic
 \label{fig:research-framework}
 \end{figure*}
 
-\subsection{Research intent and parameterized physical research problem}
+\subsection{Research Intent and PPRP Construction}
 \label{subsec:pprp}
 
 A research intent begins with a physical hypothesis and a proposed investigation. For example, observed coupling between tip and mid-region motion may motivate the hypothesis that tendon-routing geometry shapes the local motion-transfer mechanism. The Main Agent identifies the parameter group, physical observables, intended analysis semantics, and computational budget needed to examine the hypothesis. These choices are expressed through a schema-constrained research decision rather than an unrestricted mathematical expression. This intent-to-problem projection is the central C2 abstraction: it exposes a reusable mathematical problem definition without exposing solver-specific operations to the Main Agent.
@@ -42,9 +42,9 @@ The deterministic projection resolves the request against registered capabilitie
 \end{equation}
 where $\Iparam_k$ is the selected parameter group, $\mathcal O_k$ the selected observables, $\mathcal F_k$ the candidate-specific inner physical problem, $\sigma_k$ the requested analysis semantics, and $\mathcal B_k$ the allocated budget. The working hypothesis $\mathcal H_k$ remains associated with the research decision and its evidence record. The symbol $\Dspace$ is reserved for the admissible design space.
 
-The frozen task contract $\tau$ retains targets, loads, constraints, scoring windows, and acceptance semantics; $\mathcal F_k$ binds the current candidate, physical model, and operating point. The projection is staged: the Main Agent supplies the scientific intent; schemas constrain request fields; registries resolve parameter and observable identifiers; and the compiler binds the task, candidate, physical problem, analysis semantics, and budget. This separation lets the Agent formulate the scientific question while ensuring that numerical execution uses registered physical quantities and the original task definition.
+The frozen task contract $\tau$ retains targets, loads, constraints, scoring windows, and acceptance semantics; $\mathcal F_k$ binds the current candidate, physical model, and operating point. The projection is staged: the Main Agent supplies the scientific intent; schemas constrain request fields; registries resolve parameter and observable identifiers; and the compiler binds the task, candidate, physical problem, analysis semantics, and budget. This separation lets the Agent formulate the scientific question while ensuring that numerical execution uses registered physical quantities and the original task definition. The schema carries the Agent-selected semantics $\sigma_k$; the compiler checks whether that requested view is applicable, rather than independently choosing a new one. The router then selects an applicable numerical method for that view and the bound physical problem. M0--M3 describe the meaning of a query, not four fixed numerical programs: different models and regularity conditions can require different implementations of the same semantics. Invalid or unsupported combinations return a typed status rather than a fabricated mathematical conclusion.
 
-\subsection{Task-conditioned mathematical research}
+\subsection{Task-Conditioned Mathematical Research}
 \label{subsec:mathematical-research}
 
 The mathematical research layer distinguishes four complementary views. Each view corresponds to a different physical or optimization object and is selected according to the current research question.
@@ -98,7 +98,7 @@ Let $\lambda_i^\star$, $\alpha_j^\star$, and $\beta_j^\star$ denote the optimal 
 \end{aligned}
 \label{eq:envelope-general}
 \end{equation}
-When actuator bounds are independent of the design, the last two terms vanish. M2 connects morphology changes to task capability after the control has adapted to the candidate.
+When actuator bounds are independent of the design, the last two terms vanish. Here $g_{\tau,i}$ is a signed normalized constraint residual (nonpositive is acceptable) and $V_\tau(d)=\min_U\max_i g_{\tau,i}(d,U)$. The auxiliary $\rho$ converts the nonsmooth maximum into constraints, making the active task constraints and their multipliers explicit. M2 connects morphology changes to task capability after the control has adapted to the candidate. M1 and M2 can therefore suggest different design decisions: the former holds $U$ fixed, whereas the latter allows control to respond. This envelope relation is local and conditional on a reliable solution and the stated regularity; an independent physical evaluation is still needed to test the selected candidate.
 
 \paragraph{M3: Closed-loop performance.}
 M3 considers the complete controller--robot execution:
@@ -114,31 +114,11 @@ where $\mathcal M_{\mathrm{hi}}$ denotes the high-fidelity execution model and $
 \end{equation}
 This view includes controller and execution dynamics rather than treating a prescribed input as fixed.
 
-For passive structures, the inner physical problem is equilibrium rather than active control optimization. Let $w_{\mathcal A}=(q,\mu_{\mathcal A})$ collect the configuration and active equilibrium multipliers. The equilibrium system is
-\begin{equation}
-F(w_{\mathcal A},d;f)=0.
-\end{equation}
-When the active set is unchanged and $F_w$ is nonsingular, implicit differentiation gives
-\begin{equation}
-\frac{\partial w^\star_{\mathcal A}}{\partial d}
-=-F_w^{-1}F_d,
-\label{eq:implicit-equilibrium}
-\end{equation}
-and the sensitivity of a passive task metric follows by
-\begin{equation}
-\frac{\mathrm d g^{\mathrm{pass}}}{\mathrm d d_j}
-=
-\frac{\partial g^{\mathrm{pass}}}{\partial d_j}
-+
-\frac{\partial g^{\mathrm{pass}}}{\partial w_{\mathcal A}}
-\frac{\partial w^\star_{\mathcal A}}{\partial d_j}.
-\label{eq:equilibrium-chain}
-\end{equation}
-Loaded and unloaded equilibria are both differentiated when a response is defined relative to an unloaded reference. Active-set transitions are handled through mode-specific or directional analysis. This passive-equilibrium sensitivity is distinct from M2, which concerns re-optimized active control.
+For passive structures the inner physical problem can be an equilibrium system rather than active control optimization. Implicit equilibrium derivatives are an implementation for an applicable physical problem, not an additional M4 view. Their KKT/IFT conditions, chain rule, and active-set limitations are detailed in Appendix~\ref{app:abc-protocol}.
 
 The differentiation router selects a numerical route according to parameter type, physical model, inner solver, and regularity conditions. Explicit models use analytic derivatives or automatic differentiation; regular implicit equilibria use KKT/IFT sensitivity; re-optimized value functions use envelope or dual sensitivity; perturbation analysis uses controlled finite differences or directional comparisons. Discrete morphology is handled through paired candidate comparison rather than continuous differentiation. Method-specific checks include solver status, residuals, active-set and regularity conditions, and finite-difference consistency where applicable. Each returned result is accompanied by its model scope, operating point, validity information, and computational cost.
 
-\subsection{Structure and control refinement}
+\subsection{Structure--Control Refinement and Physical Validation}
 \label{subsec:structure-control-refinement}
 
 Mathematical evidence guides a design decision; it does not automatically modify the robot. The Main Agent interprets the evidence and selects one or more refinement actions. Structure generation, continuous parameter optimization, and control re-optimization are distinct operations with complementary roles.
@@ -166,53 +146,36 @@ The Main Agent uses both evidence paths to decide whether to accept the candidat
 Algorithm~\ref{alg:agent-research} summarizes the C1/C2 research cycle: the Main Agent selects a scientific investigation, PPRP compiles it into a valid mathematical problem, and the resulting evidence guides structural or control refinement. Context assembly and individual tool calls are omitted because they support, rather than define, the research algorithm.
 
 \begin{figure*}[t]
-\refstepcounter{algorithm}
-\label{alg:agent-research}
+\refstepcounter{algorithm}\label{alg:agent-research}
 \noindent\rule{\textwidth}{0.4pt}\par
 \noindent\textbf{Algorithm \thealgorithm. Agent-directed mathematical research and co-design}\par
-\vspace{2pt}
 \begin{algorithmic}[1]
-\Require Frozen task $\tau$, admissible design space $\Dspace$, initial candidate $d_0$ (possibly empty), registries $\mathcal R$, budget $\mathcal B_0$
-\Ensure Validated candidate $d^\star$, separate mathematical/physical evidence $\mathcal E^\star$, research trace $\mathcal T$
-\State Initialize hypotheses $\mathcal H_0$, evidence $\mathcal E_0$, and trace $\mathcal T_0$
-\State $k\gets0$
-\While{$\mathcal B_k>0 \land \text{research process is active}$}
-    \State $e_k^{\mathrm{math}}\gets\bot$; $e_k^{\mathrm{phys}}\gets\bot$
-    \State $I_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k)$ \Comment{C1: form a hypothesis and select an investigation}
-    \If{$I_k$ requests mathematical investigation}
-        \State $\mathcal P_k\gets\operatorname{CompilePPRP}(I_k,\tau,d_k,\mathcal R,\mathcal B_k)$ \Comment{C2: compile the physical research problem}
-        \If{$\mathcal P_k$ is valid and applicable}
-            \State $\sigma_k\gets\operatorname{SelectApplicableView}(\mathcal P_k)$ \Comment{select one of the complementary M0--M3 views}
-            \State $e_k^{\mathrm{math}}\gets\operatorname{ExecuteAndValidate}(\operatorname{RouteMethod}(\mathcal P_k,\sigma_k),\mathcal P_k)$
-        \Else
-            \State $e_k^{\mathrm{math}}\gets\operatorname{ReturnTypedStatus}(\mathcal P_k)$
-        \EndIf
+\Require Frozen task $\tau$, candidate $d$, registries $\mathcal R$, budget $\mathcal B$
+\Ensure Selected candidate and separate mathematical and physical evidence
+\While{budget remains and research is active}
+  \State $e^{\mathrm{math}}\gets\bot$
+  \State $I\gets\operatorname{MainAgent}(\tau,d,\mathcal H,\mathcal E,\mathcal B)$ \Comment{hypothesis, action, and requested analysis semantics}
+  \If{$I$ requests mathematical investigation}
+    \State $\mathcal P\gets\operatorname{CompileAndCheck}(I,\tau,d,\mathcal R,\mathcal B)$
+    \If{$\mathcal P$ is applicable}
+      \State $e^{\mathrm{math}}\gets\operatorname{ExecuteAndCheck}(\operatorname{RouteMethod}(\mathcal P))$
     \Else
-        \State $e_k^{\mathrm{phys}}\gets\operatorname{DirectPhysicalTest}(\tau,d_k,I_k)$
+      \State $e^{\mathrm{math}}\gets\operatorname{TypedStatus}(\mathcal P)$
     \EndIf
-    \State $a_k\gets\operatorname{MainAgent}(\tau,d_k,\mathcal H_k,\mathcal E_k,e_k^{\mathrm{math}},e_k^{\mathrm{phys}},\mathcal B_k)$ \Comment{C1: choose the next design or control action}
-    \State $d_{k+1}\gets d_k$; retain $U_k$ when a control sequence is defined
-    \If{$a_k$ requests a discrete morphology or topology change}
-        \State $d_{k+1}\gets\operatorname{GenerateAndCompileStructure}(a_k,\Dspace)$
-    \EndIf
-    \If{$a_k$ requests continuous structural refinement}
-        \State $d_{k+1}\gets\operatorname{OptimizeSelectedParameters}(d_{k+1},a_k,\tau)$
-    \EndIf
-    \If{$a_k$ requests control refinement or $d_{k+1}\neq d_k$}
-        \State $U_{k+1}\gets\operatorname{OptimizeTaskSpecificControl}(d_{k+1},a_k,\tau)$
-    \EndIf
-    \If{the candidate changes or physical validation is requested}
-        \State $e_{k+1}^{\mathrm{phys}}\gets\operatorname{IndependentPhysicalEvaluation}(\tau,d_{k+1},U_{k+1})$
-    \EndIf
-    \State Update hypotheses, separate evidence paths, trace, and budget; set $k\gets k+1$
+  \EndIf
+  \State $a\gets\operatorname{MainAgentDecision}(I,\mathcal E,e^{\mathrm{math}})$
+  \State Apply selected structure and/or control refinement, or request a direct physical test
+  \If{a physical test or candidate validation is requested}
+    \State $e^{\mathrm{phys}}\gets\operatorname{IndependentPhysicalEvaluation}(\tau,d,a)$
+  \EndIf
+  \State Record evidence, update hypothesis, candidate and budget
 \EndWhile
-\State $d^\star\gets\operatorname{SelectValidatedCandidate}(\mathcal E_k)$
-\State \Return $(d^\star,\mathcal E_k,\mathcal T_k)$
+\State \Return selected candidate and separate evidence paths
 \end{algorithmic}
 \noindent\rule{\textwidth}{0.4pt}
 \end{figure*}
 
-\subsection{Deterministic capability interface}
+\paragraph{Deterministic capability interface.}
 \label{subsec:research-tools}
 
 The research interface exposes a compact set of typed tool families. Each family has a deterministic execution contract, while the Main Agent chooses when and why it is used. The interface is organized around research actions rather than a flat list of software APIs.
@@ -238,32 +201,7 @@ Physical evaluation & Execute active dynamics or passive equilibrium and apply t
 
 The task, parameter, and observable registries provide deterministic bindings for the research interface. They resolve the frozen task contract, legal design variables and bounds, and registered physical quantities with their units and model scope. Before execution, the compiler checks identifiers, units, admissible ranges, and analysis applicability. Each capability returns typed evidence tied to its candidate, model, operating point, validity status, and computational cost. The Main Agent therefore selects research actions at the capability level without managing solver-specific APIs.
 
-\subsection{Evidence management and research continuity}
+\subsection{Evidence Management and Research Continuity}
 \label{subsec:research-continuity-method}
 
-Long-horizon research requires the Agent to preserve the full research record while presenting only the information needed for the current decision. \softrobotagent{} separates persistent evidence from the compact context delivered to the Main Agent. The complete history remains in Store/Trace; a hierarchical context interface exposes concise state summaries and retrieves detailed resources on demand.
-
-\begin{table}[t]
-\centering
-\caption{Hierarchical research context and retrieval policy.}
-\label{tab:context-hierarchy}
-\small
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabularx}{\columnwidth}{@{}p{0.12\columnwidth}p{0.24\columnwidth}X@{}}
-\toprule
-Level & Contents & Access policy \\
-\midrule
-L0 & Current task, candidate, validated findings, research focus, available actions, and remaining budget & Automatically assembled for each Main Agent decision \\
-L1 & Method details, parameter/observable registries, tool descriptions, and request schemas & Retrieved when the current research intent requires method or interface details \\
-L2 & Numerical evidence, solver outputs, physical metrics, and validity records & Retrieved to inspect or compare specific mathematical/physical findings \\
-L3 & Original trajectories, execution logs, and source provenance & Retrieved when a decision requires raw evidence or audit-level detail \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-Knowledge and Skill provide two complementary forms of reusable experience. Knowledge stores evidence-linked physical findings, candidate comparisons, and conclusions together with their applicability conditions. Skill stores reusable research procedures, including the situations in which a procedure is appropriate and the expected inputs and outputs. They are independently retrievable resources: a Main Agent can reuse a physical finding without loading the full procedure, or retrieve a procedure while checking its evidence and validity scope.
-
-Store/Trace links research intents, PPRP requests, candidate identities, mathematical results, physical evaluations, and subsequent decisions. It retains both successful and unsuccessful investigations so that later decisions can distinguish validated findings from exploratory attempts. The L0 brief is assembled from this persistent record, while L1--L3 remain available through targeted retrieval. This arrangement preserves long-term research continuity without requiring the full history to occupy every decision context.
-
-The Reporter operates on completed evidence records. It summarizes physical interpretation, relevant evidence, and open questions using the values and validity flags supplied by deterministic tools. It cannot alter records, invoke tools, or select the next action. The Main Agent reviews the interpretation, decides whether it is relevant to the current hypothesis, and retains full authority over the subsequent research decision.
+The L0 brief supplies the task, current candidate, findings, and budget; L1--L3 provide progressively more detailed methods, evidence, and original records on demand. Store/Trace preserves the links between intent, candidate, computation, and independent physical outcome. Knowledge supplies evidence-linked findings and Skill supplies reusable procedures with applicability conditions. The read-only Reporter interprets completed evidence; the Main Agent retains decision authority. These mechanisms support continuity and are evaluated separately from the central mathematical method. Their retrieval rules and decision-replay protocols appear in Appendix~\ref{app:architecture-ablations}.

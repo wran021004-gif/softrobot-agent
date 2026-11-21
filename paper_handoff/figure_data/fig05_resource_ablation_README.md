@@ -1,0 +1,7 @@
+# Figure 5 resource data
+
+The 44 K/S records are transcribed from `summary/RESOURCE_COSTS.csv` and `summary/TASK_RESULTS.csv` at [ed1419b](https://github.com/wran021004-gif/softrobot-agent/tree/ed1419b012d1a6399776b09c26b3b9c0566ecf33/paper_experiments/knowledge_skill_task_ablation_20261116). The source's `mathematical_evaluations` is the charged-evaluation ledger count; `physical_launches` and `core_tool_calls` are the physical-launch and Core-request counts. Recorded total tokens include cached input once and may omit interrupted usage; T06 K1S0 has no recorded usage. Empty fields are unavailable, not zero. A task pass requires formal SELECT.
+
+The eleven historical FULL resource totals come from the archived historical comparison incorporated in the manuscript's cross-model resource profile. Historical token values are estimates: for each task, historical Core requests multiplied by the current K1S1 recorded token-per-request rate, separately for input and output. They are not historical provider usage. The model labels were supplied by the user. Execution histories and request granularity differ, so these data do not isolate a model effect.
+
+The task-level K/S table uses the same-structure, complete-required-protocol best violation from the task-comparison audit. A recorded formal SELECT is a pass; absent a full-protocol magnitude, the manuscript displays a dash. Two termination categories explicitly record budget exhaustion; an empty termination category is not interpreted as exhaustion. No frozen source file was changed.

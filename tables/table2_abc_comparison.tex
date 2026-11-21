@@ -1,38 +1,22 @@
 \begin{table*}[t]
 \centering
-\caption{Task-wise maximum known normalized constraint violation and required-condition coverage for LLM-only (A), Direct Tools (B), and Ours (FULL). Each cell reports the maximum known positive normalized violation, outcome state, and evaluated/required conditions. For incomplete runs, $\geq$ denotes a known lower bound; -- denotes an unavailable magnitude. F: valid physical failure; I: incomplete; Q: qualification failure; P: pass. A dagger marks B results that passed under documented protocol variants.}
+\caption{Task-wise maximum known normalized constraint violation and status. Methods are rows and the eleven tasks are columns.}
 \label{tab:abc-comparison}
-\small
-\setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{1.12}
-\begin{tabularx}{\textwidth}{@{}p{0.18\textwidth} X c c c@{}}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l*{11}{c}c}
 \toprule
-Task family & Task & LLM-only (A) & Direct Tools (B) & Ours (FULL) \\
+Method & T01 & T02 & T03 & T04 & T05 & T06 & T07 & T08 & T09 & T10 & PHS & Pass rate \\
 \midrule
-\multirow{4}{=}{\emph{Reach and dynamic motion}}
-& T01 Multi-target Reach-and-Hold & \shortstack{15.13\\[-2pt]\scriptsize F, 3/3} & \shortstack{22.22\\[-2pt]\scriptsize F, 3/3} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 3/3}} \\
-& T02 Load-Conditioned Hold & \shortstack{$\geq$19.34\\[-2pt]\scriptsize I, 1/3} & \shortstack{--\\[-2pt]\scriptsize I, 0/3} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 3/3}} \\
-& T03 Fast Target Reaching & \shortstack{16.09\\[-2pt]\scriptsize F, 1/1} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P$^\dagger$, 1/1}} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 1/1}} \\
-& T04 Figure-Eight Trajectory Tracking & \shortstack{6.05\\[-2pt]\scriptsize F, 1/1} & \shortstack{566.37\\[-2pt]\scriptsize Q, 0/1} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 1/1}} \\
-\midrule
-\multirow{3}{=}{\emph{Pose and contact}}
-& T05 End-Effector Position and Tool-Axis Alignment & \shortstack{1.76\\[-2pt]\scriptsize F, 1/1} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P$^\dagger$, 1/1}} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 1/1}} \\
-& T06 Loaded Time-Indexed Pose Scanning & \shortstack{2.23\\[-2pt]\scriptsize F, 1/1} & \shortstack{12.33\\[-2pt]\scriptsize F, 1/1} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 1/1}} \\
-& T09 Guided Spring-Button Contact Manipulation & \shortstack{3.45\\[-2pt]\scriptsize F, 1/1} & \shortstack{4.45\\[-2pt]\scriptsize F, 1/1} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 1/1}} \\
-\midrule
-\multirow{2}{=}{\emph{Shared morphology and control}}
-& T07 Shared-Morphology Multi-Task Design & \shortstack{10.38\\[-2pt]\scriptsize F, 4/4} & \shortstack{13.23\\[-2pt]\scriptsize F, 4/4} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 4/4}} \\
-& T10 Impact-Recovery Control & \shortstack{$\geq$41.11\\[-2pt]\scriptsize I, 1/3} & \shortstack{36.94\\[-2pt]\scriptsize F, 3/3} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 3/3}} \\
-\midrule
-\multirow{2}{=}{\emph{Passive mechanics}}
-& T08 Passive Progressive-Stiffness Response & \shortstack{--\\[-2pt]\scriptsize I, 0/2} & \shortstack{0.05\\[-2pt]\scriptsize Q, 0/2} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 2/2}} \\
-& PHS-2D Passive Tendon-Constrained Compliance and Tip Suppression & \shortstack{254.39\\[-2pt]\scriptsize Q, 0/10} & \shortstack{32.16\\[-2pt]\scriptsize Q, 0/10} & \shortstack{\textbf{0.00}\\[-2pt]\scriptsize \textbf{P, 10/10}} \\
-\midrule
-\textbf{Task pass rate} & \textbf{11 benchmark tasks} & \textbf{0/11 (0\%)} & \textbf{2/11 (18.2\%)$^\dagger$} & \textbf{11/11 (100\%)} \\
+LLM-only & 15.13 F & $\geq$19.34 I & 16.09 F & 6.05 F & 1.76 F & 2.23 F & 10.38 F & -- I & 3.45 F & $\geq$41.11 I & 254.39 Q & 0/11 \\
+Direct Tools & 22.22 F & -- I & 0 P$^\dagger$ & 566.37 Q & 0 P$^\dagger$ & 12.33 F & 13.23 F & 0.05 Q & 4.45 F & 36.94 F & 32.16 Q & 2/11$^\dagger$ \\
+\textbf{Ours (historical FULL)} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{11/11} \\
+K$-$S$-$ (Sol) & -- I & 0.00 P & 0.07 I & -- I & 3.78 I & 0.00 P & -- I & -- I & 0.00 P & -- I & -- I & 3/11 \\
+K$+$S$-$ (Sol) & 3.96 B & -- I & 0.00 P & -- B & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 1.00 I & 0.00 P & -- I & 6/11 \\
+K$-$S$+$ (Sol) & 0.00 P & 0.00 P & 0.28 I & 0.00 P & 0.00 P & 0.00 P & -- I & 0.00 P & 3.46 I & -- I & -- I & 6/11 \\
+K$+$S$+$ (Sol) & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 11/11 \\
 \bottomrule
-\end{tabularx}
+\end{tabular}}
 \vspace{2pt}
-
-\noindent\scriptsize
-The reported magnitude is the maximum known positive normalized excess among available task-constraint records; it is not the fraction of constraints violated and is not the M2 optimal-capability value $V_\tau(d)$. Qualification-failure values are based on qualification-stage constraints with zero required physical conditions completed. The two daggered Direct Tools passes (T03 and T05) use documented protocol variants; under the original frozen protocol, B has 0/11 strict task passes.
+\par\noindent\scriptsize P: pass; F: physical failure; Q: qualification failure; I: incomplete or not selected; B: documented budget exhaustion. A dash means no complete-protocol magnitude is available; $\geq$ is a documented partial lower bound. $^\dagger$Two Direct Tools passes use documented protocol variants (strict frozen-protocol passes: 0/11). K/S cells use the best complete-protocol result for one structure and formal SELECT for pass; where the termination reason is unrecorded we do not infer exhaustion. Historical FULL and the current K/S studies differ in model, protocol, and execution history; this is not a randomized comparison.
 \end{table*}
