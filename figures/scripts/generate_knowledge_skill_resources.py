@@ -12,8 +12,8 @@ LABELS=['K−S−','K+S−','K−S+','K+S+']
 COLORS=['#a3acb5','#c4a578','#8eaaa0','#2877b5']
 data={r['configuration']:r for r in csv.DictReader(SOURCE.open(encoding='utf-8'))}
 assert set(data)==set(CONFIGS)
-METRICS=[('mathematical_analyses','A  Mathematical analyses',1,900,[0,300,600,900]),
-         ('physical_evaluations','B  Physical evaluations',1,300,[0,100,200,300]),
+METRICS=[('mathematical_analyses','A  Mathematical analyses',1,450,[0,150,300,450]),
+         ('physical_evaluations','B  Physical evaluations',1,150,[0,50,100,150]),
          ('agent_requests','C  Agent requests',1,600,[0,200,400,600]),
          ('total_tokens','D  Token consumption (M)',1e6,6,[0,2,4,6])]
 svg=['<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1220" viewBox="0 0 2400 1220">',
