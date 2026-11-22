@@ -1,16 +1,17 @@
 \begin{table*}[t]
 \centering
-\caption{Task completion across architecture, Knowledge/Skill, and model comparisons. $\checkmark$ marks a completed task; -- marks a task not completed within the research budget. Ours--Sol (K$+$S$+$) is the shared reference. All configurations use Sol except the Astra column.}
+\caption{Task completion under equal resource-budget ceilings. $\checkmark$: completed; --: not completed within budget. Ours--Sol (K$+$S$+$) is the shared reference.}
 \label{tab:abc-comparison}
-\small
-\setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{1.16}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{l*{7}{c}}
+\fontfamily{ptm}\selectfont\fontsize{8.5}{10}\selectfont
+\setlength{\tabcolsep}{3.5pt}
+\setlength{\heavyrulewidth}{0.65pt}
+\setlength{\lightrulewidth}{0.35pt}
+\renewcommand{\arraystretch}{1.10}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}>{\itshape}l!{\color{TraceGray}\vrule width 0.25pt}ccc!{\color{TraceGray}\vrule width 0.25pt}ccc!{\color{TraceGray}\vrule width 0.25pt}c@{}}
 \toprule
- & \multicolumn{3}{c}{Architecture ablation} & \multicolumn{3}{c}{Knowledge/Skill ablation} & Model comparison \\
+ & \multicolumn{3}{c}{\textbf{Architecture ablation}} & \multicolumn{3}{c}{\textbf{Knowledge/Skill ablation}} & \textbf{Model comparison} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-8}
-Task & LLM-only & \shortstack{Without\\PPRP} & \shortstack{\textbf{Ours--Sol}\\K$+$S$+$} & K$-$S$-$ & K$+$S$-$ & K$-$S$+$ & Ours--Astra \\
+\normalfont\bfseries Task & \textbf{LLM-only} & \shortstack{\textbf{Without}\\\textbf{PPRP}} & \shortstack{\textbf{Ours--Sol}\\K$+$S$+$} & \textbf{K$-$S$-$} & \textbf{K$+$S$-$} & \textbf{K$-$S$+$} & \textbf{Ours--Astra} \\
 \midrule
 Multi-target Reach & -- & -- & $\checkmark$ & -- & -- & $\checkmark$ & $\checkmark$ \\
 Loaded Hold & -- & -- & $\checkmark$ & $\checkmark$ & -- & $\checkmark$ & $\checkmark$ \\
@@ -24,8 +25,8 @@ Button Press & -- & -- & $\checkmark$ & $\checkmark$ & -- & -- & $\checkmark$ \\
 Impact Recovery & -- & -- & $\checkmark$ & -- & $\checkmark$ & -- & $\checkmark$ \\
 Passive Tip Suppression & -- & -- & $\checkmark$ & -- & -- & -- & $\checkmark$ \\
 \midrule
-Completed tasks & 0/11 & 2/11 & \textbf{11/11} & 3/11 & 6/11 & 6/11 & \textbf{11/11} \\
-Completion rate & 0.0\% & 18.2\% & \textbf{100.0\%} & 27.3\% & 54.5\% & 54.5\% & \textbf{100.0\%} \\
+\normalfont\bfseries Completed tasks & 0/11 & 2/11 & \textbf{11/11} & 3/11 & 6/11 & 6/11 & \textbf{11/11} \\
+\normalfont\bfseries Completion rate & 0.0\% & 18.2\% & \textbf{100.0\%} & 27.3\% & 54.5\% & 54.5\% & \textbf{100.0\%} \\
 \bottomrule
-\end{tabular}}
+\end{tabular*}
 \end{table*}
