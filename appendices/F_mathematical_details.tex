@@ -1,0 +1,82 @@
+\section{Mathematical Formulations and Tool Interface}
+\label{app:mathematical-details}
+\begin{table*}[!t]
+\centering
+\caption{Capability-level interface between the Main Agent and deterministic robot tools.}
+\label{tab:tool-action-taxonomy}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{@{}p{0.19\textwidth} X X@{}}
+\toprule
+Capability & Deterministic execution & Main Agent decision \\
+\midrule
+Structure and modeling & Compile discrete morphology changes and continuous design candidates against the admissible design space & Select the physical mechanism, topology, and parameter group \\
+Mathematical research & Execute registered M0--M3 analyses, validity checks, and numerical optimization & Select the research question, observables, analysis semantics, and budget \\
+Control and trajectory & Solve task-specific actuation, initialization, trajectory, and feedback-control problems & Select the control formulation and decide when control should be re-optimized \\
+Physical evaluation & Execute active dynamics or passive equilibrium and apply the frozen task evaluator & Select direct physical tests and interpret the resulting physical evidence \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+\subsection{Passive and Multi-condition Formulations}
+For a passive fixed-payout robot, the response is determined by its structure, unilateral tendon constraints, and applied load. A quasi-static equilibrium $q^\star_\tau(d,f)$ satisfies
+\begin{equation}
+\begin{aligned}
+\nabla_q\Pi(q^\star_\tau;d,f)
++\sum_j\mu^\star_j\nabla_q c_j(q^\star_\tau,d)&=0,\\
+c_j(q^\star_\tau,d)\leq0,\quad
+\mu^\star_j&\geq0,\quad
+\mu^\star_jc_j(q^\star_\tau,d)=0,
+\end{aligned}
+\label{eq:passive-problem}
+\end{equation}
+where $\Pi$ is the potential energy and $c_j$ denotes a unilateral tendon or assembly constraint. The passive response is evaluated against
+\begin{equation}
+g^{\mathrm{pass}}_{\tau,i}
+\bigl(d,q^\star_\tau(d,f)\bigr)\leq0.
+\label{eq:passive-constraints}
+\end{equation}
+
+For a set of required conditions $\mathcal C$, one morphology is shared while each active condition may use its own control sequence. The condition-wise violation and shared-design capability are
+\begin{equation}
+v_c(d)=
+\begin{cases}
+\displaystyle\inf_{U_c\in\mathcal U_c(d)}
+\max_i g_{c,i}(d,U_c), & c\in\mathcal C_{\mathrm{act}},\\[0.8em]
+\displaystyle\max_i g^{\mathrm{pass}}_{c,i}
+\bigl(d,q^\star_c(d,f_c)\bigr), & c\in\mathcal C_{\mathrm{pass}},
+\end{cases}
+\label{eq:condition-violation}
+\end{equation}
+\begin{equation}
+V_{\mathcal C}(d)=\max_{c\in\mathcal C}v_c(d).
+\label{eq:multi-capability}
+\end{equation}
+Thus, all required conditions must be satisfied by the same morphology; an average cannot conceal a failed condition.
+
+\subsection{Control-Optimized Sensitivity}
+Let $\lambda_i^\star$, $\alpha_j^\star$, and $\beta_j^\star$ denote the optimal multipliers for the task, lower-input, and upper-input constraints, respectively. The actuator bounds are $\ell_j(d)\leq U_j\leq h_j(d)$. Under the relevant local optimality, differentiability, constraint-qualification, and regularity conditions, the envelope relation gives
+\begin{equation}
+\begin{aligned}
+\frac{\partial V_\tau}{\partial d_j}
+={}&\sum_i\lambda_i^\star
+\frac{\partial g_{\tau,i}}{\partial d_j}\\
+&+\sum_\ell\alpha_\ell^\star
+\frac{\partial \ell_\ell}{\partial d_j}
+-\sum_\ell\beta_\ell^\star
+\frac{\partial h_\ell}{\partial d_j}.
+\end{aligned}
+\label{eq:envelope-general}
+\end{equation}
+When actuator bounds are independent of the design, the last two terms vanish. Here $g_{\tau,i}$ is a signed normalized constraint residual (nonpositive is acceptable) and $V_\tau(d)=\min_U\max_i g_{\tau,i}(d,U)$. The auxiliary $\rho$ converts the nonsmooth maximum into constraints, making the active task constraints and their multipliers explicit. M2 connects morphology changes to task capability after the control has adapted to the candidate. M1 and M2 can therefore suggest different design decisions: the former holds $U$ fixed, whereas the latter allows control to respond. This envelope relation is local and conditional on a reliable solution and the stated regularity; an independent physical evaluation is still needed to test the selected candidate.
+
+
+\subsection{Deterministic Capability Families}
+\paragraph{Deterministic capability interface.}
+\label{subsec:research-tools}
+
+Table~\ref{tab:tool-action-taxonomy} summarizes the capability interface. The research interface exposes a compact set of typed tool families. Each family has a deterministic execution contract, while the Main Agent chooses when and why it is used. The interface is organized around research actions rather than a flat list of software APIs.
+
+
+
+The task, parameter, and observable registries provide deterministic bindings for the research interface. They resolve the frozen task contract, legal design variables and bounds, and registered physical quantities with their units and model scope. Before execution, the compiler checks identifiers, units, admissible ranges, and analysis applicability. Each capability returns typed evidence tied to its candidate, model, operating point, validity status, and computational cost. The Main Agent therefore selects research actions at the capability level without managing solver-specific APIs.

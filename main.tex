@@ -26,7 +26,7 @@
 
 \hypersetup{hidelinks}
 \sisetup{detect-all,per-mode=symbol}
-\newcommand{\softrobotagent}{\textsc{Softrobot-Agent}}
+\newcommand{\softrobotagent}{\textnormal{\textsc{Softrobot-Agent}}}
 \newcommand{\MainAgent}{\textsc{Main Agent}}
 \newcommand{\Reporter}{\textsc{Reporter}}
 \newcommand{\PPRP}{\textsc{PPRP}}
@@ -43,9 +43,12 @@
 \title{Softrobot-Agent: Physics-Grounded Agentic Research for Soft-Robot Co-Design}
 \author{Anonymous Authors\thanks{Working manuscript. Author information and affiliations will be added after technical content and final figure assets are approved.}}
 \begin{document}
+\setcounter{dbltopnumber}{3}
+\renewcommand{\dbltopfraction}{0.95}
+\renewcommand{\textfraction}{0.05}
 \maketitle
 \begin{abstract}
-Soft-robot co-design requires coordinated decisions about morphology, tendon routing, material properties, and control under coupled physical constraints. This paper presents \softrobotagent{}, a physics-grounded agentic research framework that turns these decisions into an adaptive scientific process. The Main Agent formulates physical research intents; a parameterized physical research problem (\PPRP{}) binds each intent to a frozen task, candidate design, selected parameters and observables, an inner physical model, analysis semantics, and computational budget. Complementary M0--M3 views organize mechanism sensitivity, fixed-input response, re-optimized task capability, and closed-loop performance. Deterministic tools execute structure generation, mathematical analysis, control refinement, and independent physical evaluation, while evidence management preserves research continuity through structured context, Knowledge, Skill, and a read-only Reporter. The framework is evaluated on a standardized eleven-task benchmark suite spanning thirty required physical conditions, all of which are satisfied by the FULL portfolio. A passive tendon-constrained design further demonstrates ten-condition bidirectional compliance and tip suppression, while an 18-pair implicit-sensitivity audit agrees with central finite differences to a maximum relative discrepancy of 0.1191\%. Representative research trajectories show how evidence guides structural and control decisions across reaching, shared-morphology design, and impact recovery.
+Soft-robot co-design requires deciding which physical mechanism to investigate as well as how to optimize a candidate. This paper presents \softrobotagent{}, a physics-grounded agentic research framework that connects these decisions through task-conditioned mathematical analysis. A Main Agent selects hypotheses, parameters, and observables; a parameterized physical research problem binds the resulting intent to a candidate, physical model, analysis semantics, and budget. Complementary views examine mechanism sensitivity, fixed-input response, control-adapted task capability, and closed-loop performance. Deterministic tools update structure and control, and independent evaluation returns evidence for the next decision. Hierarchical context, reusable experience, and a read-only Reporter preserve research continuity. The recorded FULL portfolio satisfies thirty required conditions across eleven tasks. Representative studies show how mathematical evidence exposes compliance tradeoffs and the need for control adaptation; an eighteen-pair local sensitivity audit has a maximum relative discrepancy of 0.1191\%. Six paired Reporter decisions show two improvements and four ties, while hierarchical context reduces recorded input by more than 80\% at two studied checkpoints.
 \end{abstract}
 \begin{IEEEkeywords}
 Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic research, scientific reasoning, sensitivity analysis, physical evidence.
@@ -58,12 +61,19 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \input{sections/07_results}
 \input{sections/09_discussion}
 \input{sections/10_conclusion}
+\clearpage
+\onecolumn
+\twocolumn
 \appendices
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\theHfigure}{S\arabic{figure}}
 \input{appendices/A_experiment_protocol}
 \input{appendices/B_additional_task_portfolio}
 \input{appendices/C_evidence_provenance}
 \input{appendices/D_architecture_ablation_protocol}
 \input{appendices/E_cross_model_resource_profile}
+\input{appendices/F_mathematical_details}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 \end{document}

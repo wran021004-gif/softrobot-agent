@@ -1,36 +1,18 @@
 \section{Experimental Setup}
 \label{sec:experimental-setup}
-
-\subsection{Standardized multi-task benchmark suite}
-
-The evaluation uses a standardized benchmark suite of eleven tendon-driven soft-robot tasks in four groups: Motion Control, Tool Operation, Adaptability, and Passive Mechanics. Each task is defined by a frozen contract containing its initial condition, target or reference, loads, required observables, tolerances, execution horizon, and independent acceptance procedure. Figure~\ref{fig:task-portfolio} shows the tasks, and Table~\ref{tab:family-portfolio} summarizes their coverage using the same groups and task names.
-
+\subsection{Tasks and Evaluation Questions}
+We evaluate eleven tendon-driven soft-robot tasks in four groups: Motion Control, Tool Operation, Adaptability, and Passive Mechanics (Fig.~\ref{fig:task-portfolio}). Each task has a frozen contract specifying initial conditions, targets, loads, tolerances, and an independent acceptance procedure. Together, the tasks contain thirty required conditions; Table~\ref{tab:family-portfolio} summarizes their coverage. Shared Morphology uses one structure across four active conditions, and Passive Tip Suppression includes ten signed-loading conditions.
 \input{figures/fig02_task_portfolio}
 \input{tables/table1_family_summary}
 
-The benchmark contains thirty required physical conditions. Impact Recovery additionally includes two frozen-input control conditions, which are reported separately from its three required impact-recovery conditions. Shared Morphology evaluates one shared morphology across four required conditions and its original hard constraints. Passive Tip Suppression evaluates passive tendon-constrained compliance under ten prescribed signed-loading conditions. The independent PHS-2D structural-design study used for the gradient and structural-evolution results is reported separately and is not included in the eleven-case, thirty-condition denominator. All task outcomes are assessed using their task-specific physical evaluators; physical quantities retain their native units and are not averaged across unlike tasks.
+The evaluation addresses three questions: can the framework produce task-feasible designs across different physical demands; how does mathematical evidence inform structural and control decisions; and how do evidence-management components support subsequent decisions? Research trajectories examine Figure-eight Tracking, a separate passive structural-design study, and Shared Morphology. The passive study also supplies the local mathematical audit in Fig.~\ref{fig:mathematical-research}.
 
-\subsection{Research-mode comparison}
+\subsection{Research Modes and Component Settings}
+The main comparison includes \emph{LLM-only}, which uses candidate generation and physical-evaluation feedback; \emph{Direct Tools}, which additionally exposes bottom-level mathematical operations; and \emph{FULL}, which provides the complete research-intent, mathematical, and evidence-feedback interface. The agent in Direct Tools constructs its mathematical requests directly. FULL binds the intended question to a task-conditioned problem and routes its numerical execution. The task-wise outcomes appear in Table~\ref{tab:abc-comparison}; the complete protocol is given in Appendix~\ref{app:abc-protocol}.
 
-The task-wise comparison spans the same eleven benchmark cases and contrasts three research modes:
-\begin{itemize}[leftmargin=*]
-\item \textbf{A: LLM-only.} The agent proposes and revises structure and control using task information and physical-evaluation feedback. Dedicated mathematical diagnosis and automated mathematical optimization are not exposed.
-\item \textbf{B: Direct Mathematical Tools.} The agent has the A capabilities and may invoke supported bottom-level mathematical operations. It constructs the mathematical question and request itself, without the high-level research-intent projection and mathematical orchestration.
-\item \textbf{FULL: \softrobotagent{}.} The complete framework exposes research-intent projection, \PPRP{} construction, complementary M0--M3 analysis semantics, differentiation routing, validity checks, structure--control refinement, and evidence feedback.
-\end{itemize}
-A and B begin from the corresponding task initial states and admissible design spaces; FULL denotes the complete-framework task records. Every outcome is assessed against the required conditions and task-specific physical evaluator. The task-wise results are summarized in Table~\ref{tab:abc-comparison}.
+Knowledge and Skill are varied independently in a four-configuration, eleven-task study. Separate decision replays evaluate Reporter OFF/ON at six matched checkpoints and Flat/hierarchical context at two passive-design checkpoints. A replay presents the same frozen evidence to the compared settings and evaluates the next proposed research decision. Anonymous reviews use ordinal scores from 0 to 4. Further Knowledge/Skill and cross-task context replays are documented in Appendix~\ref{app:architecture-ablations}.
 
-\subsection{Representative research cases}
-Figure~\ref{fig:agent-directed-research} compares representative archived observations and refined outcomes for Figure-eight Tracking, the independent PHS-2D study, and Shared Morphology. Figure~\ref{fig:evidence-validation} combines independent mathematical and physical validation with the Shared Morphology fixed-input and control-reoptimization comparison.
+\subsection{Mathematical Audit and Resource Measures}
+The passive sensitivity audit compares implicit derivatives with central finite differences over six signed loads and three response metrics. Shared Morphology provides a fixed-input structural comparison and subsequent control adaptation on the modified design. Task success is determined by the independent evaluator, while the mathematical audit measures agreement between numerical calculations.
 
-\subsection{Mathematical and physical validation}
-
-The mathematical and physical validation panels refer to the independent PHS-2D structural-design study, not the benchmark PHS-2D instance. The mathematical validation uses eighteen implicit-equilibrium derivative/finite-difference pairs, formed by six signed-loading branches and three physical metrics along one common normalized Young's-modulus direction. The physical validation summarizes ten signed-loading conditions under independent-process reproduction, half-time-step evaluation, and initial-state perturbation. The corresponding evidence is presented in Fig.~\ref{fig:evidence-validation}. Shared Morphology additionally uses a shared archived input for the available M1\_B pair, four finite-budget $d_0$ optimizations and four independently evaluated $d_1$ control solutions; no full study was rerun.
-
-\subsection{Architecture-level decision studies}
-
-A separate eleven-task, four-cell K/S study evaluates physical outcomes and research resources. Its four settings vary Knowledge and Skill independently. Historical FULL and current K/S have different model versions and study histories; the comparison is descriptive. The following component studies instead evaluate proposed research decisions at frozen checkpoints. The Reporter study contains six matched OFF/ON checkpoint pairs, twelve Main sessions, and six anonymous independent-model reviews. The original Knowledge/Skill experiment is a $2\times2$ factorial replay at Figure-eight Tracking and Shared Morphology, with one Main decision per cell and eight decisions overall. A separate four-checkpoint supplement adds sixteen K/S sessions, of which fifteen produce valid decisions. The context studies include two historical PHS-2D checkpoint pairs and six cross-task checkpoint pairs at Multi-target Reach, Figure-eight Tracking, Shared Morphology, Progressive Stiffness, Button Press, and Impact Recovery. These studies assess decision behavior and evidence access; their results are reported separately from physical task completion.
-
-\subsection{Scoring and resource accounting}
-
-Decision reviews use frozen evidence and anonymous outputs. Scores are descriptive ordinal assessments on a 0--4 scale. Provider token counts are reported when returned by the Provider; local serialized-text estimates are kept separate from Provider usage. Physical task metrics, benchmark completion, mathematical consistency, and architecture decision measures are reported as distinct evidence categories.
+Research workload is recorded separately as charged mathematical evaluations, physical launches, Core request records, and tokens. Task-wise resource profiles and their accounting definitions are retained in Appendix~\ref{app:cross-model-profile}, allowing the main results to focus on task outcomes and the mechanisms that support the research loop.

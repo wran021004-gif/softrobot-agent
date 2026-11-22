@@ -1,36 +1,27 @@
 \section{Results}
 \label{sec:results}
-
-\subsection{Physical task outcomes}
+\subsection{Task Feasibility Across the Benchmark}
 \label{subsec:portfolio-results}
-Table~\ref{tab:abc-comparison} reports the maximum known normalized constraint violation and status by task. Historical Ours satisfies all eleven tasks and thirty required conditions. The K/S columns are separate current-model runs with formal SELECT required for a pass; their full-protocol values are not replaced by partial-condition lower bounds. The Direct Tools passes marked by daggers use documented variants, so its strict original-protocol pass count is zero. These heterogeneous historical and current records are descriptive and do not establish a controlled model or component effect.
+The complete framework produces feasible designs across all eleven tasks in the recorded FULL portfolio, satisfying all thirty required conditions. Table~\ref{tab:abc-comparison} places these outcomes alongside the LLM-only, Direct Tools, and Knowledge/Skill configurations. The current K$+$S$+$ configuration also completes all eleven tasks, compared with three for K$-$S$-$ and six for either single-resource configuration. The main result is the breadth of feasible outcomes across active motion, interaction, shared-morphology design, and passive response.
 \input{tables/table2_abc_comparison}
-
-\subsection{Agent-directed research trajectories}
-\label{subsec:process-dissection}
-Figure~\ref{fig:agent-directed-research} compares archived observations with refined outcomes across three studies. In Figure-eight Tracking, both recorded trajectories track the figure-eight closely, but the earlier execution violates the strict lower tension boundary; the refined execution passes the full evaluator. In the independent PHS-2D study, the six common signed-load cases show lower normalized tip-to-loaded-point displacement ratios for the refined candidate, whose full evaluation passes all ten cases. In Shared Morphology, the initial Case~A tendon-speed bar is a native diagnostic, whereas the final bars summarize maximum normalized constraints after separate control refinement for four conditions. These are different measures and do not constitute a paired M1 or M2 contrast; that comparison is addressed in Fig.~\ref{fig:evidence-validation}D. The central icons represent the decision loop conceptually rather than execution receipts.
-
-Another recorded research route, Impact Recovery, changed from GVS/NMPC trials to a native tangent model, discrete LQR, and bounded tension allocation. These examples illustrate distinct decisions, not a prescribed sequence of views.
 \input{figures/fig03_agent_directed_research}
+\input{figures/fig04_mathematical_research}
+\input{figures/fig05_research_continuity}
 
-\subsection{Mathematical Evidence and Physical Validation}
+\subsection{Adaptive Decisions Address Different Physical Bottlenecks}
+\label{subsec:process-dissection}
+Effective refinement depends on identifying what prevents task acceptance. In Figure-eight Tracking, close geometric tracking alone does not ensure feasible tension; the research process addresses the actuation boundary while retaining the trajectory. In Passive Tip Suppression, the design must preserve displacement near an applied load while reducing transmission to the tip. In Shared Morphology, one structure must support several conditions through appropriate control. Figure~\ref{fig:agent-directed-research} presents these contrasting bottlenecks and their refined outcomes.
+
+These cases motivate an action space that includes both structural and control changes. A further Impact Recovery study changes the control formulation from GVS/NMPC trials to a native tangent model, discrete LQR, and bounded tension allocation. The useful next action therefore depends on the physical evidence accumulated during the study.
+
+\subsection{Mathematical Research Exposes Design Tradeoffs}
 \label{subsec:evidence-validation}
-In the independent PHS-2D design study, 18 implicit-sensitivity and central finite-difference pairs agree in sign, with median and maximum relative discrepancies of 0.0260\% and 0.1191\%. Ten signed-load conditions retain their acceptance under independent-process reproduction, half-timestep evaluation, and initial-state perturbation (Fig.~\ref{fig:evidence-validation}A--C). This independent study is outside the benchmark's thirty-condition denominator.
+The mathematical layer makes a design hypothesis testable through task-relevant observables. In the passive-design study, increasing local material stiffness reduces both loaded-point displacement and tip motion. The decrease in the tip-to-point ratio favors motion suppression, whereas the decrease in loaded-point motion opposes compliance. Examining these observables together exposes the tradeoff that a single displacement metric would miss. Figure~\ref{fig:mathematical-research}A shows the local predictions and re-solved responses; the eighteen-pair audit agrees in sign and has a maximum relative discrepancy of 0.1191\%.
 
-Figure~\ref{fig:evidence-validation}D distinguishes structural response from control adaptation in Shared Morphology. Under the same archived input, M1\_B changes from $g_{\max}=1.996961$ on $d_0$ to $2.116883$ on $d_1$, a deterioration of $+0.119921$; both fail. Although geometric tendon speed falls from 74.924 to 45.381 mm/s, maximum position error grows from 8.089 to 31.169 mm, shifting the limiting constraint. On $d_1$, task-specific control re-optimization produces four independent physical PASS outcomes; for M1\_B it lowers $g_{\max}$ by 2.126883 relative to the fixed-input $d_1$ replay. This is an improvement within $d_1$, not a measured improvement of re-optimized $d_1$ over re-optimized $d_0$. The four finite-budget $d_0$ attempts did not converge reliably; no $\Delta$M2 or infeasibility claim follows. The other original $d_0$ inputs were unavailable. The supplement reused four optimizations, four independent physical acceptances, and one original control sequence, adding two independent replays and four bounded optimizations without rerunning a FULL study.
-\input{figures/fig04_evidence_validation}
+Shared Morphology illustrates why the mathematical question must also specify how control is treated. Under the same input, the structural revision changes the limiting residual from 1.997 to 2.117; after control adaptation on the revised structure, it reaches $-0.010$, satisfying the displayed condition (Fig.~\ref{fig:mathematical-research}B). This comparison makes control adaptation part of the design investigation. Together, the examples demonstrate the role of task-conditioned analysis: reveal coupled responses, identify the relevant mathematical object, and guide the next structural or control action.
 
-\subsection{Architecture Ablation}
+\subsection{Evidence Support and Compact Context}
 \label{subsec:architecture-ablation}
-Figure~\ref{fig:architecture-resources} and Table~\ref{tab:resource-ablation} show the eleven-task workload across K/S configurations and the historical FULL snapshot. Mathematical operations count charged evaluations, physical operations count launches, requests count Core records, and tokens count input plus output with cached input counted once. Historical token values are estimates based on current task-wise usage per request; current recorded usage may omit interrupted requests. The model and execution histories differ, and request granularity can vary, so these are workload profiles rather than isolated model effects.
-\input{figures/fig05_architecture_resources}
-\input{tables/table_resource_ablation}
+Evidence interpretation and context delivery support different parts of the next research decision. Reporter interpretation raises the mean blind-review score from 3.433 to 3.733 across six matched decisions and removes the two unsupported conclusions recorded in the OFF condition. The paired outcomes are shown in Fig.~\ref{fig:research-continuity}A.
 
-The six matched Reporter decision pairs have mean scores 3.433 OFF and 3.733 ON, with two wins, four ties, no losses, and unsupported conclusions reduced from two to zero in the blind review. In the original two-task K/S decision replay, historical-experience utilization is 0/3/3/3 while decision quality, consistency, and actionability are saturated at 4/4. Context replay results vary by checkpoint: the two historical PHS-2D comparisons reduce accepted-request input by 88.34\% and 80.13\%, while evidence coverage and decision scores do not uniformly improve. These decision-only studies do not measure downstream task success; protocols and limitations are in Appendix~\ref{app:architecture-ablations}.
-
-The archived C1 action audit links 220 proposals to evidence, 205 dispatches, 160 confirmed executions, and 10 independent validations: 72.73\% proposal-to-execution and 6.25\% post-execution validation. Main Agent accounts for 46 executions and one validation; external Codex accounts for 114 and nine. An additional 1,094 action records without a confirmed evidence or execution chain are excluded from the denominator. This retrospective audit concerns provenance and does not measure new physical trials.
-
-\clearpage
-\section{Real-World Experiments}
-\label{sec:real-world}
-This section and Figure 6 are reserved for future hardware experiments; no physical-robot results are available in this draft.
+Hierarchical context substantially reduces recorded input at the two historical checkpoints, by 88.34\% for load diagnosis and 80.13\% for parameter tradeoff (Fig.~\ref{fig:research-continuity}B). Decision scores and key-evidence coverage do not improve consistently; complete checkpoint results appear in Appendix~\ref{app:architecture-ablations}. Together with the task-level Knowledge/Skill results in Table~\ref{tab:abc-comparison}, these studies examine evidence interpretation, reusable experience, and information delivery as complementary supports for the research loop.

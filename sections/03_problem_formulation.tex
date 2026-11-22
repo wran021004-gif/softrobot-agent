@@ -1,67 +1,22 @@
 \section{Problem Formulation}
 \label{sec:formulation}
-
-We study tendon-driven soft-robot design under task-specific physical requirements. A design must satisfy a frozen task contract, while the research agent may investigate and revise morphology, structural parameters, and control strategy.
-
-\subsection{Robot design and task specification}
-\label{subsec:design-space}
-A robot design is represented by
+We consider tendon-driven soft robots whose morphology and control must jointly satisfy a task. The design is
 \begin{equation}
-d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},
-d_{\mathrm{route}},d_{\mathrm{assembly}}),
+d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},d_{\mathrm{route}},d_{\mathrm{assembly}})\in\Dspace,
 \label{eq:design}
 \end{equation}
-which collects topology, geometry, material properties, tendon routing, and assembly or payout settings. The admissible design space is $\Dspace$. Structural variables $d$ are distinct from controller parameters $\theta$ and, for active robots, the actuation sequence $U=(u_0,\ldots,u_{N-1})$.
+including topology, geometry, material, tendon routing, and assembly settings. Controller parameters $\theta$ and the actuation sequence $U=(u_0,\ldots,u_{N-1})$ are optimized alongside this structure.
 
-Each task $\tau$ is a fixed contract specifying the initial condition, target or reference, loads, execution horizon, observables, tolerances, and evaluation procedure. Its active-task requirements are written as normalized constraints
+A task contract $\tau$ specifies the initial condition, targets, loads, horizon, and acceptance criteria. For active execution, its signed normalized constraint residuals satisfy
 \begin{equation}
-g_{\tau,i}(d,U)\leq 0,\qquad i=1,\ldots,m_\tau,
+g_{\tau,i}(d,U)\leq0,\qquad i=1,\ldots,m_\tau.
 \label{eq:taskconstraints}
 \end{equation}
-where non-positive values satisfy the corresponding requirement. The task contract and acceptance criteria remain fixed during research.
-
-\subsection{Active, passive, and multi-condition design}
-\label{subsec:physical-problems}
-For an active robot, the best achievable task violation for a fixed design is
+The best achievable residual after control adaptation defines the task-capability value
 \begin{equation}
-V_\tau(d)=
-\inf_{U\in\mathcal U(d)}
-\max_i g_{\tau,i}(d,U),
+V_\tau(d)=\inf_{U\in\mathcal U(d)}\max_i g_{\tau,i}(d,U),
 \label{eq:capability}
 \end{equation}
-where $\mathcal U(d)$ contains the input sequences allowed by the design-dependent actuator limits. This value function evaluates a structure after its admissible control has been re-optimized. A numerically returned local solution is not, by itself, a global infeasibility certificate.
+where $\mathcal U(d)$ specifies admissible actuation. For a passive robot, the applied load $f$ and unilateral tendon constraints determine an equilibrium $q^\star(d,f)$; the corresponding requirements are $g^{\mathrm{pass}}_{\tau,i}(d,q^\star)\leq0$. For multiple required conditions, one morphology must satisfy every condition, with condition-specific control allowed for active tasks.
 
-For a passive fixed-payout robot, the response is determined by its structure, unilateral tendon constraints, and applied load. A quasi-static equilibrium $q^\star_\tau(d,f)$ satisfies
-\begin{equation}
-\begin{aligned}
-\nabla_q\Pi(q^\star_\tau;d,f)
-+\sum_j\mu^\star_j\nabla_q c_j(q^\star_\tau,d)&=0,\\
-c_j(q^\star_\tau,d)\leq0,\quad
-\mu^\star_j&\geq0,\quad
-\mu^\star_jc_j(q^\star_\tau,d)=0,
-\end{aligned}
-\label{eq:passive-problem}
-\end{equation}
-where $\Pi$ is the potential energy and $c_j$ denotes a unilateral tendon or assembly constraint. The passive response is evaluated against
-\begin{equation}
-g^{\mathrm{pass}}_{\tau,i}
-\bigl(d,q^\star_\tau(d,f)\bigr)\leq0.
-\label{eq:passive-constraints}
-\end{equation}
-
-For a set of required conditions $\mathcal C$, one morphology is shared while each active condition may use its own control sequence. The condition-wise violation and shared-design capability are
-\begin{equation}
-v_c(d)=
-\begin{cases}
-\displaystyle\inf_{U_c\in\mathcal U_c(d)}
-\max_i g_{c,i}(d,U_c), & c\in\mathcal C_{\mathrm{act}},\\[0.8em]
-\displaystyle\max_i g^{\mathrm{pass}}_{c,i}
-\bigl(d,q^\star_c(d,f_c)\bigr), & c\in\mathcal C_{\mathrm{pass}},
-\end{cases}
-\label{eq:condition-violation}
-\end{equation}
-\begin{equation}
-V_{\mathcal C}(d)=\max_{c\in\mathcal C}v_c(d).
-\label{eq:multi-capability}
-\end{equation}
-Thus, all required conditions must be satisfied by the same morphology; an average cannot conceal a failed condition.
+The research problem is to decide which physical mechanism to investigate and which structural or control update to attempt under a finite budget. The task remains fixed while the candidate, mathematical formulation, and research route evolve. This separates the agent's choice of a useful investigation from the numerical optimization performed within that investigation.
