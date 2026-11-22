@@ -15,7 +15,7 @@ assert set(data)==set(CONFIGS)
 METRICS=[('mathematical_analyses','A  Mathematical analyses',1,450,[0,150,300,450]),
          ('physical_evaluations','B  Physical evaluations',1,150,[0,50,100,150]),
          ('agent_requests','C  Agent requests',1,600,[0,200,400,600]),
-         ('total_tokens','D  Token consumption (M)',1e6,6,[0,2,4,6])]
+         ('total_tokens','D  Token consumption (M)',1e6,0.6,[0,0.2,0.4,0.6])]
 svg=['<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1220" viewBox="0 0 2400 1220">',
      '<title>Knowledge and Skill: total resource consumption across eleven tasks</title>',
      '<style>text{font-family:"Comic Sans MS","Microsoft YaHei",cursive}</style>',
