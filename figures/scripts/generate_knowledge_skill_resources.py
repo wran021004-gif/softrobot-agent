@@ -19,7 +19,7 @@ assert len(data) == 44
 svg = ['<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1350" viewBox="0 0 2400 1350">',
        '<title>Knowledge and Skill: within-task resource comparison</title>',
        '<style>text{font-family:"Comic Sans MS","Microsoft YaHei",cursive}</style>',
-       '<defs><pattern id="missing" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#f0f0f0"/><path d="M-3 3 L3 -3 M0 12 L12 0 M9 15 L15 9" stroke="#b7bdc2" stroke-width="2"/></pattern><linearGradient id="scale"><stop stop-color="#eef4f6"/><stop offset="1" stop-color="#527f91"/></linearGradient></defs>',
+       '<defs><pattern id="missing" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#69666e"/><path d="M0 0 L16 16 M0 16 L16 0" stroke="#94919a" stroke-width="1.8"/></pattern><linearGradient id="scale"><stop stop-color="#eef4f6"/><stop offset="1" stop-color="#527f91"/></linearGradient></defs>',
        '<rect width="2400" height="1350" fill="white"/>']
 def text(x, y, s, size=32, anchor='start', weight=400, color='#283c44'):
     svg.append(f'<text x="{x}" y="{y}" font-size="{size}" text-anchor="{anchor}" font-weight="{weight}" fill="{color}">{html.escape(s)}</text>')
@@ -28,15 +28,21 @@ def rect(x, y, w, h, fill, stroke='none', sw=1, rx=0):
 def color(value):
     a, b = (238,244,246), (82,127,145)
     return '#'+''.join(f'{round(x+(y-x)*value):02x}' for x,y in zip(a,b))
+def checkmark(x, y):
+    path = f'M{x-9} {y} L{x-3} {y+6} L{x+10} {y-8}'
+    for stroke, width in [('white', 7), ('#233b46', 3.8)]:
+        svg.append(f'<path d="{path}" fill="none" stroke="{stroke}" stroke-width="{width}" stroke-linecap="round" stroke-linejoin="round"/>')
 
 text(42, 44, 'Within-task resource contrast', 36, weight=700)
 rect(1040, 20, 280, 28, 'url(#scale)')
 text(1020, 45, 'Lowest', 29, anchor='end')
 text(1340, 45, 'Highest in task', 29)
-svg.append('<circle cx="1740" cy="33" r="9" fill="#233b46" stroke="white" stroke-width="2"/>')
+checkmark(1740,33)
 text(1760,45,'Task completed',29)
-rect(2100,20,35,28,'url(#missing)')
-text(2150,45,'Unavailable',29)
+rect(2095,17,62,35,'url(#missing)','#56535b',1,3)
+rect(2104,21,44,27,'#56535b',rx=2)
+text(2126,43,'NA',23,'middle',700,'white')
+text(2172,45,'Unavailable',29)
 X, CW = 275, 187
 for c, task in enumerate(TASKS):
     text(X+c*CW+CW/2, 103, task, 32, 'middle', 700)
@@ -60,9 +66,13 @@ for panel, (key, title) in enumerate(METRICS):
             x,y = X+c*CW, top+37+r*51
             fill = 'url(#missing)' if value is None else ('#e4e5e7' if equal else color(value))
             rect(x,y,CW-6,46,fill, '#d6dfe2', 0.8, 3)
+            if value is None:
+                rect(x+58,y+4,65,38,'#56535b',rx=3)
+                text(x+90.5,y+34,'NA',30,'middle',700,'white')
             passed = data[task,k]['formal_select']=='selected'
             if passed:
-                svg.append(f'<circle cx="{x+(CW-6)/2}" cy="{y+23}" r="8" fill="#233b46" stroke="white" stroke-width="2"/>')
+                check_x = x+CW-24 if value is None else x+(CW-6)/2
+                checkmark(check_x,y+23)
             normalized.append(dict(task=task,configuration=k,metric=key,raw=raw,normalized=value,equal_column=equal,completed=passed))
     rect(X-4,top+37+3*51-3,CW*11-2,52,'none','#527f91',3,5)
 svg.append('</svg>')
