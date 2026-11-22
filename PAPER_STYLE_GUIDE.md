@@ -1,6 +1,6 @@
 # Manuscript style and notation guide
 
-This is the manuscript-wide reference for terminology, mathematical notation, and visual style. Figure 1 is frozen and must not be edited.
+This is the manuscript-wide reference for terminology, mathematical notation, and visual style. Figure 1 retains its approved layout. Its parameter-group symbol was updated to $\mathcal I_k$ on 2026-11-22 at the author's request to match the manuscript.
 
 ## Canonical task names
 

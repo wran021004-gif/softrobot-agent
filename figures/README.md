@@ -1,6 +1,6 @@
 # Publication figures
 
-Figure 1 is the approved, editable architecture figure already imported into the Overleaf project. It is intentionally preserved during the current manuscript update.
+Figure 1 is the approved, editable architecture figure already imported into the Overleaf project. Its approved layout is preserved; the parameter-group symbol is now ℐₖ, consistent with the manuscript (author-requested correction, 2026-11-22).
 
 Current manuscript figure sequence:
 - Figure 2: `fig02_task_portfolio.tex` — standardized eleven-task benchmark suite grouped into four functional families.
