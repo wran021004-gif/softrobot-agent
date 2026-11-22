@@ -1,18 +1,17 @@
 \begin{table}[t]
 \centering
-\caption{Research-resource totals across eleven tasks.}
+\caption{Aggregate resource consumption across eleven tasks.}
 \label{tab:resource-ablation}
-\setlength{\tabcolsep}{3pt}\scriptsize
+\setlength{\tabcolsep}{4pt}\small
 \begin{tabular}{lrrrr}
 \toprule
-Configuration & Math & Physical & Requests & Token (M) \\
+Configuration & Math & Physical & Requests & Tokens (M) \\
 \midrule
-Historical FULL (Astra) & 322 & 93 & 895 & 105.13$^*$ \\
-K$-$S$-$ & 282 & 271 & 2,848 & 473.26 \\
-K$+$S$-$ & 725 & 274 & 5,127 & 560.01$^{\ddagger}$ \\
-K$-$S$+$ & 289 & 295 & 2,722 & 452.21 \\
-K$+$S$+$ & 388 & 267 & 3,050 & 286.02 \\
+K$-$S$-$ & 227 & 208 & 2,848 & 473.26 \\
+K$+$S$-$ & 788 & 267 & 5,127 & 563.42 \\
+K$-$S$+$ & 334 & 225 & 2,722 & 452.21 \\
+K$+$S$+$ & 145 & 162 & 3,050 & 286.02 \\
 \bottomrule
 \end{tabular}
-\par\noindent\scriptsize Math: charged evaluations; Physical: physical launches; Requests: Core request records; Token: recorded input plus output, including cached input once. $^*$Historical tokens are estimated from task-specific current tokens per request, not provider usage. $^{\ddagger}$One session lacks token usage and is omitted, so the total is a recorded lower bound. Interrupted usage can be missing in other cells. Different interfaces and study histories limit cross-model comparisons.
+\par\noindent\small Math: mathematical analyses; Physical: physical evaluations; Requests: Core requests. Token totals are expressed in millions.
 \end{table}
