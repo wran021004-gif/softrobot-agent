@@ -6,8 +6,10 @@
 \usepackage{siunitx}
 \usepackage{enumitem}
 \usepackage{algpseudocode}
-\newcounter{algorithm}
-\renewcommand{\thealgorithm}{\arabic{algorithm}}
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}
+\floatname{algorithm}{Algorithm}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc}
@@ -24,9 +26,11 @@
 \definecolor{TraceGray}{HTML}{929BA4}
 \definecolor{TraceLight}{HTML}{D9DEE2}
 
-\hypersetup{hidelinks}
+\hypersetup{hidelinks,
+  pdftitle={PRIME-Soft: Projection of Research Intent into Mathematical Execution for Agentic Structure-Control Co-Design of Tendon-Driven Soft Robots},
+  pdfauthor={Anonymous Authors}}
 \sisetup{detect-all,per-mode=symbol}
-\newcommand{\softrobotagent}{\textnormal{\textsc{Softrobot-Agent}}}
+\newcommand{\softrobotagent}{\textnormal{PRIME-Soft}}
 \newcommand{\MainAgent}{\textsc{Main Agent}}
 \newcommand{\Reporter}{\textsc{Reporter}}
 \newcommand{\PPRP}{\textsc{PPRP}}
@@ -39,16 +43,31 @@
 \newcommand{\EvidPhys}{\mathcal{E}^{\mathrm{phys}}}
 \newcommand{\dd}{\mathrm{d}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+% Shared typography and rules for main-text and supplementary tables.
+\newcommand{\papertablestyle}{%
+  \fontfamily{ptm}\selectfont\fontsize{8.5}{10}\selectfont
+  \setlength{\tabcolsep}{3.5pt}%
+  \setlength{\heavyrulewidth}{0.65pt}%
+  \setlength{\lightrulewidth}{0.35pt}%
+  \renewcommand{\arraystretch}{1.10}%
+}
+
 \newcommand{\includeplot}[2]{\IfFileExists{#1}{\includegraphics[width=#2]{#1}}{\fbox{\parbox[c][2.2cm][c]{0.94\linewidth}{\centering Plot asset pending: \texttt{#1}}}}}
-\title{Softrobot-Agent: Physics-Grounded Agentic Research for Tendon-Driven Soft-Robot Co-Design}
-\author{Anonymous Authors\thanks{Working manuscript. Author information and affiliations will be added after technical content and final figure assets are approved.}}
+\title{PRIME-Soft: Projection of Research Intent\\into Mathematical Execution for Agentic\\Structure--Control Co-Design of\\Tendon-Driven Soft Robots}
+\author{Anonymous Authors}
 \begin{document}
 \setcounter{dbltopnumber}{2}
+\setcounter{topnumber}{1}
 \renewcommand{\dbltopfraction}{0.90}
 \renewcommand{\textfraction}{0.15}
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
 \maketitle
 \begin{abstract}
-Co-design within tendon-driven soft-robot families requires deciding which physical mechanism to investigate as well as how to optimize a candidate. This paper presents \softrobotagent{}, a physics-grounded agentic research framework that connects these decisions through task-conditioned mathematical analysis. A Main Agent selects hypotheses, parameters, and observables; a parameterized physical research problem binds the resulting intent to a candidate, physical model, analysis semantics, and budget. Complementary views examine mechanism sensitivity, fixed-input response, control-adapted task capability, and closed-loop performance. Deterministic tools update structure and control, and independent evaluation returns evidence for the next decision. Hierarchical context, reusable experience, and a read-only Reporter preserve research continuity. The framework is evaluated on eleven tasks spanning thirty required physical conditions within this family; both full-system model configurations complete all eleven tasks. Representative studies show how mathematical evidence exposes compliance tradeoffs and the need for control adaptation; an eighteen-pair local sensitivity audit has a maximum relative discrepancy of 0.1191\%. Six paired Reporter decisions show two improvements and four ties, while hierarchical context reduces recorded input by more than 80\% at two studied checkpoints.
+Co-design within tendon-driven soft-robot families requires deciding which physical mechanism to investigate as well as how to optimize a candidate. This paper presents \softrobotagent{}, a physics-grounded research harness for agentic structure--control co-design. Its central mechanism projects research intent into executable, task-conditioned mathematical problems. A Main Agent selects hypotheses, parameters, and observables; a parameterized physical research problem binds the resulting intent to a candidate, physical model, analysis semantics, and budget. Complementary views examine mechanism sensitivity, fixed-input response, control-adapted task capability, and closed-loop performance. Deterministic tools update structure and control, and independent evaluation returns evidence for the next decision. Hierarchical context, reusable experience, and a read-only Reporter preserve research continuity. The framework is evaluated on eleven tasks spanning thirty required physical conditions within this family; both full-system model configurations complete all eleven tasks. Representative studies show how mathematical evidence exposes compliance tradeoffs and the need for control adaptation; an eighteen-pair local sensitivity audit has a maximum relative discrepancy of 0.1191\%. Six paired Reporter decisions show two improvements and four ties, while hierarchical context reduces recorded input by more than 80\% at two studied checkpoints.
 \end{abstract}
 \begin{IEEEkeywords}
 Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic research, scientific reasoning, sensitivity analysis, physical evidence.
@@ -61,19 +80,20 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \input{sections/07_results}
 \input{sections/09_discussion}
 \input{sections/10_conclusion}
-\clearpage
-\onecolumn
-\twocolumn
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\par\bigskip
 \appendices
 \setcounter{figure}{0}
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\theHfigure}{S\arabic{figure}}
+\setcounter{table}{0}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\theHtable}{S\arabic{table}}
+\input{appendices/F_mathematical_details}
 \input{appendices/A_experiment_protocol}
 \input{appendices/B_additional_task_portfolio}
-\input{appendices/C_evidence_provenance}
 \input{appendices/D_architecture_ablation_protocol}
 \input{appendices/E_cross_model_resource_profile}
-\input{appendices/F_mathematical_details}
-\bibliographystyle{IEEEtran}
-\bibliography{references}
+\input{appendices/C_evidence_provenance}
 \end{document}

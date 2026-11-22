@@ -5,10 +5,10 @@ We evaluate eleven tendon-driven soft-robot tasks in four groups: Motion Control
 \input{figures/fig02_task_portfolio}
 \input{tables/table1_family_summary}
 
-The evaluation addresses three questions: can the framework produce task-feasible designs across different physical demands; how does mathematical evidence inform structural and control decisions; and how do evidence-management components support subsequent decisions? Research trajectories examine Figure-eight Tracking, a separate passive structural-design study, and Shared Morphology. The passive study also supplies the local mathematical audit in Fig.~\ref{fig:mathematical-research}.
+The evaluation addresses three questions: can the framework produce task-feasible designs across different physical demands; how does mathematical evidence inform structural and control decisions; and how do evidence-management components support subsequent decisions? Research trajectories examine Figure-eight Tracking, a separate passive structural-design study, and Shared Morphology. The passive study also supplies the local mathematical audit in Fig.~\ref{fig:mathematical-research}. Task-specific quantities and detailed outcomes appear in Appendix~\ref{app:task-portfolio}.
 
 \subsection{Ablation and Model Settings}
-The task-level comparison contains seven configurations organized around three questions. All configurations in Table~\ref{tab:abc-comparison} use identical upper budgets for mathematical operations, physical operations, Agent requests, and token consumption. Architecture ablation compares \emph{LLM-only}, \emph{Without PPRP}, and \emph{Ours} with GPT-5.6 Sol. LLM-only uses candidate generation and physical-evaluation feedback. Without PPRP additionally exposes bottom-level mathematical operations, with the agent constructing its requests directly. Ours compiles the research intent into a task-conditioned problem and routes its numerical execution.
+The task-level comparison contains seven configurations organized around three questions. All configurations in Table~\ref{tab:abc-comparison} use identical upper budgets for mathematical operations, physical operations, Agent requests, and token consumption. Architecture ablation compares \emph{LLM-only}, \emph{Without PPRP}, and \emph{Ours} with GPT-5.6 Sol. LLM-only uses candidate generation and physical-evaluation feedback. Without PPRP additionally exposes bottom-level mathematical operations, with the agent constructing its requests directly. Ours compiles the research intent into a task-conditioned problem and routes its numerical execution. The capability permissions are specified in Appendix~\ref{app:abc-protocol}.
 
 Component ablation varies Knowledge and Skill independently. Ours--Sol enables both resources (K$+$S$+$); the other settings remove Knowledge, Skill, or both. Reporter OFF/ON is evaluated at six matched decision checkpoints, while Flat and L0--L3 hierarchical context are compared at two passive-design checkpoints. Each decision replay presents the same evidence and evaluates the proposed next action using anonymous scores from 0 to 4. The model comparison applies the complete framework with GPT-6 Astra, using Ours--Sol as the reference.
 
@@ -17,3 +17,6 @@ The passive sensitivity audit compares implicit derivatives with central finite 
 
 Research workload is summarized as mathematical analyses, physical evaluations, Agent requests, and tokens. Figure~\ref{fig:knowledge-skill-resources} compares the totals across all eleven tasks for the four Knowledge/Skill configurations, using a separate zero-baseline axis for each resource.
 An additional workload comparison reports the GPT-6 Astra and GPT-5.6 Sol full-system runs over the eleven-task portfolio (Fig.~\ref{fig:astra-sol-resources}). The Sol totals use the K$+$S$+$ configuration from the Knowledge/Skill study.
+
+% Queue the wide research-case figure before the Results page boundary.
+\input{figures/fig03_agent_directed_research}

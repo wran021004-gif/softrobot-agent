@@ -4,15 +4,17 @@ The evaluation connects task feasibility to the research mechanisms that produce
 
 \subsection{Adaptive Decisions Address Different Physical Bottlenecks}
 \label{subsec:process-dissection}
-\input{figures/fig03_agent_directed_research}
 Effective refinement depends on identifying what prevents task acceptance. In Figure-eight Tracking, close geometric tracking alone does not ensure feasible tension; the research process addresses the actuation boundary while retaining the trajectory. In Passive Tip Suppression, the design must preserve displacement near an applied load while reducing transmission to the tip. In Shared Morphology, one structure must support several conditions through appropriate control. Figure~\ref{fig:agent-directed-research} presents these contrasting bottlenecks and their refined outcomes.
 
 These cases motivate an action space that includes both structural and control changes. A further Impact Recovery study changes the control formulation from GVS/NMPC trials to a native tangent model, discrete LQR, and bounded tension allocation. The useful next action therefore depends on the physical evidence accumulated during the study.
 
 \subsection{Mathematical Research Exposes Design Tradeoffs}
 \label{subsec:evidence-validation}
-\input{figures/fig04_mathematical_research}
 The mathematical layer makes a design hypothesis testable through task-relevant observables. In the passive-design study, increasing local material stiffness reduces both loaded-point displacement and tip motion. The decrease in the tip-to-point ratio favors motion suppression, whereas the decrease in loaded-point motion opposes compliance. Examining these observables together exposes the tradeoff that a single displacement metric would miss. Figure~\ref{fig:mathematical-research}A shows the local predictions and re-solved responses; the eighteen-pair audit agrees in sign and has a maximum relative discrepancy of 0.1191\%.
+\input{figures/fig04_mathematical_research}
+% Queue the wide ablation summary for the following results page.
+\input{tables/table2_abc_comparison}
+\input{figures/fig06_knowledge_skill_resources}
 
 Shared Morphology illustrates why the mathematical question must also specify how control is treated. Under the same input, the structural revision changes the limiting residual from 1.997 to 2.117; after control adaptation on the revised structure, it reaches $-0.010$, satisfying the displayed condition (Fig.~\ref{fig:mathematical-research}B). This comparison makes control adaptation part of the design investigation. Together, the examples demonstrate the role of task-conditioned analysis: reveal coupled responses, identify the relevant mathematical object, and guide the next structural or control action.
 
@@ -20,7 +22,6 @@ Shared Morphology illustrates why the mathematical question must also specify ho
 \subsection{Ablation Studies and Model Comparison}
 \label{subsec:ablation-studies}
 Table~\ref{tab:abc-comparison} provides a common task-level view of completion across the eleven-task benchmark. A task is complete when its acceptance criteria are satisfied. Ours--Sol is the K$+$S$+$ configuration and serves as the shared reference for architecture, Knowledge/Skill, and model comparisons.
-\input{tables/table2_abc_comparison}
 
 \subsubsection{Architecture Ablation}
 \label{subsec:portfolio-results}
@@ -32,17 +33,16 @@ Research continuity depends on three complementary functions: reusing experience
 
 \paragraph{Knowledge and Skill}
 \label{subsec:knowledge-skill-workload}
-\input{figures/fig06_knowledge_skill_resources}
 Reusable findings and procedures increase the range of tasks the system completes. The four Knowledge/Skill configurations have identical upper limits on mathematical operations, physical operations, Agent requests, and tokens. Removing both resources yields three completed tasks; enabling either Knowledge or Skill alone raises this to six, and their joint use completes all eleven (Table~\ref{tab:abc-comparison}). Their joint contribution is therefore visible in task coverage as well as research workload. Across the eleven tasks, K$+$S$+$ reduces total mathematical analyses by 81.5\%, physical evaluations by 39.6\%, and token consumption by 49.2\% relative to K$-$S$-$ (Fig.~\ref{fig:knowledge-skill-resources}).
 
 \paragraph{Reporter}
-\input{figures/fig05_research_continuity}
 Interpreting completed evidence improves the support for the next research decision. Reporter raises the mean blind-review score from 3.433 to 3.733 across six matched decisions, with two improvements, four ties, and no losses. The two unsupported conclusions in the OFF condition are absent with Reporter enabled (Fig.~\ref{fig:research-continuity}A). This result connects evidence interpretation to better-grounded action selection.
 
 \paragraph{Hierarchical Context}
-The L0--L3 organization keeps immediate decision context compact while making supporting records available on demand. Hierarchical context reduces recorded input by 88.34\% for load diagnosis and 80.13\% for parameter tradeoff (Fig.~\ref{fig:research-continuity}B). Decision scores and key-evidence coverage do not improve consistently; complete checkpoint results appear in Appendix~\ref{app:architecture-ablations}. Together, these component studies explain how reusable experience, evidence interpretation, and selective information delivery sustain the research loop.
+The L0--L3 organization keeps immediate decision context compact while making supporting records available on demand. Hierarchical context reduces recorded input by 88.34\% for load diagnosis and 80.13\% for parameter tradeoff (Fig.~\ref{fig:research-continuity}B). Decision scores and key-evidence coverage do not improve consistently; complete checkpoint results appear in Appendix~\ref{app:architecture-ablations}.
+\input{figures/fig05_research_continuity}
 
 \subsubsection{Model Comparison}
 \label{subsec:full-system-workload}
+The complete framework finishes all eleven tasks with both Sol and Astra under identical resource-budget ceilings (Table~\ref{tab:abc-comparison}). Figure~\ref{fig:astra-sol-resources} compares their aggregate mathematical operations, physical evaluations, Agent requests, and token consumption. Sol uses the same K$+$S$+$ reference as the component study. These results demonstrate task-feasible operation with both backbones within the studied robot family.
 \input{figures/fig07_astra_sol_resources}
-The model comparison examines the complete framework with Sol and Astra under the same four resource-budget ceilings. Both configurations complete all eleven tasks (Table~\ref{tab:abc-comparison}), demonstrating task-feasible operation with both backbones within the studied robot family. Figure~\ref{fig:astra-sol-resources} complements these outcomes with the four aggregate resource profiles, separating mathematical and physical work from agent requests and token consumption. The Sol profile is the same K$+$S$+$ reference used in the component study.

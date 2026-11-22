@@ -10,7 +10,7 @@ s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
 \end{equation}
 where $\mathcal H_k$ contains the hypotheses, $\mathcal E_k$ the accumulated evidence, and $\mathcal B_k$ the remaining budget. An action can investigate a mechanism, generate a morphology, optimize selected parameters, refine control, or evaluate a candidate. Observations update the hypothesis and determine the next action.
 
-The layers in Fig.~\ref{fig:research-framework} implement this loop. The Main Agent selects the scientific question; deterministic tools formulate and execute the numerical problem; an independent evaluator checks the resulting robot against the task contract. Four tool families support these actions: structure and model compilation, mathematical analysis and optimization, control and trajectory synthesis, and active or passive physical evaluation. This interface lets the agent change its research route while reusing the same physical definitions and acceptance criteria.
+The layers in Fig.~\ref{fig:research-framework} implement this loop. The Main Agent selects the scientific question; deterministic tools formulate and execute the numerical problem; an independent evaluator checks the resulting robot against the task contract. Four tool families support these actions: structure and model compilation, mathematical analysis and optimization, control and trajectory synthesis, and active or passive physical evaluation. This interface lets the agent change its research route while reusing the same physical definitions and acceptance criteria. Algorithm~\ref{alg:agent-research} summarizes the decision--execution loop.
 
 
 
@@ -69,37 +69,36 @@ The agent translates the mathematical evidence into a refinement action. For a d
 
 Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. An independent physical evaluator then tests the resulting trajectory or passive equilibrium against the original task contract. The agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question. Algorithm~\ref{alg:agent-research} makes these structural and control operations explicit.
 
-\begin{figure*}[t]
-\refstepcounter{algorithm}\label{alg:agent-research}
-\noindent\rule{\textwidth}{0.4pt}\par
-\noindent\textbf{Algorithm \thealgorithm. Evidence-guided structure--control research}\par
-\small
+\begin{algorithm}[!t]
+\caption{Research-intent-guided co-design}
+\label{alg:agent-research}
+\fontsize{8.5}{10}\selectfont
 \begin{algorithmic}[1]
-\Require Task $\tau$, initial design $d$, controls $(U,\theta)$, registries $\mathcal R$, budget $\mathcal B$
-\Ensure Evaluated candidate and linked mathematical/physical evidence $\mathcal E$
-\State Initialize hypotheses $\mathcal H$ and evidence store $\mathcal E$
+\Require Task $\tau$, design $d$, control $(U,\theta)$, registries $\mathcal R$, budget $\mathcal B$
+\Ensure Evaluated candidate and linked evidence $\mathcal E$
+\State Initialize hypotheses $\mathcal H$ and evidence $\mathcal E$
 \While{budget remains and research is active}
-  \State $C\gets\operatorname{AssembleBrief}(\tau,d,\mathcal H,\mathcal E,\mathcal B)$; retrieve supporting records as needed
-  \State $I\gets\operatorname{MainAgent}(C)$ \Comment{hypothesis, investigation, parameters, and observables}
+  \State Assemble L0 brief; retrieve L1--L3 records as needed
+  \State Main Agent selects research intent $I$
   \State $e^{\mathrm{math}}\gets\bot$; $e^{\mathrm{phys}}\gets\bot$
   \If{$I$ requests mathematical investigation}
-    \State $\mathcal P\gets\operatorname{CompileAndCheck}(I,\tau,d,\mathcal R,\mathcal B)$
+    \State $\mathcal P\gets\operatorname{Compile}(I,\tau,d,\mathcal R,\mathcal B)$; check validity
     \State $e^{\mathrm{math}}\gets\operatorname{AnalyzeOrReturnStatus}(\mathcal P)$
   \EndIf
-  \State $a\gets\operatorname{MainAgentDecision}(I,\mathcal E,e^{\mathrm{math}})$
-  \If{$a$ revises discrete morphology} $d\gets\operatorname{CompileDesign}(d,a)$ \EndIf
-  \If{$a$ optimizes structural parameters} $d\gets\operatorname{OptimizeSelectedParameters}(\tau,d,a)$ \EndIf
-  \If{$a$ refines control} $(U,\theta)\gets\operatorname{SynthesizeControl}(\tau,d,a)$ \EndIf
-  \If{$a$ requests a physical test or candidate validation}
+  \State Main Agent selects action $a$ from $(I,\mathcal E,e^{\mathrm{math}})$
+  \State \textbf{if} morphology revision: compile and check design $d$
+  \State \textbf{if} parameter refinement: optimize selected variables of $d$
+  \State \textbf{if} control refinement: synthesize $(U,\theta)$ for $d$
+  \If{physical testing or candidate validation is requested}
     \State $e^{\mathrm{phys}}\gets\operatorname{IndependentEvaluation}(\tau,d,U,\theta)$
   \EndIf
-  \State Store $(I,a,d,e^{\mathrm{math}},e^{\mathrm{phys}})$; obtain Reporter interpretation when requested
-  \State Update hypotheses, candidate status, brief, and remaining budget from completed records
+  \State Store $(I,a,d,e^{\mathrm{math}},e^{\mathrm{phys}})$ with linked records
+  \State Request Reporter interpretation when needed
+  \State Update $\mathcal H$, candidate status, L0 brief, and $\mathcal B$
 \EndWhile
 \State \Return selected evaluated candidate and $\mathcal E$
 \end{algorithmic}
-\noindent\rule{\textwidth}{0.4pt}
-\end{figure*}
+\end{algorithm}
 
 \subsection{Evidence and Context for Research Continuity}
 \label{subsec:research-continuity-method}
