@@ -21,6 +21,11 @@ METRICS = [('math_charged_evaluations', 'Math'),
 rows = list(csv.DictReader((ROOT / 'paper_handoff/figure_data/fig05_resource_ablation.csv').open(encoding='utf-8-sig')))
 data = {(r['task'], r['configuration']): r for r in rows if r['configuration'] in CONFIGS}
 assert len(data) == 44
+totals = {}
+for k in CONFIGS:
+    totals[k] = {key: sum(int(data[t,k][key]) for t in TASKS if data[t,k][key]!='') for key,_ in METRICS}
+    data['ALL',k] = {key: str(totals[k][key]) for key,_ in METRICS}
+    data['ALL',k]['formal_select'] = ''
 svg = ['<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1800" viewBox="0 0 2400 1800">',
        '<title>Knowledge and Skill: task-wise grouped resource bars</title>',
        '<style>text{font-family:"Comic Sans MS","Microsoft YaHei",cursive}</style>',
@@ -49,19 +54,25 @@ text(1322,95,'Task completed',28)
 text(1730,95,'Lower bar = less recorded work',28)
 
 normalized=[]
-for t,(task,name) in enumerate(zip(TASKS,NAMES)):
+for t,(task,name) in enumerate(list(zip(TASKS,NAMES))+[('ALL','Total workload')]):
     px=25+(t%3)*795
     py=132+(t//3)*414
     frame(px,py,760,394)
-    text(px+23,py+43,f'{task}  {name}',33,weight=700)
-    text(px+23,py+86,'Completed:',27)
-    completed_slot=0
-    for c,label in enumerate(LABELS):
-        if data[task,CONFIGS[c]]['formal_select']=='selected':
-            tx=px+184+completed_slot*135
-            text(tx,py+86,label,27,weight=700 if c==3 else 400,color='#2877b5' if c==3 else '#44545d')
-            checkmark(tx+96,py+76)
-            completed_slot+=1
+    text(px+23,py+43,'All 11 tasks — total workload' if task=='ALL' else f'{task}  {name}',33,weight=700)
+    if task=='ALL':
+        for c,k in enumerate(CONFIGS):
+            completed=sum(data[a,k]['formal_select']=='selected' for a in TASKS)
+            text(px+23+c*180,py+83,f'{LABELS[c]}: {completed}/11',25,weight=700 if c==3 else 400,color='#2877b5' if c==3 else '#44545d')
+        text(px+23,py+111,'K+S− Tokens: ≥ subtotal (10/11 tasks)',23,color='#56535b')
+    else:
+        text(px+23,py+86,'Completed:',27)
+        completed_slot=0
+        for c,label in enumerate(LABELS):
+            if data[task,CONFIGS[c]]['formal_select']=='selected':
+                tx=px+184+completed_slot*135
+                text(tx,py+86,label,27,weight=700 if c==3 else 400,color='#2877b5' if c==3 else '#44545d')
+                checkmark(tx+96,py+76)
+                completed_slot+=1
     for m,(key,label) in enumerate(METRICS):
         gx=px+27+m*180
         top=py+125
@@ -91,26 +102,16 @@ for t,(task,name) in enumerate(zip(TASKS,NAMES)):
                     line(bx,base,bx+28,base,COLORS[c],5)
                 else:
                     rect(bx,base-bar_height,28,bar_height,COLORS[c],rx=2)
+                if task=='ALL' and k=='K1S0' and key=='total_tokens':
+                    text(bx+14,top+29,'≥',28,'middle',700,'#283c44')
             normalized.append(dict(task=task,configuration=k,metric=key,raw=raw,normalized=z,equal_column=equal,completed=data[task,k]['formal_select']=='selected'))
         text(gx+82,py+367,label,30,'middle',700)
 
-# The twelfth tile is a shared reading key, not another task.
-px,py=1615,1374
-frame(px,py,760,394)
-text(px+28,py+48,'Reading the panels',34,weight=700)
-text(px+28,py+98,'Four bars = four configurations',29)
-text(px+28,py+144,'Each resource group has its own scale',29)
-text(px+28,py+190,'Lowest = baseline; highest = full height',28)
-checkmark(px+40,py+232)
-text(px+64,py+243,'Completed task',29)
-rect(px+28,py+265,55,39,'url(#missing)',rx=3)
-text(px+55.5,py+294,'NA',25,'middle',700,'white')
-text(px+98,py+295,'Unavailable; outside the scale',28)
-text(px+28,py+350,'Math: evaluations • Requests: Core records',27)
 svg.append('</svg>')
 OUT.with_suffix('.svg').write_text('\n'.join(svg),encoding='utf-8')
 OUT.with_suffix('.json').write_text(json.dumps(normalized,indent=2),encoding='utf-8')
-assert len(normalized)==176
+assert len(normalized)==192
 assert sum(v['normalized'] is None for v in normalized)==1
 assert all(v['normalized'] is None or 0<=v['normalized']<=1 for v in normalized)
-print('Generated 11 task panels, 44 independent resource groups, 1 NA.')
+print('Generated 11 task panels plus aggregate panel; 1 NA and 1 incomplete aggregate.')
+print(json.dumps(totals,indent=2))
