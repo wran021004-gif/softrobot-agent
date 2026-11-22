@@ -29,10 +29,10 @@ def color(value):
     a, b = (238,244,246), (82,127,145)
     return '#'+''.join(f'{round(x+(y-x)*value):02x}' for x,y in zip(a,b))
 
-text(42, 44, 'Compare configurations within each task', 36, weight=700)
+text(42, 44, 'Within-task resource contrast', 36, weight=700)
 rect(1040, 20, 280, 28, 'url(#scale)')
-text(1020, 45, 'Less', 29, anchor='end')
-text(1340, 45, 'More recorded work', 29)
+text(1020, 45, 'Lowest', 29, anchor='end')
+text(1340, 45, 'Highest in task', 29)
 svg.append('<circle cx="1740" cy="33" r="9" fill="#233b46" stroke="white" stroke-width="2"/>')
 text(1760,45,'Task completed',29)
 rect(2100,20,35,28,'url(#missing)')
@@ -52,16 +52,18 @@ for panel, (key, title) in enumerate(METRICS):
         text(241,top+71+r*51,label,33,'end',700 if r==3 else 400)
     for c,task in enumerate(TASKS):
         available = [float(data[task,k][key]) for k in CONFIGS if data[task,k][key] != '']
-        maximum = max(available)
+        minimum, maximum = min(available), max(available)
+        equal = maximum == minimum
         for r,k in enumerate(CONFIGS):
             raw = data[task,k][key]
-            value = None if raw=='' else (float(raw)/maximum if maximum else 0.0)
+            value = None if raw=='' else ((float(raw)-minimum)/(maximum-minimum) if not equal else 0.5)
             x,y = X+c*CW, top+37+r*51
-            rect(x,y,CW-6,46,'url(#missing)' if value is None else color(value), '#d6dfe2', 0.8, 3)
+            fill = 'url(#missing)' if value is None else ('#e4e5e7' if equal else color(value))
+            rect(x,y,CW-6,46,fill, '#d6dfe2', 0.8, 3)
             passed = data[task,k]['formal_select']=='selected'
             if passed:
                 svg.append(f'<circle cx="{x+(CW-6)/2}" cy="{y+23}" r="8" fill="#233b46" stroke="white" stroke-width="2"/>')
-            normalized.append(dict(task=task,configuration=k,metric=key,raw=raw,normalized=value,completed=passed))
+            normalized.append(dict(task=task,configuration=k,metric=key,raw=raw,normalized=value,equal_column=equal,completed=passed))
     rect(X-4,top+37+3*51-3,CW*11-2,52,'none','#527f91',3,5)
 svg.append('</svg>')
 OUT.with_suffix('.svg').write_text('\n'.join(svg),encoding='utf-8')
