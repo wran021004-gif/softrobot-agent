@@ -1,20 +1,26 @@
 \begin{table*}[t]
 \centering
-\caption{Task-wise maximum known normalized constraint violation and status. Methods are rows and the eleven tasks are columns.}
+\caption{Task-wise maximum known normalized constraint violation and status. Tasks are rows and methods are columns.}
 \label{tab:abc-comparison}
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{4pt}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{l*{11}{c}c}
+\begin{tabular}{l*{7}{c}}
 \toprule
-Method & T01 & T02 & T03 & T04 & T05 & T06 & T07 & T08 & T09 & T10 & PHS & Pass rate \\
+Task & LLM-only & Direct Tools & \shortstack{Ours\\(historical FULL)} & K$-$S$-$ (Sol) & K$+$S$-$ (Sol) & K$-$S$+$ (Sol) & K$+$S$+$ (Sol) \\
 \midrule
-LLM-only & 15.13 F & $\geq$19.34 I & 16.09 F & 6.05 F & 1.76 F & 2.23 F & 10.38 F & -- I & 3.45 F & $\geq$41.11 I & 254.39 Q & 0/11 \\
-Direct Tools & 22.22 F & -- I & 0 P$^\dagger$ & 566.37 Q & 0 P$^\dagger$ & 12.33 F & 13.23 F & 0.05 Q & 4.45 F & 36.94 F & 32.16 Q & 2/11$^\dagger$ \\
-\textbf{Ours (historical FULL)} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{0 P} & \textbf{11/11} \\
-K$-$S$-$ (Sol) & -- I & 0.00 P & 0.07 I & -- I & 3.78 I & 0.00 P & -- I & -- I & 0.00 P & -- I & -- I & 3/11 \\
-K$+$S$-$ (Sol) & 3.96 B & -- I & 0.00 P & -- B & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 1.00 I & 0.00 P & -- I & 6/11 \\
-K$-$S$+$ (Sol) & 0.00 P & 0.00 P & 0.28 I & 0.00 P & 0.00 P & 0.00 P & -- I & 0.00 P & 3.46 I & -- I & -- I & 6/11 \\
-K$+$S$+$ (Sol) & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 0.00 P & 11/11 \\
+Multi-target Reach & 15.13 F & 22.22 F & \textbf{0 P} & -- I & 3.96 B & 0.00 P & 0.00 P \\
+Loaded Hold & $\geq$19.34 I & -- I & \textbf{0 P} & 0.00 P & -- I & 0.00 P & 0.00 P \\
+Fast Reach & 16.09 F & 0 P$^\dagger$ & \textbf{0 P} & 0.07 I & 0.00 P & 0.28 I & 0.00 P \\
+Figure-eight Tracking & 6.05 F & 566.37 Q & \textbf{0 P} & -- I & -- B & 0.00 P & 0.00 P \\
+Tool Alignment & 1.76 F & 0 P$^\dagger$ & \textbf{0 P} & 3.78 I & 0.00 P & 0.00 P & 0.00 P \\
+Pose Scanning & 2.23 F & 12.33 F & \textbf{0 P} & 0.00 P & 0.00 P & 0.00 P & 0.00 P \\
+Shared Morphology & 10.38 F & 13.23 F & \textbf{0 P} & -- I & 0.00 P & -- I & 0.00 P \\
+Progressive Stiffness & -- I & 0.05 Q & \textbf{0 P} & -- I & 0.00 P & 0.00 P & 0.00 P \\
+Button Press & 3.45 F & 4.45 F & \textbf{0 P} & 0.00 P & 1.00 I & 3.46 I & 0.00 P \\
+Impact Recovery & $\geq$41.11 I & 36.94 F & \textbf{0 P} & -- I & 0.00 P & -- I & 0.00 P \\
+Passive Tip Suppression & 254.39 Q & 32.16 Q & \textbf{0 P} & -- I & -- I & -- I & 0.00 P \\
+\midrule
+Pass rate & 0/11 & 2/11$^\dagger$ & \textbf{11/11} & 3/11 & 6/11 & 6/11 & 11/11 \\
 \bottomrule
 \end{tabular}}
 \vspace{2pt}
