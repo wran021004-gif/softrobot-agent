@@ -19,12 +19,12 @@ Shared Morphology illustrates why the mathematical question must also specify ho
 
 \subsection{Ablation Studies and Model Comparison}
 \label{subsec:ablation-studies}
-Table~\ref{tab:abc-comparison} provides a common task-level view: normalized constraint violation describes the remaining physical mismatch, while completion requires satisfying the task's acceptance criteria. Ours--Sol is the K$+$S$+$ configuration and serves as the shared reference for architecture, Knowledge/Skill, and model comparisons.
+Table~\ref{tab:abc-comparison} provides a common task-level view of completion across the eleven-task benchmark. A task is complete when its acceptance criteria are satisfied. Ours--Sol is the K$+$S$+$ configuration and serves as the shared reference for architecture, Knowledge/Skill, and model comparisons.
 \input{tables/table2_abc_comparison}
 
 \subsubsection{Architecture Ablation}
 \label{subsec:portfolio-results}
-The architecture comparison asks whether a research-intent interface helps the agent turn physical feedback into feasible designs. LLM-only proposes candidates using physical-evaluation feedback; Without PPRP additionally exposes bottom-level mathematical tools; Ours binds the intended investigation to a task-conditioned problem and routes its execution. The complete Sol framework finishes all eleven tasks, whereas the two reduced architectures retain violations across several task families (Table~\ref{tab:abc-comparison}). Together with the cases in Figs.~\ref{fig:agent-directed-research} and~\ref{fig:mathematical-research}, these outcomes support an integrated loop that connects the choice of physical question, mathematical analysis, and candidate refinement.
+The architecture comparison asks whether a research-intent interface helps the agent turn physical feedback into feasible designs. LLM-only proposes candidates using physical-evaluation feedback; Without PPRP additionally exposes bottom-level mathematical tools; Ours binds the intended investigation to a task-conditioned problem and routes its execution. The complete Sol framework finishes all eleven tasks, whereas the two reduced architectures leave tasks unfinished across several task families (Table~\ref{tab:abc-comparison}). Together with the cases in Figs.~\ref{fig:agent-directed-research} and~\ref{fig:mathematical-research}, these outcomes support an integrated loop that connects the choice of physical question, mathematical analysis, and candidate refinement.
 
 \subsubsection{Component Ablation}
 \label{subsec:architecture-ablation}
