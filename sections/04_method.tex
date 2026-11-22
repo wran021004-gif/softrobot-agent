@@ -3,7 +3,7 @@
 
 \subsection{Adaptive Research Loop}
 \label{subsec:overall-framework}
-\softrobotagent{} couples scientific decisions with executable physical models. The Main Agent maintains a working hypothesis about the current bottleneck and chooses the investigation most relevant to that hypothesis. Its research state is
+\softrobotagent{} couples scientific decisions with executable physical models of the tendon-driven robot family. The Main Agent maintains a working hypothesis about the current bottleneck and chooses the investigation most relevant to that hypothesis. Its research state is
 \begin{equation}
 s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
 \label{eq:researchstate}
@@ -12,12 +12,7 @@ where $\mathcal H_k$ contains the hypotheses, $\mathcal E_k$ the accumulated evi
 
 The layers in Fig.~\ref{fig:research-framework} implement this loop. The Main Agent selects the scientific question; deterministic tools formulate and execute the numerical problem; an independent evaluator checks the resulting robot against the task contract. Four tool families support these actions: structure and model compilation, mathematical analysis and optimization, control and trajectory synthesis, and active or passive physical evaluation. This interface lets the agent change its research route while reusing the same physical definitions and acceptance criteria.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{figures/fig01_research_framework.pdf}
-\caption{Physics-grounded agentic research framework. The Main Agent converts task and physical observations into a research intent. Deterministic projection and registry binding compile this intent into a parameterized physical research problem. Complementary M0--M3 analysis views produce mathematical evidence, while candidate refinement is independently evaluated through active or passive physical execution. Both evidence paths are stored and returned to the Main Agent; the Reporter provides read-only interpretation.}
-\label{fig:research-framework}
-\end{figure*}
+
 
 \subsection{From Research Intent to an Executable Problem}
 \label{subsec:pprp}

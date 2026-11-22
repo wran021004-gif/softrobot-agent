@@ -1,28 +1,32 @@
 \begin{table*}[t]
 \centering
-\caption{Task-wise maximum known normalized constraint violation and status. Tasks are rows and methods are columns.}
+\caption{Task completion and normalized constraint violation across architecture, Knowledge/Skill, and model comparisons. Lower violation is better; $\checkmark$ marks a completed task. Ours--Sol (K$+$S$+$) is the shared reference. All configurations use Sol except the Astra column.}
 \label{tab:abc-comparison}
-\setlength{\tabcolsep}{4pt}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.16}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{l*{7}{c}}
 \toprule
-Task & LLM-only & Direct Tools & \shortstack{Ours\\(historical FULL)} & K$-$S$-$ (Sol) & K$+$S$-$ (Sol) & K$-$S$+$ (Sol) & K$+$S$+$ (Sol) \\
+ & \multicolumn{3}{c}{Architecture ablation} & \multicolumn{3}{c}{Knowledge/Skill ablation} & Model comparison \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-8}
+Task & LLM-only & \shortstack{Without\\PPRP} & \shortstack{\textbf{Ours--Sol}\\K$+$S$+$} & K$-$S$-$ & K$+$S$-$ & K$-$S$+$ & Ours--Astra \\
 \midrule
-Multi-target Reach & 15.13 F & 22.22 F & \textbf{0 P} & -- I & 3.96 B & 0.00 P & 0.00 P \\
-Loaded Hold & $\geq$19.34 I & -- I & \textbf{0 P} & 0.00 P & -- I & 0.00 P & 0.00 P \\
-Fast Reach & 16.09 F & 0 P$^\dagger$ & \textbf{0 P} & 0.07 I & 0.00 P & 0.28 I & 0.00 P \\
-Figure-eight Tracking & 6.05 F & 566.37 Q & \textbf{0 P} & -- I & -- B & 0.00 P & 0.00 P \\
-Tool Alignment & 1.76 F & 0 P$^\dagger$ & \textbf{0 P} & 3.78 I & 0.00 P & 0.00 P & 0.00 P \\
-Pose Scanning & 2.23 F & 12.33 F & \textbf{0 P} & 0.00 P & 0.00 P & 0.00 P & 0.00 P \\
-Shared Morphology & 10.38 F & 13.23 F & \textbf{0 P} & -- I & 0.00 P & -- I & 0.00 P \\
-Progressive Stiffness & -- I & 0.05 Q & \textbf{0 P} & -- I & 0.00 P & 0.00 P & 0.00 P \\
-Button Press & 3.45 F & 4.45 F & \textbf{0 P} & 0.00 P & 1.00 I & 3.46 I & 0.00 P \\
-Impact Recovery & $\geq$41.11 I & 36.94 F & \textbf{0 P} & -- I & 0.00 P & -- I & 0.00 P \\
-Passive Tip Suppression & 254.39 Q & 32.16 Q & \textbf{0 P} & -- I & -- I & -- I & 0.00 P \\
+Multi-target Reach & 15.13 & 22.22 & 0.00 $\checkmark$ & \textsc{n/a} & 3.96 & 0.00 $\checkmark$ & 0.00 $\checkmark$ \\
+Loaded Hold & $\geq$19.34 & \textsc{n/a} & 0.00 $\checkmark$ & 0.00 $\checkmark$ & \textsc{n/a} & 0.00 $\checkmark$ & 0.00 $\checkmark$ \\
+Fast Reach & 16.09 & 0.00 $\checkmark$ & 0.00 $\checkmark$ & 0.07 & 0.00 $\checkmark$ & 0.28 & 0.00 $\checkmark$ \\
+Figure-eight Tracking & 6.05 & 566.37 & 0.00 $\checkmark$ & \textsc{n/a} & \textsc{n/a} & 0.00 $\checkmark$ & 0.00 $\checkmark$ \\
+Tool Alignment & 1.76 & 0.00 $\checkmark$ & 0.00 $\checkmark$ & 3.78 & 0.00 $\checkmark$ & 0.00 $\checkmark$ & 0.00 $\checkmark$ \\
+Pose Scanning & 2.23 & 12.33 & 0.00 $\checkmark$ & 0.00 $\checkmark$ & 0.00 $\checkmark$ & 0.00 $\checkmark$ & 0.00 $\checkmark$ \\
+Shared Morphology & 10.38 & 13.23 & 0.00 $\checkmark$ & \textsc{n/a} & 0.00 $\checkmark$ & \textsc{n/a} & 0.00 $\checkmark$ \\
+Progressive Stiffness & \textsc{n/a} & 0.05 & 0.00 $\checkmark$ & \textsc{n/a} & 0.00 $\checkmark$ & 0.00 $\checkmark$ & 0.00 $\checkmark$ \\
+Button Press & 3.45 & 4.45 & 0.00 $\checkmark$ & 0.00 $\checkmark$ & 1.00 & 3.46 & 0.00 $\checkmark$ \\
+Impact Recovery & $\geq$41.11 & 36.94 & 0.00 $\checkmark$ & \textsc{n/a} & 0.00 $\checkmark$ & \textsc{n/a} & 0.00 $\checkmark$ \\
+Passive Tip Suppression & 254.39 & 32.16 & 0.00 $\checkmark$ & \textsc{n/a} & \textsc{n/a} & \textsc{n/a} & 0.00 $\checkmark$ \\
 \midrule
-Pass rate & 0/11 & 2/11$^\dagger$ & \textbf{11/11} & 3/11 & 6/11 & 6/11 & 11/11 \\
+Completed tasks & 0/11 & 2/11 & \textbf{11/11} & 3/11 & 6/11 & 6/11 & \textbf{11/11} \\
+Completion rate & 0.0\% & 18.2\% & \textbf{100.0\%} & 27.3\% & 54.5\% & 54.5\% & \textbf{100.0\%} \\
 \bottomrule
 \end{tabular}}
-\vspace{2pt}
-\par\noindent\scriptsize P: pass; F: physical failure; Q: qualification failure; I: incomplete or not selected; B: documented budget exhaustion. A dash means no complete-protocol magnitude is available; $\geq$ is a documented partial lower bound. $^\dagger$Two Direct Tools passes use documented protocol variants (strict frozen-protocol passes: 0/11). K/S cells use the best complete-protocol result for one structure and formal SELECT for pass; where the termination reason is unrecorded we do not infer exhaustion. Historical FULL and the current K/S studies differ in model, protocol, and execution history; this is not a randomized comparison.
+\par\smallskip\noindent\footnotesize \textsc{n/a}: unavailable violation; $\geq$: lower bound.
 \end{table*}

@@ -1,11 +1,17 @@
 \section{Problem Formulation}
 \label{sec:formulation}
-We consider tendon-driven soft robots whose morphology and control must jointly satisfy a task. The design is
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig01_research_framework.pdf}
+\caption{Physics-grounded agentic research framework for a tendon-driven soft-robot family. The Main Agent converts task and physical observations into a research intent. Deterministic projection and registry binding compile this intent into a parameterized physical research problem. Complementary M0--M3 analysis views produce mathematical evidence, while candidate refinement is independently evaluated through active or passive physical execution. Both evidence paths are stored and returned to the Main Agent; the Reporter provides read-only interpretation.}
+\label{fig:research-framework}
+\end{figure*}
+We consider a family of tendon-driven soft robots whose morphology and control must jointly satisfy a task. The design is
 \begin{equation}
 d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},d_{\mathrm{route}},d_{\mathrm{assembly}})\in\Dspace,
 \label{eq:design}
 \end{equation}
-including topology, geometry, material, tendon routing, and assembly settings. Controller parameters $\theta$ and the actuation sequence $U=(u_0,\ldots,u_{N-1})$ are optimized alongside this structure.
+where $\Dspace$ is the admissible design space of this tendon-driven family, including topology, geometry, material, tendon routing, and assembly settings. Controller parameters $\theta$ and the actuation sequence $U=(u_0,\ldots,u_{N-1})$ are optimized alongside this structure.
 
 A task contract $\tau$ specifies the initial condition, targets, loads, horizon, and acceptance criteria. For active execution, its signed normalized constraint residuals satisfy
 \begin{equation}
