@@ -56,6 +56,7 @@
 \title{PRIME-Soft: Projection of Research Intent\\into Mathematical Execution for Agentic\\Structure--Control Co-Design of\\Tendon-Driven Soft Robots}
 \author{Anonymous Authors}
 \begin{document}
+\raggedbottom
 \setcounter{dbltopnumber}{2}
 \setcounter{topnumber}{1}
 \renewcommand{\dbltopfraction}{0.90}
@@ -67,7 +68,7 @@
 \setlength{\intextsep}{10pt plus 2pt minus 2pt}
 \maketitle
 \begin{abstract}
-Co-design within tendon-driven soft-robot families requires deciding which physical mechanism to investigate as well as how to optimize a candidate. This paper presents \softrobotagent{}, a physics-grounded research harness for agentic structure--control co-design. Its central mechanism projects research intent into executable, task-conditioned mathematical problems. A Main Agent selects hypotheses, parameters, and observables; a parameterized physical research problem binds the resulting intent to a candidate, physical model, analysis semantics, and budget. Complementary views examine mechanism sensitivity, fixed-input response, control-adapted task capability, and closed-loop performance. Deterministic tools update structure and control, and independent evaluation returns evidence for the next decision. Hierarchical context, reusable experience, and a read-only Reporter preserve research continuity. The framework is evaluated on eleven tasks spanning thirty required physical conditions within this family; both full-system model configurations complete all eleven tasks. Representative studies show how mathematical evidence exposes compliance tradeoffs and the need for control adaptation; an eighteen-pair local sensitivity audit has a maximum relative discrepancy of 0.1191\%. Six paired Reporter decisions show two improvements and four ties, while hierarchical context reduces recorded input by more than 80\% at two studied checkpoints.
+Co-design of tendon-driven soft robots requires identifying the physical bottleneck as well as optimizing structure and control. We present \softrobotagent{}, an agentic co-design framework that turns physical observations into research hypotheses and executable mathematical investigations. Its central mechanism projects research intent into a parameterized physical research problem that binds the task, candidate, selected parameters, observables, inner physical model, analysis semantics, and budget. Four complementary views examine mechanism sensitivity, fixed-input response, control-adapted task capability, and closed-loop performance. The resulting evidence informs structural and control updates within an adaptive research loop. Across eleven tasks with thirty required conditions, the recorded full-system portfolio satisfies every condition; the architecture comparison records task completion of 11/11 for the full framework, 2/11 with directly exposed mathematical tools, and 0/11 for LLM-only design. Case studies show how task-conditioned analysis reveals passive compliance tradeoffs and the need to adapt control after a structural change. These results motivate connecting research-question selection to mathematical execution in soft-robot co-design.
 \end{abstract}
 \begin{IEEEkeywords}
 Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic research, scientific reasoning, sensitivity analysis, physical evidence.
@@ -78,11 +79,13 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \input{sections/04_method}
 \input{sections/06_experimental_setup}
 \input{sections/07_results}
+% Hardware section reserved for the ongoing experiments.
+% \input{sections/08_real_world_validation}
 \input{sections/09_discussion}
 \input{sections/10_conclusion}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
-\par\bigskip
+\clearpage
 \appendices
 \setcounter{figure}{0}
 \renewcommand{\thefigure}{S\arabic{figure}}
@@ -90,10 +93,9 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \setcounter{table}{0}
 \renewcommand{\thetable}{S\arabic{table}}
 \renewcommand{\theHtable}{S\arabic{table}}
-\input{appendices/F_mathematical_details}
-\input{appendices/A_experiment_protocol}
-\input{appendices/B_additional_task_portfolio}
+\input{appendices/A_mathematical_details}
+\input{appendices/B_architecture_protocol}
+\input{appendices/C_task_portfolio}
 \input{appendices/D_architecture_ablation_protocol}
 \input{appendices/E_cross_model_resource_profile}
-\input{appendices/C_evidence_provenance}
 \end{document}

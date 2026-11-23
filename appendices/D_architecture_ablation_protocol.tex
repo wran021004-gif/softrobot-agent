@@ -1,57 +1,13 @@
-\section{Component Decision-Study Protocols}
+\section{Research-Continuity Studies}
 \label{app:architecture-ablations}
+\subsection{Task-Level Knowledge/Skill Comparison}
+The four K/S configurations comprise 44 task cells. Each cell is evaluated against the complete task protocol, and the recorded selection and acceptance determine task completion. Table~\ref{tab:abc-comparison} gives the task outcomes; Appendix~\ref{app:cross-model-profile} reports aggregate workload.
 
-\subsection{Common decision-replay protocol}
+\subsection{Reporter Decision Replay}
+Six matched checkpoints are replayed with the saved Reporter interpretation withheld or included, producing twelve Main Agent sessions. Each pair uses the same task, candidate, and evidence snapshot. An independent model reviews anonymized proposed decisions on five dimensions scored from 0 to 4: physical interpretation, evidence consistency, limitation recognition, research actionability, and decision quality.
 
-The architecture studies use frozen task checkpoints and compare proposed Main Agent decisions under controlled context or component settings. Each replay begins from an isolated session with the same task, candidate, and evidence snapshot for its matched conditions. The unit of evaluation is the proposed next research decision. No replay launches a mathematical worker, candidate search, physical simulation, or hardware execution. Scores therefore characterize research-decision behavior and evidence use, not downstream robot success.
+The equal-weight mean is 3.433 with Reporter OFF and 3.733 with Reporter ON, with two improvements and four ties across the six pairs. Unsupported conclusions occur twice in OFF and zero times in ON. Figure~\ref{fig:research-continuity}A shows the paired scores.
 
-Decisions are anonymized before independent model review. The review rubrics use ordinal scores from 0 to 4. Human verification is retained separately. All reported contrasts are descriptive; no significance test, confidence interval, or population-level causal effect is inferred from one decision per cell or one reviewer per paired set.
-
-\subsection{Reporter ON/OFF}
-
-Six matched checkpoints are included: M1-A, M1-B, M1-C, P3-A, P3-B, and P3-C. Each is replayed with the Reporter interpretation withheld (OFF) or included in the Main context (ON), producing twelve Main sessions and six anonymous paired reviews. The ON condition reuses the six corresponding saved Reporter reports; the study does not regenerate Reporter reports or measure their generation cost.
-
-The five scored dimensions are physical interpretation, evidence consistency, limitation recognition, research actionability, and Main decision quality. The equal-weight mean is 3.433 OFF and 3.733 ON; the paired mean difference is +0.300, the paired median is zero, and the win/tie/loss count is 2/4/0. The mean dimension differences (ON minus OFF) are +0.167, +0.500, +0.167, +0.333, and +0.333. Unsupported conclusions are scored as two in OFF and zero in ON. M1-C concerns a proposed 120-iteration plan against a frozen 100-iteration budget and an unsupported initialization assumption. P3-A concerns the missing directional tendon-ablation comparison required to distinguish a passive mechanism. These are illustrative cases within the six pairs.
-
-Main Provider usage is unavailable. Local visible-context token counts are estimates and are not verified against the model tokenizer, hidden reasoning, or billing. The current ON/OFF sessions issue no new Reporter-generation requests.
-
-\subsection{Original Knowledge/Skill factorial replay}
-
-The original experiment is a $2\times2$ factorial design with Knowledge (K) and Skill (S) as binary factors. For each task, the four conditions are K$-$S$-$, K$+$S$-$, K$-$S$+$, and K$+$S$+$. One Main decision is collected per cell for Figure-eight Tracking and Shared Morphology, giving eight decisions and two joint blind reviews.
-
-For a metric $y$, the descriptive main effects and interaction contrast are
-\begin{align}
-E_K &= \frac{(y_{10}-y_{00})+(y_{11}-y_{01})}{2},\\
-E_S &= \frac{(y_{01}-y_{00})+(y_{11}-y_{10})}{2},\\
-I_{KS} &= y_{11}-y_{10}-y_{01}+y_{00}.
-\end{align}
-The corresponding interaction coefficient in a $\{-1,+1\}$-coded regression is $I_{KS}/4$ and is not interchangeable with the difference-in-differences contrast.
-
-For both Figure-eight Tracking and Shared Morphology, historical-experience utilization scores are $(0,3,3,3)$ in the order above. Original decision quality, evidence consistency, and research actionability are 4 in every cell. Thus, $E_K=E_S=+1.5$, $I_{KS}=-3$, and the joint condition equals the best single-resource condition. These are descriptive contrasts from one decision per cell.
-
-\subsection{Supplemental Knowledge/Skill decision replay}
-
-The supplemental replay applies the same four K/S conditions to two frozen checkpoints per task: Figure-eight Tracking checkpoint~216, Figure-eight Tracking checkpoint~220, Shared Morphology checkpoint~074, and Shared Morphology checkpoint~106. It contains sixteen sessions and fifteen valid decisions. The Shared Morphology checkpoint~074 K$+$S$+$ submission exhausts its request budget and remains a failed cell; it is not replaced. A common five-dimensional rubric assesses physical interpretation, evidence consistency, limitation recognition, research actionability, and evidence-reference accuracy. The same five-dimensional rubric is also applied to the original eight E1 decisions. Original four-dimensional E1 scores and historical-experience utilization remain separate.
-
-The supplemental five-dimensional scores vary across checkpoints. The completed Figure-eight Tracking checkpoint~220 is saturated across all four K/S conditions, while Figure-eight Tracking checkpoint~216 and the two Shared Morphology checkpoints show condition-dependent differences. These results do not establish a universal resource effect or synergy. Resource citations can partly reveal access condition, so the semantic blinding is not complete.
-
-\subsection{Historical Flat and hierarchical context studies}
-
-E2 compares Flat and hierarchical context at PHS-C035 using a frozen 66-record corpus. Flat receives the complete corpus; the hierarchical condition receives an automatically assembled L0 brief and a directory for optional retrieval. No additional evidence reads occur. Accepted-inference actual Provider input is 675,802 tokens for Flat and 78,785 for hierarchical context, an 88.342\% reduction. Blind mean scores are 4.0 and 3.8. The hierarchical condition includes an initial HTTP 400 request with no usage, so its all-attempt actual usage is unknown.
-
-E2-R2 is a preregistered follow-up at C037. Flat receives the complete included corpus; the hierarchical condition receives L0 and makes three parallel L3 reads. No L1/L2 reads occur, and all three exact records are delivered before the final decision. C042 is excluded before inference by the preregistered capacity gate and is not replaced. At C037, Flat uses one accepted Main request and 877,197 actual cumulative input tokens; hierarchical context uses two accepted requests and 174,298 tokens, an 80.130\% reduction. Blind mean scores are 3.4 and 3.6, while key-evidence coverage is 5/5 and 3/5. The higher score accompanies lower key-evidence coverage and does not establish a causal effect of individual reads.
-
-\subsection{Cross-task context decision replay}
-
-Six checkpoints are evaluated under Flat and hierarchical delivery: Multi-target Reach checkpoint~127, Figure-eight Tracking checkpoint~216, Shared Morphology checkpoint~074, Progressive Stiffness checkpoint~006, Button Press checkpoint~213, and Impact Recovery checkpoint~222. The protocol contains twelve Main sessions, eleven valid final decisions, one Flat Progressive Stiffness request-budget-exhausted session, and six anonymous paired reviews. The checkpoint corpus and key-evidence checklist are frozen before inference. The review reports decision quality, key-evidence recall, critical omissions, evidence-reference accuracy, unsupported claims, and actionability.
-
-Decision outcomes vary by checkpoint. Shared Morphology checkpoint~074 favors hierarchical context in both blind score and key-evidence recall, whereas Figure-eight Tracking checkpoint~216 and Impact Recovery checkpoint~222 favor Flat on the reported decision score. Progressive Stiffness checkpoint~006 has no valid Flat decision. Provider usage was not returned for these Gateway sessions and remains UNKNOWN. No scientific action follows the replay, so the results do not establish downstream physical improvement or measured cross-task token savings.
-
-\subsection{Token accounting and interpretation boundary}
-
-Provider-returned usage is the primary token measure. Missing usage remains UNKNOWN. A separate post-hoc local text-token reconstruction uses \texttt{o200k\_base} over serialized message content and is reported only as an estimate. Across the six cross-task Context pairs, estimated cumulative input text counts are 1,546,342 for Flat and 280,283 for hierarchical context (81.87\% by ratio of sums). Across the sixteen supplemental K/S sessions, estimated cumulative input/output text counts are 6,125,281/40,932; the Context sessions have corresponding estimates of 1,826,625/25,332. These estimates exclude hidden reasoning, service framing, backend transformations, and billing/cache semantics. Unequal repair requests affect cumulative totals. They do not replace actual Provider usage.
-
-The Reporter and Knowledge/Skill studies measure proposed research decisions and use of stored experience. The context studies measure the relationship between delivery format, decision quality, evidence coverage, and available cost measurements. None of these decision-only replays measures physical task-success improvement.
-
-\subsection{Eleven-task K/S physical outcomes}
-The four K/S configurations comprise 44 task cells in the archived study at commit \texttt{ed1419b012d1a6399776b09c26b3b9c0566ecf33}. Formal SELECT and the full required protocol determine task pass; the best complete-protocol maximum normalized violation is reported when available. A partial-condition result is not a complete task result. Only two nonselected cells explicitly record mathematical or user-time budget exhaustion; remaining nonselected cells do not record a termination reason. Aggregate resource values are reported in Appendix~\ref{app:cross-model-profile}.
+\subsection{Hierarchical Context Replay}
+Flat delivery supplies the checkpoint corpus; hierarchical delivery supplies an L0 brief and access to supporting records. At the load-diagnosis checkpoint, accepted-request input is 675,802 tokens for Flat and 78,785 for hierarchical delivery, with decision scores of 4.0 and 3.8. At the parameter-tradeoff checkpoint, cumulative accepted-request input is 877,197 and 174,298 tokens, with decision scores of 3.4 and 3.6 and key-evidence coverage of 5/5 and 3/5. The reductions are 88.34\% and 80.13\%, respectively (Fig.~\ref{fig:research-continuity}B).
+\input{figures/fig05_research_continuity}

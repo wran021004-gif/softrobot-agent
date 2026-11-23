@@ -1,0 +1,12 @@
+\section{Architecture Comparison Protocol}
+\label{app:abc-protocol}
+\subsection{Interfaces}
+\paragraph{LLM-only}
+The agent generates and revises structures and controls using the frozen task and physical-evaluation feedback. It can set control inputs, execute a candidate, and read its task evaluation.
+\paragraph{Without PPRP}
+This interface adds Jacobian, equilibrium/KKT, finite-difference, and supported optimization operations. The agent constructs the mathematical question and tool request directly.
+\paragraph{Full framework}
+The full interface compiles research intents into task-conditioned problems, routes numerical execution, and returns linked evidence for refinement.
+
+\subsection{Evaluation}
+The comparison comprises eleven tasks and 33 task--configuration records. The reduced-interface runs begin from the task initial conditions and legal design spaces; the full-system column uses the recorded reference portfolio. Acceptance requires completion of every required condition under the task evaluator. The Fast Reach direct-tool record uses the direct-mathematical-only variant, and the Tool Alignment record uses its documented direct-tool variant. Table~\ref{tab:abc-comparison} reports task-level acceptance; Appendix~\ref{app:task-portfolio} defines the corresponding physical quantities.

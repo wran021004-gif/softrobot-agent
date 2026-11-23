@@ -1,0 +1,19 @@
+\begin{table*}[!t]
+\centering
+\caption{Parameterized design space of the tendon-driven soft-robot family: implemented base-only serial configuration.}
+\label{tab:design-space}
+\papertablestyle
+\begin{tabularx}{\textwidth}{@{}>{\itshape}p{0.14\textwidth}!{\color{TraceGray}\vrule width 0.25pt}p{0.24\textwidth}p{0.10\textwidth}Y@{}}
+\toprule
+\normalfont\textbf{Category} & \textbf{Parameter} & \textbf{Type} & \textbf{Domain or assembly rule} \\
+\midrule
+Topology & Segment count; tendon count & Discrete & 1--9 segments; 1--7 tendons; consecutive base-origin spans \\
+Geometry & Segment length; section family and dimensions & Mixed & 60--240~mm generic length; circle, tube, ellipse, rectangle; indexed bounds in Appendix~\ref{app:design-space} \\
+Material & Young's modulus & Continuous & 2--15~MPa per segment \\
+Tendon routing & Radius; guide and anchor station; angular placement & Mixed & Radius 14--23~mm; guide $s\in[0.15,0.75]$; anchor $s\in[0.8,1]$; phase $[-2\pi,2\pi]$; offsets $[-\pi,\pi]$~rad \\
+Assembly & Tendon diameter; force rating; component placement & Mixed & Diameter 0.5--1.2~mm; force limit 1--8~N; guides and connectors at serial boundaries, payload at the tip \\
+\midrule
+Control $(U,\theta)$ & Input sequence; initialization; controller settings & Continuous & Task-specific admissible input; pretension 0--1~N; terminal/holding speed weights 0--1 in the base configuration \\
+\bottomrule
+\end{tabularx}
+\end{table*}
