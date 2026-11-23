@@ -3,10 +3,10 @@
 \subsection{Interfaces}
 \paragraph{LLM-only}
 The agent generates and revises structures and controls using the frozen task and physical-evaluation feedback. It can set control inputs, execute a candidate, and read its task evaluation.
-\paragraph{Without PPRP}
+\paragraph{Direct Mathematical Tools}
 This interface adds Jacobian, equilibrium/KKT, finite-difference, and supported optimization operations. The agent constructs the mathematical question and tool request directly.
 \paragraph{Full framework}
 The full interface compiles research intents into task-conditioned problems, routes numerical execution, and returns linked evidence for refinement.
 
 \subsection{Evaluation}
-The architecture comparison comprises eleven tasks and 33 task--configuration records. All configurations use strictly identical resource-budget ceilings, and every incomplete run terminates because its allocated budget is exhausted. Acceptance requires completion of every required condition under the task evaluator. Table~\ref{tab:abc-comparison} reports task-level acceptance; Appendix~\ref{app:task-portfolio} defines the corresponding physical quantities.
+The architecture comparison comprises eleven tasks and 33 task--configuration records. All configurations use GPT-5.6 Sol and ceilings of 30 mathematical research operations, 30 physical evaluations, and 60 Agent requests per task run, and every incomplete run terminates because its allocated budget is exhausted. Acceptance requires completion of every required condition under the task evaluator. Table~\ref{tab:abc-comparison} reports task-level acceptance; Appendix~\ref{app:task-portfolio} defines the corresponding physical quantities.

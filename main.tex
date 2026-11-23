@@ -27,7 +27,7 @@
 \definecolor{TraceLight}{HTML}{D9DEE2}
 
 \hypersetup{hidelinks,
-  pdftitle={PRIME-Soft: Projection of Research Intent into Mathematical Execution for Agentic Structure-Control Co-Design of Tendon-Driven Soft Robots},
+  pdftitle={PRIME-Soft: Projection of Research Intent into Mathematical Execution for Agentic Structure-Control Co-Design of Tendon-Driven Continuum Robots},
   pdfauthor={Anonymous Authors}}
 \sisetup{detect-all,per-mode=symbol}
 \newcommand{\softrobotagent}{\textnormal{PRIME-Soft}}
@@ -53,14 +53,16 @@
 }
 
 \newcommand{\includeplot}[2]{\IfFileExists{#1}{\includegraphics[width=#2]{#1}}{\fbox{\parbox[c][2.2cm][c]{0.94\linewidth}{\centering Plot asset pending: \texttt{#1}}}}}
-\title{PRIME-Soft: Projection of Research Intent\\into Mathematical Execution for Agentic\\Structure--Control Co-Design of\\Tendon-Driven Soft Robots}
+\title{PRIME-Soft: Projection of Research Intent\\into Mathematical Execution for Agentic\\Structure--Control Co-Design of\\Tendon-Driven Continuum Robots}
 \author{Anonymous Authors}
 \begin{document}
 \raggedbottom
-\setcounter{dbltopnumber}{2}
-\setcounter{topnumber}{1}
+\setcounter{dbltopnumber}{1}
+\setcounter{topnumber}{2}
 \renewcommand{\dbltopfraction}{0.90}
 \renewcommand{\textfraction}{0.15}
+\renewcommand{\dblfloatpagefraction}{0.85}
+\renewcommand{\floatpagefraction}{0.85}
 \setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
 \setlength{\dbltextfloatsep}{12pt plus 2pt minus 2pt}
 \setlength{\floatsep}{10pt plus 2pt minus 2pt}
@@ -68,7 +70,7 @@
 \setlength{\intextsep}{10pt plus 2pt minus 2pt}
 \maketitle
 \begin{abstract}
-Co-design of tendon-driven soft robots requires identifying the physical bottleneck as well as optimizing structure and control. We present \softrobotagent{}, an agentic co-design framework that turns physical observations into research hypotheses and executable mathematical investigations. Its central mechanism projects research intent into a parameterized physical research problem that binds the task, candidate, selected parameters, observables, inner physical model, analysis semantics, and budget. Four complementary views examine mechanism sensitivity, fixed-input response, control-adapted task capability, and closed-loop performance. The resulting evidence informs structural and control updates within an adaptive research loop. Across eleven tasks with thirty required conditions, the recorded full-system portfolio satisfies every condition; the architecture comparison records task completion of 11/11 for the full framework, 2/11 with directly exposed mathematical tools, and 0/11 for LLM-only design. Case studies show how task-conditioned analysis reveals passive compliance tradeoffs and the need to adapt control after a structural change. These results motivate connecting research-question selection to mathematical execution in soft-robot co-design.
+In tendon-driven continuum robots, morphology and tendon routing jointly shape feasible deformation and actuation authority. Autonomous structure--control co-design must identify the physical mechanism underlying a task violation and determine how a structural change should be assessed when control can adapt. To address this challenge, we present \softrobotagent{}, a method for autonomous feasibility discovery through mechanism-guided structure--control co-design. The Main Agent formulates hypotheses about task-limiting physical mechanisms and selects the design parameters, observables, and analysis semantics needed to investigate them. Research-intent projection binds these choices to a parameterized physical research problem (\PPRP{}), enabling deterministic mathematical execution. Mechanism sensitivity characterizes how design changes affect a hypothesized mechanism, while task-capability analysis assesses feasibility across required conditions after control adaptation or equilibrium re-solution. Fixed-input and closed-loop analyses provide complementary views. Mathematical evidence and independent simulation evaluation guide the Main Agent in refining structure, adapting control, or selecting a new investigation. We evaluate \softrobotagent{} on eleven simulated tasks spanning motion control, tool operation, adaptability, and passive mechanics. Under identical per-task resource-budget ceilings, \softrobotagent{} finds feasible structure--control solutions in 11/11 tasks, compared with 2/11 for directly exposed mathematical tools and 0/11 for LLM-only design. Representative cases illustrate spatial compliance shaping, control adaptation on a shared morphology, and the need to assess tendon-force feasibility even when trajectory tracking is accurate.
 \end{abstract}
 \begin{IEEEkeywords}
 Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic research, scientific reasoning, sensitivity analysis, physical evidence.
@@ -79,8 +81,8 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \input{sections/04_method}
 \input{sections/06_experimental_setup}
 \input{sections/07_results}
-% Hardware section reserved for the ongoing experiments.
-% \input{sections/08_real_world_validation}
+% Hardware section reserved for measured experiments.
+\input{sections/08_real_world_validation}
 \input{sections/09_discussion}
 \input{sections/10_conclusion}
 \bibliographystyle{IEEEtran}
@@ -97,5 +99,4 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \input{appendices/B_architecture_protocol}
 \input{appendices/C_task_portfolio}
 \input{appendices/D_architecture_ablation_protocol}
-\input{appendices/E_cross_model_resource_profile}
 \end{document}

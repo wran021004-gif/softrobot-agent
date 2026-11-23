@@ -1,28 +1,27 @@
-\begin{table*}[!t]
+\par\medskip\noindent\begin{minipage}{\columnwidth}
+\makeatletter\def\@captype{table}\makeatother
 \centering
-\caption{Task completion under strictly identical budgets. $\checkmark$: completed; --: budget exhausted. Ours--Sol (K$+$S$+$) is the shared reference.}
+\caption{Feasible task completion under identical per-task budgets. $\checkmark$: all required conditions passed; --: task not completed.}
 \label{tab:abc-comparison}
 \papertablestyle
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}>{\itshape}l!{\color{TraceGray}\vrule width 0.25pt}ccc!{\color{TraceGray}\vrule width 0.25pt}ccc!{\color{TraceGray}\vrule width 0.25pt}c@{}}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}>{\itshape}lccc@{}}
 \toprule
- & \multicolumn{3}{c}{\textbf{Architecture ablation}} & \multicolumn{3}{c}{\textbf{Knowledge/Skill ablation}} & \textbf{Model comparison} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-8}
-\normalfont\bfseries Task & \textbf{LLM-only} & \shortstack{\textbf{Without}\\\textbf{PPRP}} & \shortstack{\textbf{Ours--Sol}\\K$+$S$+$} & \textbf{K$-$S$-$} & \textbf{K$+$S$-$} & \textbf{K$-$S$+$} & \textbf{Ours--Astra} \\
+\normalfont\textbf{Task} & \shortstack{\textbf{LLM-}\\\textbf{only}} & \shortstack{\textbf{Direct Math.}\\\textbf{Tools}} & \textbf{PRIME-Soft} \\
 \midrule
-Multi-target Reach & -- & -- & $\checkmark$ & -- & -- & $\checkmark$ & $\checkmark$ \\
-Loaded Hold & -- & -- & $\checkmark$ & $\checkmark$ & -- & $\checkmark$ & $\checkmark$ \\
-Fast Reach & -- & $\checkmark$ & $\checkmark$ & -- & $\checkmark$ & -- & $\checkmark$ \\
-Figure-eight Tracking & -- & -- & $\checkmark$ & -- & -- & $\checkmark$ & $\checkmark$ \\
-Tool Alignment & -- & $\checkmark$ & $\checkmark$ & -- & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
-Pose Scanning & -- & -- & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
-Shared Morphology & -- & -- & $\checkmark$ & -- & $\checkmark$ & -- & $\checkmark$ \\
-Progressive Stiffness & -- & -- & $\checkmark$ & -- & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
-Button Press & -- & -- & $\checkmark$ & $\checkmark$ & -- & -- & $\checkmark$ \\
-Impact Recovery & -- & -- & $\checkmark$ & -- & $\checkmark$ & -- & $\checkmark$ \\
-Passive Tip Suppression & -- & -- & $\checkmark$ & -- & -- & -- & $\checkmark$ \\
+Multi-target Reach & -- & -- & $\checkmark$ \\
+Loaded Hold & -- & -- & $\checkmark$ \\
+Fast Reach & -- & $\checkmark$ & $\checkmark$ \\
+Figure-eight Tracking & -- & -- & $\checkmark$ \\
+Tool Alignment & -- & $\checkmark$ & $\checkmark$ \\
+Pose Scanning & -- & -- & $\checkmark$ \\
+Shared Morphology & -- & -- & $\checkmark$ \\
+Progressive Stiffness & -- & -- & $\checkmark$ \\
+Button Press & -- & -- & $\checkmark$ \\
+Impact Recovery & -- & -- & $\checkmark$ \\
+Passive Tip Suppression & -- & -- & $\checkmark$ \\
 \midrule
-\normalfont\bfseries Completed tasks & 0/11 & 2/11 & \textbf{11/11} & 3/11 & 6/11 & 6/11 & \textbf{11/11} \\
-\normalfont\bfseries Completion rate & 0.0\% & 18.2\% & \textbf{100.0\%} & 27.3\% & 54.5\% & 54.5\% & \textbf{100.0\%} \\
+\normalfont\textbf{Completed tasks} & 0/11 & 2/11 & \textbf{11/11} \\
+\normalfont\textbf{Completion rate} & 0.0\% & 18.2\% & \textbf{100.0\%} \\
 \bottomrule
 \end{tabular*}
-\end{table*}
+\end{minipage}\par\medskip

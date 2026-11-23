@@ -1,97 +1,118 @@
-\section{Method: Physics-Grounded Agentic Research}
+\section{Method: Task-Conditioned Mechanism-to-Capability Reasoning}
 \label{sec:method}
-
-\subsection{Adaptive Research Loop}
+\subsection{From Task Behavior to a Physical Hypothesis}
 \label{subsec:overall-framework}
-\softrobotagent{} couples scientific decisions with executable physical models of the tendon-driven robot family. The Main Agent maintains a working hypothesis about the current bottleneck and chooses the investigation most relevant to that hypothesis. Its research state is
+The Main Agent interprets task behavior through the deformation and actuation relationships in Section~\ref{sec:formulation}. Its research state is
 \begin{equation}
 s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
 \label{eq:researchstate}
 \end{equation}
-where $\mathcal H_k$ contains the hypotheses, $\mathcal E_k$ the accumulated evidence, and $\mathcal B_k$ the remaining budget. An action can investigate a mechanism, generate a morphology, optimize selected parameters, refine control, or evaluate a candidate. Observations update the hypothesis and determine the next action.
+where $\mathcal H_k$ contains working hypotheses, $\mathcal E_k$ accumulated evidence, and $\mathcal B_k$ the remaining budget. A hypothesis identifies a physical relationship that could explain the current bottleneck and a design change that could alter it. For example, excessive tip motion under a local load motivates examining how tendon-constrained deformation reaches the tip; accurate tracking with excessive tension motivates examining force transmission and control demand.
 
-The layers in Fig.~\ref{fig:research-framework} connect these decisions to deterministic mathematical execution and independent task evaluation. Algorithm~\ref{alg:agent-research} summarizes how the agent selects an investigation, interprets the returned evidence, and updates its research direction.
+The agent selects an investigation whose observables expose the hypothesized relationship and its task consequences. It can investigate a mechanism, generate a morphology, optimize selected parameters, adapt control, or request physical evaluation. The returned evidence updates the hypothesis and the next action. Figure~\ref{fig:research-framework} shows the architecture supporting these decisions, and Algorithm~\ref{alg:agent-research} summarizes their execution.
 
-\subsection{From Research Intent to an Executable Problem}
+\subsection{Projecting a Hypothesis into a Mathematical Problem}
 \label{subsec:pprp}
-A research intent specifies a physical hypothesis, the parameters to investigate, the observables needed to test it, and the requested analysis. In Passive Tip Suppression, for example, the agent may hypothesize that local stiffening reduces motion transfer while retaining compliance near the load. Testing this hypothesis requires both loaded-point and tip displacement, a selected material-parameter direction, and a passive equilibrium model.
-
-The \PPRP{} interface turns these choices into a bound problem:
+The research intent makes the physical hypothesis explicit:
 \begin{equation}
-\mathcal P_k=(\tau,d_k,\Iparam_k,\mathcal O_k,\mathcal F_k,\sigma_k,\mathcal B_k),
+\mathcal R_k=(h_k,\Iparam_k,\mathcal O_k,\sigma_k),
+\label{eq:research-intent}
+\end{equation}
+where $\Iparam_k$ identifies selected parameters, $\mathcal O_k$ the observables, and $\sigma_k$ the analysis semantics. \PPRP{} projects this intent into a bound mathematical problem:
+\begin{equation}
+\begin{aligned}
+\mathcal P_k&=\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)\\
+&=(\tau,d_k,\Iparam_k,\mathcal O_k,\mathcal F_k,\sigma_k,\mathcal B_k),
+\end{aligned}
 \label{eq:pprp}
 \end{equation}
-where $\Iparam_k$ identifies the selected design or control parameters, $\mathcal O_k$ the physical observables, $\mathcal F_k$ the inner physical problem, and $\sigma_k$ the analysis semantics. The task $\tau$, current candidate $d_k$, and budget $\mathcal B_k$ complete the execution context.
+where $\mathcal F_k$ specifies the physical model, operating context, and inner equilibrium, trajectory, or optimization problem. The hypothesis remains associated with the intent and returned evidence.
 
-Projection has three steps. First, parameter and observable registries resolve the requested quantities to model variables, units, and admissible bounds. Second, the compiler instantiates the inner problem and the control treatment specified by $\sigma_k$, then checks their compatibility. Third, the numerical router executes the bound problem and returns the observables, sensitivities or optimized responses, solver status, and operating point. These results enter the next Main Agent decision in Algorithm~\ref{alg:agent-research}.
+Projection gives the hypothesis a testable mathematical meaning through three bindings. \emph{Hypothesis-to-observable binding} selects physical quantities that expose both the proposed mechanism and the task requirements it could affect. A tip-suppression hypothesis therefore pairs tip motion with loaded-point motion. \emph{Parameter-to-model binding} resolves the selected variables and observables to the current candidate's model, units, and admissible design space. \emph{Semantics-to-problem binding} specifies the mathematical object and control treatment: a mechanism indicator in M0, fixed-input response in M1, the condition-aggregated task-violation value with adapted control or re-solved equilibrium in M2, or executed feedback behavior in M3. The first two bindings establish what physical relationship is studied on which candidate; the third determines how its structural influence is assessed in~\eqref{eq:conditioned-sensitivity}.
 
-This binding gives each numerical operation a physical meaning. A stiffness derivative, for example, can describe a mechanism indicator, a fixed-input response, or task capability after control adaptation. Selecting the intended object before numerical execution lets the agent reuse the same parameters and models across different research questions. Section~\ref{subsec:portfolio-results} examines this interface through the comparison with directly exposed mathematical tools.
+The deterministic compiler checks the bindings and analysis applicability before numerical execution. The router then computes the requested observables, sensitivities, or optimized responses and returns their candidate, operating context, solver status, and computational cost. The Main Agent interprets this evidence relative to $h_k$ and selects the next research action. In this way, the agent's choice of what to investigate determines an executable physical problem whose results remain linked to the originating question.
 
-\subsection{Task-Conditioned Mathematical Views}
+\subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
-The same design change can affect a physical mechanism, a prescribed-input response, and achievable task performance differently. Four complementary views make the object of investigation explicit.
-
-\paragraph{M0: Mechanism sensitivity.}
-M0 asks which parameters influence the mechanism in the hypothesis. For a registered indicator $m(d)$, it evaluates $\partial m/\partial d_j$; an example is the tip-motion freedom allowed by the active tendon constraints. Appendix~\ref{app:mathematical-details} gives this indicator's formulation.
-
-\paragraph{M1: Fixed-input response.}
-M1 holds the prescribed actuation $U_0$ fixed and evaluates
+M0 and M2 provide the main connection between a physical hypothesis and a structure--control decision:
 \begin{equation}
-S^{\mathrm{M1}}_{\tau,ij}=\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\right|_{U=U_0}.
+\boxed{\begin{aligned}
+\mathrm{M0}:&\quad S_j^{\mathrm{M0}}=\frac{\partial m_h(d;\chi)}{\partial d_j},\\[3pt]
+\mathrm{M2}:&\quad S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
+\end{aligned}}
+\label{eq:mechanism-capability-sensitivity}
+\end{equation}
+M1 and M3 supply complementary evidence about fixed-input response and closed-loop execution. The four analysis semantics are complementary and selected according to the research question, rather than executed as a fixed sequence.
+
+\paragraph{M0: Mechanism sensitivity}
+M0 evaluates the structural influence on a hypothesis-specific indicator $m_h(d;\chi)$.
+For tendon-constrained tip suppression,~\eqref{eq:m0-indicator} makes the research question explicit: which routing or geometric changes reduce tip-motion freedom while preserving motion near the load? Loaded-equilibrium analysis then relates those directions and material properties to the spatial response required by the task.
+
+\paragraph{M2: Task capability across required conditions}
+M2 investigates $V_{\mathcal Q_\tau}$ in~\eqref{eq:multi-capability} and its local sensitivity. Each active condition adapts its admissible control, while each passive condition re-solves equilibrium. Their maximum identifies the task-limiting conditions on the shared structure. At regular active-condition solutions, envelope sensitivity includes both task constraints and design-dependent actuator limits; passive-condition sensitivities follow the equilibrium response. Appendix~\ref{app:mathematical-details} gives the condition-wise derivatives and their aggregation.
+
+M0 asks whether a structural change can realize the intended physical mechanism; M2 asks whether that change supports feasibility across the required conditions after control adaptation or equilibrium re-solution. Together they connect mechanism-guided directions to candidate structure--control solutions. Independent evaluation determines whether the resulting candidate satisfies all required task constraints.
+
+\paragraph{M1: Fixed-input structural response}
+M1 holds the input $U_0$ fixed and evaluates
+\begin{equation}
+S^{\mathrm{M1}}_{\tau,ij}=\frac{\partial g_{\tau,i}(d,U_0)}{\partial d_j}.
 \label{eq:m1}
 \end{equation}
-This view exposes how a structural change redistributes task constraints before control adapts.
+This separates the structural response to an unchanged input from the benefit of later control adaptation. It helps determine whether a revised morphology calls for a new input rather than immediate rejection.
 
-\paragraph{M2: Re-optimized task capability.}
-M2 asks how achievable task performance changes when control is re-optimized for a modified structure. It investigates $V_\tau(d)$ in~\eqref{eq:capability}; at a regular local solution, envelope sensitivity relates changes in this value to the active task constraints. Appendix~\ref{app:mathematical-details} gives the epigraph formulation and the derivative for design-dependent actuator bounds.
-
-\paragraph{M3: Closed-loop performance.}
-M3 evaluates the executed controller--robot system:
+% Queue the task overview for the page containing the experimental setup.
+\input{figures/fig02_task_portfolio}
+\paragraph{M3: Closed-loop performance}
+M3 investigates executed feedback behavior with joint variables $z=(d,\theta)$:
 \begin{equation}
-J_\tau^{\mathrm{cl}}(d,\theta;\mathcal M_{\mathrm{hi}})=\mathcal J_\tau\bigl(y_{0:N}(d,\theta;\mathcal M_{\mathrm{hi}})\bigr).
+\begin{aligned}
+J_\tau^{\mathrm{cl}}(d,\theta)&=\mathcal J_\tau\bigl(y_{0:N}(d,\theta)\bigr),\\
+S_j^{\mathrm{M3}}&=\frac{\partial J_\tau^{\mathrm{cl}}(d,\theta)}{\partial z_j}.
+\end{aligned}
 \label{eq:m3}
 \end{equation}
-Its sensitivity with respect to $(d,\theta)$ includes the feedback and execution dynamics, providing a view suited to tracking or disturbance recovery.
+Here $y_{0:N}$ is the closed-loop trajectory under the execution model selected by the investigation, and $\mathcal J_\tau$ is the task performance functional. The sensitivity includes feedback and execution dynamics, supporting tracking and disturbance-recovery studies.
 
-The selected view defines the mathematical object; the router chooses its numerical treatment. Analytic or automatic differentiation handles explicit models, implicit differentiation handles regular equilibria, and envelope sensitivity handles optimized values~\cite{bonnans2000perturbation,nocedal2006numerical}. Controlled perturbations and paired comparisons support the corresponding numerical investigations. Derivations, applicability conditions, and the tool interface are collected in Appendix~\ref{app:mathematical-details}.
-
+The selected semantics determine the mathematical object, and the deterministic router applies the corresponding differentiation or optimization method~\cite{bonnans2000perturbation,nocedal2006numerical}. Appendix~\ref{app:mathematical-details} gives the numerical formulations and applicability conditions.
 \subsection{Updating Structure and Control}
 \label{subsec:structure-control-refinement}
+
 The agent translates the mathematical evidence into a refinement action. For a discrete change, it proposes a segment arrangement, cross-section family, tendon routing, or assembly revision; a design compiler instantiates and checks the candidate. For continuous refinement, it selects a parameter subspace, bounds, and task objective, and a deterministic optimizer computes the update. Sensitivities guide the selected variables and directions.
 
-Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. An independent physical evaluator then tests the resulting trajectory or passive equilibrium against the original task contract. The agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question. Algorithm~\ref{alg:agent-research} makes these structural and control operations explicit.
+Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. An independent simulator then tests the resulting trajectory or passive equilibrium against the original task contract. The agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question. Algorithm~\ref{alg:agent-research} summarizes this research loop with $x_k=(d_k,U_k,\theta_k)$ and model registries $\Gamma$. $\operatorname{Agent}_{\mathcal R}$ and $\operatorname{Agent}_a$ denote the Main Agent's intent and action decisions; $\sigma_k=\bot$ denotes an action without mathematical analysis.
 
-\begin{algorithm}[!t]
-\caption{Research-intent-guided co-design}
+\begin{algorithm}[H]
+\caption{Task-conditioned research-intent projection and co-design}
 \label{alg:agent-research}
-\fontsize{8.5}{10}\selectfont
+\fontsize{9}{11}\selectfont
 \begin{algorithmic}[1]
-\Require Task $\tau$, design $d$, control $(U,\theta)$, registries $\mathcal R$, budget $\mathcal B$
-\Ensure Evaluated candidate and linked evidence $\mathcal E$
-\State Initialize hypotheses $\mathcal H$ and evidence $\mathcal E$
-\While{budget remains and research is active}
-  \State Assemble L0 brief; retrieve L1--L3 records as needed
-  \State Main Agent selects research intent $I$
-  \State $e^{\mathrm{math}}\gets\bot$; $e^{\mathrm{phys}}\gets\bot$
-  \If{$I$ requests mathematical investigation}
-    \State $\mathcal P\gets\operatorname{Compile}(I,\tau,d,\mathcal R,\mathcal B)$; check validity
-    \State $e^{\mathrm{math}}\gets\operatorname{AnalyzeOrReturnStatus}(\mathcal P)$
-  \EndIf
-  \State Main Agent selects action $a$ from $(I,\mathcal E,e^{\mathrm{math}})$
-  \State \textbf{if} morphology revision: compile and check design $d$
-  \State \textbf{if} parameter refinement: optimize selected variables of $d$
-  \State \textbf{if} control refinement: synthesize $(U,\theta)$ for $d$
-  \If{physical testing or candidate validation is requested}
-    \State $e^{\mathrm{phys}}\gets\operatorname{IndependentEvaluation}(\tau,d,U,\theta)$
-  \EndIf
-  \State Store $(I,a,d,e^{\mathrm{math}},e^{\mathrm{phys}})$ with linked records
-  \State Request Reporter interpretation when needed
-  \State Update $\mathcal H$, candidate status, L0 brief, and $\mathcal B$
+\Require $\tau,\ x_0=(d_0,U_0,\theta_0),\ \Gamma,\ \mathcal B_0$
+\Ensure $\operatorname{Select}_{\tau}(\mathcal E_k),\ \mathcal E_k$
+\State $k\gets0,\quad s_0\gets(\tau,d_0,\varnothing,\varnothing,\mathcal B_0)$
+\While{$\operatorname{BudgetOK}(\mathcal B_k)\land\neg\operatorname{Accept}_{\tau}(\mathcal E_k)$}
+\State $\mathcal R_k=(h_k,\mathcal I_k,\mathcal O_k,\sigma_k)$
+\Statex \hspace{\algorithmicindent}$\hphantom{\mathcal R_k}\gets\operatorname{Agent}_{\mathcal R}(s_k,x_k)$
+\State $e_k^{\mathrm{math}}\gets\bot,\quad e_k^{\mathrm{sim}}\gets\bot$
+\If{$\sigma_k\neq\bot$}
+  \State $\mathcal F_k\gets\operatorname{Bind}_{\Gamma}(\tau,x_k,\mathcal R_k)$
+  \Statex \hspace{\algorithmicindent}$h_k\mapsto\mathcal O_k,\quad\mathcal I_k\mapsto(d_k,\mathcal F_k),\quad\sigma_k\mapsto\Psi_{\sigma_k}$
+  \State $\mathcal P_k\gets\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)$
+  \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k)$
+\EndIf
+\State $a_k\gets\operatorname{Agent}_{a}(s_k,x_k,\mathcal R_k,e_k^{\mathrm{math}})$
+\State $x_{k+1}\gets\operatorname{Apply}(x_k,a_k)$
+\If{$\mathrm{evaluate}\in a_k$}
+  \State $e_k^{\mathrm{sim}}\gets\operatorname{Eval}_{\mathrm{MuJoCo}}(\tau,x_{k+1})$
+\EndIf
+\State $s_{k+1}\gets\operatorname{Update}(s_k,\mathcal R_k,a_k,$
+\Statex \hspace{\algorithmicindent}$\hphantom{s_{k+1}\gets\operatorname{Update}(}x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{sim}})$
+\State $k\gets k+1$
 \EndWhile
-\State \Return selected evaluated candidate and $\mathcal E$
+\State \Return $\operatorname{Select}_{\tau}(\mathcal E_k),\ \mathcal E_k$
 \end{algorithmic}
 \end{algorithm}
 
 \subsection{Evidence and Context for Research Continuity}
 \label{subsec:research-continuity-method}
-Each decision begins with an L0 brief containing the task, candidate, current findings, research focus, and budget. On-demand retrieval supplies method and registry details (L1), numerical evidence (L2), and original records (L3). Linked records associate each finding with its candidate and computation; Knowledge stores reusable findings and Skill stores procedures. A read-only Reporter interprets completed evidence for the Main Agent's next decision. Component protocols appear in Appendix~\ref{app:architecture-ablations}.
+Each finding remains associated with its originating hypothesis, candidate, analysis semantics, and physical outcome. This lets the next decision recover which relationship was supported and which question remains open. Knowledge retains reusable physical findings, Skill retains research procedures, and hierarchical context retrieves the evidence relevant to the current bottleneck. A read-only Reporter interprets completed evidence for the Main Agent's next decision. These mechanisms preserve the connection between a research question and the evidence used to refine structure and control. Component protocols appear in Appendix~\ref{app:architecture-ablations}.

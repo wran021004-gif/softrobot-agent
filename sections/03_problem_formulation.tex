@@ -1,27 +1,82 @@
 \section{Problem Formulation}
 \label{sec:formulation}
-We consider a family of tendon-driven soft robots whose morphology and control must jointly satisfy a task. The design is
+\subsection{Morphology, Deformation, and Actuation}
+We consider a family of tendon-driven continuum robots with design
 \begin{equation}
 d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},d_{\mathrm{route}},d_{\mathrm{assembly}})\in\Dspace,
 \label{eq:design}
 \end{equation}
-where $\Dspace$ is the admissible design space of this tendon-driven family, including topology, geometry, material, tendon routing, and assembly settings. The input sequence $U=(u_0,\ldots,u_{N-1})$ specifies actuation in the mathematical model, and $\theta$ parameterizes the closed-loop controller. Admissible control choices satisfy $(U,\theta)\in\mathcal C(d,\tau)$. Appendix~\ref{app:design-space} gives the implemented parameterization and its bounds.
-
-A task contract $\tau$ specifies the initial condition, targets, loads, horizon, and acceptance criteria. For active execution, its signed normalized constraint residuals satisfy
+where $\Dspace$ specifies admissible topology, geometry, material, tendon routing, and assembly. Let $q$ denote generalized coordinates. Tendon lengths $\ell(q,d)$ and their Jacobian $J_\ell=\partial\ell/\partial q$ determine the generalized tendon force through virtual work~\cite{rucker2011computing}:
 \begin{equation}
-g_{\tau,i}(d,U)\leq0,\qquad i=1,\ldots,m_\tau.
+Q_{\mathrm{tendon}}=-J_\ell(q,d)^\top T,\qquad
+T\in\mathcal T(q,d).
+\label{eq:tendon-force}
+\end{equation}
+The admissible tension set $\mathcal T$ includes tension-only actuation and force limits. Thus the instantaneous actuation set is
+\begin{equation}
+\mathcal W(q,d)=\{-J_\ell(q,d)^\top T:T\in\mathcal T(q,d)\}.
+\label{eq:actuation-set}
+\end{equation}
+Morphology also determines the elastic and inertial operators $K(q,d)$ and $M(q,d)$. Together, these quantities govern how a load or tendon input produces spatially distributed deformation.
+
+For a locally maintained set $\mathcal A$ of taut, fixed-payout tendon constraints, the first-order deformation space satisfies
+\begin{equation}
+J_{\ell,\mathcal A}\delta q=0,\qquad
+\delta q=Z_{\mathcal A}\eta.
+\label{eq:deformation-space}
+\end{equation}
+Here $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized coordinates. The same internal deformation produces tip and loaded-point motions
+\begin{equation}
+\delta p_{\mathrm{tip}}=J_{\mathrm{tip}}Z_{\mathcal A}\eta,\qquad
+\delta p_{\mathrm{load}}=J_{\mathrm{load}}Z_{\mathcal A}\eta.
+\label{eq:motion-transfer}
+\end{equation}
+The associated mechanism indicators are
+\begin{equation}
+\begin{aligned}
+m_h(d;\chi)&=\|J_{\mathrm{tip}}Z_{\mathcal A}\|_F^2,\\
+r_{\mathrm{load}}(d;\chi)&=\|J_{\mathrm{load}}Z_{\mathcal A}\|_F^2.
+\end{aligned}
+\label{eq:m0-indicator}
+\end{equation}
+The indicator $m_h$ measures the tip-motion component of admissible unit internal deformation, while $r_{\mathrm{load}}$ measures the local motion freedom retained at the loaded point. Reducing $m_h$ while maintaining $r_{\mathrm{load}}\geq r_{\min}$ expresses spatial deformation shaping: suppressing tip motion while retaining motion near the load. Routing shapes these directions; material distribution shapes their loaded response. Appendix~\ref{app:mathematical-details} gives the corresponding equilibrium and compliance relations.
+
+\subsection{Task Capability and Analysis Semantics}
+A frozen task contract $\tau$ specifies initial conditions, targets, loads, horizon, and acceptance criteria. Let $U=(u_0,\ldots,u_{N-1})$ be the input sequence and $\theta$ the feedback-controller parameters. Autonomous feasibility discovery seeks a structure--control pair $(d^*,U^*)$ satisfying all required signed normalized task residuals:
+\begin{equation}
+\begin{aligned}
+d^*\in\Dspace,\quad U^*\in\mathcal U(d^*),\\
+g_{\tau,i}(d^*,U^*)\leq0,\quad \forall i.
+\end{aligned}
 \label{eq:taskconstraints}
 \end{equation}
-The best achievable residual after control adaptation defines the task-capability value
+For shared-morphology tasks with active conditions, feasibility requires one structure and condition-specific admissible controls:
+\begin{equation}
+\begin{aligned}
+&\exists\,d^*\in\Dspace,\ \{U_c\in\mathcal U_c(d^*)\}_{c\in\mathcal Q_\tau}:\\
+&\hspace{2em}g_{c,i}(d^*,U_c)\leq0,\quad\forall c,i.
+\end{aligned}
+\label{eq:shared-feasibility}
+\end{equation}
+The control-adapted task-violation value is
 \begin{equation}
 V_\tau(d)=\inf_{U\in\mathcal U(d)}\max_i g_{\tau,i}(d,U),
 \label{eq:capability}
 \end{equation}
-where $\mathcal U(d)$ specifies admissible actuation. For a passive robot, the applied load $f$ and unilateral tendon constraints determine an equilibrium $q^\star(d,f)$; the corresponding requirements are $g^{\mathrm{pass}}_{\tau,i}(d,q^\star)\leq0$. For required conditions $c\in\mathcal Q_\tau$, define
+where $\mathcal U(d)$ is the admissible input set. At a fixed structure $d$, $V_\tau$ evaluates feasibility after control adaptation; it is an evaluation quantity rather than an outer structural optimization objective. The research goal is to find a feasible pair satisfying~\eqref{eq:taskconstraints}. For passive operation, the applied load and tendon constraints determine an equilibrium $q^\star(d,f)$ and residuals $g^{\mathrm{pass}}_{\tau,i}(d,q^\star)$. Across required conditions $c\in\mathcal Q_\tau$, a shared morphology is evaluated by
 \begin{equation}
-V_{\mathcal Q_\tau}(d)=\max_{c\in\mathcal Q_\tau}v_c(d)\leq0,
+V_{\mathcal Q_\tau}(d)=\max_{c\in\mathcal Q_\tau}v_c(d),
 \label{eq:multi-capability}
 \end{equation}
-where $v_c$ is the control-adapted value for an active condition or the largest passive constraint residual at equilibrium. The same $d$ is shared across conditions, with a separate admissible input $U_c$ for each active condition. The condition-wise formulation appears in Appendix~\ref{app:mathematical-details}.
+where $v_c$ is the control-adapted value for an active condition or the largest passive residual at a re-solved equilibrium. Each active condition may use its own admissible input $U_c$ on the shared structure. A single-condition task is the special case $|\mathcal Q_\tau|=1$. Thus $V_{\mathcal Q_\tau}$ supplies a common task-capability object for active, passive, and shared-morphology investigations. Appendix~\ref{app:mathematical-details} gives the condition-wise formulation.
 
-The research problem is to decide which physical mechanism to investigate and which structural or control update to attempt under a finite budget. The task remains fixed while the candidate, mathematical formulation, and research route evolve. The agent selects the investigation and uses its outcome to choose the next co-design action.
+An investigation specifies an operating context $\chi$: its reference configuration, external load, active tendon set, and control conditions. Its analysis semantics $\sigma$ determine which variables remain fixed and which are recomputed as the design changes. For a selected mathematical object $\Psi_\sigma$, define the local task-conditioned sensitivity
+\begin{equation}
+\mathsf S_j^{(\sigma)}(\tau,d,\chi)
+=\frac{\dd}{\dd d_j}\Psi_\sigma(\tau,d;\chi).
+\label{eq:conditioned-sensitivity}
+\end{equation}
+The derivative follows the state and control treatment prescribed by $\sigma$. The object can be a hypothesis-specific mechanism indicator, a fixed-input task response, a condition-aggregated task-violation value, or closed-loop performance. Thus parameter influence is a property of a specified research question: the task, operating context, observable, and control treatment jointly determine its meaning.
+
+\subsection{Mechanism-to-Capability Research}
+Given a task $\tau$, design $d$, physical context $\chi$, and budget $\mathcal B$, PRIME-Soft pursues autonomous feasibility discovery through mechanism-guided structure--control co-design. It selects a mechanism hypothesis and mathematical investigation, then uses the returned evidence to choose a structural update, control adaptation, or further investigation. The frozen task contract defines acceptance, while the research question determines which physical relationship and analysis semantics guide the next decision.

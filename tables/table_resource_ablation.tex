@@ -1,17 +1,34 @@
 \par\medskip\noindent\begin{minipage}{\columnwidth}
 \makeatletter\def\@captype{table}\makeatother
 \centering
-\caption{Aggregate resource consumption across eleven tasks.}
+\caption{Knowledge/Skill ablation: task completion and aggregate resource consumption across eleven tasks.}
 \label{tab:resource-ablation}
 \papertablestyle
-\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}>{\itshape}l!{\color{TraceGray}\vrule width 0.25pt}rrrr@{}}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}>{\itshape}lcccc@{}}
 \toprule
-\normalfont\textbf{Configuration} & \shortstack{\textbf{Math.}\\\textbf{operations}} & \shortstack{\textbf{Physical}\\\textbf{operations}} & \textbf{\shortstack{Agent\\requests}} & \textbf{Tokens (M)} \\
+\normalfont\textbf{Task / measure} & \textbf{K$-$S$-$} & \textbf{K$+$S$-$} & \textbf{K$-$S$+$} & \textbf{K$+$S$+$} \\
 \midrule
-K$-$S$-$ & 394 & 134 & 513 & 0.56 \\
-K$+$S$-$ & 114 & 104 & 285 & 0.47 \\
-K$-$S$+$ & 167 & 113 & 273 & 0.45 \\
-\normalfont\textbf{K$+$S$+$} & \textbf{73} & \textbf{81} & \textbf{305} & \textbf{0.29} \\
+Multi-target Reach & -- & -- & $\checkmark$ & $\checkmark$ \\
+Loaded Hold & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+Fast Reach & -- & $\checkmark$ & -- & $\checkmark$ \\
+Figure-eight Tracking & -- & -- & $\checkmark$ & $\checkmark$ \\
+Tool Alignment & -- & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+Pose Scanning & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+Shared Morphology & -- & $\checkmark$ & -- & $\checkmark$ \\
+Progressive Stiffness & -- & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+Button Press & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+Impact Recovery & -- & $\checkmark$ & -- & $\checkmark$ \\
+Passive Tip Suppression & -- & -- & -- & $\checkmark$ \\
+\midrule
+\normalfont\textbf{Completed tasks} & 3/11 & 8/11 & 7/11 & \textbf{11/11} \\
+\normalfont\textbf{Completion rate} & 27.3\% & 72.7\% & 63.6\% & \textbf{100.0\%} \\
+\midrule
+\normalfont Mathematical operations & 194 & 114 & 167 & \textbf{73} \\
+\normalfont Physical evaluations & 134 & 104 & 113 & \textbf{81} \\
+\normalfont Agent requests & 513 & 285 & 273 & \textbf{305} \\
+\normalfont Tokens (M) & 0.56 & 0.47 & 0.45 & \textbf{0.29} \\
 \bottomrule
 \end{tabular*}
+\par\smallskip\raggedright\footnotesize
+K denotes Knowledge and S denotes Skill. The symbols $+$ and $-$ indicate that the corresponding component is enabled and disabled, respectively. K$+$S$+$ enables both components. $\checkmark$: all required task conditions passed; --: task not completed.
 \end{minipage}\par\medskip

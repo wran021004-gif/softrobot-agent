@@ -43,18 +43,25 @@ v_c(d)=
 \end{equation}
 The maximum of these condition-wise values gives~\eqref{eq:multi-capability}.
 
-\subsection{Mechanism Indicators}
-With tendon-constraint null-space basis $Z_{\mathcal A}$ and tip Jacobian $J_{\mathrm{tip}}$, the indicator
+
+\subsection{Mechanism Indicators and Loaded Response}
+For the indicators in~\eqref{eq:m0-indicator}, choose $Z_{\mathcal A}$ orthonormal in a fixed, dimensionally scaled generalized-coordinate system. The indicators are invariant to orthogonal changes of null-space basis. The investigation fixes the coordinate scaling and the lower bound $r_{\min}$ on loaded-point motion freedom.
+
+The actual displacement under load also depends on mechanical response. For a stable equilibrium with maintained fixed-payout constraints, let $K_t$ be the tangent stiffness of the constrained Lagrangian. Under a small applied load increment $\delta f$ at the loaded point, define $K_r=Z_{\mathcal A}^\top K_tZ_{\mathcal A}$. When $K_r$ is positive definite, the reduced linear response is
 \begin{equation}
-m(d)=\|J_{\mathrm{tip}}(d)Z_{\mathcal A}(d)\|_F^2
-\label{eq:m0-indicator}
+\begin{aligned}
+\delta q&=Z_{\mathcal A}K_r^{-1}Z_{\mathcal A}^\top J_{\mathrm{load}}^\top\delta f,\\
+\delta p_{\mathrm{tip}}&=J_{\mathrm{tip}}Z_{\mathcal A}K_r^{-1}
+Z_{\mathcal A}^\top J_{\mathrm{load}}^\top\delta f.
+\end{aligned}
+\label{eq:reduced-compliance}
 \end{equation}
-measures local tip-motion freedom under the active tendon constraints. M0 evaluates its sensitivity to the selected structural parameters.
+Thus routing-dependent directions, stiffness along those directions, and load coupling jointly determine motion transfer. This relation connects a kinematic mechanism indicator to the passive task response. The investigation specifies whether the reference configuration is fixed or follows a re-solved equilibrium branch. The active set and rank are locally maintained; derivatives refer to continuous parameters within the selected morphology.
 
 \subsection{Passive equilibrium sensitivity}
 For active set $\mathcal A$, let $w_{\mathcal A}=(q,\mu_{\mathcal A})$ satisfy $F(w_{\mathcal A},d;f)=0$. When the active set is unchanged and $F_w$ is nonsingular, the implicit-function theorem gives $\partial w^\star/\partial d=-F_w^{-1}F_d$. A task metric follows by the chain rule. Loaded and unloaded equilibria are both differentiated for a response relative to an unloaded reference. Active-set transitions require directional or mode-specific analysis.
 
-\subsection{Control-Optimized Sensitivity}
+\subsection{Condition-Wise and Aggregated Task Sensitivity}
 The epigraph form of~\eqref{eq:capability} is
 \begin{equation}
 \min_{U,\rho}\ \rho\quad\text{s.t.}\quad g_{\tau,i}(d,U)\leq\rho\ (\forall i),\quad U\in\mathcal U(d).
@@ -74,6 +81,14 @@ Let $\lambda_i^\star$, $\alpha_j^\star$, and $\beta_j^\star$ denote the optimal 
 \label{eq:envelope-general}
 \end{equation}
 When actuator bounds are independent of the design, the last two terms vanish. The epigraph variable $\rho$ exposes the active task constraints and their multipliers. The relation applies to the regular local solution branch represented by these multipliers.
+
+For M2, the active-condition derivative is applied to each $v_c$ in~\eqref{eq:condition-violation}; passive-condition derivatives use the re-solved equilibrium and its task residuals. Let $\mathcal C^*(d)=\operatorname*{arg\,max}_{c\in\mathcal Q_\tau}v_c(d)$. If a unique condition $c^*$ is limiting and $v_{c^*}$ is differentiable, then $\partial V_{\mathcal Q_\tau}/\partial d_j=\partial v_{c^*}/\partial d_j$. At a tie among differentiable condition values, the directional derivative in a design direction $p$ is
+\begin{equation}
+V_{\mathcal Q_\tau}'(d;p)
+=\max_{c\in\mathcal C^*(d)}\nabla_d v_c(d)^\top p.
+\label{eq:condition-directional-sensitivity}
+\end{equation}
+The same maximum rule applies to tied passive residuals. Smooth sensitivities refer to the selected regular branches; active-set or equilibrium transitions use the corresponding directional or mode-specific analysis.
 
 \subsection{Deterministic Capability Families}
 \label{subsec:research-tools}
