@@ -2,7 +2,7 @@
 \label{sec:results}
 \subsection{Task Completion Across the Robot Family}
 \label{subsec:portfolio-results}
-Table~\ref{tab:abc-comparison} gives the overall task comparison. The full-system reference completes all eleven tasks and satisfies thirty required conditions. The LLM-only and directly exposed mathematical-tool configurations record 0/11 and 2/11 completed tasks, respectively. The complete framework covers motion control, tool operation, multi-condition adaptation, and passive mechanics.
+Table~\ref{tab:abc-comparison} compares task completion under strictly identical resource budgets. The full-system reference completes all eleven tasks and satisfies thirty required conditions. The LLM-only and directly exposed mathematical-tool configurations complete 0/11 and 2/11 tasks, respectively; all unfinished runs terminate upon budget exhaustion. The complete framework covers motion control, tool operation, multi-condition adaptation, and passive mechanics.
 \input{tables/table2_abc_comparison}
 
 This comparison addresses the role of research-intent projection introduced in Section~\ref{subsec:pprp}. Direct tools provide numerical operations; \PPRP{} additionally binds the intended physical question to the candidate, observables, and control treatment. The following cases examine how these choices organize structural and control refinement.
@@ -32,4 +32,4 @@ Shared Morphology demonstrates the role of control treatment in the mathematical
 \label{subsec:architecture-ablation}
 Removing both Knowledge and Skill yields three completed tasks; enabling either alone yields six, and their joint use yields eleven (Table~\ref{tab:abc-comparison}). Across the portfolio, the joint configuration records 73 mathematical operations and 81 physical evaluations, compared with 394 and 134 when both resources are removed. Table~\ref{tab:resource-ablation} in Appendix~\ref{app:cross-model-profile} reports the resource profiles. Reporter interpretation and hierarchical context are examined at the decision level in Appendix~\ref{app:architecture-ablations}.
 
-The complete framework records 11/11 completed tasks with both Sol and Astra. Their workload profiles are provided in Fig.~\ref{fig:astra-sol-resources}. This comparison evaluates the same research interface with two language-model backbones.
+Under the same resource-budget ceilings, the complete framework records 11/11 completed tasks with both Sol and Astra. Their workload profiles are provided in Fig.~\ref{fig:astra-sol-resources}. This comparison evaluates the same research interface with two language-model backbones.
