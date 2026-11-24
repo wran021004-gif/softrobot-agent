@@ -80,39 +80,54 @@ The selected semantics determine the mathematical object, and the deterministic 
 
 The agent translates the mathematical evidence into a refinement action. For a discrete change, it proposes a segment arrangement, cross-section family, tendon routing, or assembly revision; a design compiler instantiates and checks the candidate. For continuous refinement, it selects a parameter subspace, bounds, and task objective, and a deterministic optimizer computes the update. Sensitivities guide the selected variables and directions.
 
-Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. An independent simulator then tests the resulting trajectory or passive equilibrium against the original task contract. The agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question. Algorithm~\ref{alg:agent-research} summarizes this research loop with $x_k=(d_k,U_k,\theta_k)$ and model registries $\Gamma$. $\operatorname{Agent}_{\mathcal R}$ and $\operatorname{Agent}_a$ denote the Main Agent's intent and action decisions; $\sigma_k=\bot$ denotes an action without mathematical analysis.
+Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. An independent simulator then tests the resulting trajectory or passive equilibrium against the original task contract. The agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question. Algorithm~\ref{alg:agent-research} summarizes this research loop with $x_k=(d_k,U_k,\theta_k)$ and model registries $\Gamma$. Each iteration proposes one typed action: mathematical research, structural or control refinement, physical evaluation, selection, or stopping. Mathematical actions carry the research intent $\mathcal R_k$. The harness checks admission before execution and returns check feedback to the next decision.
 
 \begin{algorithm}[H]
-\caption{Task-conditioned research-intent projection and co-design}
+\caption{Gated research-intent projection and co-design}
 \label{alg:agent-research}
 \fontsize{9}{11}\selectfont
 \begin{algorithmic}[1]
 \Require $\tau,\ x_0=(d_0,U_0,\theta_0),\ \Gamma,\ \mathcal B_0$
-\Ensure $\operatorname{Select}_{\tau}(\mathcal E_k),\ \mathcal E_k$
+\Ensure Selected candidate and accumulated evidence
 \State $k\gets0,\quad s_0\gets(\tau,d_0,\varnothing,\varnothing,\mathcal B_0)$
-\While{$\operatorname{BudgetOK}(\mathcal B_k)\land\neg\operatorname{Accept}_{\tau}(\mathcal E_k)$}
-\State $\mathcal R_k=(h_k,\mathcal I_k,\mathcal O_k,\sigma_k)$
-\Statex \hspace{\algorithmicindent}$\hphantom{\mathcal R_k}\gets\operatorname{Agent}_{\mathcal R}(s_k,x_k)$
-\State $e_k^{\mathrm{math}}\gets\bot,\quad e_k^{\mathrm{sim}}\gets\bot$
-\If{$\sigma_k\neq\bot$}
-  \State $\mathcal F_k\gets\operatorname{Bind}_{\Gamma}(\tau,x_k,\mathcal R_k)$
-  \Statex \hspace{\algorithmicindent}$h_k\mapsto\mathcal O_k,\quad\mathcal I_k\mapsto(d_k,\mathcal F_k),\quad\sigma_k\mapsto\Psi_{\sigma_k}$
-  \State $\mathcal P_k\gets\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)$
-  \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k)$
+\While{$\operatorname{BudgetOK}(s_k)\land\neg\operatorname{Terminated}(s_k)$}
+\State $a_k\gets\operatorname{MainAgent}(s_k,x_k)$
+\State $(g_k,r_k)\gets\operatorname{Gate}(s_k,a_k)$
+\State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{sim}}\gets\bot$
+\If{$g_k=1$}
+  \If{$\operatorname{Type}(a_k)=\mathrm{research}$}
+    \State $\mathcal R_k=(h_k,\mathcal I_k,\mathcal O_k,\sigma_k)\gets\operatorname{Intent}(a_k)$
+    \State $\mathcal F_k\gets\operatorname{Bind}_{\Gamma}(\tau,x_k,\mathcal R_k)$
+    \State $\mathcal P_k\gets\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)$
+    \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k)$
+  \ElsIf{$\operatorname{Type}(a_k)\in\{\mathrm{refine},\mathrm{control}\}$}
+    \State $x_{k+1}\gets\operatorname{Apply}(x_k,a_k)$
+  \ElsIf{$\operatorname{Type}(a_k)=\mathrm{evaluate}$}
+    \State $e_k^{\mathrm{sim}}\gets\operatorname{Eval}_{\mathrm{MuJoCo}}(\tau,x_k)$
+  \EndIf
 \EndIf
-\State $a_k\gets\operatorname{Agent}_{a}(s_k,x_k,\mathcal R_k,e_k^{\mathrm{math}})$
-\State $x_{k+1}\gets\operatorname{Apply}(x_k,a_k)$
-\If{$\mathrm{evaluate}\in a_k$}
-  \State $e_k^{\mathrm{sim}}\gets\operatorname{Eval}_{\mathrm{MuJoCo}}(\tau,x_{k+1})$
-\EndIf
-\State $s_{k+1}\gets\operatorname{Update}(s_k,\mathcal R_k,a_k,$
+\State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,g_k,r_k,$
 \Statex \hspace{\algorithmicindent}$\hphantom{s_{k+1}\gets\operatorname{Update}(}x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{sim}})$
 \State $k\gets k+1$
 \EndWhile
-\State \Return $\operatorname{Select}_{\tau}(\mathcal E_k),\ \mathcal E_k$
+\State \Return $\operatorname{Selected}(s_k),\ \mathcal E_k$
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Evidence and Context for Research Continuity}
+\subsection{Persistent Research Harness}
 \label{subsec:research-continuity-method}
+\paragraph{Gated research execution}
+The harness admits proposed actions through deterministic checks of their contracts, applicability, evidence requirements, and available resources. For research state $s_k$ and proposed action $a_k$, define
+\begin{equation}
+\begin{aligned}
+\mathcal G(s_k,a_k)&\in\{0,1\},\\
+\mathcal A_{\mathrm{adm}}(s_k)&=\{a\in\mathcal A(s_k):\mathcal G(s_k,a)=1\}.
+\end{aligned}
+\label{eq:action-admission}
+\end{equation}
+Here $\mathcal A(s_k)$ contains the action types available in the current research state. Contract checks resolve typed inputs and the permitted operation; applicability checks establish candidate identity, model compatibility, and method or execution-protocol requirements. Evidence checks resolve cited records and the scope of the proposed conclusion, while budget checks admit the requested resource allocation.
+
+For mathematical research, admission incorporates the binding and applicability checks in Section~\ref{subsec:pprp}. Design and evaluation actions additionally check candidate parameters and physical inputs; selection and stopping check the corresponding evidence and termination conditions. The gate returns $(g_k,r_k)$, comprising the admission decision and check feedback. Rejected actions return this feedback for a new Main Agent decision. The update in Algorithm~\ref{alg:agent-research} records feedback and resource use, commits admitted selection or stopping decisions, and links completed results to their originating action. An executable experiment can retain its physical interpretation as a working hypothesis; supported conclusions draw on the resulting mathematical evidence and independent task evaluation. Numerical validity checks accompany mathematical results, and independent simulation determines task acceptance.
+
+\paragraph{Persistent research continuity}
 Each finding remains associated with its originating hypothesis, candidate, analysis semantics, and physical outcome. This lets the next decision recover which relationship was supported and which question remains open. Knowledge retains reusable physical findings, Skill retains research procedures, and hierarchical context retrieves the evidence relevant to the current bottleneck. A read-only Reporter interprets completed evidence for the Main Agent's next decision. These mechanisms preserve the connection between a research question and the evidence used to refine structure and control. Component protocols appear in Appendix~\ref{app:architecture-ablations}.
