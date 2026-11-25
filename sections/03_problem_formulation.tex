@@ -5,9 +5,7 @@ We formulate task-conditioned structure--control co-design for tendon-driven con
 
 \subsection{Morphology, Deformation, and Actuation}
 
-In tendon-driven continuum robots, morphology determines both the generalized forces that tendons can transmit and the deformation response of the elastic backbone under external loads. Tendon routing determines the kinematic constraints imposed by taut tendons and the generalized forces they can transmit, while geometry and material distribution determine the stiffness and inertial properties governing deformation under external loads. Consequently, a structural change can alter both the admissible deformation modes and the actuation authority available to realize a task.
-
-We represent a family of tendon-driven continuum robots by a design vector
+We represent a tendon-driven continuum-robot morphology by the design vector
 \begin{equation}
 d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},d_{\mathrm{route}},d_{\mathrm{assembly}})\in\Dspace,
 \label{eq:design}
@@ -37,7 +35,7 @@ where $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized 
 \end{equation}
 These mappings describe how an internal deformation is transferred to task-relevant locations along the robot.
 
-Let $\chi$ denote the operating context, including the reference configuration, external load, active tendon set, and control conditions. The Jacobians and active-set null-space basis are evaluated at the configuration specified by this context. We define two mechanism indicators:
+Let $\chi$ denote the operating context, including the reference configuration, external load, active tendon set, and control conditions. For a physical hypothesis $h$, let $m_h(d;\chi)$ be a scalar mechanism indicator chosen to quantify the hypothesized physical relationship. For example, tendon-constrained tip suppression uses the motion-transfer mappings in~\eqref{eq:motion-transfer}, evaluated at the configuration specified by $\chi$, to define $m_h$ and a companion loaded-point indicator:
 \begin{equation}
 \begin{aligned}
 m_h(d;\chi)&=\|J_{\mathrm{tip}}Z_{\mathcal A}\|_F^2,\\
@@ -45,7 +43,7 @@ r_{\mathrm{load}}(d;\chi)&=\|J_{\mathrm{load}}Z_{\mathcal A}\|_F^2.
 \end{aligned}
 \label{eq:m0-indicator}
 \end{equation}
-The indicator $m_h$ quantifies the tip-motion component of admissible internal deformation, whereas $r_{\mathrm{load}}$ measures the motion freedom retained at the loaded point. For tasks requiring tip stability together with retained deformation freedom near the load, a representative spatial deformation-shaping requirement is to reduce $m_h$ while maintaining $r_{\mathrm{load}}\geq r_{\min}$. Tendon routing shapes the admissible deformation directions, whereas material distribution determines their stiffness and loaded response.
+In this example, $m_h$ quantifies the tip-motion component of admissible internal deformation, whereas $r_{\mathrm{load}}$ measures the motion freedom retained at the loaded point. For tasks requiring tip stability together with retained deformation freedom near the load, a representative spatial deformation-shaping requirement is to reduce $m_h$ while maintaining $r_{\mathrm{load}}\geq r_{\min}$. Tendon routing shapes the admissible deformation directions, whereas material distribution determines their stiffness and loaded response.
 
 \subsection{Task Capability and Structural Influence}
 
@@ -84,15 +82,15 @@ where $V_c$ is the condition-specific counterpart of the active-task value in~\e
 V_{\mathcal Q_\tau}(d)=\max_{c\in\mathcal Q_\tau}v_c(d).
 \label{eq:multi-capability}
 \end{equation}
-This worst-condition measure evaluates the shared morphology across the complete task portfolio, accounting for condition-specific control adaptation and passive equilibrium responses.
+This worst-condition measure evaluates one morphology across the required conditions of task $\tau$, accounting for condition-specific control adaptation and passive equilibrium responses. Cross-task research reuses the research framework across different task contracts. Shared-morphology co-design, exemplified by T07, seeks one structure satisfying multiple prescribed conditions within a task.
 
-Structural influence depends on how the physical state and control variables are treated as the design changes. Let $\theta$ denote feedback-controller parameters and $z_{\mathrm{cl}}=(d,\theta)$ the combined design and controller parameter vector. The differentiated variables are $z=d$ for M0--M2 and $z=z_{\mathrm{cl}}$ for M3. The analysis semantics $\sigma$ specify the state and control treatment associated with a selected research question. For a selected mathematical quantity $\Psi_\sigma$, define the local task-conditioned sensitivity
+Structural influence depends on how the physical state and control variables are treated as the design changes. Let $\theta$ denote feedback-controller parameters and $z_{\mathrm{cl}}=(d,\theta)$ the combined design and controller parameter vector. The differentiated variables are $z=d$ for M0--M2 and $z=z_{\mathrm{cl}}$ for M3. The analysis semantics $\sigma$ specify the state and control treatment associated with a selected research question. For a selected mathematical quantity $\Psi_\sigma$ and continuous parameter $z_j$, define the local task-conditioned sensitivity
 \begin{equation}
 \mathsf S_j^{(\sigma)}(\tau,z,\chi)
 =\frac{\mathrm d}{\mathrm d z_j}\Psi_\sigma(\tau,z;\chi).
 \label{eq:conditioned-sensitivity}
 \end{equation}
-The selected quantity may represent a hypothesis-specific mechanism indicator, a fixed-input task response, a condition-aggregated task-capability value, or closed-loop performance. Its sensitivity follows the state and control treatment specified by $\sigma$. Thus, parameter influence is determined jointly by the task, operating context, observable, and control treatment.
+The selected quantity may represent a hypothesis-specific mechanism indicator, a fixed-input task response, a condition-aggregated task-capability value, or closed-loop performance. The derivative is defined under the selected physical model, the state and control treatment specified by $\sigma$, and the local analysis conditions detailed in Appendix~\ref{app:mathematical-details}. Parameter influence is therefore determined jointly by the task, model, operating context, observable, and control treatment.
 
 Given the frozen task contract $\tau$ and required condition set $\mathcal Q_\tau$, feasibility discovery seeks a morphology $d^*\in\Dspace$ satisfying
 \begin{equation}
