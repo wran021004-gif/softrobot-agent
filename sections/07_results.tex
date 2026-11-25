@@ -1,6 +1,5 @@
 \section{Results}
 \label{sec:results}
-\input{figures/fig03_agent_directed_research}
 \subsection{Feasibility Discovery Across Eleven Tasks}
 \label{subsec:portfolio-results}
 Under the common per-run budget ceilings, \softrobotagent{} completes all eleven tasks, compared with two for Direct Mathematical Tools (Fast Reach and Tool Alignment) and none for LLM-only (Table~\ref{tab:abc-comparison}). The nine additional tasks span all four task families.
@@ -12,7 +11,9 @@ We next trace the structural and control decisions underlying three of these cap
 
 \subsection{Mechanism-Guided Physical Co-Design}
 \label{subsec:process-dissection}
-Figure~\ref{fig:agent-directed-research} traces three research episodes from a physical bottleneck through mathematical investigation to candidate evolution and validation. The quantitative responses explain why the Main Agent retained a structural change, rejected a variant, or redirected research toward control.
+
+\input{figures/fig03_agent_directed_research}
+Figure~\ref{fig:agent-directed-research} summarizes three complementary physical findings: tendon routing shapes spatial compliance, morphology and control jointly determine multi-condition feasibility, and equilibrium-based force generation enables constrained tracking.
 
 \paragraph{Passive Tip Suppression: shaping spatial compliance}
 During the mechanism-guided search for Passive Tip Suppression, an intermediate three-segment layout exposed a mismatch between local and finite-deformation behavior: Jacobian-based analysis predicted a maximum tip-to-loaded-point displacement ratio of 0.0448, whereas the four geometrically valid loading cases reached a maximum ratio of 0.5297; two distal cases also exhibited cable--solid interference. These results motivated joint refinement of guide spacing, structural segmentation, and material stiffness. The resulting passive design routes four tendons through eight physical guide plates under a common fixed payout, passes all ten signed-load conditions, including four held-out cases, and achieves a maximum ratio of 0.1093 while retaining more than 11~mm of loaded-point displacement.
@@ -58,5 +59,5 @@ Hierarchical context addresses the cost of accessing evidence in a long research
 \input{figures/fig05_research_continuity}
 
 \subsection{Evaluation Across LLM Backbones}
-GPT-5.6 Sol and GPT-6 Astra each complete all eleven tasks using the same research-intent interface and common budget ceilings (Table~\ref{tab:model-comparison}). Their recorded workloads differ: Sol uses 73 mathematical operations and 81 physical evaluations, compared with 43 and 47 for Astra; Agent requests are 305 and 179, and token consumption is 0.29~M and 0.11~M, respectively. These runs demonstrate the interface's applicability across the two backbone configurations and quantify their research resource consumption.
+GPT-5.6 Sol and GPT-6 Astra each complete all eleven tasks using the same research-intent interface and common budget ceilings (Table~\ref{tab:model-comparison}). Their recorded workloads differ: Sol uses 73 mathematical operations and 81 physical evaluations, compared with 43 and 47 for Astra; Agent requests are 305 and 179, and token consumption is 0.29~M and 0.11~M, respectively.
 \input{tables/table_model_comparison}
