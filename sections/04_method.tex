@@ -3,16 +3,16 @@
 \subsection{From Task Behavior to a Physical Hypothesis}
 \label{subsec:overall-framework}
 
-Figure~\ref{fig:research-framework} places the Main Agent at the center of \softrobotagent{}'s research decisions. At each decision point, the Main Agent receives the frozen task contract, current candidate, fixed research context, and accumulated feedback, together with relevant research records retrieved through the persistent research harness. It interprets task behavior through the deformation and actuation mechanisms established in Section~\ref{sec:formulation} and selects the physical relationship that should guide the next investigation.
+Figure~\ref{fig:research-framework} places the Main Agent at the center of \softrobotagent{}'s research decisions. At each decision point, the Main Agent receives the frozen task contract, current structure--control candidate, fixed research context, and accumulated feedback, together with relevant research records retrieved through the persistent research harness. It interprets task behavior through the deformation and actuation mechanisms established in Section~\ref{sec:formulation} and identifies the physical relationship most relevant to the current task bottleneck.
 
 Its research state is
 \begin{equation}
-s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
+s_k=(\tau,x_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
 \label{eq:researchstate}
 \end{equation}
-where $\mathcal H_k$ contains working hypotheses, $\mathcal E_k$ contains accumulated evidence, and $\mathcal B_k$ denotes the remaining research budget. A working hypothesis links a task bottleneck to a candidate-dependent physical mechanism and a plausible design intervention. For example, excessive tip motion under a local load motivates investigating how tendon-constrained deformation is transmitted to the tip, whereas accurate tracking accompanied by excessive tendon tension motivates investigating tendon-force transmission and control demand.
+where $x_k=(d_k,U_k,\theta_k)$ denotes the current structure--control candidate, with actuation and feedback variables included as applicable. The set $\mathcal H_k$ contains working physical hypotheses, $\mathcal E_k$ contains accumulated mathematical and physical evidence, and $\mathcal B_k$ denotes the remaining research budget. A working hypothesis relates an observed task bottleneck to a candidate-dependent physical mechanism and identifies the physical relationship to investigate. For example, excessive tip motion under a local load motivates investigating how tendon-constrained deformation is transmitted to the tip, whereas accurate tracking accompanied by excessive tendon tension motivates investigating tendon-force transmission and control demand.
 
-The Main Agent uses the hypothesis to select the next research action. For a mathematical investigation, it specifies the physical hypothesis, selected design parameters, observables, and analysis semantics as a research intent. It may also propose a structural or control refinement or request independent physical evaluation; after reviewing the resulting evidence, it selects a candidate or terminates the investigation when the task contract is satisfied. Mathematical analyses and physical evaluations return distinct evidence to the Main Agent, informing its subsequent research decisions. Algorithm~\ref{alg:agent-research} summarizes the decision logic and its associated research actions.
+The Main Agent selects the next research action according to the hypothesis and available evidence. For a mathematical investigation, it specifies the physical hypothesis, selected design parameters, observables, and analysis semantics as a research intent. It may instead propose a structural or control refinement, request independent physical evaluation, or select a validated candidate and stop the study. The resulting mathematical and physical evidence is returned to the Main Agent, which uses it to select subsequent investigations, retain a candidate, or terminate the study according to the task and research stopping criteria.
 
 \subsection{Projecting a Hypothesis into a Mathematical Problem}
 \label{subsec:pprp}
@@ -98,9 +98,9 @@ Control is adapted through task-specific actuation, trajectory, initialization, 
 \begin{algorithmic}[1]
 \Require $\tau,\ x_0=(d_0,U_0,\theta_0),\ \Gamma,\ \mathcal B_0$
 \Ensure Selected candidate and accumulated evidence
-\State $k\gets0,\quad s_0\gets(\tau,d_0,\varnothing,\varnothing,\mathcal B_0)$
+\State $k\gets0,\quad s_0\gets(\tau,x_0,\varnothing,\varnothing,\mathcal B_0)$
 \While{$\operatorname{BudgetOK}(s_k)\land\neg\operatorname{Terminated}(s_k)$}
-\State $a_k\gets\operatorname{MainAgent}(s_k,x_k)$
+\State $a_k\gets\operatorname{MainAgent}(s_k)$
 \State $(g_k,r_k)\gets\operatorname{Gate}(s_k,a_k)$
 \State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{sim}}\gets\bot$
 \If{$g_k=1$}
