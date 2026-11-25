@@ -1,6 +1,7 @@
 \section{Experimental Setup}
 \label{sec:experimental-setup}
 \subsection{Task Portfolio and Evaluation}
+\input{figures/fig02_task_portfolio}
 We evaluate eleven tendon-driven continuum-robot tasks in four groups: Motion Control, Tool Operation, Adaptability, and Passive Mechanics (Fig.~\ref{fig:task-portfolio}). Each task has a frozen contract specifying initial conditions, targets, loads, tolerances, and acceptance criteria. Shared Morphology uses one structure across four active conditions, and Passive Tip Suppression includes ten signed-loading conditions. Appendix~\ref{app:task-portfolio} gives their metrics and condition-level reporting.
 
 Mathematical investigations bind the candidate to the model needed by the selected physical question. The active-model backend provides a generalized variable strain (GVS) description of bending kinematics, inertia, elasticity, damping, gravity, and tendon force transmission, with CasADi expressions for differentiation and control-oriented analysis. Passive fixed-payout investigations use constrained quasi-static equilibrium and its loaded-response sensitivities. Candidate structures and controls are independently evaluated in \MuJoCo{}, which returns trajectories, physical constraint responses, and task acceptance. The Main Agent uses both mathematical and simulation evidence to select its next research action.

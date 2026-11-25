@@ -43,47 +43,48 @@ Figure~\ref{fig:research-framework} summarizes this path from the Main Agent's r
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
-M0 and M2 provide the main connection between a physical hypothesis and a structure--control decision:
-\begin{equation}
-\boxed{\begin{aligned}
-\mathrm{M0}:&\quad S_j^{\mathrm{M0}}=\frac{\partial m_h(d;\chi)}{\partial d_j},\\[3pt]
-\mathrm{M2}:&\quad S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
-\end{aligned}}
-\label{eq:mechanism-capability-sensitivity}
-\end{equation}
-M1 and M3 supply complementary evidence about fixed-input response and closed-loop execution. The Main Agent selects among these four complementary analysis semantics according to the research question.
+The $\operatorname{Analyze}$ step in Algorithm~\ref{alg:agent-research} evaluates the mathematical quantity specified by the compiled research problem. M0 and M2 provide the main connection between a physical hypothesis and a structure--control decision. M1 and M3 supply complementary evidence about fixed-input response and closed-loop execution. The selected semantics determines which physical response is evaluated and how the state and control variables are treated.
 
 \paragraph{M0: Mechanism sensitivity}
-M0 evaluates the structural influence on a hypothesis-specific indicator $m_h(d;\chi)$.
-For tendon-constrained tip suppression,~\eqref{eq:m0-indicator} makes the research question explicit: which routing or geometric changes reduce tip-motion freedom while preserving motion near the load? Loaded-equilibrium analysis then relates those directions and material properties to the spatial response required by the task.
+M0 evaluates the structural influence on a hypothesis-specific indicator $m_h(d;\chi)$; for tendon-constrained tip suppression, the question is which routing or geometric changes reduce tip-motion freedom while preserving deformation freedom near the load. The local sensitivity is
+\begin{equation}
+S_j^{\mathrm{M0}}=\frac{\partial m_h(d;\chi)}{\partial d_j}.
+\label{eq:m0-sensitivity}
+\end{equation}
+The requirement $r_{\mathrm{load}}(d;\chi)\geq r_{\min}$ preserves loaded-point motion freedom. Both indicators in~\eqref{eq:m0-indicator} describe kinematically admissible deformation directions; actual loaded displacement also depends on stiffness along those directions, as expressed by the reduced-compliance relation in Appendix~\ref{app:mathematical-details}.
 
 \paragraph{M2: Task capability across required conditions}
-M2 investigates $V_{\mathcal Q_\tau}$ in~\eqref{eq:multi-capability} and its local sensitivity. Each active condition adapts its admissible control, while each passive condition re-solves equilibrium. Their maximum identifies the task-limiting conditions on the shared structure. At regular active-condition solutions, envelope sensitivity includes both task constraints and design-dependent actuator limits; passive-condition sensitivities follow the equilibrium response. Appendix~\ref{app:mathematical-details} gives the condition-wise derivatives and their aggregation.
+M2 investigates $V_{\mathcal Q_\tau}$ in~\eqref{eq:multi-capability} and its local sensitivity. Each active condition adapts its admissible control, while each passive condition re-solves equilibrium. The maximum condition-wise violation identifies the task-limiting conditions on the shared structure. The corresponding sensitivity is
+\begin{equation}
+S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
+\label{eq:m2-sensitivity}
+\end{equation}
+At regular active-condition solutions, envelope sensitivity accounts for task constraints and design-dependent actuator limits; passive-condition sensitivities follow the equilibrium response. Appendix~\ref{app:mathematical-details} gives the condition-wise derivatives and their aggregation.
 
-M0 asks whether a structural change can realize the intended physical mechanism; M2 asks whether that change supports feasibility across the required conditions after control adaptation or equilibrium re-solution. Together they connect mechanism-guided directions to candidate structure--control solutions. Independent evaluation determines whether the resulting candidate satisfies all required task constraints.
+M0 asks whether a structural change can realize the intended physical mechanism; M2 asks whether that change supports feasibility across the required conditions after control adaptation or equilibrium re-solution, connecting mechanism-guided directions to candidate structure--control solutions. Independent evaluation determines whether the resulting candidate satisfies all required task constraints.
 
 \paragraph{M1: Fixed-input structural response}
 M1 holds the input $U_0$ fixed and evaluates
 \begin{equation}
-S^{\mathrm{M1}}_{\tau,ij}=\frac{\partial g_{\tau,i}(d,U_0)}{\partial d_j}.
+S^{\mathrm{M1}}_{\tau,ij}=\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\right|_{U=U_0}.
 \label{eq:m1}
 \end{equation}
-This separates the structural response to an unchanged input from the benefit of later control adaptation. It helps determine whether a revised morphology calls for a new input rather than immediate rejection.
+This separates the structural response to an unchanged input from the benefit of later control adaptation. It provides a fixed-input reference for distinguishing direct structural effects from the task-capability changes obtained through control adaptation in M2.
 
-% Queue the task overview for the page containing the experimental setup.
-\input{figures/fig02_task_portfolio}
 \paragraph{M3: Closed-loop performance}
-M3 investigates executed feedback behavior with joint variables $z=(d,\theta)$:
+M3 investigates executed feedback behavior with joint variables $z_{\mathrm{cl}}=(d,\theta)$:
 \begin{equation}
 \begin{aligned}
-J_\tau^{\mathrm{cl}}(d,\theta)&=\mathcal J_\tau\bigl(y_{0:N}(d,\theta)\bigr),\\
-S_j^{\mathrm{M3}}&=\frac{\partial J_\tau^{\mathrm{cl}}(d,\theta)}{\partial z_j}.
+J_\tau^{\mathrm{cl}}(d,\theta;\mathcal M_{\mathrm{hi}})
+&=\mathcal J_\tau\bigl(y_{0:N}(d,\theta;\mathcal M_{\mathrm{hi}})\bigr),\\
+S_j^{\mathrm{M3}}&=\frac{\partial J_\tau^{\mathrm{cl}}(d,\theta;\mathcal M_{\mathrm{hi}})}{\partial(z_{\mathrm{cl}})_j}.
 \end{aligned}
 \label{eq:m3}
 \end{equation}
-Here $y_{0:N}$ is the closed-loop trajectory under the execution model selected by the investigation, and $\mathcal J_\tau$ is the task performance functional. The sensitivity includes feedback and execution dynamics, supporting tracking and disturbance-recovery studies.
+Here $y_{0:N}$ is the closed-loop trajectory under the high-fidelity physical execution model $\mathcal M_{\mathrm{hi}}$ selected by the investigation, and $\mathcal J_\tau$ is the task performance functional. The sensitivity includes feedback and execution dynamics, supporting tracking and disturbance-recovery studies.
 
-The selected semantics determine the mathematical object, and the deterministic router applies a compatible numerical procedure, such as explicit or implicit differentiation, optimal-value sensitivity, or perturbation analysis~\cite{bonnans2000perturbation,nocedal2006numerical}. Appendix~\ref{app:mathematical-details} gives the numerical formulations and applicability conditions.
+Explicit differentiation follows differentiable response maps; implicit differentiation uses regular equilibrium or optimality systems; optimal-value sensitivity uses regular optimized solution branches; and perturbation analysis examines model responses to parameter changes~\cite{bonnans2000perturbation,nocedal2006numerical}. Appendix~\ref{app:mathematical-details} gives the numerical formulations and applicability conditions.
+
 \subsection{Updating Structure and Control}
 \label{subsec:structure-control-refinement}
 
