@@ -1,4 +1,4 @@
-\section{Mathematical Formulations and Tool Interface}
+\section{Mathematical Details}
 \label{app:mathematical-details}
 
 \subsection{Parameterized Design Space}
@@ -13,7 +13,7 @@ Density, bending viscosity, connector and payload inertia, and prototype station
 Throughout the sensitivity formulas, derivatives with respect to $d$ act only on $d_{\mathrm{cont}}$, with $d_{\mathrm{disc}}$ and the local parameterization held fixed. Likewise, design perturbation directions have zero discrete components.
 
 
-\subsection{Passive and Multi-condition Formulations}
+\subsection{Passive Equilibrium and Stability}
 \label{app:passive-stability}
 For a passive fixed-payout robot, the response is determined by its structure, unilateral tendon constraints, and applied load. A quasi-static equilibrium $q^\star_\tau(d,f)$ satisfies
 \begin{equation}
@@ -33,31 +33,12 @@ v^\top K_t v>0\quad\text{for all }v=Z_+\eta\ne0.
 \end{equation}
 This condition implies positive curvature on the critical cone and hence a strict constrained local minimum of potential energy. It also covers weakly active constraints, whose first-order feasible directions form a subset of this null space. Under strict complementarity with tendon constraints only, $Z_+$ reduces to $Z_{\mathcal A}$, and the condition becomes $Z_{\mathcal A}^\top K_tZ_{\mathcal A}\succ0$.
 
-The passive equilibrium solver qualifies a local solution using primal feasibility, stationarity, complementarity, and the minimum reduced-stiffness eigenvalue, together with tendon-force limits and geometric checks. Its initialization selects the local solution; sensitivities refer to that same branch. The passive response is evaluated against
-\begin{equation}
-g^{\mathrm{pass}}_{\tau,i}
-\bigl(d,q^\star_\tau(d,f)\bigr)\leq0.
-\label{eq:passive-constraints-detail}
-\end{equation}
-
-For a set of required conditions $\mathcal Q_\tau=\mathcal Q_{\mathrm{act}}\cup\mathcal Q_{\mathrm{pass}}$, one morphology is shared while each active condition may use its own control sequence. The condition-wise violation is
-\begin{equation}
-v_c(d)=
-\begin{cases}
-\displaystyle\inf_{U_c\in\mathcal U_c(d)}
-\max_i g_{c,i}(d,U_c), & c\in\mathcal Q_{\mathrm{act}},\\[0.8em]
-\displaystyle\max_i g^{\mathrm{pass}}_{c,i}
-\bigl(d,q^\star_c(d,f_c)\bigr), & c\in\mathcal Q_{\mathrm{pass}},
-\end{cases}
-\label{eq:condition-violation-expanded}
-\end{equation}
-The maximum of these condition-wise values gives~\eqref{eq:multi-capability}.
-
+The passive equilibrium solver qualifies a local solution using primal feasibility, stationarity, complementarity, and the minimum reduced-stiffness eigenvalue, together with tendon-force limits and geometric checks. Its initialization selects the local solution; sensitivities refer to that same branch. The resulting equilibrium enters the passive task residuals in~\eqref{eq:passive-constraints}; condition-wise and shared-morphology feasibility follow~\eqref{eq:condition-violation} and~\eqref{eq:multi-capability}.
 
 \subsection{Mechanism Indicators and Loaded Response}
 For the indicators in~\eqref{eq:m0-indicator}, choose $Z_{\mathcal A}$ orthonormal in a fixed, dimensionally scaled generalized-coordinate system. The indicators are invariant to orthogonal changes of null-space basis. The investigation fixes the coordinate scaling and the lower bound $r_{\min}$ on loaded-point motion freedom.
 
-The actual displacement under load also depends on mechanical response. For a stable equilibrium with maintained fixed-payout constraints, let $K_t$ be the tangent stiffness of the constrained Lagrangian. Under a small applied load increment $\delta f$ at the loaded point, define $K_r=Z_{\mathcal A}^\top K_tZ_{\mathcal A}$. When $K_r$ is positive definite, the reduced linear response is
+The actual displacement under load also depends on mechanical response. For a stable equilibrium with maintained fixed-payout constraints, let $K_t$ be the tangent stiffness of the constrained Lagrangian. Under a small applied load increment $\delta f$ at the loaded point, define $K_r=Z_{\mathcal A}^\top K_tZ_{\mathcal A}$. Projecting the linearized equilibrium onto $Z_{\mathcal A}$ gives $K_r\eta=Z_{\mathcal A}^\top J_{\mathrm{load}}^\top\delta f$. When $K_r$ is positive definite, the reduced linear response is
 \begin{equation}
 \begin{aligned}
 \delta q&=Z_{\mathcal A}K_r^{-1}Z_{\mathcal A}^\top J_{\mathrm{load}}^\top\delta f,\\
@@ -70,23 +51,6 @@ Thus routing-dependent directions, stiffness along those directions, and load co
 
 \subsection{Passive equilibrium sensitivity}
 For active set $\mathcal A$, let $w_{\mathcal A}=(q,\mu_{\mathcal A})$ satisfy $F(w_{\mathcal A},d;f)=0$. When the active set is unchanged and $F_w$ is nonsingular, the implicit-function theorem gives $\partial w^\star/\partial d=-F_w^{-1}F_d$. A task metric follows by the chain rule. Loaded and unloaded equilibria are both differentiated for a response relative to an unloaded reference. Active-set transitions require directional or mode-specific analysis.
-
-\begin{table*}[!t]
-\centering
-\caption{Capability-level interface between the Main Agent and deterministic robot tools.}
-\label{tab:tool-action-taxonomy}
-\papertablestyle
-\begin{tabularx}{\textwidth}{@{}>{\itshape}p{0.19\textwidth}!{\color{TraceGray}\vrule width 0.25pt} X X@{}}
-\toprule
-\normalfont\textbf{Capability} & \textbf{Deterministic execution} & \textbf{Main Agent decision} \\
-\midrule
-Structure and modeling & Compile discrete morphology changes and continuous design candidates against the admissible design space & Select the physical mechanism, topology, and parameter group \\
-Mathematical research & Execute registered M0--M3 analyses, validity checks, and numerical optimization & Select the research question, observables, analysis semantics, and budget \\
-Control and trajectory & Solve task-specific actuation, initialization, trajectory, and feedback-control problems & Select the control formulation and decide when control should be re-optimized \\
-Physical evaluation & Execute active dynamics or passive equilibrium and apply the frozen task evaluator & Select direct physical tests and interpret the resulting physical evidence \\
-\bottomrule
-\end{tabularx}
-\end{table*}
 
 \subsection{Condition-Wise and Aggregated Task Sensitivity}
 The epigraph form of~\eqref{eq:capability} is
@@ -116,13 +80,3 @@ V_{\mathcal Q_\tau}'(d;p)
 \label{eq:condition-directional-sensitivity}
 \end{equation}
 The same maximum rule applies to tied passive residuals. Smooth sensitivities refer to the selected regular branches; active-set or equilibrium transitions use the corresponding directional or mode-specific analysis.
-
-\subsection{Deterministic Capability Families}
-\label{subsec:research-tools}
-
-
-Table~\ref{tab:tool-action-taxonomy} summarizes the capability interface. The research interface exposes a compact set of typed tool families. Each family has a deterministic execution contract, while the Main Agent chooses when and why it is used. The interface is organized around research actions rather than a flat list of software APIs.
-
-
-
-The task, parameter, and observable registries provide deterministic bindings for the research interface. They resolve the frozen task contract, legal design variables and bounds, and registered physical quantities with their units and model scope. Before execution, the compiler checks identifiers, units, admissible ranges, and analysis applicability. Each capability returns typed evidence tied to its candidate, model, operating point, validity status, and computational cost. The Main Agent therefore selects research actions at the capability level without managing solver-specific APIs.
