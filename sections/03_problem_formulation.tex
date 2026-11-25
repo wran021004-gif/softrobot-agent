@@ -5,7 +5,7 @@ We formulate task-conditioned structure--control co-design for tendon-driven con
 
 \subsection{Morphology, Deformation, and Actuation}
 
-In tendon-driven continuum robots, morphology influences task behavior through two coupled mechanisms. Tendon routing determines the kinematic constraints imposed by taut tendons and the generalized forces they can transmit, while geometry and material distribution determine the stiffness and inertial properties governing deformation under external loads. Consequently, a structural change can alter both the admissible deformation modes and the actuation authority available to realize a task.
+In tendon-driven continuum robots, morphology determines both the generalized forces that tendons can transmit and the deformation response of the elastic backbone under external loads. Tendon routing determines the kinematic constraints imposed by taut tendons and the generalized forces they can transmit, while geometry and material distribution determine the stiffness and inertial properties governing deformation under external loads. Consequently, a structural change can alter both the admissible deformation modes and the actuation authority available to realize a task.
 
 We represent a family of tendon-driven continuum robots by a design vector
 \begin{equation}
@@ -29,7 +29,7 @@ The same morphology also determines the deformation modes available under tendon
 J_{\ell,\mathcal A}\delta q=0,\qquad \delta q=Z_{\mathcal A}\eta,
 \label{eq:deformation-space}
 \end{equation}
-where $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized coordinates and $\eta$ parameterizes the admissible deformation. The corresponding tip and loaded-point displacements are
+where $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized coordinates and $\eta$ parameterizes the admissible deformation. The coordinate scaling is fixed across candidates within a study. The corresponding tip and loaded-point displacements are
 \begin{equation}
 \delta p_{\mathrm{tip}}=J_{\mathrm{tip}}Z_{\mathcal A}\eta,\qquad
 \delta p_{\mathrm{load}}=J_{\mathrm{load}}Z_{\mathcal A}\eta.
@@ -37,7 +37,7 @@ where $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized 
 \end{equation}
 These mappings describe how an internal deformation is transferred to task-relevant locations along the robot.
 
-We define two mechanism indicators:
+Let $\chi$ denote the operating context, including the reference configuration, external load, active tendon set, and control conditions. The Jacobians and active-set null-space basis are evaluated at the configuration specified by this context. We define two mechanism indicators:
 \begin{equation}
 \begin{aligned}
 m_h(d;\chi)&=\|J_{\mathrm{tip}}Z_{\mathcal A}\|_F^2,\\
@@ -45,11 +45,11 @@ r_{\mathrm{load}}(d;\chi)&=\|J_{\mathrm{load}}Z_{\mathcal A}\|_F^2.
 \end{aligned}
 \label{eq:m0-indicator}
 \end{equation}
-The indicator $m_h$ quantifies the tip-motion component of admissible internal deformation, whereas $r_{\mathrm{load}}$ measures the motion freedom retained at the loaded point. For tasks requiring tip stability together with local compliance, a representative spatial deformation-shaping requirement is to reduce $m_h$ while maintaining $r_{\mathrm{load}}\geq r_{\min}$. Tendon routing shapes the admissible deformation directions, whereas material distribution determines their stiffness and loaded response.
+The indicator $m_h$ quantifies the tip-motion component of admissible internal deformation, whereas $r_{\mathrm{load}}$ measures the motion freedom retained at the loaded point. For tasks requiring tip stability together with retained deformation freedom near the load, a representative spatial deformation-shaping requirement is to reduce $m_h$ while maintaining $r_{\mathrm{load}}\geq r_{\min}$. Tendon routing shapes the admissible deformation directions, whereas material distribution determines their stiffness and loaded response.
 
-\subsection{Task Capability and Analysis Semantics}
+\subsection{Task Capability and Structural Influence}
 
-A frozen task contract $\tau$ specifies initial conditions, targets or reference trajectories, external loads, task horizon, and acceptance criteria. Let $\mathcal Q_\tau$ denote the required operating conditions, partitioned into active and passive conditions as $\mathcal Q_\tau=\mathcal Q_{\mathrm{act}}\cup\mathcal Q_{\mathrm{pass}}$. An operating context $\chi_c$ specifies the reference configuration, external load, active tendon set, and control conditions for each condition $c$.
+A frozen task contract $\tau$ specifies initial conditions, targets or reference trajectories, task observables, external loads, task horizon, and acceptance criteria. Let $\mathcal Q_\tau$ denote the required operating conditions, partitioned into active and passive conditions as $\mathcal Q_\tau=\mathcal Q_{\mathrm{act}}\cup\mathcal Q_{\mathrm{pass}}$. The operating context $\chi_c$ is the condition-specific instance of $\chi$ for each required condition $c$.
 
 For an active task, the physical model maps the morphology and an admissible input sequence $U=(u_0,\ldots,u_{N-1})$ to a task trajectory, from which signed normalized task residuals are evaluated:
 \begin{equation}
@@ -63,7 +63,7 @@ V_\tau(d)=\inf_{U\in\mathcal U(d)}\max_i g_{\tau,i}(d,U),
 \end{equation}
 where $\mathcal U(d)$ is the admissible input set determined by the design-dependent actuator limits. At a fixed morphology, $V_\tau$ quantifies the best attainable task violation after control adaptation. For compact admissible input sets and continuous task residuals, the infimum is attained, and $V_\tau(d)\leq0$ is equivalent to the existence of a satisfying input sequence.
 
-Passive fixed-payout robots exhibit a different task response: their configurations are determined by morphology, unilateral tendon constraints, and applied loads. For a passive condition $c$, let $q_c^\star(d,f_c)$ denote the selected equilibrium under load $f_c$. The corresponding task requirements are expressed as
+Passive fixed-payout robots exhibit a different task response: their configurations are determined by morphology, unilateral tendon constraints, and applied loads. For a passive condition $c$, let $q_c^\star(d,f_c)$ denote the selected stable equilibrium branch under load $f_c$. The corresponding task requirements are expressed as
 \begin{equation}
 g^{\mathrm{pass}}_{c,i}\bigl(d,q_c^\star(d,f_c)\bigr)\leq0.
 \label{eq:passive-constraints}
@@ -86,7 +86,7 @@ V_{\mathcal Q_\tau}(d)=\max_{c\in\mathcal Q_\tau}v_c(d).
 \end{equation}
 This worst-condition measure evaluates the shared morphology across the complete task portfolio, accounting for condition-specific control adaptation and passive equilibrium responses.
 
-Structural influence depends on how the physical state and control variables are treated as the design changes. Let $\theta$ denote feedback-controller parameters and $z=(d,\theta)$ the combined design and controller parameter vector. The analysis semantics $\sigma$ specify the state and control treatment associated with a selected research question. For a selected mathematical quantity $\Psi_\sigma$, define the local task-conditioned sensitivity
+Structural influence depends on how the physical state and control variables are treated as the design changes. Let $\theta$ denote feedback-controller parameters and $z=(d,\theta)$ the combined design and controller parameter vector. For M0--M2, the differentiated variables are structural parameters, whereas M3 may additionally include feedback-controller parameters. The analysis semantics $\sigma$ specify the state and control treatment associated with a selected research question. For a selected mathematical quantity $\Psi_\sigma$, define the local task-conditioned sensitivity
 \begin{equation}
 \mathsf S_j^{(\sigma)}(\tau,z,\chi)
 =\frac{\mathrm d}{\mathrm d z_j}\Psi_\sigma(\tau,z;\chi).
