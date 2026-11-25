@@ -57,7 +57,7 @@
 \author{Anonymous Authors}
 \begin{document}
 \raggedbottom
-\setcounter{dbltopnumber}{1}
+\setcounter{dbltopnumber}{3}
 \setcounter{topnumber}{2}
 \renewcommand{\dbltopfraction}{0.90}
 \renewcommand{\textfraction}{0.15}
@@ -89,6 +89,11 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \bibliography{references}
 \clearpage
 \appendices
+\setlength{\dbltextfloatsep}{8pt plus 1pt minus 1pt}
+\setlength{\dblfloatsep}{6pt plus 1pt minus 1pt}
+% Compact appendix table rows while preserving the shared font size.
+\let\maintablestyle\papertablestyle
+\renewcommand{\papertablestyle}{\maintablestyle\fontsize{8.5}{9}\selectfont\renewcommand{\arraystretch}{1.0}}
 \setcounter{figure}{0}
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\theHfigure}{S\arabic{figure}}
