@@ -2,35 +2,44 @@
 \label{sec:method}
 \subsection{From Task Behavior to a Physical Hypothesis}
 \label{subsec:overall-framework}
-At each research decision point, the Main Agent interprets task behavior in terms of the robot's deformation and actuation mechanisms in Section~\ref{sec:formulation} and selects the physical relationship to investigate. Its research state is
+
+Figure~\ref{fig:research-framework} places the Main Agent at the center of \softrobotagent{}'s research decisions. At each decision point, the Main Agent receives the frozen task contract, current candidate, fixed research context, and accumulated feedback, together with relevant research records retrieved through the persistent research harness. It interprets task behavior through the deformation and actuation mechanisms established in Section~\ref{sec:formulation} and selects the physical relationship that should guide the next investigation.
+
+Its research state is
 \begin{equation}
 s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
 \label{eq:researchstate}
 \end{equation}
-where $\mathcal H_k$ contains working hypotheses, $\mathcal E_k$ accumulated evidence, and $\mathcal B_k$ the remaining budget. A hypothesis identifies a physical relationship that could explain the current bottleneck and a design change that could alter it. For example, excessive tip motion under a local load motivates examining how tendon-constrained deformation reaches the tip; accurate tracking with excessive tension motivates examining force transmission and control demand.
+where $\mathcal H_k$ contains working hypotheses, $\mathcal E_k$ contains accumulated evidence, and $\mathcal B_k$ denotes the remaining research budget. A working hypothesis links a task bottleneck to a candidate-dependent physical mechanism and a plausible design intervention. For example, excessive tip motion under a local load motivates investigating how tendon-constrained deformation is transmitted to the tip, whereas accurate tracking accompanied by excessive tendon tension motivates investigating tendon-force transmission and control demand.
 
-The agent selects an investigation whose observables expose the hypothesized relationship and its task consequences. It can investigate a mechanism, generate a morphology, optimize selected parameters, adapt control, or request physical evaluation. The returned evidence updates the hypothesis and the next action. Figure~\ref{fig:research-framework} shows the architecture supporting these decisions, and Algorithm~\ref{alg:agent-research} summarizes their execution.
+The Main Agent uses the hypothesis to select the next research action. For a mathematical investigation, it specifies the physical hypothesis, selected design parameters, observables, and analysis semantics as a research intent. It may also propose a structural or control refinement or request independent physical evaluation; after reviewing the resulting evidence, it selects a candidate or terminates the investigation when the task contract is satisfied. Mathematical analyses and physical evaluations return distinct evidence to the Main Agent, informing its subsequent research decisions. Algorithm~\ref{alg:agent-research} summarizes the decision logic and its associated research actions.
 
 \subsection{Projecting a Hypothesis into a Mathematical Problem}
 \label{subsec:pprp}
-The research intent makes the physical hypothesis explicit:
+
+For a mathematical investigation, the Main Agent encodes the selected hypothesis as a research intent:
 \begin{equation}
-\mathcal R_k=(h_k,\Iparam_k,\mathcal O_k,\sigma_k),
+\mathcal R_k=(h_k,\mathcal I_k,\mathcal O_k,\sigma_k),
 \label{eq:research-intent}
 \end{equation}
-where $\Iparam_k$ identifies selected parameters, $\mathcal O_k$ the observables, and $\sigma_k$ the analysis semantics.
+where $h_k$ denotes the physical hypothesis, $\mathcal I_k$ identifies the selected design parameters, $\mathcal O_k$ specifies the observables, and $\sigma_k$ selects the analysis semantics.
 
-Research-intent projection defines a parameterized physical research problem (\PPRP{}) with an explicit physical interpretation and applicability scope through three bindings. \emph{Hypothesis-to-observable binding} selects physical quantities that expose both the proposed mechanism and the task requirements it could affect. A tip-suppression hypothesis therefore pairs tip motion with loaded-point motion. \emph{Parameter-to-model binding} resolves the selected variables and observables to the current candidate's model, units, and admissible design space. \emph{Semantics-to-problem binding} specifies the mathematical object and control treatment: a mechanism indicator in M0, fixed-input response in M1, the condition-aggregated task-violation value with adapted control or re-solved equilibrium in M2, or executed feedback behavior in M3. Together, these bindings determine which physical relationship is studied, on which candidate and under which conditions, and how its structural influence is assessed in~\eqref{eq:conditioned-sensitivity}.
+\PPRP{} binds this intent to a candidate-specific mathematical problem through three complementary bindings. \emph{Hypothesis-to-observable binding} selects physical quantities that reveal the proposed mechanism and its consequences for the task contract. A tip-suppression hypothesis, for example, pairs tip displacement with loaded-point displacement, allowing the investigation to assess tip-motion suppression alongside the compliance retained near the load. \emph{Parameter-to-model binding} maps the selected design variables and observables to the current candidate's physical model, parameterization, units, and admissible design ranges. \emph{Semantics-to-problem binding} specifies the mathematical response and the treatment of state and control variables as the design changes. M0 evaluates a hypothesis-specific mechanism indicator; M1 evaluates fixed-input response; M2 evaluates the condition-aggregated task-violation value after control adaptation for active conditions or equilibrium re-solution for passive conditions; and M3 evaluates closed-loop feedback behavior. Together, the three bindings specify the physical quantity to be studied, the candidate and operating context to which it applies, and the control treatment used to assess structural influence.
 
-The resulting research object is compiled into a bound mathematical problem:
+These bindings are compiled into a parameterized physical research problem:
 \begin{equation}
 \begin{aligned}
-\mathcal P_k&=\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)\\
-&=(\tau,d_k,\Iparam_k,\mathcal O_k,\mathcal F_k,\sigma_k,\mathcal B_k),
+\mathcal P_k
+&=\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)\\
+&=(\tau,d_k,\mathcal I_k,\mathcal O_k,\mathcal F_k,\sigma_k),
 \end{aligned}
 \label{eq:pprp}
 \end{equation}
-where $\mathcal F_k$ specifies the physical model, operating context, and inner equilibrium, trajectory, or optimization problem. The hypothesis remains associated with the intent and returned evidence. Deterministic compilation checks the bindings and analysis applicability before numerical execution. Mathematical programs compute the requested observables, sensitivities, or optimized responses and return their candidate, operating context, solver status, and computational cost. The Main Agent interprets this evidence relative to $h_k$ and selects the next research action.
+where $\mathcal F_k$ specifies the bound physical model, operating context, and inner equilibrium, trajectory, or optimization problem. The remaining budget $\mathcal B_k$ constrains numerical execution and is tracked as execution metadata.
+
+Before numerical execution, validity checks verify that the selected parameters and observables are registered, their units and admissible ranges are consistent with the candidate model, and the selected analysis semantics apply to the specified operating context. The differentiation router then dispatches the compiled problem to the numerical procedure required by the selected semantics, including explicit or implicit differentiation, optimal-value sensitivity, or perturbation analysis. The resulting mathematical evidence contains the requested observables, sensitivities, or optimized responses, together with candidate and context identifiers, solver status, and computational cost.
+
+Figure~\ref{fig:research-framework} depicts this mathematical-evidence path from \PPRP{} compilation through validity checks and the differentiation router to mathematical evidence. The Main Agent interprets the returned results relative to $h_k$ and considers them alongside evidence from the independent physical-evaluation path when selecting the next research action.
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
