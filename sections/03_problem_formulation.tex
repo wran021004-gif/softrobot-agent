@@ -10,7 +10,7 @@ We represent a tendon-driven continuum-robot morphology by the design vector
 d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},d_{\mathrm{route}},d_{\mathrm{assembly}})\in\Dspace,
 \label{eq:design}
 \end{equation}
-where $\Dspace$ specifies admissible topology, geometry, material distribution, tendon routing, and assembly configurations. Let $q$ denote generalized coordinates and $\ell(q,d)$ the tendon lengths, with Jacobian $J_\ell=\partial\ell/\partial q$. Through virtual work, tendon tensions generate the generalized force
+where $\Dspace$ specifies admissible topology, geometry, material distribution, tendon routing, and assembly configurations. Let $q$ denote scaled generalized coordinates and $\ell(q,d)$ the tendon lengths, with Jacobian $J_\ell=\partial\ell/\partial q$. Through virtual work, tendon tensions generate the generalized force
 \begin{equation}
 Q_{\mathrm{tendon}}=-J_\ell(q,d)^\top T,\qquad T\in\mathcal T(q,d),
 \label{eq:tendon-force}
@@ -27,7 +27,7 @@ The same morphology also determines the deformation modes available under tendon
 J_{\ell,\mathcal A}\delta q=0,\qquad \delta q=Z_{\mathcal A}\eta,
 \label{eq:deformation-space}
 \end{equation}
-where $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized coordinates and $\eta$ parameterizes the admissible deformation. The coordinate scaling is fixed across candidates within a study. The corresponding tip and loaded-point displacements are
+where $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized coordinates and $\eta$ parameterizes the admissible deformation. All Jacobians use this same coordinate representation, with the scaling fixed across candidates within a study. The corresponding tip and loaded-point displacements are
 \begin{equation}
 \delta p_{\mathrm{tip}}=J_{\mathrm{tip}}Z_{\mathcal A}\eta,\qquad
 \delta p_{\mathrm{load}}=J_{\mathrm{load}}Z_{\mathcal A}\eta.
@@ -59,7 +59,7 @@ A nonpositive residual indicates satisfaction of the corresponding task constrai
 V_\tau(d)=\inf_{U\in\mathcal U(d)}\max_i g_{\tau,i}(d,U),
 \label{eq:capability}
 \end{equation}
-where $\mathcal U(d)$ is the admissible input set determined by the design-dependent actuator limits. At a fixed morphology, $V_\tau$ quantifies the best attainable task violation after control adaptation. For compact admissible input sets and continuous task residuals, the infimum is attained, and $V_\tau(d)\leq0$ is equivalent to the existence of a satisfying input sequence.
+where $\mathcal U(d)$ is the admissible input set determined by the design-dependent actuator limits. At a fixed morphology, $V_\tau$ quantifies the best attainable task violation after control adaptation. For nonempty compact admissible input sets and continuous task residuals, the infimum is attained, and $V_\tau(d)\leq0$ is equivalent to the existence of a satisfying input sequence.
 
 Passive fixed-payout robots exhibit a different task response: their configurations are determined by morphology, unilateral tendon constraints, and applied loads. For a passive condition $c$, let $q_c^\star(d,f_c)$ denote the selected stable equilibrium branch under load $f_c$. The corresponding task requirements are expressed as
 \begin{equation}
@@ -82,7 +82,7 @@ where $V_c$ is the condition-specific counterpart of the active-task value in~\e
 V_{\mathcal Q_\tau}(d)=\max_{c\in\mathcal Q_\tau}v_c(d).
 \label{eq:multi-capability}
 \end{equation}
-This worst-condition measure evaluates one morphology across the required conditions of task $\tau$, accounting for condition-specific control adaptation and passive equilibrium responses. Cross-task research reuses the research framework across different task contracts. Shared-morphology co-design, exemplified by T07, seeks one structure satisfying multiple prescribed conditions within a task.
+This worst-condition measure evaluates one morphology across the required conditions of task $\tau$, accounting for condition-specific control adaptation and passive equilibrium responses.
 
 Structural influence depends on how the physical state and control variables are treated as the design changes. Let $\theta$ denote feedback-controller parameters and $z_{\mathrm{cl}}=(d,\theta)$ the combined design and controller parameter vector. The differentiated variables are $z=d$ for M0--M2 and $z=z_{\mathrm{cl}}$ for M3. The analysis semantics $\sigma$ specify the state and control treatment associated with a selected research question. For a selected mathematical quantity $\Psi_\sigma$ and continuous parameter $z_j$, define the local task-conditioned sensitivity
 \begin{equation}
