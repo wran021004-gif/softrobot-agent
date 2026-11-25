@@ -3,12 +3,12 @@
 \input{figures/fig03_agent_directed_research}
 \subsection{Feasibility Discovery Across Eleven Tasks}
 \label{subsec:portfolio-results}
-Table~\ref{tab:abc-comparison} compares task-level feasibility discovery across eleven tasks under the common per-run budgets. A task is counted as completed when at least one of ten runs finds a structure--control candidate satisfying every required condition of its frozen contract. The complete framework discovers feasible solutions for 11/11 tasks, compared with 2/11 for directly exposed mathematical tools and 0/11 for LLM-only design. These outcomes span motion control, tool operation, adaptation, and passive mechanics.
+Under the common per-run budget ceilings, \softrobotagent{} completes all eleven tasks, compared with two for Direct Mathematical Tools (Fast Reach and Tool Alignment) and none for LLM-only (Table~\ref{tab:abc-comparison}). The nine additional tasks span all four task families.
 \input{tables/table2_abc_comparison}
 
-The resulting candidates exhibit distinct physical capabilities across the portfolio (Table~\ref{tab:physical-portfolio}, Appendix~\ref{app:task-portfolio}). Figure-eight Tracking achieves 0.688~mm RMSE and 1.021~mm maximum error over the full 22-s, two-cycle trajectory while satisfying the task's actuation constraints. Tool Alignment achieves 7.458~mm position error and 0.0518~rad directed tool-axis error. Shared Morphology satisfies all four prescribed conditions with one structure, with a reported position error of 7.920~mm. Passive Tip Suppression satisfies all ten signed-loading conditions while preserving the required local compliance, with a maximum tip-to-loaded-point displacement ratio of 0.1538.
+The resulting task-specific candidates collectively satisfy all 30 required operating conditions (Table~\ref{tab:physical-portfolio}). Figure-eight Tracking achieves a tracking RMSE of 0.688~mm and a maximum error of 1.021~mm over two cycles (22~s) within the prescribed actuation limits. Button Press achieves a depth error of 0.0528~mm and a force error of 0.00247~N. One morphology with condition-specific controls satisfies all four conditions of Shared Morphology. Passive Tip Suppression meets the loaded-point displacement requirements across all ten signed-loading conditions, with a maximum tip-to-loaded-point displacement ratio of 0.1538.
 
-The observed capabilities involve spatial compliance shaping, control adaptation across conditions, and tracking within actuation limits. The following three cases trace how physical observations and mathematical evidence led to the corresponding structural and control decisions.
+We next trace the structural and control decisions underlying three of these capabilities, focusing on tendon-constrained deformation transfer, control-adapted task capability, and admissible tendon-force generation.
 
 \subsection{Mechanism-Guided Physical Co-Design}
 \label{subsec:process-dissection}
