@@ -91,33 +91,31 @@ The Main Agent selects the research objective, the design variables to change, a
 
 Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. The Main Agent may select independent physical evaluation directly as a research action, alongside mathematical analysis. The simulator tests the candidate trajectory or passive equilibrium against the original task contract. The Main Agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question.
 
-Algorithm~\ref{alg:agent-research} summarizes the overall research loop. The Main Agent selects among mathematical investigation, candidate refinement, independent physical evaluation, and candidate selection or termination. \PPRP{} and the selected analysis semantics implement the mathematical research branch, while the refinement and evaluation branches update the candidate and produce physical evidence. The research-state update records the resulting evidence and resource use and refreshes task-relevant context for subsequent decisions.
+Algorithm~\ref{alg:agent-research} summarizes Main-Agent-directed mathematical investigation, candidate refinement, independent physical evaluation, and selection or termination. Here, $\mathcal K$ and $\mathcal S$ denote the harness's Knowledge and Skill, retrieved when a new task begins. The harness records task-scoped evidence and resource use and retains validated physical findings and research procedures for subsequent investigations.
 
 \begin{algorithm}[H]
 \caption{Main-Agent-directed research and structure--control co-design}
 \label{alg:agent-research}
 \fontsize{9}{11}\selectfont
 \begin{algorithmic}[1]
-\Require Frozen task contract $\tau$, initial candidate $x_0$ (possibly empty), registered capabilities $\Gamma$, research budget $\mathcal B_0$
-\Ensure Selected candidate $x^\star$ and accumulated evidence $\mathcal E^\star$
-\State Initialize $k\gets0$, working hypotheses $\mathcal H_0$, and evidence $\mathcal E_0$
-\State $\mathcal C_0\gets\operatorname{Retrieve}(\tau,\mathrm{Knowledge},\mathrm{Skill})$
+\Require $\tau,\ x_0$ (possibly empty), $\Gamma,\ \mathcal B_0$
+\Ensure $x^\star,\ \mathcal E^\star$
+\State $\mathcal C_0\gets\operatorname{Retrieve}(\tau,\mathcal K,\mathcal S)$
+\State $k\gets0,\quad\mathcal H_0,\mathcal E_0\gets\varnothing$
 \State $s_0\gets(\tau,x_0,\mathcal H_0,\mathcal E_0,\mathcal C_0,\mathcal B_0)$
-\While{the budget remains and the study is active}
+\While{budget remains and study is active}
   \State $a_k\gets\operatorname{MainAgent}(s_k)$
-  \If{$a_k$ selects a candidate or stops the study}
-    \State Record the selection or stopping decision in $s_k$
-    \State \textbf{break}
+  \If{$a_k$ is Select/Stop}
+    \State Record decision in $s_k$; \textbf{break}
   \EndIf
   \State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{phys}}\gets\varnothing$
-  \If{mathematical research is selected}
+  \If{$a_k$ is Research}
     \State $\mathcal R_k\gets\operatorname{Intent}(a_k)$
     \State $\mathcal P_k\gets\operatorname{PPRP}(\tau,x_k,\mathcal R_k,\Gamma)$
     \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k;\mathcal B_k)$
-    \Statex \hspace{\algorithmicindent}The selected $\sigma_k$ determines the M0--M3 analysis.
-  \ElsIf{structure or control refinement is selected}
+  \ElsIf{$a_k$ is Refine/Control}
     \State $x_{k+1}\gets\operatorname{Refine}(x_k,a_k)$
-  \ElsIf{physical evaluation is selected}
+  \ElsIf{$a_k$ is Evaluate}
     \State $e_k^{\mathrm{phys}}\gets\operatorname{Evaluate}(\tau,x_k)$
   \EndIf
   \State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{phys}})$
