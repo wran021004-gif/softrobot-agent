@@ -14,32 +14,32 @@ where $x_k=(d_k,U_k,\theta_k)$ denotes the current structure--control candidate,
 
 The Main Agent selects the next research action according to the hypothesis and available evidence. For a mathematical investigation, it specifies the physical hypothesis, selected design parameters, observables, and analysis semantics as a research intent. It may instead propose a structural or control refinement, request independent physical evaluation, or select a validated candidate and stop the study. The resulting mathematical and physical evidence is returned to the Main Agent, which uses it to select subsequent investigations, retain a candidate, or terminate the study according to the task and research stopping criteria.
 
-\subsection{Projecting a Hypothesis into a Mathematical Problem}
+\subsection{Projecting Research Intent into a Task-Specific Mathematical Problem}
 \label{subsec:pprp}
 
-For a mathematical investigation, the Main Agent encodes the selected hypothesis as a research intent:
+Physical insights can inform investigations across tasks, but the associated mathematical problem must be reconstructed for each task. For example, a routing effect observed under passive loading may motivate a routing study in an active reaching task; the task constraints and operating conditions, however, must be reconsidered. The Main Agent therefore formulates a fresh research intent for the current task and candidate:
 \begin{equation}
 \mathcal R_k=(h_k,\mathcal I_k,\mathcal O_k,\sigma_k),
 \label{eq:research-intent}
 \end{equation}
-where $h_k$ denotes the physical hypothesis, $\mathcal I_k$ identifies the selected design parameters, $\mathcal O_k$ specifies the observables, and $\sigma_k$ selects the analysis semantics.
+where $h_k$ states the physical hypothesis, $\mathcal I_k$ identifies the design factors to investigate, $\mathcal O_k$ specifies the relevant physical quantities, and $\sigma_k$ selects the analysis semantics. These choices express the scientific intent of the investigation: the Main Agent determines what physical relationship to study, while \PPRP{} grounds that intent in the current task and candidate.
 
-\PPRP{} binds this intent to a candidate-specific mathematical problem through three complementary bindings. \emph{Hypothesis-to-observable binding} selects physical quantities that reveal the proposed mechanism and its consequences for the task contract. A tip-suppression hypothesis, for example, pairs tip displacement with loaded-point displacement, allowing the investigation to assess tip-motion suppression alongside the compliance retained near the load. \emph{Parameter-to-model binding} maps the selected design variables and observables to the current candidate's physical model, parameterization, units, and admissible design ranges. \emph{Semantics-to-problem binding} specifies the mathematical response and the treatment of state and control variables as the design changes. M0 evaluates a hypothesis-specific mechanism indicator; M1 evaluates fixed-input response; M2 evaluates the condition-aggregated task-violation value after control adaptation for active conditions or equilibrium re-solution for passive conditions; and M3 evaluates closed-loop feedback behavior. Together, the three bindings specify the physical quantity to be studied, the candidate and operating context to which it applies, and the control treatment used to assess structural influence.
+\softrobotagent{} establishes three complementary bindings. In the \emph{hypothesis-to-observable binding}, the Main Agent identifies the physical quantities relevant to $h_k$, and \PPRP{} resolves them to observables defined by the candidate's physical model and operating context. For a tip-suppression hypothesis, for example, $m_h$ is considered together with $r_{\mathrm{load}}$, so reduced tip-motion freedom is assessed while retaining deformation freedom near the load. In the \emph{parameter-to-model binding}, the Main Agent selects the design factors, and \PPRP{} maps them to candidate-specific model parameters and their admissible domains. In the \emph{semantics-to-problem binding}, the Main Agent selects the relevant analysis semantics, and \PPRP{} formulates the corresponding mathematical response, specifying how state, actuation, equilibrium, or feedback variables are treated as the design changes. M0--M3 provide complementary analysis views selected according to the research question, rather than a prescribed sequence.
 
-These bindings are compiled into a parameterized physical research problem:
+The resulting Parameterized Physical Research Problem is
 \begin{equation}
 \begin{aligned}
 \mathcal P_k
-&=\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)\\
-&=(\tau,d_k,\mathcal I_k,\mathcal O_k,\mathcal F_k,\sigma_k),
+&=\operatorname{PPRP}(\tau,x_k,\mathcal R_k,\Gamma)\\
+&=(\tau,d_k,\tilde{\mathcal I}_k,\tilde{\mathcal O}_k,\mathcal F_k,\chi_k,\Psi_{\sigma_k}),
 \end{aligned}
 \label{eq:pprp}
 \end{equation}
-where $\mathcal F_k$ specifies the bound physical model, operating context, and inner equilibrium, trajectory, or optimization problem. The remaining budget $\mathcal B_k$ constrains numerical execution and is tracked as execution metadata.
+where $\Gamma$ denotes the registered parameter, observable, physical-model, and analysis-capability definitions. The resolved sets $\tilde{\mathcal I}_k$ and $\tilde{\mathcal O}_k$ bind the selected design factors and observables to the current candidate. Here, $\mathcal F_k$ is the corresponding physical model, $\chi_k$ specifies the operating context, and $\Psi_{\sigma_k}$ defines the mathematical problem induced by the selected semantics.
 
-Before numerical execution, validity checks verify that the selected parameters and observables are registered, their units and admissible ranges are consistent with the candidate model, and the selected analysis semantics apply to the specified operating context. The differentiation router then dispatches the compiled problem to the numerical procedure required by the selected semantics, including explicit or implicit differentiation, optimal-value sensitivity, or perturbation analysis. The resulting mathematical evidence contains the requested observables, sensitivities, or optimized responses, together with candidate and context identifiers, solver status, and computational cost.
+Before computation, validity checks establish that the selected parameters and observables are defined for the candidate, their physical definitions are consistent with the bound model, and the analysis semantics applies to the specified operating context. The semantics determines the mathematical object to be studied, whereas the numerical procedure depends on the structure and properties of the resulting model problem. A deterministic differentiation router therefore selects a compatible procedure, such as explicit or implicit differentiation, optimal-value sensitivity, or perturbation analysis, subject to the applicable model and regularity conditions.
 
-Figure~\ref{fig:research-framework} depicts this mathematical-evidence path from \PPRP{} compilation through validity checks and the differentiation router to mathematical evidence. The Main Agent interprets the returned results relative to $h_k$ and considers them alongside evidence from the independent physical-evaluation path when selecting the next research action.
+Figure~\ref{fig:research-framework} summarizes this path from the Main Agent's research intent through the three bindings, validity checks, and differentiation router to mathematical evidence returned to the Main Agent. The resulting mathematical evidence records the requested observables, sensitivities, or optimized responses together with their task, candidate, model, and operating-context provenance. The Main Agent interprets this evidence relative to $h_k$ and the task contract, considering it alongside evidence from the independent physical-evaluation path when selecting subsequent research actions. Thus, reusable physical insights inform successive investigations, while each mathematical problem and its resulting evidence remain grounded in the current task and candidate.
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
@@ -111,8 +111,8 @@ Algorithm~\ref{alg:agent-research} summarizes the overall research loop. The Mai
   \State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{phys}}\gets\varnothing$
   \If{mathematical research is selected}
     \State $\mathcal R_k\gets\operatorname{Intent}(a_k)$
-    \State $\mathcal P_k\gets\operatorname{CompilePPRP}(\tau,x_k,\mathcal R_k,\Gamma,\mathcal B_k)$
-    \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k)$
+    \State $\mathcal P_k\gets\operatorname{PPRP}(\tau,x_k,\mathcal R_k,\Gamma)$
+    \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k;\mathcal B_k)$
     \Statex \hspace{\algorithmicindent}The selected $\sigma_k$ determines the M0--M3 analysis.
   \ElsIf{structure or control refinement is selected}
     \State $x_{k+1}\gets\operatorname{Refine}(x_k,a_k)$
