@@ -7,7 +7,7 @@ We evaluate \softrobotagent{} in simulation with a focus on cross-task feasibili
 \input{figures/fig02_task_portfolio}
 The portfolio comprises eleven tasks in four groups: Motion Control, Tool Operation, Adaptability, and Passive Mechanics (Fig.~\ref{fig:task-portfolio}), with 30 required operating conditions in total. Each task has a frozen contract and an admissible design space, with one morphology shared across its required conditions. Appendix~\ref{app:task-portfolio} details the task-specific conditions and evaluation metrics.
 
-Active mathematical investigations use a generalized variable strain (GVS) model with CasADi expressions for dynamics and tendon-force transmission. Passive fixed-payout investigations use constrained quasi-static equilibrium. Independent \MuJoCo{} evaluation returns trajectories, physical constraint responses, and task acceptance. A task is completed when the selected structure--control candidate passes every required condition of its frozen contract.
+The mathematical backends include a generalized variable strain (GVS) model with CasADi expressions for active dynamics and a constrained quasi-static equilibrium formulation for passive fixed-payout systems. Candidate structures and controls are independently evaluated in \MuJoCo{} against the frozen task contracts. A task is counted as completed when the selected candidate satisfies all required conditions.
 
 \subsection{Compared Methods and Research Budgets}
 \label{subsec:setup-comparisons}
