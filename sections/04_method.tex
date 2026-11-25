@@ -2,7 +2,7 @@
 \label{sec:method}
 \subsection{From Task Behavior to a Physical Hypothesis}
 \label{subsec:overall-framework}
-The Main Agent interprets task behavior through the deformation and actuation relationships in Section~\ref{sec:formulation}. Its research state is
+At each research decision point, the Main Agent interprets task behavior in terms of the robot's deformation and actuation mechanisms in Section~\ref{sec:formulation} and selects the physical relationship to investigate. Its research state is
 \begin{equation}
 s_k=(\tau,d_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
 \label{eq:researchstate}
@@ -18,7 +18,11 @@ The research intent makes the physical hypothesis explicit:
 \mathcal R_k=(h_k,\Iparam_k,\mathcal O_k,\sigma_k),
 \label{eq:research-intent}
 \end{equation}
-where $\Iparam_k$ identifies selected parameters, $\mathcal O_k$ the observables, and $\sigma_k$ the analysis semantics. \PPRP{} projects this intent into a bound mathematical problem:
+where $\Iparam_k$ identifies selected parameters, $\mathcal O_k$ the observables, and $\sigma_k$ the analysis semantics.
+
+Research-intent projection defines a parameterized physical research problem (\PPRP{}) with an explicit physical interpretation and applicability scope through three bindings. \emph{Hypothesis-to-observable binding} selects physical quantities that expose both the proposed mechanism and the task requirements it could affect. A tip-suppression hypothesis therefore pairs tip motion with loaded-point motion. \emph{Parameter-to-model binding} resolves the selected variables and observables to the current candidate's model, units, and admissible design space. \emph{Semantics-to-problem binding} specifies the mathematical object and control treatment: a mechanism indicator in M0, fixed-input response in M1, the condition-aggregated task-violation value with adapted control or re-solved equilibrium in M2, or executed feedback behavior in M3. Together, these bindings determine which physical relationship is studied, on which candidate and under which conditions, and how its structural influence is assessed in~\eqref{eq:conditioned-sensitivity}.
+
+The resulting research object is compiled into a bound mathematical problem:
 \begin{equation}
 \begin{aligned}
 \mathcal P_k&=\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)\\
@@ -26,11 +30,7 @@ where $\Iparam_k$ identifies selected parameters, $\mathcal O_k$ the observables
 \end{aligned}
 \label{eq:pprp}
 \end{equation}
-where $\mathcal F_k$ specifies the physical model, operating context, and inner equilibrium, trajectory, or optimization problem. The hypothesis remains associated with the intent and returned evidence.
-
-Projection gives the hypothesis a testable mathematical meaning through three bindings. \emph{Hypothesis-to-observable binding} selects physical quantities that expose both the proposed mechanism and the task requirements it could affect. A tip-suppression hypothesis therefore pairs tip motion with loaded-point motion. \emph{Parameter-to-model binding} resolves the selected variables and observables to the current candidate's model, units, and admissible design space. \emph{Semantics-to-problem binding} specifies the mathematical object and control treatment: a mechanism indicator in M0, fixed-input response in M1, the condition-aggregated task-violation value with adapted control or re-solved equilibrium in M2, or executed feedback behavior in M3. The first two bindings establish what physical relationship is studied on which candidate; the third determines how its structural influence is assessed in~\eqref{eq:conditioned-sensitivity}.
-
-The deterministic compiler checks the bindings and analysis applicability before numerical execution. The router then computes the requested observables, sensitivities, or optimized responses and returns their candidate, operating context, solver status, and computational cost. The Main Agent interprets this evidence relative to $h_k$ and selects the next research action. In this way, the agent's choice of what to investigate determines an executable physical problem whose results remain linked to the originating question.
+where $\mathcal F_k$ specifies the physical model, operating context, and inner equilibrium, trajectory, or optimization problem. The hypothesis remains associated with the intent and returned evidence. Deterministic compilation checks the bindings and analysis applicability before numerical execution. Mathematical programs compute the requested observables, sensitivities, or optimized responses and return their candidate, operating context, solver status, and computational cost. The Main Agent interprets this evidence relative to $h_k$ and selects the next research action.
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
@@ -42,7 +42,7 @@ M0 and M2 provide the main connection between a physical hypothesis and a struct
 \end{aligned}}
 \label{eq:mechanism-capability-sensitivity}
 \end{equation}
-M1 and M3 supply complementary evidence about fixed-input response and closed-loop execution. The four analysis semantics are complementary and selected according to the research question, rather than executed as a fixed sequence.
+M1 and M3 supply complementary evidence about fixed-input response and closed-loop execution. The Main Agent selects among these four complementary analysis semantics according to the research question.
 
 \paragraph{M0: Mechanism sensitivity}
 M0 evaluates the structural influence on a hypothesis-specific indicator $m_h(d;\chi)$.
@@ -78,9 +78,9 @@ The selected semantics determine the mathematical object, and the deterministic 
 \subsection{Updating Structure and Control}
 \label{subsec:structure-control-refinement}
 
-The agent translates the mathematical evidence into a refinement action. For a discrete change, it proposes a segment arrangement, cross-section family, tendon routing, or assembly revision; a design compiler instantiates and checks the candidate. For continuous refinement, it selects a parameter subspace, bounds, and task objective, and a deterministic optimizer computes the update. Sensitivities guide the selected variables and directions.
+The Main Agent selects the research objective, the design variables to change, and the control strategy; deterministic mathematical programs carry out numerical solution, optimization, and validity checks. For a discrete change, the Main Agent proposes a topology, segment count or arrangement, cross-section family, tendon routing, or assembly revision; a design compiler instantiates and checks the candidate. For continuous refinement, it selects a parameter subspace, bounds, and task objective, and a deterministic optimizer computes the update. Sensitivities guide the selected variables and directions.
 
-Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. An independent simulator then tests the resulting trajectory or passive equilibrium against the original task contract. The agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question. Algorithm~\ref{alg:agent-research} summarizes this research loop with $x_k=(d_k,U_k,\theta_k)$ and model registries $\Gamma$. Each iteration proposes one typed action: mathematical research, structural or control refinement, physical evaluation, selection, or stopping. Mathematical actions carry the research intent $\mathcal R_k$. The harness checks admission before execution and returns check feedback to the next decision. $\operatorname{Update}$ records feedback and resource use, commits admitted selection or stopping decisions, and links completed results to their originating action.
+Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. The Main Agent may select independent physical evaluation directly as a research action, alongside mathematical analysis. The simulator tests the candidate trajectory or passive equilibrium against the original task contract. The Main Agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question. Algorithm~\ref{alg:agent-research} summarizes this research loop with $x_k=(d_k,U_k,\theta_k)$ and model registries $\Gamma$. Each iteration proposes one typed action: mathematical research, structural or control refinement, physical evaluation, selection, or stopping. Mathematical actions carry the research intent $\mathcal R_k$. The harness checks admission before execution and returns check feedback to the next decision. $\operatorname{Update}$ records feedback and resource use, commits admitted selection or stopping decisions, and links completed results to their originating action.
 
 \begin{algorithm}[H]
 \caption{Task-conditioned research-intent projection and co-design}
@@ -116,6 +116,6 @@ Control is adapted through task-specific actuation, trajectory, initialization, 
 
 \subsection{Persistent Research Harness}
 \label{subsec:research-continuity-method}
-The harness checks agent-proposed actions against typed operation contracts, evidence requirements, and resource budgets. Admitted actions proceed to execution, while check feedback informs subsequent research decisions. For mathematical actions, $\operatorname{Compile}$ checks model bindings and analysis applicability before numerical execution. Mathematical results undergo numerical validity checks, and independent simulation evaluates candidate solutions against the task contract.
+The persistent research harness maintains provenance-linked records across successive investigations, connecting each physical hypothesis to its candidate design, model and operating context, selected analysis semantics, mathematical findings, and independent physical outcomes. Mathematical analyses and simulation evaluations remain distinct evidence sources associated with the same research question and candidate, preserving their respective origins and applicability scopes.
 
-Each finding remains associated with its originating hypothesis, candidate, analysis semantics, and physical outcome. This lets the next decision recover which relationship was supported and which question remains open. Knowledge retains reusable physical findings, Skill retains research procedures, and hierarchical context retrieves the evidence relevant to the current bottleneck. A read-only Reporter interprets completed evidence for the Main Agent's next decision. These mechanisms preserve the connection between a research question and the evidence used to refine structure and control. Component protocols appear in Appendix~\ref{app:architecture-ablations}.
+Typed action contracts and resource checks govern research execution and maintain the association between each admitted action and its resulting evidence. Knowledge retains reusable physical findings, while Skill retains validated research procedures. Hierarchical context retrieves the records relevant to the current research bottleneck, and a read-only Reporter interprets completed evidence for the Main Agent's subsequent decisions. Component protocols appear in Appendix~\ref{app:architecture-ablations}.
