@@ -55,7 +55,15 @@ S_j^{\mathrm{M0}}=\frac{\partial m_h(d;\chi)}{\partial d_j}.
 \end{equation}
 For tendon-constrained tip suppression, this sensitivity identifies routing or geometric directions that reduce tip-motion freedom, with $r_{\mathrm{load}}(d;\chi)\geq r_{\min}$ preserving deformation freedom near the load. These indicators guide structural refinement toward the hypothesized spatial deformation pattern. Appendix~\ref{app:mathematical-details} relates the mechanism indicators to the loaded response through reduced compliance.
 
-\paragraph{M2: Task capability across required conditions}
+\paragraph{M1: Fixed-input response}
+M1 asks how a structural change affects the physical response when the input is fixed. Holding $U_0$ fixed, it evaluates the task-residual sensitivity
+\begin{equation}
+S^{\mathrm{M1}}_{\tau,ij}=\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\right|_{U=U_0}.
+\label{eq:m1}
+\end{equation}
+This sensitivity isolates the direct structural effect and provides a reference for comparison with the control-adapted task-capability sensitivity in M2.
+
+\paragraph{M2: Re-optimized task capability}
 M2 asks whether a structure can satisfy the task after control adaptation or equilibrium re-solution. It evaluates $V_{\mathcal Q_\tau}$ in~\eqref{eq:multi-capability}, with admissible control adapted for each active condition and equilibrium re-solved for each passive condition. The corresponding local sensitivity is
 \begin{equation}
 S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
@@ -64,14 +72,6 @@ S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
 The maximum condition-wise violation identifies the task-limiting conditions on the shared structure, and its sensitivity guides structural changes toward feasibility across the required conditions. Active-condition sensitivities account for task constraints and design-dependent actuator limits; passive-condition sensitivities follow the equilibrium response. Appendix~\ref{app:mathematical-details} gives the condition-wise derivatives and their aggregation.
 
 Together, M0 and M2 connect mechanism-guided structural directions to task capability, guiding candidate refinement before independent physical evaluation.
-
-\paragraph{M1: Fixed-input structural response}
-M1 asks how a structural change affects the physical response when the input is fixed. Holding $U_0$ fixed, it evaluates the task-residual sensitivity
-\begin{equation}
-S^{\mathrm{M1}}_{\tau,ij}=\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\right|_{U=U_0}.
-\label{eq:m1}
-\end{equation}
-This sensitivity isolates the direct structural effect and provides a reference for comparison with the control-adapted task-capability sensitivity in M2.
 
 \paragraph{M3: Closed-loop performance}
 M3 asks how structural and feedback-control parameters influence closed-loop performance. With joint variables $z_{\mathrm{cl}}=(d,\theta)$, it evaluates
@@ -83,7 +83,7 @@ S_j^{\mathrm{M3}}&=\frac{\partial J_\tau^{\mathrm{cl}}(d,\theta;\mathcal M_{\mat
 \end{aligned}
 \label{eq:m3}
 \end{equation}
-Here $y_{0:N}$ is the closed-loop trajectory under the high-fidelity physical execution model $\mathcal M_{\mathrm{hi}}$ selected by the investigation, and $\mathcal J_\tau$ is the task performance functional. The sensitivity includes feedback and execution dynamics, guiding joint structural and controller refinement for tracking and disturbance recovery.
+Here $y_{0:N}$ is the closed-loop trajectory under the high-fidelity physical execution model $\mathcal M_{\mathrm{hi}}$ selected by the investigation, and $\mathcal J_\tau$ is the task performance functional. Changes in morphology or controller parameters alter both the state trajectory and the feedback-generated inputs, so the sensitivity follows the full closed-loop execution model. It guides joint structural and controller refinement for tracking and disturbance recovery.
 
 The Differentiation Router in Fig.~\ref{fig:research-framework} selects a compatible mathematical implementation for the response defined by the \PPRP{} and its bound model. It uses explicit differentiation for differentiable response maps, implicit differentiation for regular equilibrium or optimality systems, optimal-value sensitivity for parameterized optimization values, and perturbation analysis for model responses to parameter changes~\cite{bonnans2000perturbation,nocedal2006numerical}. These implementations provide the sensitivities needed to investigate structural influence under the selected analysis semantics. Appendix~\ref{app:mathematical-details} gives the numerical formulations and applicability conditions.
 
@@ -136,8 +136,8 @@ The Main Agent can also request independent physical evaluation as a separate re
 \subsection{Persistent Research Harness}
 \label{subsec:research-continuity-method}
 
-The persistent research harness preserves mathematical and physical evidence together with its source, originating task, candidate, physical model, operating conditions, and scope of applicability. Mathematical records also identify the motivating hypothesis and selected analysis semantics, linking each finding to the research intent. The harness governs access to registered deterministic analysis, refinement, and evaluation capabilities through action-admissibility checks. The resulting evidence and subsequent Main Agent actions are linked through the research-state updates in Algorithm~\ref{alg:agent-research}.
+Each research record links the task and candidate to the motivating hypothesis, compiled \PPRP{}, physical model, operating conditions, analysis result, and applicability conditions. Independent physical-evaluation records attach task residuals and acceptance outcomes to the evaluated candidate. These candidate and condition links allow the Main Agent to compare mathematical predictions with physical responses and trace subsequent actions to their supporting evidence. Action-admissibility checks govern execution, and Algorithm~\ref{alg:agent-research} records the resulting evidence in the research state.
 
-The harness retains reusable physical findings as Knowledge and validated research procedures as Skill, together with their supporting evidence and applicability conditions. Hierarchical context provides access from concise summaries to the underlying research records, allowing the Main Agent to examine the evidence relevant to its current decision. A read-only Reporter synthesizes these records into source-grounded interpretations for the Main Agent. Together, these mechanisms preserve the connection between accumulated findings, the conditions under which they were obtained, and subsequent research decisions.
+The Main Agent obtains historical information through $\mathcal C_k=\operatorname{Retrieve}(\tau,\mathrm{Knowledge},\mathrm{Skill})$. Knowledge findings and Skill procedures retain links to supporting records and applicability conditions; hierarchical access lets the agent move from summaries to the underlying evidence. For the current task and candidate, it assesses which findings apply and uses them to formulate the next research intent, which \PPRP{} binds to the current physical problem.
 
-For a new task, the Main Agent retrieves relevant experience through $\mathcal C_k=\operatorname{Retrieve}(\tau,\mathrm{Knowledge},\mathrm{Skill})$ and assesses its applicability to the current task and candidate. It uses this context to formulate a fresh physical hypothesis and research intent. \PPRP{} then reconstructs the mathematical problem for the current candidate, task constraints, and operating conditions as described in Section~\ref{subsec:pprp}. Cross-task reuse thus carries forward research findings and procedures while grounding each investigation in its own physical problem.
+The read-only Reporter interprets a saved evidence snapshot and returns source-linked findings and unresolved questions to the Main Agent. It does not modify candidates or evidence records. The Main Agent retains authority to form or revise hypotheses, choose mathematical investigations, request structural or control changes, and select or stop a candidate study.

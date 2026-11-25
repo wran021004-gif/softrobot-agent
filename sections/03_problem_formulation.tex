@@ -10,7 +10,7 @@ We represent a tendon-driven continuum-robot morphology by the design vector
 d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},d_{\mathrm{route}},d_{\mathrm{assembly}})\in\Dspace,
 \label{eq:design}
 \end{equation}
-where $\Dspace$ specifies admissible topology, geometry, material distribution, tendon routing, and assembly configurations. Let $q$ denote scaled generalized coordinates and $\ell(q,d)$ the tendon lengths, with Jacobian $J_\ell=\partial\ell/\partial q$. Through virtual work, tendon tensions generate the generalized force
+where $\Dspace$ specifies admissible topology, geometry, material distribution, tendon routing, and assembly configurations. We partition $d=(d_{\mathrm{disc}},d_{\mathrm{cont}})$ into discrete structural choices and continuous design parameters. Continuous sensitivities are computed at fixed $d_{\mathrm{disc}}$ within a smooth local parameterization; topology changes are assessed by comparing candidate structures. Let $q$ denote scaled generalized coordinates and $\ell(q,d)$ the tendon lengths, with Jacobian $J_\ell=\partial\ell/\partial q$. Through virtual work, tendon tensions generate the generalized force
 \begin{equation}
 Q_{\mathrm{tendon}}=-J_\ell(q,d)^\top T,\qquad T\in\mathcal T(q,d),
 \label{eq:tendon-force}
@@ -61,7 +61,7 @@ V_\tau(d)=\inf_{U\in\mathcal U(d)}\max_i g_{\tau,i}(d,U),
 \end{equation}
 where $\mathcal U(d)$ is the admissible input set determined by the design-dependent actuator limits. At a fixed morphology, $V_\tau$ quantifies the best attainable task violation after control adaptation. For nonempty compact admissible input sets and continuous task residuals, the infimum is attained, and $V_\tau(d)\leq0$ is equivalent to the existence of a satisfying input sequence.
 
-Passive fixed-payout robots exhibit a different task response: their configurations are determined by morphology, unilateral tendon constraints, and applied loads. For a passive condition $c$, let $q_c^\star(d,f_c)$ denote the selected stable equilibrium branch under load $f_c$. The corresponding task requirements are expressed as
+Passive fixed-payout robots exhibit a different task response: their configurations are determined by morphology, unilateral tendon constraints, and applied loads. For a passive condition $c$, let $q_c^\star(d,f_c)$ denote the selected stable equilibrium branch under load $f_c$, with the local stability condition specified in Appendix~\ref{app:passive-stability}. The corresponding task requirements are expressed as
 \begin{equation}
 g^{\mathrm{pass}}_{c,i}\bigl(d,q_c^\star(d,f_c)\bigr)\leq0.
 \label{eq:passive-constraints}

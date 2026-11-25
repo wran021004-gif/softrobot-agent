@@ -10,8 +10,11 @@ Indexed segment domains override the generic domain: segment~0 has length 80--24
 
 Density, bending viscosity, connector and payload inertia, and prototype station angles are inherited from the selected assembly in this configuration. Active pretension and controller weights belong to the control configuration; passive fixed-payout conditions are specified by the passive assembly and load model. Numerical cell count controls discretization. Parameter identifiers, units, and effective model bindings are resolved for each compiled candidate.
 
+Throughout the sensitivity formulas, derivatives with respect to $d$ act only on $d_{\mathrm{cont}}$, with $d_{\mathrm{disc}}$ and the local parameterization held fixed. Likewise, design perturbation directions have zero discrete components.
+
 
 \subsection{Passive and Multi-condition Formulations}
+\label{app:passive-stability}
 For a passive fixed-payout robot, the response is determined by its structure, unilateral tendon constraints, and applied load. A quasi-static equilibrium $q^\star_\tau(d,f)$ satisfies
 \begin{equation}
 \begin{aligned}
@@ -23,7 +26,14 @@ c_j(q^\star_\tau,d)\leq0,\quad
 \end{aligned}
 \label{eq:passive-problem}
 \end{equation}
-where $\Pi$ is the potential energy and $c_j$ denotes a unilateral tendon or assembly constraint. The passive response is evaluated against
+where $\Pi$ is the potential energy and $c_j$ denotes a unilateral tendon or assembly constraint. Define the constrained Lagrangian $\mathcal L=\Pi+\sum_j\mu_jc_j$ and its tangent stiffness $K_t=\nabla_{qq}^2\mathcal L(q^\star_\tau,\mu^\star;d,f)$. Let $\mathcal A_+$ contain the active constraints with positive multipliers, and let $Z_+$ span the null space of their Jacobian. For twice continuously differentiable potential and constraints, a sufficient local stability condition at a KKT equilibrium is
+\begin{equation}
+v^\top K_t v>0\quad\text{for all }v=Z_+\eta\ne0.
+\label{eq:passive-stability}
+\end{equation}
+This condition implies positive curvature on the critical cone and hence a strict constrained local minimum of potential energy. It also covers weakly active constraints, whose first-order feasible directions form a subset of this null space. Under strict complementarity with tendon constraints only, $Z_+$ reduces to $Z_{\mathcal A}$, and the condition becomes $Z_{\mathcal A}^\top K_tZ_{\mathcal A}\succ0$.
+
+The passive equilibrium solver qualifies a local solution using primal feasibility, stationarity, complementarity, and the minimum reduced-stiffness eigenvalue, together with tendon-force limits and geometric checks. Its initialization selects the local solution; sensitivities refer to that same branch. The passive response is evaluated against
 \begin{equation}
 g^{\mathrm{pass}}_{\tau,i}
 \bigl(d,q^\star_\tau(d,f)\bigr)\leq0.
