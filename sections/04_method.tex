@@ -7,10 +7,10 @@ Figure~\ref{fig:research-framework} places the Main Agent at the center of \soft
 
 Its research state is
 \begin{equation}
-s_k=(\tau,x_k,\mathcal H_k,\mathcal E_k,\mathcal B_k),
+s_k=(\tau,x_k,\mathcal H_k,\mathcal E_k,\mathcal C_k,\mathcal B_k),
 \label{eq:researchstate}
 \end{equation}
-where $x_k=(d_k,U_k,\theta_k)$ denotes the current structure--control candidate, with actuation and feedback variables included as applicable. The set $\mathcal H_k$ contains working physical hypotheses, $\mathcal E_k$ contains accumulated mathematical and physical evidence, and $\mathcal B_k$ denotes the remaining research budget. A working hypothesis relates an observed task bottleneck to a candidate-dependent physical mechanism and identifies the physical relationship to investigate. For example, excessive tip motion under a local load motivates investigating how tendon-constrained deformation is transmitted to the tip, whereas accurate tracking accompanied by excessive tendon tension motivates investigating tendon-force transmission and control demand.
+where $x_k=(d_k,U_k,\theta_k)$ denotes the current structure--control candidate, with actuation and feedback variables included as applicable. The set $\mathcal H_k$ contains working physical hypotheses, $\mathcal E_k$ contains evidence generated in the current investigation, and $\mathcal C_k$ denotes task-relevant research context retrieved from the persistent research harness. The remaining research budget is denoted by $\mathcal B_k$. The harness supplies $\mathcal C_k=\operatorname{Retrieve}(\tau,\mathrm{Knowledge},\mathrm{Skill})$, allowing current-task evidence and reusable historical experience to inform the Main Agent's decisions. A working hypothesis relates an observed task bottleneck to a candidate-dependent physical mechanism and identifies the physical relationship to investigate. For example, excessive tip motion under a local load motivates investigating how tendon-constrained deformation is transmitted to the tip, whereas accurate tracking accompanied by excessive tendon tension motivates investigating tendon-force transmission and control demand.
 
 The Main Agent selects the next research action according to the hypothesis and available evidence. For a mathematical investigation, it specifies the physical hypothesis, selected design parameters, observables, and analysis semantics as a research intent. It may instead propose a structural or control refinement, request independent physical evaluation, or select a validated candidate and stop the study. The resulting mathematical and physical evidence is returned to the Main Agent, which uses it to select subsequent investigations, retain a candidate, or terminate the study according to the task and research stopping criteria.
 
@@ -91,7 +91,7 @@ The Main Agent selects the research objective, the design variables to change, a
 
 Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. The Main Agent may select independent physical evaluation directly as a research action, alongside mathematical analysis. The simulator tests the candidate trajectory or passive equilibrium against the original task contract. The Main Agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question.
 
-Algorithm~\ref{alg:agent-research} summarizes the overall research loop. The Main Agent selects among mathematical investigation, candidate refinement, independent physical evaluation, and candidate selection or termination. \PPRP{} and the selected analysis semantics implement the mathematical research branch, while the refinement and evaluation branches update the candidate and produce physical evidence. The research-state update records the resulting evidence and resource use for subsequent decisions.
+Algorithm~\ref{alg:agent-research} summarizes the overall research loop. The Main Agent selects among mathematical investigation, candidate refinement, independent physical evaluation, and candidate selection or termination. \PPRP{} and the selected analysis semantics implement the mathematical research branch, while the refinement and evaluation branches update the candidate and produce physical evidence. The research-state update records the resulting evidence and resource use and refreshes task-relevant context for subsequent decisions.
 
 \begin{algorithm}[H]
 \caption{Main-Agent-directed research and structure--control co-design}
@@ -101,7 +101,8 @@ Algorithm~\ref{alg:agent-research} summarizes the overall research loop. The Mai
 \Require Frozen task contract $\tau$, initial candidate $x_0$ (possibly empty), registered capabilities $\Gamma$, research budget $\mathcal B_0$
 \Ensure Selected candidate $x^\star$ and accumulated evidence $\mathcal E^\star$
 \State Initialize $k\gets0$, working hypotheses $\mathcal H_0$, and evidence $\mathcal E_0$
-\State $s_0\gets(\tau,x_0,\mathcal H_0,\mathcal E_0,\mathcal B_0)$
+\State $\mathcal C_0\gets\operatorname{Retrieve}(\tau,\mathrm{Knowledge},\mathrm{Skill})$
+\State $s_0\gets(\tau,x_0,\mathcal H_0,\mathcal E_0,\mathcal C_0,\mathcal B_0)$
 \While{the budget remains and the study is active}
   \State $a_k\gets\operatorname{MainAgent}(s_k)$
   \If{$a_k$ selects a candidate or stops the study}
