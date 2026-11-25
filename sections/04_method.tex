@@ -89,37 +89,40 @@ The selected semantics determine the mathematical object, and the deterministic 
 
 The Main Agent selects the research objective, the design variables to change, and the control strategy; deterministic mathematical programs carry out numerical solution, optimization, and validity checks. For a discrete change, the Main Agent proposes a topology, segment count or arrangement, cross-section family, tendon routing, or assembly revision; a design compiler instantiates and checks the candidate. For continuous refinement, it selects a parameter subspace, bounds, and task objective, and a deterministic optimizer computes the update. Sensitivities guide the selected variables and directions.
 
-Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. The Main Agent may select independent physical evaluation directly as a research action, alongside mathematical analysis. The simulator tests the candidate trajectory or passive equilibrium against the original task contract. The Main Agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question. Algorithm~\ref{alg:agent-research} summarizes this research loop with $x_k=(d_k,U_k,\theta_k)$ and model registries $\Gamma$. Each iteration proposes one typed action: mathematical research, structural or control refinement, physical evaluation, selection, or stopping. Mathematical actions carry the research intent $\mathcal R_k$. The harness checks admission before execution and returns check feedback to the next decision. $\operatorname{Update}$ records feedback and resource use, commits admitted selection or stopping decisions, and links completed results to their originating action.
+Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. The Main Agent may select independent physical evaluation directly as a research action, alongside mathematical analysis. The simulator tests the candidate trajectory or passive equilibrium against the original task contract. The Main Agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question.
+
+Algorithm~\ref{alg:agent-research} summarizes the overall research loop. The Main Agent selects among mathematical investigation, candidate refinement, independent physical evaluation, and candidate selection or termination. \PPRP{} and the selected analysis semantics implement the mathematical research branch, while the refinement and evaluation branches update the candidate and produce physical evidence. The research-state update records the resulting evidence and resource use for subsequent decisions.
 
 \begin{algorithm}[H]
-\caption{Task-conditioned research-intent projection and co-design}
+\caption{Main-Agent-directed research and structure--control co-design}
 \label{alg:agent-research}
 \fontsize{9}{11}\selectfont
 \begin{algorithmic}[1]
-\Require $\tau,\ x_0=(d_0,U_0,\theta_0),\ \Gamma,\ \mathcal B_0$
-\Ensure Selected candidate and accumulated evidence
-\State $k\gets0,\quad s_0\gets(\tau,x_0,\varnothing,\varnothing,\mathcal B_0)$
-\While{$\operatorname{BudgetOK}(s_k)\land\neg\operatorname{Terminated}(s_k)$}
-\State $a_k\gets\operatorname{MainAgent}(s_k)$
-\State $(g_k,r_k)\gets\operatorname{Gate}(s_k,a_k)$
-\State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{sim}}\gets\bot$
-\If{$g_k=1$}
-  \If{$\operatorname{Type}(a_k)=\mathrm{research}$}
-    \State $\mathcal R_k=(h_k,\mathcal I_k,\mathcal O_k,\sigma_k)\gets\operatorname{Intent}(a_k)$
-    \State $\mathcal F_k\gets\operatorname{Bind}_{\Gamma}(\tau,x_k,\mathcal R_k)$
-    \State $\mathcal P_k\gets\operatorname{Compile}(\tau,d_k,\mathcal R_k,\mathcal F_k,\mathcal B_k)$
-    \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k)$
-  \ElsIf{$\operatorname{Type}(a_k)\in\{\mathrm{refine},\mathrm{control}\}$}
-    \State $x_{k+1}\gets\operatorname{Apply}(x_k,a_k)$
-  \ElsIf{$\operatorname{Type}(a_k)=\mathrm{evaluate}$}
-    \State $e_k^{\mathrm{sim}}\gets\operatorname{Eval}_{\mathrm{MuJoCo}}(\tau,x_k)$
+\Require Frozen task contract $\tau$, initial candidate $x_0$ (possibly empty), registered capabilities $\Gamma$, research budget $\mathcal B_0$
+\Ensure Selected candidate $x^\star$ and accumulated evidence $\mathcal E^\star$
+\State Initialize $k\gets0$, working hypotheses $\mathcal H_0$, and evidence $\mathcal E_0$
+\State $s_0\gets(\tau,x_0,\mathcal H_0,\mathcal E_0,\mathcal B_0)$
+\While{the budget remains and the study is active}
+  \State $a_k\gets\operatorname{MainAgent}(s_k)$
+  \If{$a_k$ selects a candidate or stops the study}
+    \State Record the selection or stopping decision in $s_k$
+    \State \textbf{break}
   \EndIf
-\EndIf
-\State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,g_k,r_k,$
-\Statex \hspace{\algorithmicindent}$\hphantom{s_{k+1}\gets\operatorname{Update}(}x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{sim}})$
-\State $k\gets k+1$
+  \State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{phys}}\gets\varnothing$
+  \If{mathematical research is selected}
+    \State $\mathcal R_k\gets\operatorname{Intent}(a_k)$
+    \State $\mathcal P_k\gets\operatorname{CompilePPRP}(\tau,x_k,\mathcal R_k,\Gamma,\mathcal B_k)$
+    \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k)$
+    \Statex \hspace{\algorithmicindent}The selected $\sigma_k$ determines the M0--M3 analysis.
+  \ElsIf{structure or control refinement is selected}
+    \State $x_{k+1}\gets\operatorname{Refine}(x_k,a_k)$
+  \ElsIf{physical evaluation is selected}
+    \State $e_k^{\mathrm{phys}}\gets\operatorname{Evaluate}(\tau,x_k)$
+  \EndIf
+  \State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{phys}})$
+  \State $k\gets k+1$
 \EndWhile
-\State \Return $\operatorname{Selected}(s_k),\ \mathcal E_k$
+\State \Return $x^\star=\operatorname{Selected}(s_k),\quad\mathcal E^\star=\mathcal E_k$
 \end{algorithmic}
 \end{algorithm}
 
