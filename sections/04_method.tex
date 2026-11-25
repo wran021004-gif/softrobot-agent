@@ -17,7 +17,7 @@ The Main Agent selects the next research action according to the hypothesis and 
 \subsection{Projecting Research Intent into a Task-Specific Mathematical Problem}
 \label{subsec:pprp}
 
-Physical insights can inform investigations across tasks, but the associated mathematical problem must be reconstructed for each task. At the beginning of a new task, the persistent research harness provides the Main Agent with relevant Knowledge and Skill from previous investigations. The Main Agent assesses their applicability to the current task and can retrieve additional Knowledge and Skill as needed. For example, a routing effect observed under passive loading may motivate a routing study in an active reaching task; the task constraints and operating conditions, however, must be reconsidered. The Main Agent therefore formulates a fresh research intent for the current task and candidate:
+Physical insights and validated research procedures retained by the harness can inform investigations across tasks. The Main Agent assesses their relevance to the current task and formulates a fresh research intent; \PPRP{} then reconstructs the associated mathematical problem for the current task and candidate. For example, a routing effect observed under passive loading may motivate a routing study in an active reaching task, with the task constraints and operating conditions reconsidered for the new investigation. The research intent is
 \begin{equation}
 \mathcal R_k=(h_k,\mathcal I_k,\mathcal O_k,\sigma_k),
 \label{eq:research-intent}
@@ -39,11 +39,11 @@ where $\Gamma$ denotes the registered parameter, observable, physical-model, and
 
 Before computation, validity checks establish that the selected parameters and observables are defined for the candidate, their physical definitions are consistent with the bound model, and the analysis semantics applies to the specified operating context. The selected semantics determines the mathematical quantity to be evaluated, while the bound model and its mathematical properties determine the compatible numerical realization. The harness dispatches the problem to the corresponding deterministic analysis capability after checking its applicability.
 
-Figure~\ref{fig:research-framework} summarizes this path from the Main Agent's research intent through the three bindings, validity checks, and differentiation router to mathematical evidence returned to the Main Agent. The resulting mathematical evidence records the requested observables, sensitivities, or optimized responses together with their task, candidate, model, and operating-context provenance. The Main Agent interprets this evidence relative to $h_k$ and the task contract, considering it alongside evidence from the independent physical-evaluation path when selecting subsequent research actions. Thus, reusable physical insights inform successive investigations, while each mathematical problem and its resulting evidence remain grounded in the current task and candidate.
+Figure~\ref{fig:research-framework} summarizes the path from research intent to mathematical evidence. The resulting evidence records the requested observables, sensitivities, or optimized responses together with their task, candidate, model, and operating-context provenance.
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
-The $\operatorname{Analyze}$ step in Algorithm~\ref{alg:agent-research} evaluates the mathematical quantity specified by the compiled research problem. M0 and M2 provide the main connection between a physical hypothesis and a structure--control decision. M1 and M3 supply complementary evidence about fixed-input response and closed-loop execution. The selected semantics determines which physical response is evaluated and how the state and control variables are treated.
+The $\operatorname{Analyze}$ step in Algorithm~\ref{alg:agent-research} evaluates the mathematical quantity specified by the \PPRP{}. M0 and M2 provide the main connection between a physical hypothesis and a structure--control decision. M1 and M3 supply complementary evidence about fixed-input response and closed-loop execution. The selected semantics determines which physical response is evaluated and how the state and control variables are treated.
 
 \paragraph{M0: Mechanism sensitivity}
 M0 evaluates the structural influence on a hypothesis-specific indicator $m_h(d;\chi)$; for tendon-constrained tip suppression, the question is which routing or geometric changes reduce tip-motion freedom while preserving deformation freedom near the load. The local sensitivity is
@@ -51,7 +51,7 @@ M0 evaluates the structural influence on a hypothesis-specific indicator $m_h(d;
 S_j^{\mathrm{M0}}=\frac{\partial m_h(d;\chi)}{\partial d_j}.
 \label{eq:m0-sensitivity}
 \end{equation}
-The requirement $r_{\mathrm{load}}(d;\chi)\geq r_{\min}$ preserves loaded-point motion freedom. Both indicators in~\eqref{eq:m0-indicator} describe kinematically admissible deformation directions; actual loaded displacement also depends on stiffness along those directions, as expressed by the reduced-compliance relation in Appendix~\ref{app:mathematical-details}.
+The requirement $r_{\mathrm{load}}(d;\chi)\geq r_{\min}$ preserves loaded-point motion freedom. Both indicators in~\eqref{eq:m0-indicator} quantify how admissible internal deformations are transmitted to the tip and loaded point; the resulting load-induced displacement further depends on stiffness along those directions, as expressed by the reduced-compliance relation in Appendix~\ref{app:mathematical-details}.
 
 \paragraph{M2: Task capability across required conditions}
 M2 investigates $V_{\mathcal Q_\tau}$ in~\eqref{eq:multi-capability} and its local sensitivity. Each active condition adapts its admissible control, while each passive condition re-solves equilibrium. The maximum condition-wise violation identifies the task-limiting conditions on the shared structure. The corresponding sensitivity is
@@ -69,7 +69,7 @@ M1 holds the input $U_0$ fixed and evaluates
 S^{\mathrm{M1}}_{\tau,ij}=\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\right|_{U=U_0}.
 \label{eq:m1}
 \end{equation}
-This separates the structural response to an unchanged input from the benefit of later control adaptation. It provides a fixed-input reference for distinguishing direct structural effects from the task-capability changes obtained through control adaptation in M2.
+This fixed-input sensitivity isolates the direct structural effect and provides a reference for comparison with the control-adapted task-capability sensitivity in M2.
 
 \paragraph{M3: Closed-loop performance}
 M3 investigates executed feedback behavior with joint variables $z_{\mathrm{cl}}=(d,\theta)$:
