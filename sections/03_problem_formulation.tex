@@ -1,14 +1,18 @@
 \section{Problem Formulation}
 \label{sec:formulation}
 
+We formulate task-conditioned structure--control co-design for tendon-driven continuum robots as a feasibility problem: identifying a robot morphology and admissible control strategy that satisfy a fixed set of physical task requirements. This problem has two coupled components: the morphology-dependent deformation and actuation mechanisms that govern the robot's response to tendon inputs and external loads, and the task-conditioned evaluation that determines whether these responses satisfy the required operating conditions. We first establish the physical relationships linking morphology to deformation and actuation, and then formulate task feasibility across active, passive, and shared-morphology conditions.
+
 \subsection{Morphology, Deformation, and Actuation}
+
+In tendon-driven continuum robots, morphology influences task behavior through two coupled mechanisms. Tendon routing determines the kinematic constraints imposed by taut tendons and the generalized forces they can transmit, while geometry and material distribution determine the stiffness and inertial properties governing deformation under external loads. Consequently, a structural change can alter both the admissible deformation modes and the actuation authority available to realize a task.
 
 We represent a family of tendon-driven continuum robots by a design vector
 \begin{equation}
 d=(d_{\mathrm{top}},d_{\mathrm{geom}},d_{\mathrm{mat}},d_{\mathrm{route}},d_{\mathrm{assembly}})\in\Dspace,
 \label{eq:design}
 \end{equation}
-where $\Dspace$ specifies admissible topology, geometry, material distribution, tendon routing, and assembly configurations. Let $q$ denote generalized coordinates, and let $\ell(q,d)$ denote tendon lengths with Jacobian $J_\ell=\partial\ell/\partial q$. Through virtual work, tendon tensions generate the generalized force
+where $\Dspace$ specifies admissible topology, geometry, material distribution, tendon routing, and assembly configurations. Let $q$ denote generalized coordinates and $\ell(q,d)$ the tendon lengths, with Jacobian $J_\ell=\partial\ell/\partial q$. Through virtual work, tendon tensions generate the generalized force
 \begin{equation}
 Q_{\mathrm{tendon}}=-J_\ell(q,d)^\top T,\qquad T\in\mathcal T(q,d),
 \label{eq:tendon-force}
@@ -18,19 +22,21 @@ where $\mathcal T$ encodes tension-only actuation and force limits. The correspo
 \mathcal W(q,d)=\{-J_\ell(q,d)^\top T:T\in\mathcal T(q,d)\}.
 \label{eq:actuation-set}
 \end{equation}
-Morphology also determines the elastic and inertial operators $K(q,d)$ and $M(q,d)$, which, together with $\mathcal W$, govern the robot's deformation under tendon inputs and external loads.
+This set characterizes the generalized forces attainable through the tendon arrangement at a given configuration.
 
-For a locally fixed active set $\mathcal A$ of taut, fixed-payout tendon constraints, admissible first-order deformations satisfy
+The same morphology also determines the deformation modes available under tendon constraints. For a locally fixed active set $\mathcal A$ of taut, fixed-payout tendon constraints, admissible first-order deformations satisfy
 \begin{equation}
-J_{\ell,\mathcal A}\delta q=0,\qquad \delta q=Z_{\mathcal A}\eta.
+J_{\ell,\mathcal A}\delta q=0,\qquad \delta q=Z_{\mathcal A}\eta,
 \label{eq:deformation-space}
 \end{equation}
-Here $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized coordinates. The corresponding tip and loaded-point displacements are
+where $Z_{\mathcal A}$ is an orthonormal null-space basis in scaled generalized coordinates and $\eta$ parameterizes the admissible deformation. The corresponding tip and loaded-point displacements are
 \begin{equation}
 \delta p_{\mathrm{tip}}=J_{\mathrm{tip}}Z_{\mathcal A}\eta,\qquad
 \delta p_{\mathrm{load}}=J_{\mathrm{load}}Z_{\mathcal A}\eta.
 \label{eq:motion-transfer}
 \end{equation}
+These mappings describe how an internal deformation is transferred to task-relevant locations along the robot.
+
 We define two mechanism indicators:
 \begin{equation}
 \begin{aligned}
@@ -39,70 +45,58 @@ r_{\mathrm{load}}(d;\chi)&=\|J_{\mathrm{load}}Z_{\mathcal A}\|_F^2.
 \end{aligned}
 \label{eq:m0-indicator}
 \end{equation}
-The indicator $m_h$ quantifies the tip-motion component of admissible internal deformation, whereas $r_{\mathrm{load}}$ measures the motion freedom retained at the loaded point. The spatial deformation-shaping hypothesis seeks to reduce $m_h$ while preserving $r_{\mathrm{load}}\geq r_{\min}$. Tendon routing shapes the admissible deformation directions, whereas material distribution determines their stiffness and loaded response. Appendix~\ref{app:mathematical-details} provides the corresponding equilibrium and compliance relations.
+The indicator $m_h$ quantifies the tip-motion component of admissible internal deformation, whereas $r_{\mathrm{load}}$ measures the motion freedom retained at the loaded point. For tasks requiring tip stability together with local compliance, a representative spatial deformation-shaping requirement is to reduce $m_h$ while maintaining $r_{\mathrm{load}}\geq r_{\min}$. Tendon routing shapes the admissible deformation directions, whereas material distribution determines their stiffness and loaded response.
 
 \subsection{Task Capability and Analysis Semantics}
 
-A frozen task contract $\tau$ specifies initial conditions, targets, external loads, task horizon, and acceptance criteria. Let $\mathcal Q_\tau$ denote the required operating conditions, partitioned into active and passive conditions:
-\begin{equation}
-\mathcal Q_\tau=\mathcal Q_{\mathrm{act}}\cup\mathcal Q_{\mathrm{pass}}.
-\end{equation}
-An operating context $\chi_c$ specifies the reference configuration, external load, active tendon set, and control conditions for condition $c$. For an active condition, the physical model maps the design and an admissible input sequence $U=(u_0,\ldots,u_{N-1})$ to a task trajectory, from which signed normalized task residuals $g_{\tau,i}$ are evaluated. A nonpositive residual indicates satisfaction of the corresponding task constraint.
+A frozen task contract $\tau$ specifies initial conditions, targets or reference trajectories, external loads, task horizon, and acceptance criteria. Let $\mathcal Q_\tau$ denote the required operating conditions, partitioned into active and passive conditions as $\mathcal Q_\tau=\mathcal Q_{\mathrm{act}}\cup\mathcal Q_{\mathrm{pass}}$. An operating context $\chi_c$ specifies the reference configuration, external load, active tendon set, and control conditions for each condition $c$.
 
-For a single active task, feasibility requires
+For an active task, the physical model maps the morphology and an admissible input sequence $U=(u_0,\ldots,u_{N-1})$ to a task trajectory, from which signed normalized task residuals are evaluated:
 \begin{equation}
-\begin{aligned}
-d^*\in\Dspace,\quad U^*\in\mathcal U(d^*),\\
-g_{\tau,i}(d^*,U^*)\leq0,\quad \forall i.
-\end{aligned}
+g_{\tau,i}(d,U)\leq0,\qquad \forall i.
 \label{eq:taskconstraints}
 \end{equation}
-The control-adapted task-violation value is
+A nonpositive residual indicates satisfaction of the corresponding task constraint. For a single active task, feasibility requires a morphology $d^*\in\Dspace$ and an admissible input sequence $U^*\in\mathcal U(d^*)$ satisfying all task constraints. The control-adapted task-violation value is
 \begin{equation}
 V_\tau(d)=\inf_{U\in\mathcal U(d)}\max_i g_{\tau,i}(d,U),
 \label{eq:capability}
 \end{equation}
-where $\mathcal U(d)$ is the admissible input set. At a fixed structure $d$, $V_\tau$ quantifies the best attainable task violation after control adaptation. For compact admissible input sets and continuous task residuals, $V_\tau(d)\leq0$ is equivalent to the existence of a satisfying input sequence.
+where $\mathcal U(d)$ is the admissible input set determined by the design-dependent actuator limits. At a fixed morphology, $V_\tau$ quantifies the best attainable task violation after control adaptation. For compact admissible input sets and continuous task residuals, the infimum is attained, and $V_\tau(d)\leq0$ is equivalent to the existence of a satisfying input sequence.
 
-For a shared-morphology task, feasibility requires one structure and condition-specific admissible controls:
-\begin{equation}
-\begin{aligned}
-&\exists\,d^*\in\Dspace,\quad
-\{U_c\in\mathcal U_c(d^*)\}_{c\in\mathcal Q_{\mathrm{act}}}:\\
-&\hspace{2em}g_{c,i}(d^*,U_c)\leq0,\quad \forall c\in\mathcal Q_{\mathrm{act}},\,i.
-\end{aligned}
-\label{eq:shared-feasibility}
-\end{equation}
-For a passive condition $c$, the applied load and unilateral tendon constraints determine a selected stable equilibrium $q_c^\star(d,f_c)$, with task residuals
+Passive fixed-payout robots exhibit a different task response: their configurations are determined by morphology, unilateral tendon constraints, and applied loads. For a passive condition $c$, let $q_c^\star(d,f_c)$ denote the selected equilibrium under load $f_c$. The corresponding task requirements are expressed as
 \begin{equation}
 g^{\mathrm{pass}}_{c,i}\bigl(d,q_c^\star(d,f_c)\bigr)\leq0.
 \label{eq:passive-constraints}
 \end{equation}
-The condition-wise task violation is
+
+For tasks involving multiple required conditions, one morphology must support the entire condition set, while each active condition may use its own admissible control sequence. We define the condition-wise task violation as
 \begin{equation}
 v_c(d)=
 \begin{cases}
-V_c(d), & c\in\mathcal Q_{\mathrm{act}},\\
+V_c(d), & c\in\mathcal Q_{\mathrm{act}},\\[0.6em]
 \displaystyle\max_i g^{\mathrm{pass}}_{c,i}\bigl(d,q_c^\star(d,f_c)\bigr),
-& c\in\mathcal Q_{\mathrm{pass}}.
+& c\in\mathcal Q_{\mathrm{pass}},
 \end{cases}
 \label{eq:condition-violation}
 \end{equation}
-Here $V_c$ is the condition-specific counterpart of~\eqref{eq:capability}. A shared morphology is evaluated across all required conditions by
+where $V_c$ is the condition-specific counterpart of the active-task value in~\eqref{eq:capability}. The capability of a shared morphology across all required conditions is then
 \begin{equation}
 V_{\mathcal Q_\tau}(d)=\max_{c\in\mathcal Q_\tau}v_c(d).
 \label{eq:multi-capability}
 \end{equation}
-This quantity captures the worst task violation across the required conditions while allowing condition-specific control adaptation and passive equilibrium re-solution. Appendix~\ref{app:mathematical-details} gives the condition-wise formulation and sensitivity relations.
+This worst-condition measure evaluates the shared morphology across the complete task portfolio, accounting for condition-specific control adaptation and passive equilibrium responses.
 
-Let $\theta$ denote feedback-controller parameters and $z=(d,\theta)$ the combined design and controller parameter vector. The analysis semantics $\sigma$ specify how the physical state and control variables are treated as $z$ changes. For a selected mathematical quantity $\Psi_\sigma$, define the local task-conditioned sensitivity
+Structural influence depends on how the physical state and control variables are treated as the design changes. Let $\theta$ denote feedback-controller parameters and $z=(d,\theta)$ the combined design and controller parameter vector. The analysis semantics $\sigma$ specify the state and control treatment associated with a selected research question. For a selected mathematical quantity $\Psi_\sigma$, define the local task-conditioned sensitivity
 \begin{equation}
 \mathsf S_j^{(\sigma)}(\tau,z,\chi)
 =\frac{\mathrm d}{\mathrm d z_j}\Psi_\sigma(\tau,z;\chi).
 \label{eq:conditioned-sensitivity}
 \end{equation}
-The selected quantity may represent a hypothesis-specific mechanism indicator, a fixed-input task response, a condition-aggregated task-capability value, or closed-loop performance. The corresponding sensitivity follows the state and control treatment specified by $\sigma$. Thus parameter influence is determined jointly by the task, operating context, observable, and control treatment.
+The selected quantity may represent a hypothesis-specific mechanism indicator, a fixed-input task response, a condition-aggregated task-capability value, or closed-loop performance. Its sensitivity follows the state and control treatment specified by $\sigma$. Thus, parameter influence is determined jointly by the task, operating context, observable, and control treatment.
 
-\subsection{Feasibility-Discovery Objective}
-
-Given a frozen task contract $\tau$ and its required condition set $\mathcal Q_\tau$, the co-design objective is to identify a morphology $d^*$ and admissible controls for active conditions that satisfy the task constraints across all required conditions. Equivalently, the worst required-condition violation satisfies $V_{\mathcal Q_\tau}(d^*)\leq0$. This defines the feasibility-discovery problem addressed by the mechanism-guided research method in the following section.
+Given the frozen task contract $\tau$ and required condition set $\mathcal Q_\tau$, feasibility discovery seeks a morphology $d^*\in\Dspace$ satisfying
+\begin{equation}
+V_{\mathcal Q_\tau}(d^*)\leq0,
+\label{eq:feasibility-target}
+\end{equation}
+with admissible controls for active conditions and equilibrium responses for passive conditions. This defines the physical feasibility target addressed by the mechanism-guided research framework in the following section.
