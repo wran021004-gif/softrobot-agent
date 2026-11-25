@@ -36,10 +36,12 @@ The initial trajectory follows the figure-eight reference closely, but its norma
 
 \subsection{Mathematical Evidence for Task-Conditioned Reasoning}
 \label{subsec:evidence-validation}
-The first study examines the numerical accuracy of passive-equilibrium response sensitivities to local material stiffness. Implicit derivatives of loaded-point displacement, tip displacement, and their ratio are compared with central finite differences of re-solved equilibria across six signed loads. All 18 derivative pairs agree in sign, with a maximum relative discrepancy of 0.1191\%. Figure~\ref{fig:mathematical-research}A illustrates the resulting design tradeoff: increasing stiffness reduces tip motion and the tip-to-point ratio, favoring suppression, but also reduces loaded-point displacement, opposing the required local compliance. The validated sensitivities therefore quantify both the desired mechanism and its cost in local deformability, providing evidence for selecting material changes.
+
+Across six signed loads, the implicit derivatives of loaded-point displacement, tip displacement, and their ratio have the same signs as central finite-difference estimates from re-solved equilibria in all 18 comparisons, with a maximum relative discrepancy of 0.1191\%. For the representative proximal positive load in Fig.~\ref{fig:mathematical-research}A, increasing Young's modulus reduces tip displacement and the tip-to-loaded-point displacement ratio, while also reducing loaded-point displacement, exposing the tradeoff between tip suppression and retained local compliance.
+
 \input{figures/fig04_mathematical_research}
 
-For the negative-reach condition in Fig.~\ref{fig:mathematical-research}B, replaying the same tendon-tension sequence changes the maximum normalized residual from 1.997 on the original morphology to 2.117 on the revised morphology. Re-optimizing tendon tensions on the revised morphology reduces the residual to $-0.010$, satisfying the condition. This comparison distinguishes the structural response under fixed actuation from the task capability recovered through control adaptation.
+With the original tendon-tension sequence held fixed, the structural revision increases the maximum signed normalized residual from 1.997 to 2.117 for negative reach (Fig.~\ref{fig:mathematical-research}B). Re-optimizing tendon tensions on the revised morphology reduces the residual to $-0.010$, satisfying the condition and demonstrating the role of control adaptation.
 
 \subsection{Evidence-Grounded Research Continuity}
 \label{subsec:ablation-studies}
