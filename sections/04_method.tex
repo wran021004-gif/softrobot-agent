@@ -88,11 +88,13 @@ Explicit differentiation follows differentiable response maps; implicit differen
 \subsection{Updating Structure and Control}
 \label{subsec:structure-control-refinement}
 
-The Main Agent selects the research objective, the design variables to change, and the control strategy; deterministic mathematical programs carry out numerical solution, optimization, and validity checks. For a discrete change, the Main Agent proposes a topology, segment count or arrangement, cross-section family, tendon routing, or assembly revision; a design compiler instantiates and checks the candidate. For continuous refinement, it selects a parameter subspace, bounds, and task objective, and a deterministic optimizer computes the update. Sensitivities guide the selected variables and directions.
+Guided by the available research evidence and task context, the Main Agent selects the structural revision and control strategy for the next candidate. A deterministic design compiler instantiates proposed discrete morphology revisions, while a deterministic optimizer updates selected continuous design parameters within specified bounds. The mathematical evidence guides the choice of design variables and update directions.
 
-Control is adapted through task-specific actuation, trajectory, initialization, or feedback synthesis. After a morphology changes, each required active condition can receive its own optimized control on the shared structure. The Main Agent may select independent physical evaluation directly as a research action, alongside mathematical analysis. The simulator tests the candidate trajectory or passive equilibrium against the original task contract. The Main Agent uses the evaluated bottleneck to retain the candidate, refine it, or change the research question.
+Following a structural update, the control sequence or feedback parameters are adapted to the revised morphology. For shared-morphology tasks, the structure remains common while each required active condition receives its own admissible control.
 
-Algorithm~\ref{alg:agent-research} summarizes Main-Agent-directed mathematical investigation, candidate refinement, independent physical evaluation, and selection or termination. Here, $\mathcal K$ and $\mathcal S$ denote the harness's Knowledge and Skill, retrieved when a new task begins. The harness records task-scoped evidence and resource use and retains validated physical findings and research procedures for subsequent investigations.
+The Main Agent can also request independent physical evaluation as a separate research action. The simulator evaluates active execution and passive loading against the frozen task contract, with an optional direct physical test providing an additional evaluation path. The resulting physical evidence identifies remaining task bottlenecks, guiding the Main Agent to retain the candidate, continue refinement, or redirect the research question.
+
+Algorithm~\ref{alg:agent-research} summarizes the overall Main-Agent-directed research loop, including mathematical investigation, candidate refinement, independent physical evaluation, and candidate selection or termination.
 
 \begin{algorithm}[!t]
 \caption{Main-Agent-directed research and structure--control co-design}
