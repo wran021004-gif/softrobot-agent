@@ -3,7 +3,7 @@
 \subsection{From Task Behavior to a Physical Hypothesis}
 \label{subsec:overall-framework}
 
-Figure~\ref{fig:research-framework} places the Main Agent at the center of \softrobotagent{}'s research decisions. From task behavior and accumulated evidence, it identifies the physical relationship most relevant to the current bottleneck using the deformation and actuation mechanisms established in Section~\ref{sec:formulation}. A working hypothesis relates that bottleneck to a candidate-dependent mechanism and identifies what to investigate. For example, excessive tip motion under a local load motivates investigating how tendon-constrained deformation is transmitted to the tip, whereas accurate tracking accompanied by excessive tendon tension motivates investigating tendon-force transmission and control demand.
+Figure~\ref{fig:research-framework} places the Main Agent at the center of \softrobotagent{}'s research decisions. From task behavior and accumulated evidence, it identifies the physical relationship most relevant to the current bottleneck using the deformation and actuation mechanisms established in Section~\ref{sec:formulation}. A working hypothesis relates that bottleneck to a candidate-dependent mechanism, such as tendon-constrained deformation transfer or tendon-force transmission, and identifies what to investigate.
 
 Its research state is
 \begin{equation}
@@ -63,7 +63,7 @@ S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
 \end{equation}
 The maximum condition-wise violation identifies the task-limiting conditions on the shared structure, and its sensitivity guides structural changes toward feasibility across the required conditions. Active-condition sensitivities account for task constraints and design-dependent actuator limits; passive-condition sensitivities follow the equilibrium response. Appendix~\ref{app:mathematical-details} gives the condition-wise derivatives and their aggregation.
 
-M0 asks whether a structural change can realize the intended physical mechanism; M2 asks whether that change supports feasibility across the required conditions after control adaptation or equilibrium re-solution, connecting mechanism-guided directions to candidate structure--control solutions. Independent evaluation determines whether the resulting candidate satisfies all required task constraints.
+Together, M0 and M2 connect mechanism-guided structural directions to task capability, guiding candidate refinement before independent physical evaluation.
 
 \paragraph{M1: Fixed-input structural response}
 M1 asks how a structural change affects the physical response when the input is fixed. Holding $U_0$ fixed, it evaluates the task-residual sensitivity
@@ -85,7 +85,7 @@ S_j^{\mathrm{M3}}&=\frac{\partial J_\tau^{\mathrm{cl}}(d,\theta;\mathcal M_{\mat
 \end{equation}
 Here $y_{0:N}$ is the closed-loop trajectory under the high-fidelity physical execution model $\mathcal M_{\mathrm{hi}}$ selected by the investigation, and $\mathcal J_\tau$ is the task performance functional. The sensitivity includes feedback and execution dynamics, guiding joint structural and controller refinement for tracking and disturbance recovery.
 
-The Differentiation Router in Fig.~\ref{fig:research-framework} selects a compatible mathematical implementation for the response defined by the \PPRP{} and its bound model. It uses explicit differentiation for explicit differentiable response maps, implicit differentiation for regular equilibrium or optimality systems, optimal-value sensitivity for parameterized optimization values, and perturbation analysis for model responses to parameter changes~\cite{bonnans2000perturbation,nocedal2006numerical}. These implementations provide the sensitivities needed to investigate structural influence under the selected analysis semantics. Appendix~\ref{app:mathematical-details} gives the numerical formulations and applicability conditions.
+The Differentiation Router in Fig.~\ref{fig:research-framework} selects a compatible mathematical implementation for the response defined by the \PPRP{} and its bound model. It uses explicit differentiation for differentiable response maps, implicit differentiation for regular equilibrium or optimality systems, optimal-value sensitivity for parameterized optimization values, and perturbation analysis for model responses to parameter changes~\cite{bonnans2000perturbation,nocedal2006numerical}. These implementations provide the sensitivities needed to investigate structural influence under the selected analysis semantics. Appendix~\ref{app:mathematical-details} gives the numerical formulations and applicability conditions.
 
 \subsection{Updating Structure and Control}
 \label{subsec:structure-control-refinement}
@@ -102,7 +102,7 @@ The Main Agent can also request independent physical evaluation as a separate re
 \fontsize{9}{11}\selectfont
 \begin{algorithmic}[1]
 \Require $\tau,\ x_0$ (possibly empty), $\Gamma,\ \mathcal B_0$
-\Ensure $x^\star,\ \mathcal E^\star$
+\Ensure $x^\star$ (possibly empty), $\mathcal E^\star$, outcome $o^\star$
 \State $\mathcal C_0\gets\operatorname{Retrieve}(\tau,\mathcal K,\mathcal S)$
 \State $k\gets0,\quad\mathcal H_0,\mathcal E_0\gets\varnothing$
 \State $s_0\gets(\tau,x_0,\mathcal H_0,\mathcal E_0,\mathcal C_0,\mathcal B_0)$
@@ -124,7 +124,12 @@ The Main Agent can also request independent physical evaluation as a separate re
   \State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{phys}})$
   \State $k\gets k+1$
 \EndWhile
-\State \Return $x^\star=\operatorname{Selected}(s_k),\quad\mathcal E^\star=\mathcal E_k$
+\State $x^\star\gets\operatorname{Selected}(s_k)$; $\varnothing$ if no candidate is retained
+\State $o^\star\gets\texttt{not\_completed}$
+\If{$x^\star\neq\varnothing$ and physical evidence in $\mathcal E_k$ verifies all required conditions for $x^\star$}
+  \State $o^\star\gets\texttt{accepted}$
+\EndIf
+\State \Return $x^\star,\quad\mathcal E^\star=\mathcal E_k,\quad o^\star$
 \end{algorithmic}
 \end{algorithm}
 
