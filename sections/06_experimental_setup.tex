@@ -14,14 +14,14 @@ The mathematical backends include a generalized variable strain (GVS) model with
 
 We compare three research interfaces. \emph{LLM-only} generates and refines structure--control candidates using simulation feedback. \emph{Direct Mathematical Tools} adds numerical analysis and optimization capabilities, with the agent formulating the mathematical problems directly. \emph{PRIME-Soft} projects research intent into a task-conditioned \PPRP{} and routes its mathematical execution. All three methods share frozen task contracts, admissible design spaces, structure-generation capabilities, physical models, and independent evaluation procedures. Appendix~\ref{app:abc-protocol} specifies the interfaces and evaluation protocol.
 
-Task runs use common per-task ceilings of 30 mathematical operations, 30 physical evaluations, and 60 agent requests. The primary comparisons and continuity studies use GPT-5.6 Sol. We additionally evaluate the complete framework with Knowledge and Skill enabled using GPT-6 Astra under the same task budgets. We report task completion and research workload in terms of mathematical operations, physical evaluations, agent requests, and token consumption.
+Task runs use common per-task ceilings of 30 mathematical operations, 30 physical evaluations, and 60 agent requests. Each task--method configuration is evaluated over ten runs under the same per-run budget. A task is counted as completed if at least one run satisfies all required conditions; resource consumption is reported as the minimum among passing runs or the mean across runs when none passes. The primary comparisons and continuity studies use GPT-5.6 Sol. We additionally evaluate the complete framework with Knowledge and Skill enabled using GPT-6 Astra under the same task budgets. We report task completion and research workload in terms of mathematical operations, physical evaluations, agent requests, and token consumption.
 
-\subsection{Mechanism and Sensitivity Studies}
+\subsection{Targeted Mechanism and Sensitivity Evaluation}
 \label{subsec:setup-mechanisms}
 
-We examine how physical hypotheses and mathematical evidence guide co-design in three research episodes: Passive Tip Suppression for spatial deformation transfer, Shared Morphology for control-adapted task capability, and Figure-eight Tracking for actuation feasibility.
+Three representative episodes examine mechanism-guided co-design: Passive Tip Suppression, Shared Morphology, and Figure-eight Tracking.
 
-For Passive Tip Suppression, we assess sensitivities to local material stiffness by comparing implicit derivatives with central finite differences of re-solved equilibria across six signed loads. Sign agreement and relative discrepancy assess derivative consistency for three observables: loaded-point displacement, tip displacement, and their ratio. The Shared Morphology study examines the control treatments of M1 and M2 through the negative-reach condition, comparing maximum normalized signed task residuals under a common tendon-tension sequence on both morphologies and re-optimized control on the revised morphology.
+For Passive Tip Suppression, sign agreement and relative discrepancy between implicit derivatives and central finite differences of re-solved equilibria assess sensitivities to local material stiffness for loaded-point displacement, tip displacement, and their ratio across six signed loads. For Shared Morphology, the M1/M2 comparison evaluates maximum normalized signed task residuals in the negative-reach condition using a common tendon-tension sequence on both morphologies and re-optimized control on the revised morphology.
 
 \subsection{Research Continuity Studies}
 \label{subsec:setup-continuity}
