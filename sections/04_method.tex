@@ -45,7 +45,7 @@ Before computation, validity checks establish that the selected parameters and o
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
-The $\operatorname{Analyze}$ step in Algorithm~\ref{alg:agent-research} evaluates the response quantity and parameter sensitivities specified by the \PPRP{}. The four analysis semantics differ in the physical quantity being differentiated and in the treatment of state and control variables. M0 and M2 connect mechanism-indicator sensitivity to control-adapted task-capability sensitivity, while M1 and M3 provide complementary evidence under fixed-input and closed-loop conditions.
+The $\operatorname{Analyze}$ step in Algorithm~\ref{alg:agent-research} evaluates the response quantity and parameter sensitivities specified by the \PPRP{}. The four analysis semantics differ in the physical quantity being differentiated and in the treatment of state and control variables. M0 and M2 connect mechanism-indicator sensitivity to task-capability sensitivity with control adaptation or equilibrium re-solution, while M1 and M3 provide complementary evidence under fixed-input and closed-loop conditions.
 
 \paragraph{M0: Mechanism-indicator sensitivity}
 M0 asks which structural changes favor the intended physical mechanism. It evaluates a hypothesis-specific indicator $m_h(d;\chi)$ and its local sensitivity:
@@ -61,9 +61,9 @@ M1 asks how a structural change affects the physical response when the input is 
 S^{\mathrm{M1}}_{\tau,ij}=\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\right|_{U=U_0}.
 \label{eq:m1}
 \end{equation}
-This sensitivity isolates the direct structural effect and provides a reference for comparison with the control-adapted task-capability sensitivity in M2.
+This sensitivity isolates the direct structural effect and provides a reference for comparison with the task-capability sensitivity with control adaptation or equilibrium re-solution in M2.
 
-\paragraph{M2: Control-adapted task-capability sensitivity}
+\paragraph{M2: Task-capability sensitivity with control adaptation or equilibrium re-solution}
 M2 asks whether a structure can satisfy the task after control adaptation or equilibrium re-solution. It evaluates $V_{\mathcal Q_\tau}$ in~\eqref{eq:multi-capability}, with admissible control adapted for each active condition and equilibrium re-solved for each passive condition. The corresponding local sensitivity is
 \begin{equation}
 S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
