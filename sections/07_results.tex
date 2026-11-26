@@ -40,8 +40,12 @@ The matched M1\_B replay in Fig.~\ref{fig:mathematical-research}(B) illustrates 
 
 Re-optimizing the tendon tensions for each condition on the revised morphology reduces the maximum tendon speed to 24.75~mm/s and brings the worst normalized residual to $-0.010$. The same morphology consequently satisfies all four required conditions. Together, Fig.~\ref{fig:agent-directed-research} and Fig.~\ref{fig:mathematical-research}(B) show how structural refinement changes the available actuation response, while condition-specific control exploits the revised morphology to recover multi-condition feasibility.
 
-\paragraph{Figure-eight Tracking: investigating actuation feasibility}
-The initial trajectory follows the figure-eight reference closely, but its normalized lower-tension measure is 1.0005, slightly above the unit bound. Equilibrium continuation with antagonistic preload produces an 89-configuration equilibrium bank with a maximum static position error of 0.611~mm. Interpolating the bank's tendon-force solutions yields a feedforward schedule that reduces the normalized lower-tension measure to 0.9529 and completes the full 22-s tracking evaluation on the same morphology.
+\paragraph{Figure-eight Tracking: constructing tension-feasible trajectories}
+The Figure-eight episode in Fig.~\ref{fig:agent-directed-research} illustrates that accurate geometric tracking does not by itself guarantee actuator feasibility. Although the initial trajectory follows the reference closely, its normalized lower-tension measure reaches 1.0005, slightly exceeding the unit bound. The remaining challenge is therefore to obtain a tendon-force distribution that supports the entire reference trajectory within the prescribed tension limits.
+
+To construct such a distribution, the Main Agent shifts the boundary-tension initialization from 0.20 to 0.21~N and restarts from the time-zero equilibrium. Equilibrium continuation then produces an 89-configuration bank, with each configuration paired with its numerically computed tendon-force solution. The maximum static position error across this bank is 0.611~mm. Interpolating the equilibrium force solutions yields a continuous feedforward tension schedule, reducing the normalized lower-tension measure to 0.9529.
+
+The resulting schedule completes the full 22-s, two-cycle tracking evaluation on the same morphology, achieving an RMSE of 0.688~mm and a maximum tracking error of 1.021~mm. This result connects equilibrium-based force allocation with dynamic trajectory execution: the equilibrium bank provides a physically grounded force reference along the path, while the independent full-trajectory evaluation verifies its effectiveness during motion.
 
 \subsection{Mathematical Evidence for Task-Conditioned Reasoning}
 \label{subsec:evidence-validation}
