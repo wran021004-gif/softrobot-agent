@@ -45,9 +45,9 @@ Before computation, validity checks establish that the selected parameters and o
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
-The $\operatorname{Analyze}$ step in Algorithm~\ref{alg:agent-research} evaluates the mathematical quantity specified by the \PPRP{}. M0 and M2 provide the main connection between a physical hypothesis and a structure--control decision. M1 and M3 supply complementary evidence about fixed-input response and closed-loop execution. Each semantics defines the response and state or control treatment needed to address its research question.
+The $\operatorname{Analyze}$ step in Algorithm~\ref{alg:agent-research} evaluates the response quantity and parameter sensitivities specified by the \PPRP{}. The four analysis semantics differ in the physical quantity being differentiated and in the treatment of state and control variables. M0 and M2 connect mechanism-indicator sensitivity to control-adapted task-capability sensitivity, while M1 and M3 provide complementary evidence under fixed-input and closed-loop conditions.
 
-\paragraph{M0: Mechanism sensitivity}
+\paragraph{M0: Mechanism-indicator sensitivity}
 M0 asks which structural changes favor the intended physical mechanism. It evaluates a hypothesis-specific indicator $m_h(d;\chi)$ and its local sensitivity:
 \begin{equation}
 S_j^{\mathrm{M0}}=\frac{\partial m_h(d;\chi)}{\partial d_j}.
@@ -55,7 +55,7 @@ S_j^{\mathrm{M0}}=\frac{\partial m_h(d;\chi)}{\partial d_j}.
 \end{equation}
 For tendon-constrained tip suppression, this sensitivity identifies routing or geometric directions that reduce tip-motion freedom, with $r_{\mathrm{load}}(d;\chi)\geq r_{\min}$ preserving deformation freedom near the load. These indicators guide structural refinement toward the hypothesized spatial deformation pattern. Appendix~\ref{app:mathematical-details} relates the mechanism indicators to the loaded response through reduced compliance.
 
-\paragraph{M1: Fixed-input response}
+\paragraph{M1: Fixed-input task-residual sensitivity}
 M1 asks how a structural change affects the physical response when the input is fixed. Holding $U_0$ fixed, it evaluates the task-residual sensitivity
 \begin{equation}
 S^{\mathrm{M1}}_{\tau,ij}=\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\right|_{U=U_0}.
@@ -63,7 +63,7 @@ S^{\mathrm{M1}}_{\tau,ij}=\left.\frac{\partial g_{\tau,i}(d,U)}{\partial d_j}\ri
 \end{equation}
 This sensitivity isolates the direct structural effect and provides a reference for comparison with the control-adapted task-capability sensitivity in M2.
 
-\paragraph{M2: Re-optimized task capability}
+\paragraph{M2: Control-adapted task-capability sensitivity}
 M2 asks whether a structure can satisfy the task after control adaptation or equilibrium re-solution. It evaluates $V_{\mathcal Q_\tau}$ in~\eqref{eq:multi-capability}, with admissible control adapted for each active condition and equilibrium re-solved for each passive condition. The corresponding local sensitivity is
 \begin{equation}
 S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
@@ -73,7 +73,7 @@ The maximum condition-wise violation identifies the task-limiting conditions on 
 
 Together, M0 and M2 connect mechanism-guided structural directions to task capability, guiding candidate refinement before independent physical evaluation.
 
-\paragraph{M3: Closed-loop performance}
+\paragraph{M3: Closed-loop performance sensitivity}
 M3 asks how structural and feedback-control parameters influence closed-loop performance. With joint variables $z_{\mathrm{cl}}=(d,\theta)$, it evaluates
 \begin{equation}
 \begin{aligned}
