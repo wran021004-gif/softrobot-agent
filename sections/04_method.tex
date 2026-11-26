@@ -103,29 +103,22 @@ The Main Agent can also request independent physical evaluation as a separate re
 \begin{algorithmic}[1]
 \Require $\tau,\ x_0$ (possibly empty), $\Gamma,\ \mathcal B_0$
 \Ensure $x^\star$ (possibly empty), $\mathcal E^\star$, outcome $o^\star$
-\State $\mathcal C_0\gets\operatorname{Retrieve}(\tau,\mathcal K,\mathcal S)$
-\State $k\gets0,\quad\mathcal H_0,\mathcal E_0\gets\varnothing$
-\State $s_0\gets(\tau,x_0,\mathcal H_0,\mathcal E_0,\mathcal C_0,\mathcal B_0)$
+\State $k\gets0;\ s_0\gets(\tau,x_0,\varnothing,\varnothing,\operatorname{Retrieve}(\tau,\mathcal K,\mathcal S),\mathcal B_0)$
 \While{budget remains and study is active}
   \State $a_k\gets\operatorname{MainAgent}(s_k)$
-  \If{$a_k$ is Select/Stop}
-    \State Record decision in $s_k$; \textbf{break}
-  \EndIf
+  \State \textbf{if} $a_k$ is Select/Stop \textbf{then} record decision; \textbf{break}
   \State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{phys}}\gets\varnothing$
   \If{$a_k$ is Research}
-    \State $\mathcal R_k\gets\operatorname{Intent}(a_k)$
-    \State $\mathcal P_k\gets\operatorname{PPRP}(\tau,x_k,\mathcal R_k,\Gamma)$
+    \State $\mathcal P_k\gets\operatorname{PPRP}(\tau,x_k,\operatorname{Intent}(a_k),\Gamma)$
     \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k;\mathcal B_k)$
   \ElsIf{$a_k$ is Refine/Control}
     \State $x_{k+1}\gets\operatorname{Refine}(x_k,a_k)$
   \ElsIf{$a_k$ is Evaluate}
     \State $e_k^{\mathrm{phys}}\gets\operatorname{Evaluate}(\tau,x_k)$
   \EndIf
-  \State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{phys}})$
-  \State $k\gets k+1$
+  \State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{phys}})$; $k\gets k+1$
 \EndWhile
-\State $x^\star\gets\operatorname{Selected}(s_k)$; $\varnothing$ if no candidate is retained
-\State $o^\star\gets\texttt{not\_completed}$
+\State $x^\star\gets\operatorname{Selected}(s_k)$ (or $\varnothing$); $o^\star\gets\texttt{not\_completed}$
 \If{$x^\star\neq\varnothing$ and physical evidence in $\mathcal E_k$ verifies all required conditions for $x^\star$}
   \State $o^\star\gets\texttt{accepted}$
 \EndIf
