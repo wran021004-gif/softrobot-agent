@@ -5,7 +5,7 @@
 Under the common per-run budget ceilings, \softrobotagent{} identifies feasible structure--control solutions for all eleven tasks, spanning motion control, tool operation, adaptability, and passive mechanics. By comparison, Direct Mathematical Tools achieves task completion in 2/11 tasks, whereas LLM-only completes none (Table~\ref{tab:abc-comparison}).
 \input{tables/table2_abc_comparison}
 
-The resulting task-specific candidates collectively satisfy all 30 required operating conditions (Table~\ref{tab:physical-portfolio}). Figure-eight Tracking achieves a tracking RMSE of 0.688~mm and a maximum error of 1.021~mm over two cycles (22~s) within the prescribed actuation limits. Button Press achieves a depth error of 0.0528~mm and a force error of 0.00247~N. One morphology with condition-specific controls satisfies all four conditions of Shared Morphology. Passive Tip Suppression meets the loaded-point displacement requirements across all ten signed-loading conditions, with a maximum tip-to-loaded-point displacement ratio of 0.1538.
+The selected candidates satisfy all 30 required operating conditions (Table~\ref{tab:physical-portfolio}). Each task-specific morphology is evaluated across its prescribed targets, loads, and execution requirements. Collectively, these conditions span dynamic motion, tool-mediated contact, multi-condition operation on a shared morphology, and passive deformation under signed loading.
 
 We next trace the structural and control decisions underlying three of these capabilities, focusing on tendon-constrained deformation transfer, control-adapted task capability, and admissible tendon-force generation.
 
