@@ -8,3 +8,26 @@ Six matched checkpoints are replayed with the saved Reporter interpretation with
 
 \subsection{Hierarchical Context Replay}
 At the load-diagnosis and parameter-tradeoff checkpoints, flat delivery supplies the checkpoint corpus, whereas hierarchical delivery supplies a concise brief and access to supporting records. We compare decision scores and provider-reported input tokens accumulated over accepted requests in each session. At parameter tradeoff, critical-evidence coverage is the fraction of five reference evidence items covered by the decision. Figure~\ref{fig:research-continuity} reports the results.
+
+
+For parameter tradeoff (checkpoint PHS\_C037\_A), the five factual groups in Table~\ref{tab:context-evidence-checklist} were frozen before blind scoring. A group is covered only when the decision correctly uses its substantive content. Exact numbers and every listed source reference are not required; a partial reference counts if it preserves the relevant physical interpretation, whereas a bare citation or an incorrect interpretation does not. Coverage is binary per group and reported as covered groups divided by five, separately from the five-dimension decision score. Flat access covers G1--G5; hierarchical access covers G2, G4, and G5.
+
+\begin{table*}[!t]
+\centering
+\caption{Predefined decision-critical evidence at the parameter-tradeoff checkpoint. Source identifiers refer to the frozen research archive.}
+\label{tab:context-evidence-checklist}
+\papertablestyle
+\begin{tabularx}{\textwidth}{@{}p{0.045\textwidth}p{0.46\textwidth}Y@{}}
+\toprule
+\textbf{ID} & \textbf{Decision-critical evidence} & \textbf{Coverage criterion} \\
+\midrule
+G1 & Matched near-load results for viscosity variants F2/F3/F4 show reduced drift but nonmonotone speed and static-balance residuals (C029, C032, C035). & Recognizes the mixed trends rather than inferring uniform improvement from reduced drift. \\
+G2 & Loaded qualification remains unsuccessful despite some unloaded or local mathematical qualification (C031, C034, C036, C037). & Distinguishes unloaded/local qualification from loaded dynamic qualification. \\
+G3 & F3 has much larger finite-load motion transfer under distal loading than near loading (C032, C037). & Uses the near/distal contrast with the correct load-case and candidate scope. \\
+G4 & Raw route records detect a cable--solid intersection at the initial pose/time (C031, C034, C036). & Separates installed-route invalidity from contact counts and late-time settling. \\
+G5 & Sampled exploratory evidence covers selected cases, without establishing every-step qualification, full independent acceptance, numerical convergence, or a unique failure cause (C027, C031, C034, C036, C037). & Keeps the proposed decision within the demonstrated scope of the sampled evidence. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+{\raggedright The hierarchical session makes three \texttt{research\_recall} calls with \texttt{view=details}: step~31 reads \texttt{C031\_EP0\_qualifications}, step~34 reads \texttt{C034\_EP0\_qualifications}, and step~36 reads \texttt{C036\_EP0\_route\_geometry}. Each call selects its record through the exact \texttt{/information/} pointer. The first two expose loaded-qualification records for the matched viscosity variants; the third exposes the installed-route geometry check. Coverage is assessed from the final decision, separately from whether a record was retrieved.\par}

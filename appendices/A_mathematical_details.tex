@@ -36,7 +36,9 @@ This condition implies positive curvature on the critical cone and hence a stric
 The passive equilibrium solver qualifies a local solution using primal feasibility, stationarity, complementarity, and the minimum reduced-stiffness eigenvalue, together with tendon-force limits and geometric checks. Its initialization selects the local solution; sensitivities refer to that same branch. The resulting equilibrium enters the passive task residuals in~\eqref{eq:passive-constraints}; condition-wise and shared-morphology feasibility follow~\eqref{eq:condition-violation} and~\eqref{eq:multi-capability}.
 
 \subsection{Mechanism Indicators and Loaded Response}
-For the indicators in~\eqref{eq:m0-indicator}, choose $Z_{\mathcal A}$ orthonormal in a fixed, dimensionally scaled generalized-coordinate system. The indicators are invariant to orthogonal changes of null-space basis. The investigation fixes the coordinate scaling and the lower bound $r_{\min}$ on loaded-point motion freedom.
+For the local reduced-compliance calculation, $\mathcal A$ denotes the set of taut constraints maintained along the selected response branch; under strict complementarity, this set coincides with $\mathcal A_+$.
+
+For the indicators in~\eqref{eq:m0-indicator}, choose $Z_{\mathcal A}$ orthonormal in a fixed, dimensionally scaled generalized-coordinate system. All constraint and point Jacobians, the stiffness matrix, and the null-space basis use this same coordinate representation. The indicators are invariant to orthogonal changes of null-space basis. The investigation fixes the coordinate scaling and the lower bound $r_{\min}$ on loaded-point motion freedom.
 
 The actual displacement under load also depends on mechanical response. For a stable equilibrium with maintained fixed-payout constraints, let $K_t$ be the tangent stiffness of the constrained Lagrangian. Under a small applied load increment $\delta f$ at the loaded point, define $K_r=Z_{\mathcal A}^\top K_tZ_{\mathcal A}$. Projecting the linearized equilibrium onto $Z_{\mathcal A}$ gives $K_r\eta=Z_{\mathcal A}^\top J_{\mathrm{load}}^\top\delta f$. When $K_r$ is positive definite, the reduced linear response is
 \begin{equation}
@@ -49,8 +51,8 @@ Z_{\mathcal A}^\top J_{\mathrm{load}}^\top\delta f.
 \end{equation}
 Thus routing-dependent directions, stiffness along those directions, and load coupling jointly determine motion transfer. This relation connects a kinematic mechanism indicator to the passive task response. The investigation specifies whether the reference configuration is fixed or follows a re-solved equilibrium branch. The active set and rank are locally maintained; derivatives refer to continuous parameters within the selected morphology.
 
-\subsection{Passive equilibrium sensitivity}
-For active set $\mathcal A$, let $w_{\mathcal A}=(q,\mu_{\mathcal A})$ satisfy $F(w_{\mathcal A},d;f)=0$. When the active set is unchanged and $F_w$ is nonsingular, the implicit-function theorem gives $\partial w^\star/\partial d=-F_w^{-1}F_d$. A task metric follows by the chain rule. Loaded and unloaded equilibria are both differentiated for a response relative to an unloaded reference. Active-set transitions require directional or mode-specific analysis.
+\subsection{Passive Equilibrium Sensitivity}
+For active set $\mathcal A$, let $w_{\mathcal A}=(q,\mu_{\mathcal A})$ satisfy $F(w_{\mathcal A},d;f)=0$. For the fixed active set, $F_w$ is the bordered KKT matrix with blocks $K_t$, $J_{c,\mathcal A}^{\top}$, $J_{c,\mathcal A}$, and zero. Linear independence of the active constraint gradients and positive definiteness of $K_t$ on their null space ensure that this matrix is nonsingular. Strict complementarity maintains the active set locally. With these conditions and unchanged material-point bindings, the implicit-function theorem gives $\partial w^\star/\partial d=-F_w^{-1}F_d$. The implementation additionally requires a qualified equilibrium and a KKT condition number below $10^{12}$ before returning an implicit gradient. A task metric follows by the chain rule. Loaded and unloaded equilibria are both differentiated for a response relative to an unloaded reference. Active-set transitions require directional or mode-specific analysis.
 
 \subsection{Condition-Wise and Aggregated Task Sensitivity}
 The epigraph form of~\eqref{eq:capability} is
@@ -58,7 +60,7 @@ The epigraph form of~\eqref{eq:capability} is
 \min_{U,\rho}\ \rho\quad\text{s.t.}\quad g_{\tau,i}(d,U)\leq\rho\ (\forall i),\quad U\in\mathcal U(d).
 \label{eq:epigraph}
 \end{equation}
-Let $\lambda_i^\star$, $\alpha_j^\star$, and $\beta_j^\star$ denote the optimal multipliers for the task, lower-input, and upper-input constraints, respectively. The actuator bounds are $\ell_j(d)\leq U_j\leq h_j(d)$. Under the relevant local optimality, differentiability, constraint-qualification, and regularity conditions, the envelope relation gives
+Let $\lambda_i^\star$, $\alpha_j^\star$, and $\beta_j^\star$ denote the optimal multipliers for the task, lower-input, and upper-input constraints, respectively. The actuator bounds are $\ell_j(d)\leq U_j\leq h_j(d)$, represented as $\ell_j(d)-U_j\leq0$ and $U_j-h_j(d)\leq0$, respectively. Under the relevant local optimality, differentiability, constraint-qualification, and regularity conditions, the envelope relation gives
 \begin{equation}
 \begin{aligned}
 \frac{\partial V_\tau}{\partial d_j}
