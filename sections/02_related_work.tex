@@ -1,15 +1,13 @@
 \section{Related Work}
 \label{sec:related}
 
-Research relevant to PRIME-Soft spans mechanics-based modeling and task-oriented co-design, agentic robot design and scientific reasoning, and persistent research harnesses for organizing execution and accumulated experience.
-
 \subsection{Mechanics-Based Modeling and Task-Oriented Co-Design}
 
 Continuum-robot models range from kinematic reductions to mechanics-based formulations of distributed deformation. Webster and Jones unify common piecewise constant-curvature formulations~\cite{webster2010design}, while Rucker and Webster model general tendon routing and external loading using Cosserat rods and strings~\cite{rucker2011computing}. Geometric variable-strain (GVS) formulations provide finite-dimensional representations for static and dynamic analysis~\cite{renda2020gvs,boyer2021dynamics}, with SoRoSim implementing this approach for hybrid rigid--soft robots~\cite{mathew2023sorosim}. Subsequent work benchmarks continuum-robot models and derives analytical or implicit derivatives for design and routing optimization~\cite{rao2021modeling,mathew2026derivatives,mathew2026routing}.
 
 Task-oriented co-design uses these models to shape compliance, stiffness, and actuation capability. Existing studies investigate load-induced deflection, co-optimize shape and segment stiffness, and optimize tendon placement for feasible or energy-efficient workspaces~\cite{oliverbutler2019stiffness,stella2023stiffness,jabari2026design}. Sensitivity and perturbation analysis characterize the influence of structural parameters~\cite{sawant2023stiffness,bonnans2000perturbation}, while actuator-space trajectory planning connects feedforward and feedback control under motion constraints~\cite{qiu2025actuator}. Structure--control co-optimization has also been studied in soft underwater swimmers and broader soft-robot design tasks~\cite{ma2021diffaqua,bhatia2022evolutiongym,wang2023softzoo}.
 
-These methods provide established physical models and mathematical tools for analyzing and optimizing robot designs. PRIME-Soft builds on these foundations by enabling an agent to identify which physical relationships should be investigated for a given task and to organize the corresponding mathematical and design actions.
+PRIME-Soft builds on these established methods by allowing the agent to determine which task-specific physical relationships should be investigated and how existing mathematical tools should be applied.
 
 \subsection{Agentic Robot Design and Scientific Reasoning}
 
@@ -17,7 +15,7 @@ Agentic robot-design methods organize reasoning around design candidates and the
 
 Scientific-discovery agents instead organize reasoning around hypotheses and research methods. The AI Scientist develops research ideas through implementation and experimentation~\cite{lu2024aiscientist}. Co-Scientist and Robin support hypothesis generation, literature-grounded reasoning, and experimental-data analysis~\cite{gottweis2026coscientist,ghareeb2026robin}. ScienceAgentBench evaluates scientific programs through execution validity, task success, and computational cost~\cite{chen2025scienceagentbench}.
 
-PRIME-Soft connects agentic design exploration with mechanism-grounded scientific research. Rather than reasoning only about candidate outcomes, the Main Agent formulates physical hypotheses and selects mathematical investigations that explain task-limiting mechanisms. PPRP connects these research decisions to established mathematical execution, allowing the resulting evidence to guide structure--control co-design.
+PRIME-Soft combines agentic design exploration with mechanism-grounded physical investigation, making the construction of research questions part of the co-design process.
 
 \subsection{Research Harnesses and Evidence Continuity}
 
@@ -25,4 +23,4 @@ Robot-agent harnesses organize execution, feedback, and persistent experience. H
 
 Experience reuse further extends research across tasks. ASPIRE consolidates validated repair patterns into reusable skills with applicability conditions~\cite{lu2026aspire}. Harness VLA combines execution traces with reusable success rules and failure models~\cite{zhang2026harnessvla}, while HoloAgent-0 retains spatial and temporal execution experience for subsequent embodied decisions~\cite{zhou2026holoagent}.
 
-PRIME-Soft applies persistent harness organization to physical co-design research. Its evidence records preserve the correspondence among physical hypotheses, mathematical formulations, candidate structures, and independent physical evaluations. Knowledge and Skill retain complementary physical findings and research procedures, allowing subsequent design decisions to build on accumulated and traceable research experience.
+Unlike execution-oriented experience reuse, PRIME-Soft preserves the links between physical hypotheses, mathematical investigations, candidate designs, and their evaluation evidence.

@@ -3,9 +3,7 @@
 \subsection{From Task Behavior to a Physical Hypothesis}
 \label{subsec:overall-framework}
 
-Figure~\ref{fig:research-framework} places the Main Agent at the center of \softrobotagent{}'s research decisions. From task behavior and accumulated evidence, it identifies the physical relationship most relevant to the current bottleneck using the deformation and actuation mechanisms established in Section~\ref{sec:formulation}. A working hypothesis relates that bottleneck to a candidate-dependent mechanism, such as tendon-constrained deformation transfer or tendon-force transmission, and identifies what to investigate.
-
-The user provides the task-and-environment contract $\tau$, while the system supplies a registered capability set $\Gamma$ containing admissible design parameters, research observables, physical models, and mathematical analysis capabilities. Given the task behavior and accumulated evidence, the Main Agent selects relevant resources from this set and constructs the next physical research intent.
+Figure~\ref{fig:research-framework} places the Main Agent at the center of PRIME-Soft's research decisions. Given the task contract, current candidate, and accumulated evidence, it identifies task-limiting physical mechanisms and formulates working hypotheses using the system's registered capabilities $\Gamma$.
 
 Its research state is
 \begin{equation}
@@ -14,7 +12,7 @@ s_k=(\tau,x_k,\mathcal H_k,\mathcal E_k,\mathcal C_k,\mathcal B_k),
 \end{equation}
 where $\tau$ is the frozen task contract and $x_k=(d_k,U_k,\theta_k)$ is the current structure--control candidate, with actuation and feedback variables included as applicable. The set $\mathcal H_k$ contains working physical hypotheses, $\mathcal E_k$ contains the mathematical and physical evidence accumulated in the current investigation, and $\mathcal C_k$ denotes task-relevant research context supplied by the persistent research harness. The remaining research budget is denoted by $\mathcal B_k$.
 
-Based on $s_k$, the Main Agent selects among four research actions: \emph{Research} specifies a physical hypothesis, design parameters, observables, and analysis semantics for mathematical investigation; \emph{Refine/Control} proposes a structural or control update; \emph{Evaluate} requests independent physical evaluation; and \emph{Select/Stop} selects a validated candidate or terminates the study. Algorithm~\ref{alg:agent-research} presents the resulting research loop.
+Based on $s_k$, the Main Agent selects among four actions: Research, Refine/Control, Evaluate, and Select/Stop. Algorithm~\ref{alg:agent-research} details the resulting research loop.
 
 \subsection{Projecting Research Intent into a Task-Specific Mathematical Problem}
 \label{subsec:pprp}
@@ -26,7 +24,7 @@ The Main Agent expresses the physical relationship to investigate as a research 
 \end{equation}
 where $h_k$ states the physical hypothesis, $\mathcal I_k$ identifies the design factors to investigate, $\mathcal O_k$ specifies the relevant physical quantities, and $\sigma_k$ selects the analysis semantics.
 
-\PPRP{} provides a structured interface between physical research intent and deterministic mathematical execution. It preserves the task and candidate context of each investigation through three complementary bindings, specifying what physical quantities to investigate, how design variables enter the model, and how the resulting response is evaluated.
+\PPRP{} compiles the research intent through three complementary bindings.
 
 The \emph{hypothesis-to-observable binding} resolves the physical quantities selected by the Main Agent to observables defined by the candidate's physical model and operating context. For tendon-constrained tip suppression, the hypothesis is that changing tendon routing can reduce tip-motion freedom while retaining deformation freedom near the load. This binds the investigation to the tip and loaded-point indicators $m_h$ and $r_{\mathrm{load}}$ in~\eqref{eq:m0-indicator}, giving the hypothesized spatial deformation relationship a measurable mathematical expression.
 
@@ -45,7 +43,7 @@ Together, these bindings compile the Parameterized Physical Research Problem:
 \end{equation}
 where $\Gamma$ denotes the registered parameter, observable, physical-model, and analysis-capability definitions. The resolved sets $\tilde{\mathcal I}_k$ and $\tilde{\mathcal O}_k$ bind the selected design factors and observables to the current candidate; $\mathcal F_k$ is the corresponding physical model, $\chi_k$ specifies the operating context, and $\Psi_{\sigma_k}$ defines the mathematical problem induced by the selected semantics.
 
-Before computation, validity checks establish that the selected parameters and observables are defined for the candidate, their physical definitions are consistent with the bound model, and the analysis semantics applies to the specified operating context. The bound model and its mathematical properties determine the compatible numerical realization of $\Psi_{\sigma_k}$. The harness dispatches the resulting problem to the applicable deterministic analysis capability. Mathematical evidence is returned to the Main Agent for subsequent research decisions, completing the path shown in Fig.~\ref{fig:research-framework}.
+The harness validates the candidate--model--semantics compatibility, dispatches the PPRP to a compatible deterministic backend, and returns the resulting mathematical evidence to the Main Agent.
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}

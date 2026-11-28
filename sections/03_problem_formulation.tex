@@ -1,7 +1,7 @@
 \section{Problem Formulation}
 \label{sec:formulation}
 
-We formulate autonomous structure--control co-design for tendon-driven continuum robots as a task-conditioned feasibility problem: identifying a robot morphology and admissible control strategy that jointly satisfy specified physical requirements. The problem couples morphology-dependent deformation and actuation mechanisms with task-conditioned physical evaluation. Its solution requires both physical design decisions and investigations that determine how structural changes influence task capability under appropriate control treatments.
+We formulate autonomous structure--control co-design for tendon-driven continuum robots as a task-conditioned feasibility problem: identifying a robot morphology and admissible control strategy that jointly satisfy specified physical requirements. The problem couples morphology-dependent deformation and actuation mechanisms with task-conditioned physical evaluation.
 
 \subsection{Morphology, Deformation, and Actuation}
 
@@ -47,9 +47,9 @@ In this example, $m_h$ quantifies the tip-motion component of admissible interna
 
 \subsection{Task Capability and Structural Influence}
 
-A user-provided task-and-environment contract $\tau$ specifies task goals and constraints, initial conditions, targets or reference trajectories, external loads, contact conditions, task horizon, and acceptance criteria. Task-level observables define the quantities used for independent task evaluation. The Main Agent separately selects research observables to investigate hypothesized physical mechanisms; these observables are resolved from the registered physical-model definitions and need not coincide with the task-level metrics.
+A task-and-environment contract $\tau$ specifies task goals and constraints, initial conditions, targets or reference trajectories, external loads, contact conditions, task horizon, and acceptance criteria. Task-level observables define the quantities used for independent task evaluation. The Main Agent separately selects research observables to investigate hypothesized physical mechanisms; these observables are resolved from the registered physical-model definitions and need not coincide with the task-level metrics.
 
-Let $\mathcal Q_\tau$ denote the required operating conditions, partitioned into active and passive conditions as $\mathcal Q_\tau=\mathcal Q_{\mathrm{act}}\cup\mathcal Q_{\mathrm{pass}}$. The operating context $\chi_c$ is the condition-specific context instantiated from the task contract and current candidate, including the reference configuration, external loads, contact conditions, active tendon set, and control conditions.
+Let $\mathcal Q_\tau$ denote the required operating conditions, partitioned into active and passive conditions as $\mathcal Q_\tau=\mathcal Q_{\mathrm{act}}\cup\mathcal Q_{\mathrm{pass}}$. Let $\chi_c$ denote the condition-specific operating context instantiated from the task contract and current candidate.
 
 For an active task, the physical model maps the morphology and an admissible input sequence $U=(u_0,\ldots,u_{N-1})$ to a task trajectory, from which signed normalized task residuals are evaluated:
 \begin{equation}
