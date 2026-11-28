@@ -13,15 +13,13 @@ The selected candidates satisfy all 30 required operating conditions (Table~\ref
 \subsection{Mechanism-Guided Physical Co-Design}
 \label{subsec:process-dissection}
 
-\input{figures/fig03_agent_directed_research}
-
 \paragraph{Passive Tip Suppression: shaping spatial compliance}
 
 For Passive Tip Suppression, the Main Agent formulated a spatial-compliance objective: retaining substantial deformation near an applied load while attenuating its transmission to the distal tip. It first examined the tendon-constrained Jacobian to identify admissible deformation patterns favorable to this objective. For an intermediate three-segment candidate, the predicted maximum tip-to-loaded-point displacement ratio was 0.0448. Nonlinear loading, however, yielded a maximum ratio of 0.5297 across the geometrically admissible loading cases. This difference led the Main Agent to expand its hypothesis to account for the coupled effects of tendon routing, backbone stiffness, and load-induced deformation.
 
 Guided by this evidence, the Main Agent jointly refined tendon-guide placement, backbone segmentation, and cross-sectional properties. The resulting morphology comprises nine backbone segments, four tendons, and eight physical guide plates under a common fixed payout. Across ten signed-load conditions, including four held-out cases, the design retains more than 11~mm of loaded-point displacement while achieving a maximum tip-to-loaded-point displacement ratio of 0.1093, below the 0.30 acceptance threshold (Fig.~\ref{fig:phs2d-mechanism}). These paired responses demonstrate deformation concentrated near the applied load with attenuated transmission to the distal tip.
 
-\begin{figure}[!t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig03_phs2d_mechanism.pdf}
 \caption{Physical response of the final nine-segment PHS-2D morphology under signed loading. (a) Simulated centerlines; (b) loaded-point displacement; (c) projected distal-tip displacement; (d) tip-to-loaded-point displacement ratio. The six plotted cases use $s\in\{0.3,0.5,0.7\}$ under $\pm0.1$~N loading; four additional held-out cases are included in the ten-condition evaluation reported in the text. The dashed line marks the 0.30 acceptance threshold.}

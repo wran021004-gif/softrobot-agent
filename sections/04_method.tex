@@ -14,6 +14,36 @@ where $\tau$ is the frozen task contract and $x_k=(d_k,U_k,\theta_k)$ is the cur
 
 Based on $s_k$, the Main Agent selects among four actions: Research, Refine/Control, Evaluate, and Select/Stop. Algorithm~\ref{alg:agent-research} details the resulting research loop.
 
+\begin{algorithm}[!t]
+\caption{Main-Agent-directed research and structure--control co-design}
+\label{alg:agent-research}
+\fontsize{9}{11}\selectfont
+\begin{algorithmic}[1]
+\Require $\tau,\ x_0$ (possibly empty), $\Gamma,\ \mathcal B_0$
+\Ensure $x^\star$ (possibly empty), $\mathcal E^\star$, outcome $o^\star$
+\State $k\gets0;\ s_0\gets(\tau,x_0,\varnothing,\varnothing,\operatorname{Retrieve}(\tau,\mathcal K,\mathcal S),\mathcal B_0)$
+\While{budget remains and study is active}
+  \State $a_k\gets\operatorname{MainAgent}(s_k)$
+  \State \textbf{if} $a_k$ is Select/Stop \textbf{then} record decision; \textbf{break}
+  \State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{phys}}\gets\varnothing$
+  \If{$a_k$ is Research}
+    \State $\mathcal P_k\gets\operatorname{PPRP}(\tau,x_k,\operatorname{Intent}(a_k),\Gamma)$
+    \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k;\mathcal B_k)$
+  \ElsIf{$a_k$ is Refine/Control}
+    \State $x_{k+1}\gets\operatorname{Refine}(x_k,a_k)$
+  \ElsIf{$a_k$ is Evaluate}
+    \State $e_k^{\mathrm{phys}}\gets\operatorname{Evaluate}(\tau,x_k)$
+  \EndIf
+  \State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{phys}})$; $k\gets k+1$
+\EndWhile
+\State $x^\star\gets\operatorname{Selected}(s_k)$ (or $\varnothing$); $o^\star\gets\texttt{not\_completed}$
+\If{$x^\star\neq\varnothing$ and physical evidence in $\mathcal E_k$ verifies all required conditions for $x^\star$}
+  \State $o^\star\gets\texttt{accepted}$
+\EndIf
+\State \Return $x^\star,\quad\mathcal E^\star=\mathcal E_k,\quad o^\star$
+\end{algorithmic}
+\end{algorithm}
+
 \subsection{Projecting Research Intent into a Task-Specific Mathematical Problem}
 \label{subsec:pprp}
 
@@ -87,42 +117,16 @@ Here $y_{0:N}$ is the closed-loop trajectory under the high-fidelity physical ex
 
 The Differentiation Router in Fig.~\ref{fig:research-framework} selects a compatible mathematical implementation for the response defined by the \PPRP{} and its bound model. It uses explicit differentiation for differentiable response maps, implicit differentiation for regular equilibrium or optimality systems, optimal-value sensitivity for parameterized optimization values, and perturbation analysis for model responses to parameter changes~\cite{bonnans2000perturbation,nocedal2006numerical}. These implementations provide the sensitivities needed to investigate structural influence under the selected analysis semantics. Appendix~\ref{app:mathematical-details} gives the numerical formulations and applicability conditions.
 
+% Queue the upcoming portfolio floats one page ahead in two-column layout.
+\input{figures/fig02_task_portfolio}
+\input{tables/table1_family_summary}
+
 \subsection{Updating Structure and Control}
 \label{subsec:structure-control-refinement}
 
 The Main Agent selects structural and control updates according to the available research evidence. A deterministic compiler instantiates discrete morphology changes, while a numerical optimizer updates continuous design parameters and adapts the corresponding control variables.
 
 Independent physical evaluation checks the revised candidate against the frozen task contract. Its evidence determines whether the candidate is retained or further research is required.
-
-\begin{algorithm}[!t]
-\caption{Main-Agent-directed research and structure--control co-design}
-\label{alg:agent-research}
-\fontsize{9}{11}\selectfont
-\begin{algorithmic}[1]
-\Require $\tau,\ x_0$ (possibly empty), $\Gamma,\ \mathcal B_0$
-\Ensure $x^\star$ (possibly empty), $\mathcal E^\star$, outcome $o^\star$
-\State $k\gets0;\ s_0\gets(\tau,x_0,\varnothing,\varnothing,\operatorname{Retrieve}(\tau,\mathcal K,\mathcal S),\mathcal B_0)$
-\While{budget remains and study is active}
-  \State $a_k\gets\operatorname{MainAgent}(s_k)$
-  \State \textbf{if} $a_k$ is Select/Stop \textbf{then} record decision; \textbf{break}
-  \State $x_{k+1}\gets x_k,\quad e_k^{\mathrm{math}},e_k^{\mathrm{phys}}\gets\varnothing$
-  \If{$a_k$ is Research}
-    \State $\mathcal P_k\gets\operatorname{PPRP}(\tau,x_k,\operatorname{Intent}(a_k),\Gamma)$
-    \State $e_k^{\mathrm{math}}\gets\operatorname{Analyze}(\mathcal P_k;\mathcal B_k)$
-  \ElsIf{$a_k$ is Refine/Control}
-    \State $x_{k+1}\gets\operatorname{Refine}(x_k,a_k)$
-  \ElsIf{$a_k$ is Evaluate}
-    \State $e_k^{\mathrm{phys}}\gets\operatorname{Evaluate}(\tau,x_k)$
-  \EndIf
-  \State $s_{k+1}\gets\operatorname{Update}(s_k,a_k,x_{k+1},e_k^{\mathrm{math}},e_k^{\mathrm{phys}})$; $k\gets k+1$
-\EndWhile
-\State $x^\star\gets\operatorname{Selected}(s_k)$ (or $\varnothing$); $o^\star\gets\texttt{not\_completed}$
-\If{$x^\star\neq\varnothing$ and physical evidence in $\mathcal E_k$ verifies all required conditions for $x^\star$}
-  \State $o^\star\gets\texttt{accepted}$
-\EndIf
-\State \Return $x^\star,\quad\mathcal E^\star=\mathcal E_k,\quad o^\star$
-\end{algorithmic}
-\end{algorithm}
 
 \subsection{Persistent Research Harness}
 \label{subsec:research-continuity-method}
