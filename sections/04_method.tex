@@ -5,6 +5,8 @@
 
 Figure~\ref{fig:research-framework} places the Main Agent at the center of \softrobotagent{}'s research decisions. From task behavior and accumulated evidence, it identifies the physical relationship most relevant to the current bottleneck using the deformation and actuation mechanisms established in Section~\ref{sec:formulation}. A working hypothesis relates that bottleneck to a candidate-dependent mechanism, such as tendon-constrained deformation transfer or tendon-force transmission, and identifies what to investigate.
 
+The user provides the task-and-environment contract $\tau$, while the system supplies a registered capability set $\Gamma$ containing admissible design parameters, research observables, physical models, and mathematical analysis capabilities. Given the task behavior and accumulated evidence, the Main Agent selects relevant resources from this set and constructs the next physical research intent.
+
 Its research state is
 \begin{equation}
 s_k=(\tau,x_k,\mathcal H_k,\mathcal E_k,\mathcal C_k,\mathcal B_k),
@@ -22,7 +24,9 @@ The Main Agent expresses the physical relationship to investigate as a research 
 \mathcal R_k=(h_k,\mathcal I_k,\mathcal O_k,\sigma_k),
 \label{eq:research-intent}
 \end{equation}
-where $h_k$ states the physical hypothesis, $\mathcal I_k$ identifies the design factors to investigate, $\mathcal O_k$ specifies the relevant physical quantities, and $\sigma_k$ selects the analysis semantics. \PPRP{} constructs a mathematical problem from this intent through three complementary bindings that determine what to measure, how design variables enter the physical model, and how the response and its sensitivity are evaluated.
+where $h_k$ states the physical hypothesis, $\mathcal I_k$ identifies the design factors to investigate, $\mathcal O_k$ specifies the relevant physical quantities, and $\sigma_k$ selects the analysis semantics.
+
+\PPRP{} provides a structured interface between physical research intent and deterministic mathematical execution. It preserves the task and candidate context of each investigation through three complementary bindings, specifying what physical quantities to investigate, how design variables enter the model, and how the resulting response is evaluated.
 
 The \emph{hypothesis-to-observable binding} resolves the physical quantities selected by the Main Agent to observables defined by the candidate's physical model and operating context. For tendon-constrained tip suppression, the hypothesis is that changing tendon routing can reduce tip-motion freedom while retaining deformation freedom near the load. This binds the investigation to the tip and loaded-point indicators $m_h$ and $r_{\mathrm{load}}$ in~\eqref{eq:m0-indicator}, giving the hypothesized spatial deformation relationship a measurable mathematical expression.
 
