@@ -7,21 +7,22 @@ A robot may need to yield near an external load while keeping its tip stable. Th
 
 Autonomous structure--control co-design aims to identify robot morphologies and control strategies that jointly satisfy task-specific physical requirements. Established methods in continuum mechanics, sensitivity analysis, mathematical optimization, structural design, and control provide the foundations for investigating and improving these systems~\cite{sawant2023stiffness,bonnans2000perturbation}. Language-model agents offer complementary capabilities for physical reasoning and design exploration~\cite{chen2026aidsr,gottweis2026coscientist}. However, effectively combining these capabilities requires more than generating and evaluating design candidates. The agent must identify which physical mechanisms govern task performance, formulate the corresponding research questions, and select appropriate mathematical investigations under explicit structural and control treatments. This makes the organization of physical research actions an essential part of autonomous co-design.
 
-We present \softrobotagent{}, a framework for agent-directed physical research and autonomous structure--control co-design (Fig.~\ref{fig:research-framework}). Users specify task constraints and operating conditions, while the Main Agent determines how the physical problem should be investigated. From task behavior and accumulated evidence, it identifies task-limiting mechanisms, formulates physical hypotheses, and selects candidate-specific design parameters, research observables, and analysis semantics. Research-intent projection then constructs a Parameterized Physical Research Problem (\PPRP{}), binding these decisions to registered physical models and mathematical capabilities. This allows established mechanics, sensitivity-analysis, and optimization methods to be selected and executed according to the physical question under investigation. The resulting evidence guides subsequent structural refinement, control adaptation, and independent physical evaluation.
+We present \softrobotagent{}, a framework for agent-directed physical research and autonomous structure--control co-design (Fig.~\ref{fig:research-framework}). Users specify task constraints and operating conditions, while the Main Agent determines the physical questions and investigations needed to guide co-design. \PPRP{} projects each research intent into a candidate-specific mathematical problem using registered physical models and analysis capabilities. The resulting evidence guides subsequent structural refinement and control adaptation.
 
 \input{figures/fig01_framework_float}
 
-A persistent research harness organizes this process by linking research intents, mathematical investigations, candidate structures, and independent physical evaluations. Knowledge and Skill preserve complementary forms of accumulated experience: established physical findings and the methods used to investigate them. These resources allow the Main Agent to reuse prior evidence and research procedures when organizing subsequent tasks.
-
 The main contributions are as follows:\par\nopagebreak[4]
 
-\par\smallskip\noindent\textbf{C1: Agent-directed structure--control co-design.}\enspace
-We develop an autonomous research process in which the Main Agent identifies task-relevant physical mechanisms and organizes mathematical investigation, structural refinement, control adaptation, and physical evaluation.
+\par\smallskip\noindent
+\textbf{C1: Agent-directed structure--control co-design.}\enspace
+We develop an autonomous research process that connects physical investigation with structural refinement, control adaptation, and physical evaluation.
 
-\par\smallskip\noindent\textbf{C2: Intent-parameterized mathematical research.}\enspace
-We introduce \PPRP{}, which projects physical research intents into candidate-specific mathematical problems by binding hypotheses, design parameters, research observables, physical models, and analysis semantics for deterministic execution.
+\par\smallskip\noindent
+\textbf{C2: Intent-parameterized mathematical research.}\enspace
+We introduce \PPRP{}, which compiles physical research intents into candidate-specific mathematical problems for deterministic execution.
 
-\par\smallskip\noindent\textbf{C3: Persistent research harness.}\enspace
-We establish an evidence-linked harness that connects research hypotheses, mathematical results, candidate structures, and physical evaluations. Knowledge and Skill preserve reusable physical findings and research methods to support cumulative research across tasks.
+\par\smallskip\noindent
+\textbf{C3: Persistent research harness.}\enspace
+We establish an evidence-linked harness that supports cross-task reuse of physical findings and research procedures.
 
-We evaluate PRIME-Soft across eleven simulated tasks under common per-run resource-budget ceilings. Comparative experiments assess autonomous feasibility discovery, while representative physical studies and mathematical analyses examine how agent-directed research informs structure--control decisions. Component ablations further evaluate the contributions of Knowledge, Skill, and evidence retrieval to research continuity and resource use.
+We evaluate these contributions through cross-task feasibility studies, representative physical investigations, mathematical sensitivity analyses, and research-continuity experiments.
