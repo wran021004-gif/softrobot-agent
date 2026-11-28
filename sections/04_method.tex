@@ -54,7 +54,7 @@ The Main Agent expresses the physical relationship to investigate as a research 
 \end{equation}
 where $h_k$ states the physical hypothesis, $\mathcal I_k$ identifies the design factors to investigate, $\mathcal O_k$ specifies the relevant physical quantities, and $\sigma_k$ selects the analysis semantics.
 
-\PPRP{} compiles the research intent through three complementary bindings.
+\PPRP{} makes the research intent executable by grounding its physical hypothesis, design factors, and analysis semantics in the current candidate and registered model.
 
 The \emph{hypothesis-to-observable binding} resolves the physical quantities selected by the Main Agent to observables defined by the candidate's physical model and operating context.
 
@@ -79,7 +79,7 @@ The harness validates the candidate--model--semantics compatibility, dispatches 
 
 \subsection{Connecting Mechanism Sensitivity to Task Capability}
 \label{subsec:mathematical-research}
-The $\operatorname{Analyze}$ step in Algorithm~\ref{alg:agent-research} evaluates the response quantity and parameter sensitivities specified by the \PPRP{}. The four analysis semantics differ in the physical quantity being differentiated and in the treatment of state and control variables. M0 and M2 connect mechanism-indicator sensitivity to task-capability sensitivity with control adaptation or equilibrium re-solution, while M1 and M3 provide complementary evidence under fixed-input and closed-loop conditions.
+The $\operatorname{Analyze}$ step evaluates the physical consequences of a research intent under its selected state and control treatment. The four analysis semantics address distinct questions about a structural change. M0 examines whether the change favors the hypothesized physical mechanism; M1 isolates its direct task-response effect under fixed inputs; M2 evaluates achievable task capability after control adaptation or equilibrium re-solution; and M3 evaluates the joint closed-loop effect of morphology and feedback parameters. The distinction between mechanism-level response and control-adapted task capability is central to structure--control co-design.
 
 \paragraph{M0: Mechanism-indicator sensitivity}
 M0 asks which structural changes favor the intended physical mechanism. It evaluates a hypothesis-specific indicator $m_h(d;\chi)$ and its local sensitivity:

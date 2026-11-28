@@ -5,24 +5,24 @@ Tendon-driven continuum robots achieve task-dependent behavior through distribut
 
 A robot may need to yield near an external load while keeping its tip stable. This calls for shaping the spatial distribution of deformation: routing can alter admissible deformation directions, while material distribution changes their response to load. A trajectory-tracking robot may reproduce the desired motion while exceeding tendon-tension limits, directing attention toward feasible force generation. These cases call for task-conditioned selection of the physical mechanism and mathematical question: deformation transfer under tendon constraints in the first case, and structure-dependent actuation capability in the second.
 
-Autonomous structure--control co-design aims to identify robot morphologies and control strategies that jointly satisfy task-specific physical requirements. Established methods in continuum mechanics, sensitivity analysis, mathematical optimization, structural design, and control provide the foundations for investigating and improving these systems~\cite{sawant2023stiffness,bonnans2000perturbation}. Language-model agents offer complementary capabilities for physical reasoning and design exploration~\cite{chen2026aidsr,gottweis2026coscientist}. However, effectively combining these capabilities requires more than generating and evaluating design candidates. The agent must identify which physical mechanisms govern task performance, formulate the corresponding research questions, and select appropriate mathematical investigations under explicit structural and control treatments. This makes the organization of physical research actions an essential part of autonomous co-design.
+These examples expose a common decision problem: task performance does not by itself identify the physical mechanism that should be changed. Moreover, the same structural modification can lead to different conclusions depending on whether tendon inputs are held fixed, re-optimized, or generated in closed loop. The relevant investigation must therefore be selected in relation to both the hypothesized mechanism and the task capability it is expected to influence. We argue that choosing this investigation is an explicit decision within autonomous structure--control co-design, rather than a step delegated entirely to a human designer.
 
-We present \softrobotagent{}, a framework for agent-directed physical research and autonomous structure--control co-design (Fig.~\ref{fig:research-framework}). Users specify task constraints and operating conditions, while the Main Agent determines the physical questions and investigations needed to guide co-design. \PPRP{} projects each research intent into a candidate-specific mathematical problem using registered physical models and analysis capabilities. The resulting evidence guides subsequent structural refinement and control adaptation.
+We present \softrobotagent{}, a framework for agent-directed physical research and autonomous structure--control co-design (Fig.~\ref{fig:research-framework}). The Main Agent treats each design iteration as a mechanism-to-capability investigation, identifying a task-limiting physical mechanism and formulating a candidate-specific research intent. \PPRP{} projects this intent into an executable mathematical problem with explicit physical and control semantics, allowing established analysis methods to evaluate its consequences. The resulting evidence guides subsequent structural refinement and control adaptation, while the persistent research harness retains the investigation and its evidence across iterations.
 
 \input{figures/fig01_framework_float}
 
-The main contributions are as follows:\par\nopagebreak[4]
+The central contribution is to make the selection of physical investigations an explicit decision in autonomous structure--control co-design. This is realized through three linked advances:\par\nopagebreak[4]
 
 \par\smallskip\noindent
-\textbf{C1: Agent-directed structure--control co-design.}\enspace
-We develop an autonomous research process that connects physical investigation with structural refinement, control adaptation, and physical evaluation.
+\textbf{C1: Mechanism-to-capability research.}\enspace
+We formulate an agent-directed co-design process in which task-limiting physical mechanisms guide subsequent structural and control decisions.
 
 \par\smallskip\noindent
-\textbf{C2: Intent-parameterized mathematical research.}\enspace
-We introduce \PPRP{}, which compiles physical research intents into candidate-specific mathematical problems for deterministic execution.
+\textbf{C2: Intent-parameterized mathematical execution.}\enspace
+We introduce \PPRP{}, which projects candidate-specific physical research intents into mathematical problems with explicit response and control semantics.
 
 \par\smallskip\noindent
-\textbf{C3: Persistent research harness.}\enspace
-We establish an evidence-linked harness that supports cross-task reuse of physical findings and research procedures.
+\textbf{C3: Evidence-linked research continuity.}\enspace
+We establish a persistent research process that retains the correspondence between physical hypotheses, mathematical investigations, and their evaluation evidence across tasks.
 
 We evaluate these contributions through cross-task feasibility studies, representative physical investigations, mathematical sensitivity analyses, and research-continuity experiments.
