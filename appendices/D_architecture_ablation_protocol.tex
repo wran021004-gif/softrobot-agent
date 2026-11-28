@@ -8,4 +8,25 @@ Independently enabling Knowledge and Skill gives four configurations and 44 task
 Six matched checkpoints are replayed with the saved Reporter interpretation withheld or included, giving twelve sessions. Each pair fixes the task, candidate, and evidence snapshot. An independent model reviews anonymized decisions on five equally weighted dimensions, scored from 0 to 4: physical interpretation, evidence consistency, limitation recognition, research actionability, and decision quality. We report the mean score and the number of conclusions unsupported by the checkpoint evidence.
 
 \subsection{Hierarchical Context Replay}
-Flat delivery supplies the checkpoint corpus; hierarchical delivery supplies a concise brief and access to the same supporting records. We compare decision scores and provider-reported input tokens, using accepted-inference accounting at load diagnosis and cumulative accepted-request accounting at parameter tradeoff. At parameter tradeoff, evidence coverage is the fraction of five factual groups, frozen before scoring, whose substance is correctly used in the final decision. A partial reference counts when its physical interpretation is accurate; a bare citation or incorrect interpretation does not. Coverage is assessed separately from retrieval counts and decision scores. The evidence checklist, checkpoint identifiers, and exact retrieval records are available in the \href{https://github.com/wran021004-gif/softrobot-agent/blob/codex/gated-harness-paper-20261124/paper_handoff/supplementary_data/appendix_details/supplementary_details.pdf}{online supplement} and linked repository records.
+Flat delivery supplies the checkpoint corpus; hierarchical delivery supplies a concise brief and access to the same supporting records. We compare decision scores and provider-reported input tokens, using accepted-inference accounting at load diagnosis and cumulative accepted-request accounting at parameter tradeoff. At parameter tradeoff, evidence coverage is the fraction of five factual groups in Table~\ref{tab:context-evidence-checklist}, frozen before scoring, whose substance is correctly used in the final decision. A partial reference counts when its physical interpretation is accurate; a bare citation or incorrect interpretation does not. Coverage is assessed separately from retrieval counts and decision scores.
+
+
+Flat access covers all five groups; hierarchical access covers G2, G4, and G5, yielding the reported 5/5 and 3/5 coverage.
+
+\begin{table*}[!t]
+\centering
+\caption{Decision-critical evidence for the parameter-tradeoff context comparison.}
+\label{tab:context-evidence-checklist}
+\papertablestyle
+\begin{tabularx}{\textwidth}{@{}p{0.04\textwidth}>{\raggedright\arraybackslash}p{0.53\textwidth}Y@{}}
+\toprule
+\textbf{ID} & \textbf{Evidence} & \textbf{Coverage criterion} \\
+\midrule
+G1 & Matched viscosity variants show reduced near-load drift but nonmonotone speed and static-balance residuals. & Recognizes mixed trends rather than uniform improvement. \\
+G2 & Loaded qualification remains unsuccessful despite some unloaded or local mathematical qualification. & Distinguishes local/unloaded qualification from loaded dynamic qualification. \\
+G3 & For the morphology tested at both load locations, distal loading produces much greater finite-load motion transfer than near loading. & Uses the near/distal contrast with the correct candidate and load scope. \\
+G4 & The installed route has a cable--solid intersection at the initial pose/time. & Separates route invalidity from contact counts and late-time settling. \\
+G5 & Sampled exploratory cases do not establish every-step qualification, full independent acceptance, numerical convergence, or a unique failure cause. & Keeps the decision within the demonstrated evidence scope. \\
+\bottomrule
+\end{tabularx}
+\end{table*}
