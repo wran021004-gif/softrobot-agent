@@ -5,7 +5,7 @@ Tendon-driven continuum robots achieve task-dependent behavior through distribut
 
 A robot may need to yield near an external load while keeping its tip stable. This calls for shaping the spatial distribution of deformation: routing can alter admissible deformation directions, while material distribution changes their response to load. A trajectory-tracking robot may reproduce the desired motion while exceeding tendon-tension limits, directing attention toward feasible force generation. These cases call for task-conditioned selection of the physical mechanism and mathematical question: deformation transfer under tendon constraints in the first case, and structure-dependent actuation capability in the second.
 
-These examples expose a common decision problem: task performance does not by itself identify the physical mechanism that should be changed. Moreover, the same structural modification can lead to different conclusions depending on whether tendon inputs are held fixed, re-optimized, or generated in closed loop. The relevant investigation must therefore be selected in relation to both the hypothesized mechanism and the task capability it is expected to influence. We argue that choosing this investigation is an explicit decision within autonomous structure--control co-design, rather than a step delegated entirely to a human designer.
+Existing co-design methods typically optimize within a prescribed formulation, where the design variables, physical responses, and task objectives are specified before optimization. In autonomous co-design, however, selecting which physical mechanism and response should define the next investigation is itself part of the design problem. Task performance does not by itself identify the physical mechanism that should be changed. Moreover, the same structural modification can lead to different conclusions depending on whether tendon inputs are held fixed, re-optimized, or generated in closed loop. The relevant investigation must therefore be selected in relation to both the hypothesized mechanism and the task capability it is expected to influence.
 
 We present \softrobotagent{}, a framework for agent-directed physical research and autonomous structure--control co-design (Fig.~\ref{fig:research-framework}). The Main Agent treats each design iteration as a mechanism-to-capability investigation, identifying a task-limiting physical mechanism and formulating a candidate-specific research intent. \PPRP{} projects this intent into an executable mathematical problem with explicit physical and control semantics, allowing established analysis methods to evaluate its consequences. The resulting evidence guides subsequent structural refinement and control adaptation, while the persistent research harness retains the investigation and its evidence across iterations.
 
@@ -14,15 +14,15 @@ We present \softrobotagent{}, a framework for agent-directed physical research a
 The central contribution is to make the selection of physical investigations an explicit decision in autonomous structure--control co-design. This is realized through three linked advances:\par\nopagebreak[4]
 
 \par\smallskip\noindent
-\textbf{C1: Mechanism-to-capability research.}\enspace
-We formulate an agent-directed co-design process in which task-limiting physical mechanisms guide subsequent structural and control decisions.
+\textbf{C1: Research-directed co-design.}\enspace
+We formulate an agent-directed co-design process that makes the construction and selection of task-conditioned physical research questions explicit design decisions.
 
 \par\smallskip\noindent
-\textbf{C2: Intent-parameterized mathematical execution.}\enspace
-We introduce \PPRP{}, which projects candidate-specific physical research intents into mathematical problems with explicit response and control semantics.
+\textbf{C2: Intent-to-analysis projection.}\enspace
+We introduce \PPRP{}, which compiles candidate-specific physical hypotheses, design parameters, observables, and control semantics into executable mathematical problems.
 
 \par\smallskip\noindent
-\textbf{C3: Evidence-linked research continuity.}\enspace
-We establish a persistent research process that retains the correspondence between physical hypotheses, mathematical investigations, and their evaluation evidence across tasks.
+\textbf{C3: Evidence-driven design evolution.}\enspace
+We establish a research process in which mathematical and physical evidence drives subsequent structural and control updates, while retaining the findings and research experience that inform later iterations and tasks.
 
 We evaluate these contributions through cross-task feasibility studies, representative physical investigations, mathematical sensitivity analyses, and research-continuity experiments.
