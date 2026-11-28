@@ -56,11 +56,13 @@ where $h_k$ states the physical hypothesis, $\mathcal I_k$ identifies the design
 
 \PPRP{} compiles the research intent through three complementary bindings.
 
-The \emph{hypothesis-to-observable binding} resolves the physical quantities selected by the Main Agent to observables defined by the candidate's physical model and operating context. For tendon-constrained tip suppression, the hypothesis is that changing tendon routing can reduce tip-motion freedom while retaining deformation freedom near the load. This binds the investigation to the tip and loaded-point indicators $m_h$ and $r_{\mathrm{load}}$ in~\eqref{eq:m0-indicator}, giving the hypothesized spatial deformation relationship a measurable mathematical expression.
+The \emph{hypothesis-to-observable binding} resolves the physical quantities selected by the Main Agent to observables defined by the candidate's physical model and operating context.
 
-The \emph{parameter-to-model binding} maps the selected design factors to candidate-specific model parameters and their admissible domains. In the same investigation, tendon-routing factors are resolved to the geometric parameters defining the current candidate's tendon paths. Changes in these parameters modify the tendon-length Jacobian and hence the admissible deformation directions used to evaluate the two indicators. The binding thus specifies how each research variable changes the physical model within the candidate's admissible design space.
+The \emph{parameter-to-model binding} maps the selected design factors to candidate-specific model parameters and their admissible domains, specifying how each research variable changes the physical model.
 
-The \emph{semantics-to-problem binding} specifies the mathematical response and the treatment of state and control variables as the design changes. Selecting M0 for this hypothesis yields an investigation of $m_h(d;\chi)$ and its local sensitivity to the selected continuous structural parameters, with $r_{\mathrm{load}}$ evaluated to check retained loaded-point motion freedom. The indicators and sensitivities are evaluated under the bound model and operating context. M0--M3 provide complementary choices of response and state or control treatment, as detailed in Section~\ref{subsec:mathematical-research}.
+The \emph{semantics-to-problem binding} specifies the mathematical response and the treatment of state and control variables as the design changes. M0--M3 provide the analysis semantics detailed in Section~\ref{subsec:mathematical-research}.
+
+For example, a tendon-constrained tip-suppression intent binds the hypothesized spatial deformation relationship to the indicators $m_h$ and $r_{\mathrm{load}}$ in~\eqref{eq:m0-indicator}, and tendon-routing factors to the current candidate's admissible path geometry. These parameters affect the tendon-length Jacobian and its admissible deformation directions. Selecting M0 then defines the local sensitivity of $m_h(d;\chi)$ to those continuous parameters, with $r_{\mathrm{load}}$ checking retained loaded-point motion freedom under the bound model and operating context.
 
 Together, these bindings compile the Parameterized Physical Research Problem:
 \begin{equation}
