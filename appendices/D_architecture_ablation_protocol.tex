@@ -1,18 +1,7 @@
 \section{Research-Continuity Protocols}
 \label{app:architecture-ablations}
 
-\subsection{Knowledge/Skill Comparison}
-Independently enabling Knowledge and Skill gives four configurations and 44 task--configuration cells. Each cell uses ten runs under the common budgets. Task completion and resource aggregation follow Appendix~\ref{app:abc-protocol}; Table~\ref{tab:resource-ablation} reports the outcomes and summed workload.
-
-\subsection{Reporter Decision Replay}
-Six matched checkpoints are replayed with the saved Reporter interpretation withheld or included, giving twelve sessions. Each pair fixes the task, candidate, and evidence snapshot. An independent model reviews anonymized decisions on five equally weighted dimensions, scored from 0 to 4: physical interpretation, evidence consistency, limitation recognition, research actionability, and decision quality. We report the mean score and the number of conclusions unsupported by the checkpoint evidence.
-
-\subsection{Hierarchical Context Replay}
-Flat delivery supplies the checkpoint corpus; hierarchical delivery supplies a concise brief and access to the same supporting records. We compare decision scores and provider-reported input tokens, using accepted-inference accounting at load diagnosis and cumulative accepted-request accounting at parameter tradeoff. At parameter tradeoff, evidence coverage is the fraction of five factual groups in Table~\ref{tab:context-evidence-checklist}, frozen before scoring, whose substance is correctly used in the final decision. A partial reference counts when its physical interpretation is accurate; a bare citation or incorrect interpretation does not. Coverage is assessed separately from retrieval counts and decision scores.
-
-
-Flat access covers all five groups; hierarchical access covers G2, G4, and G5, yielding the reported 5/5 and 3/5 coverage.
-
+% Queue the wide evidence checklist before the short protocol subsections.
 \begin{table*}[!t]
 \centering
 \caption{Decision-critical evidence for the parameter-tradeoff context comparison.}
@@ -30,3 +19,19 @@ G5 & Sampled exploratory cases do not establish every-step qualification, full i
 \bottomrule
 \end{tabularx}
 \end{table*}
+
+\subsection{Evidence-to-Action Audit}
+\label{app:evidence-action-audit}
+The archive-level audit covers recorded research actions initiated by the Main Agent. An evidence-linked proposal is a structured scientific action with at least one explicit reference resolving to a recorded mathematical or physical artifact or a derived control schedule. Proposals are deduplicated by run, action identifier, and initiator. Execution is counted when the corresponding operation has a successful receipt and an inspectable output, matched through recorded request identifiers and inputs. A completed physical evaluation counts as execution regardless of its task-acceptance outcome.
+
+\subsection{Knowledge/Skill Comparison}
+Independently enabling Knowledge and Skill gives four configurations and 44 task--configuration cells. Each cell uses ten runs under the common budgets. Task completion and resource aggregation follow Appendix~\ref{app:abc-protocol}; Table~\ref{tab:resource-ablation} reports the outcomes and summed workload.
+
+\subsection{Reporter Decision Replay}
+Six matched checkpoints are replayed with the saved Reporter interpretation withheld or included, giving twelve sessions. Each pair fixes the task, candidate, and evidence snapshot. An independent model reviews anonymized decisions on five equally weighted dimensions, scored from 0 to 4: physical interpretation, evidence consistency, limitation recognition, research actionability, and decision quality. We report the mean score and the number of conclusions unsupported by the checkpoint evidence.
+
+\subsection{Hierarchical Context Replay}
+Flat delivery supplies the checkpoint corpus; hierarchical delivery supplies a concise brief and access to the same supporting records. We compare decision scores and provider-reported input tokens, using accepted-inference accounting at load diagnosis and cumulative accepted-request accounting at parameter tradeoff. At parameter tradeoff, evidence coverage is the fraction of five factual groups in Table~\ref{tab:context-evidence-checklist}, frozen before scoring, whose substance is correctly used in the final decision. A partial reference counts when its physical interpretation is accurate; a bare citation or incorrect interpretation does not. Coverage is assessed separately from retrieval counts and decision scores.
+
+
+Flat access covers all five groups; hierarchical access covers G2, G4, and G5, yielding the reported 5/5 and 3/5 coverage.
