@@ -73,8 +73,6 @@ S_j^{\mathrm{M2}}=\frac{\dd V_{\mathcal Q_\tau}(d)}{\dd d_j}.
 \end{equation}
 The maximum condition-wise violation identifies the task-limiting conditions on the shared structure, and its sensitivity guides structural changes toward feasibility across the required conditions. Active-condition sensitivities account for task constraints and design-dependent actuator limits; passive-condition sensitivities follow the equilibrium response. Appendix~\ref{app:mathematical-details} gives the condition-wise derivatives and their aggregation.
 
-Together, M0 and M2 connect mechanism-guided structural directions to task capability, guiding candidate refinement before independent physical evaluation.
-
 \paragraph{M3: Closed-loop performance sensitivity}
 M3 asks how structural and feedback-control parameters influence closed-loop performance. With joint variables $z_{\mathrm{cl}}=(d,\theta)$, it evaluates
 \begin{equation}
@@ -92,11 +90,9 @@ The Differentiation Router in Fig.~\ref{fig:research-framework} selects a compat
 \subsection{Updating Structure and Control}
 \label{subsec:structure-control-refinement}
 
-Guided by the available research evidence and task context, the Main Agent selects the structural revision and control strategy for the next candidate. A deterministic design compiler instantiates proposed discrete morphology revisions, while a deterministic optimizer updates selected continuous design parameters within specified bounds. The mathematical evidence guides the choice of design variables and update directions.
+The Main Agent selects structural and control updates according to the available research evidence. A deterministic compiler instantiates discrete morphology changes, while a numerical optimizer updates continuous design parameters and adapts the corresponding control variables.
 
-Following a structural update, the control sequence or feedback parameters are adapted to the revised morphology. For shared-morphology tasks, the structure remains common while each required active condition receives its own admissible control.
-
-The Main Agent can also request independent physical evaluation as a separate research action. The simulator evaluates active execution and passive loading against the frozen task contract, with an optional direct physical test providing an additional evaluation path. The resulting physical evidence identifies remaining task bottlenecks, guiding the Main Agent to retain the candidate, continue refinement, or redirect the research question. Algorithm~\ref{alg:agent-research} summarizes the overall Main-Agent-directed research loop, including mathematical investigation, candidate refinement, independent physical evaluation, and candidate selection or termination.
+Independent physical evaluation checks the revised candidate against the frozen task contract. Its evidence determines whether the candidate is retained or further research is required.
 
 \begin{algorithm}[!t]
 \caption{Main-Agent-directed research and structure--control co-design}
@@ -131,8 +127,8 @@ The Main Agent can also request independent physical evaluation as a separate re
 \subsection{Persistent Research Harness}
 \label{subsec:research-continuity-method}
 
-Each research record links the task and candidate to the motivating hypothesis, compiled \PPRP{}, physical model, operating conditions, analysis result, and applicability conditions. Independent physical-evaluation records attach task residuals and acceptance outcomes to the evaluated candidate. These candidate and condition links allow the Main Agent to compare mathematical predictions with physical responses and trace subsequent actions to their supporting evidence. Action-admissibility checks govern execution, and Algorithm~\ref{alg:agent-research} records the resulting evidence in the research state.
+Each research record links a task and candidate to its physical hypothesis, PPRP, analysis results, and independent evaluation, preserving evidence provenance and applicability conditions.
 
-The Main Agent obtains historical information through $\mathcal C_k=\operatorname{Retrieve}(\tau,\mathrm{Knowledge},\mathrm{Skill})$. Knowledge preserves established physical relationships and design rationales, while Skill retains reusable research methods and practical know-how for investigating physical questions. Both retain links to supporting records and applicability conditions; hierarchical access lets the agent move from summaries to the underlying evidence. For the current task and candidate, it assesses which findings and research methods apply and uses them to formulate the next research intent, which \PPRP{} binds to the current physical problem.
+Knowledge stores established physical relationships and design rationales, whereas Skill stores reusable procedures for investigating and validating them. Hierarchical retrieval provides access to the supporting records when needed.
 
-The read-only Reporter interprets a saved evidence snapshot and returns source-linked findings and unresolved questions to the Main Agent. It does not modify candidates or evidence records. The Main Agent retains authority to form or revise hypotheses, choose mathematical investigations, request structural or control changes, and select or stop a candidate study.
+The Reporter summarizes saved evidence with source-linked findings and unresolved questions to inform subsequent Main Agent decisions.

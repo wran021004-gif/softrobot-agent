@@ -1,11 +1,11 @@
 \section{Experimental Setup}
 \label{sec:experimental-setup}
-We evaluate \softrobotagent{} in simulation to assess autonomous structure--control co-design across diverse task requirements. The experiments examine feasibility discovery, mechanism-guided research decisions, mathematical evidence, and the contributions of persistent research components to cross-task continuity and resource use.
+We evaluate PRIME-Soft through cross-task feasibility studies and targeted investigations of its mathematical and research-continuity components.
 
 \subsection{Task Portfolio and Physical Evaluation}
 \label{subsec:setup-portfolio}
 \input{figures/fig02_task_portfolio}
-The portfolio comprises eleven tasks in four groups: Motion Control, Tool Operation, Adaptability, and Passive Mechanics (Fig.~\ref{fig:task-portfolio}), with 30 required operating conditions in total (Table~\ref{tab:family-portfolio}). Each task is specified by a frozen task-and-environment contract and an admissible design space, with one morphology shared across its required conditions. The physical models and evaluation procedures provide the registered capabilities used by the Main Agent to organize task-specific research.
+The portfolio contains eleven tasks with thirty required operating conditions (Table~\ref{tab:family-portfolio}). Each task uses a frozen contract and admissible design space, with one morphology shared across its required conditions.
 \input{tables/table1_family_summary}
 
 The mathematical backends include a generalized variable strain (GVS) model with CasADi expressions for active dynamics and a constrained quasi-static equilibrium formulation for passive fixed-payout systems. Candidate structures and controls are independently evaluated in \MuJoCo{} against the frozen task contracts. A task is counted as completed when the selected candidate satisfies all required conditions.
@@ -13,22 +13,18 @@ The mathematical backends include a generalized variable strain (GVS) model with
 \subsection{Compared Methods and Research Budgets}
 \label{subsec:setup-comparisons}
 
-We compare three research interfaces. \emph{LLM-only} generates and refines structure--control candidates using simulation feedback. \emph{Direct Mathematical Tools} additionally provides numerical analysis and optimization capabilities, with the agent constructing mathematical problems directly. \emph{PRIME-Soft} organizes physical research through agent-selected research intents and their projection into task- and candidate-specific \PPRP{} formulations. All three methods share frozen task contracts, admissible design spaces, structure-generation capabilities, physical models, and independent evaluation procedures. Appendix~\ref{app:abc-protocol} specifies the interfaces and evaluation protocol.
+We compare LLM-only, Direct Mathematical Tools, and PRIME-Soft under shared task contracts, design spaces, physical models, and independent evaluation procedures. Appendix~\ref{app:abc-protocol} specifies their interfaces.
 
-Task runs use common per-task ceilings of 30 mathematical operations, 30 physical evaluations, and 60 agent requests. Each task--method configuration is evaluated over ten runs under the same per-run budget. A task is counted as completed if at least one run satisfies all required conditions. The primary comparisons and continuity studies use GPT-5.6 Sol. We additionally evaluate the complete framework with Knowledge and Skill enabled using GPT-6 Astra under the same task budgets. The three-interface comparison reports task-level completion. For the Knowledge/Skill ablation and the full-framework backbone comparison, we additionally report mathematical operations, physical evaluations, agent requests, and token consumption. Each task-level resource metric is the minimum among passing runs, or the mean across runs when none passes.
+Task runs use common per-run ceilings of 30 mathematical operations, 30 physical evaluations, and 60 agent requests. The primary comparisons and continuity studies use GPT-5.6 Sol. We additionally evaluate the complete framework with Knowledge and Skill enabled using GPT-6 Astra under the same task budgets.
 
 \subsection{Targeted Mechanism and Sensitivity Evaluation}
 \label{subsec:setup-mechanisms}
 
 Three representative episodes examine mechanism-guided co-design: Passive Tip Suppression, Shared Morphology, and Figure-eight Tracking.
 
-For Passive Tip Suppression, sign agreement and relative discrepancy between implicit derivatives and central finite differences of re-solved equilibria assess sensitivities to local material stiffness for loaded-point displacement, tip displacement, and their ratio across six signed loads. For Shared Morphology, the M1/M2 comparison evaluates maximum normalized signed task residuals in the negative-reach condition using a common tendon-tension sequence on both morphologies and re-optimized control on the revised morphology.
+We examine implicit equilibrium sensitivities for Passive Tip Suppression by comparing them with finite-difference estimates across signed loading conditions. For Shared Morphology, we compare structural responses under fixed inputs with task capability after control re-optimization.
 
 \subsection{Research Continuity Studies}
 \label{subsec:setup-continuity}
 
-We evaluate four Knowledge/Skill configurations across the task portfolio by independently enabling or disabling each resource. Task completion and resource consumption characterize their separate and joint contributions under common task protocols and budget ceilings.
-
-At six matched checkpoints, we replay Main Agent decisions with and without the saved Reporter interpretation, holding the task, candidate, and evidence snapshot fixed within each pair. An independent model evaluates anonymized decisions using a five-dimensional rubric (0--4 per dimension); we report mean scores and unsupported-conclusion counts.
-
-At the load-diagnosis and parameter-tradeoff checkpoints, we compare flat delivery of the checkpoint corpus with hierarchical access to its records. We compare input-token consumption and decision scores, with key-evidence coverage additionally assessed at the parameter-tradeoff checkpoint. Appendix~\ref{app:architecture-ablations} details the continuity-study protocols and scoring criteria.
+We evaluate Knowledge and Skill through component ablations, Reporter through matched decision replays, and hierarchical retrieval through flat-versus-hierarchical context comparisons. Appendix~\ref{app:architecture-ablations} specifies the evaluation protocols.
