@@ -89,6 +89,12 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \bibliography{references}
 \clearpage
 \appendices
+% Keep supplementary float-only pages compact and aligned at the top.
+\makeatletter
+\setlength{\@dblfptop}{0pt}
+\setlength{\@dblfpsep}{12pt}
+\setlength{\@dblfpbot}{0pt plus 1fil}
+\makeatother
 \setlength{\dbltextfloatsep}{8pt plus 1pt minus 1pt}
 \setlength{\dblfloatsep}{6pt plus 1pt minus 1pt}
 % Compact appendix table rows while preserving the shared font size.
@@ -102,6 +108,5 @@ Soft robotics, continuum robots, tendon-driven robots, robot co-design, agentic 
 \renewcommand{\theHtable}{S\arabic{table}}
 \input{appendices/A_mathematical_details}
 \input{appendices/B_architecture_protocol}
-\input{appendices/C_task_portfolio}
 \input{appendices/D_architecture_ablation_protocol}
 \end{document}

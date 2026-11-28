@@ -1,33 +1,11 @@
 \section{Research-Continuity Protocols}
 \label{app:architecture-ablations}
-\subsection{Task-Level Knowledge/Skill Comparison}
-Independently enabling Knowledge and Skill gives four configurations and 44 task--configuration cells. Each cell uses ten runs under the common per-run budgets. Task completion and resource aggregation follow Appendix~\ref{app:abc-protocol}, including the minimum among passing runs or the mean when none passes. Table~\ref{tab:resource-ablation} reports task-level outcomes and the summed workload.
+
+\subsection{Knowledge/Skill Comparison}
+Independently enabling Knowledge and Skill gives four configurations and 44 task--configuration cells. Each cell uses ten runs under the common budgets. Task completion and resource aggregation follow Appendix~\ref{app:abc-protocol}; Table~\ref{tab:resource-ablation} reports the outcomes and summed workload.
 
 \subsection{Reporter Decision Replay}
-Six matched checkpoints are replayed with the saved Reporter interpretation withheld or included, producing twelve Main Agent sessions. Each pair holds the task, candidate, and evidence snapshot fixed. An independent model reviews anonymized decisions on five equally weighted dimensions, each scored from 0 to 4: physical interpretation, evidence consistency, limitation recognition, research actionability, and decision quality. We report the mean score and count conclusions unsupported by the checkpoint evidence.
+Six matched checkpoints are replayed with the saved Reporter interpretation withheld or included, giving twelve sessions. Each pair fixes the task, candidate, and evidence snapshot. An independent model reviews anonymized decisions on five equally weighted dimensions, scored from 0 to 4: physical interpretation, evidence consistency, limitation recognition, research actionability, and decision quality. We report the mean score and the number of conclusions unsupported by the checkpoint evidence.
 
 \subsection{Hierarchical Context Replay}
-At the load-diagnosis and parameter-tradeoff checkpoints, flat delivery supplies the checkpoint corpus, whereas hierarchical delivery supplies a concise brief and access to supporting records. We compare decision scores and provider-reported input tokens accumulated over accepted requests in each session. At parameter tradeoff, critical-evidence coverage is the fraction of five reference evidence items covered by the decision. Figure~\ref{fig:research-continuity} reports the results.
-
-
-For parameter tradeoff (checkpoint PHS\_C037\_A), the five factual groups in Table~\ref{tab:context-evidence-checklist} were frozen before blind scoring. A group is covered only when the decision correctly uses its substantive content. Exact numbers and every listed source reference are not required; a partial reference counts if it preserves the relevant physical interpretation, whereas a bare citation or an incorrect interpretation does not. Coverage is binary per group and reported as covered groups divided by five, separately from the five-dimension decision score. Flat access covers G1--G5; hierarchical access covers G2, G4, and G5.
-
-\begin{table*}[!t]
-\centering
-\caption{Predefined decision-critical evidence at the parameter-tradeoff checkpoint. Source identifiers refer to the frozen research archive.}
-\label{tab:context-evidence-checklist}
-\papertablestyle
-\begin{tabularx}{\textwidth}{@{}p{0.045\textwidth}p{0.46\textwidth}Y@{}}
-\toprule
-\textbf{ID} & \textbf{Decision-critical evidence} & \textbf{Coverage criterion} \\
-\midrule
-G1 & Matched near-load results for viscosity variants F2/F3/F4 show reduced drift but nonmonotone speed and static-balance residuals (C029, C032, C035). & Recognizes the mixed trends rather than inferring uniform improvement from reduced drift. \\
-G2 & Loaded qualification remains unsuccessful despite some unloaded or local mathematical qualification (C031, C034, C036, C037). & Distinguishes unloaded/local qualification from loaded dynamic qualification. \\
-G3 & F3 has much larger finite-load motion transfer under distal loading than near loading (C032, C037). & Uses the near/distal contrast with the correct load-case and candidate scope. \\
-G4 & Raw route records detect a cable--solid intersection at the initial pose/time (C031, C034, C036). & Separates installed-route invalidity from contact counts and late-time settling. \\
-G5 & Sampled exploratory evidence covers selected cases, without establishing every-step qualification, full independent acceptance, numerical convergence, or a unique failure cause (C027, C031, C034, C036, C037). & Keeps the proposed decision within the demonstrated scope of the sampled evidence. \\
-\bottomrule
-\end{tabularx}
-\end{table*}
-
-{\raggedright The hierarchical session makes three \texttt{research\_recall} calls with \texttt{view=details}: step~31 reads \texttt{C031\_EP0\_qualifications}, step~34 reads \texttt{C034\_EP0\_qualifications}, and step~36 reads \texttt{C036\_EP0\_route\_geometry}. Each call selects its record through the exact \texttt{/information/} pointer. The first two expose loaded-qualification records for the matched viscosity variants; the third exposes the installed-route geometry check. Coverage is assessed from the final decision, separately from whether a record was retrieved.\par}
+Flat delivery supplies the checkpoint corpus; hierarchical delivery supplies a concise brief and access to the same supporting records. We compare decision scores and provider-reported input tokens, using accepted-inference accounting at load diagnosis and cumulative accepted-request accounting at parameter tradeoff. At parameter tradeoff, evidence coverage is the fraction of five factual groups, frozen before scoring, whose substance is correctly used in the final decision. A partial reference counts when its physical interpretation is accurate; a bare citation or incorrect interpretation does not. Coverage is assessed separately from retrieval counts and decision scores. The evidence checklist, checkpoint identifiers, and exact retrieval records are available in the \href{https://github.com/wran021004-gif/softrobot-agent/blob/codex/gated-harness-paper-20261124/paper_handoff/supplementary_data/appendix_details/supplementary_details.pdf}{online supplement} and linked repository records.

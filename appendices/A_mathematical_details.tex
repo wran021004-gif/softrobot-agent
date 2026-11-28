@@ -3,15 +3,7 @@
 
 \subsection{Parameterized Design Space}
 \label{app:design-space}
-Table~\ref{tab:design-space} specifies the implemented base-only serial family through its generator domains. The family definition composes the base segment, guide, connector, and payload prototypes with the serial assembly rule. A study selects its permitted subset and freezes the associated task and control configuration.
-\input{tables/tableS1_design_space}
-
-Indexed segment domains override the generic domain: segment~0 has length 80--240~mm, segment~1 has length 60--200~mm, and subsequent segments use 60--240~mm. Circular radius and elliptical semiaxes range from 3 to 12~mm; tube outer and inner radii range from 5 to 12~mm and 1 to 4~mm, respectively; rectangular width and height range from 6 to 18~mm. The compiler enforces positive section dimensions, tube wall thickness, ordered route stations, nonzero spans, owned guide holes, routing clearances, and consistent force and pretension limits. The base-only rule starts each tendon span at the base and routes it through consecutive segments to its anchor.
-
-Density, bending viscosity, connector and payload inertia, and prototype station angles are inherited from the selected assembly in this configuration. Active pretension and controller weights belong to the control configuration; passive fixed-payout conditions are specified by the passive assembly and load model. Numerical cell count controls discretization. Parameter identifiers, units, and effective model bindings are resolved for each compiled candidate.
-
-Throughout the sensitivity formulas, derivatives with respect to $d$ act only on $d_{\mathrm{cont}}$, with $d_{\mathrm{disc}}$ and the local parameterization held fixed. Likewise, design perturbation directions have zero discrete components.
-
+The implemented base-only serial family parameterizes topology, geometry, material, tendon routing, and assembly. Each study freezes its admissible subset and task configuration; the compiler enforces geometric and actuator consistency. Continuous derivatives act on $d_{\mathrm{cont}}$ with $d_{\mathrm{disc}}$ and the local parameterization fixed, and perturbation directions have zero discrete components. Complete generator domains and parameter ranges are provided in the \href{https://github.com/wran021004-gif/softrobot-agent/blob/codex/gated-harness-paper-20261124/paper_handoff/supplementary_data/appendix_details/supplementary_details.pdf}{online supplement}.
 
 \subsection{Passive Equilibrium and Stability}
 \label{app:passive-stability}

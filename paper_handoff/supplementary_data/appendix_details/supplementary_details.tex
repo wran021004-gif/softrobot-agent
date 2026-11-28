@@ -1,0 +1,79 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\renewcommand{\rmdefault}{ptm}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,tabularx,array,multirow,xcolor,float,hyperref}
+\usepackage[expansion=false]{microtype}
+\hypersetup{hidelinks,pdftitle={PRIME-Soft: Supplementary Design and Replay Details}}
+\definecolor{TraceGray}{HTML}{929BA4}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\papertablestyle}{\fontsize{9}{11}\selectfont\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.05}}
+\title{PRIME-Soft: Supplementary Design and Replay Details}
+\author{}\date{}
+\begin{document}
+\maketitle
+\section{Design-Space Domains and Parameter Bindings}
+
+\label{app:design-space}
+Table~\ref{tab:design-space} specifies the implemented base-only serial family through its generator domains. The family definition composes the base segment, guide, connector, and payload prototypes with the serial assembly rule. A study selects its permitted subset and freezes the associated task and control configuration.
+\begin{table}[H]
+\centering
+\caption{Parameterized design space of the tendon-driven soft-robot family: implemented base-only serial configuration.}
+\label{tab:design-space}
+\papertablestyle
+\begin{tabularx}{\textwidth}{@{}>{\itshape}>{\raggedright\arraybackslash}p{0.14\textwidth}!{\color{TraceGray}\vrule width 0.25pt}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.10\textwidth}Y@{}}
+\toprule
+\normalfont\textbf{Category} & \textbf{Parameter} & \textbf{Type} & \textbf{Domain or assembly rule} \\
+\midrule
+Topology & Segment count; tendon count & Discrete & 1--9 segments; 1--7 tendons; consecutive base-origin spans \\
+Geometry & Segment length; section family and dimensions & Mixed & 60--240~mm generic length; circle, tube, ellipse, rectangle; indexed bounds in the text below \\
+Material & Young's modulus & Continuous & 2--15~MPa per segment \\
+Tendon routing & Radius; guide and anchor station; angular placement & Mixed & Radius 14--23~mm; guide $s\in[0.15,0.75]$; anchor $s\in[0.8,1]$; phase $[-2\pi,2\pi]$; offsets $[-\pi,\pi]$~rad \\
+Assembly & Tendon diameter; force rating; component placement & Mixed & Diameter 0.5--1.2~mm; force limit 1--8~N; guides and connectors at serial boundaries, payload at the tip \\
+\midrule
+Control $(U,\theta)$ & Input sequence; initialization; controller settings & Continuous & Task-specific admissible input; pretension 0--1~N; terminal/holding speed weights 0--1 in the base configuration \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+Indexed segment domains override the generic domain: segment~0 has length 80--240~mm, segment~1 has length 60--200~mm, and subsequent segments use 60--240~mm. Circular radius and elliptical semiaxes range from 3 to 12~mm; tube outer and inner radii range from 5 to 12~mm and 1 to 4~mm, respectively; rectangular width and height range from 6 to 18~mm. The compiler enforces positive section dimensions, tube wall thickness, ordered route stations, nonzero spans, owned guide holes, routing clearances, and consistent force and pretension limits. The base-only rule starts each tendon span at the base and routes it through consecutive segments to its anchor.
+
+Density, bending viscosity, connector and payload inertia, and prototype station angles are inherited from the selected assembly in this configuration. Active pretension and controller weights belong to the control configuration; passive fixed-payout conditions are specified by the passive assembly and load model. Numerical cell count controls discretization. Parameter identifiers, units, and effective model bindings are resolved for each compiled candidate.
+
+Throughout the sensitivity formulas, derivatives with respect to $d$ act only on $d_{\mathrm{cont}}$, with $d_{\mathrm{disc}}$ and the local parameterization held fixed. Likewise, design perturbation directions have zero discrete components.
+
+
+
+\section{Recorded Model, Prompt, and Operation Configuration}
+
+The archived baseline configuration and full-framework runtime identify the model as \texttt{gpt-5.6-sol} and configure medium reasoning. The parameter-tradeoff context replay uses the same model identifier with reasoning set to \texttt{none}; its fixed system prompt requests one next research decision and permits \texttt{research\_plan}, \texttt{research\_recall}, and \texttt{evidence\_read} within four provider requests.
+
+{\raggedright The archived baseline command interface exposes \texttt{generate}, \texttt{evaluate}, and \texttt{finish} to both methods. Direct Mathematical Tools additionally exposes \texttt{math} with \texttt{jacobian}, \texttt{mechanics}, \texttt{finite\_difference}, \texttt{equilibrium}, and \texttt{kkt} operations. Its direct-optimization records additionally use nonlinear least squares for configuration fitting and bounded SLSQP for tendon-force allocation. The archived full-framework configuration permits structure generation, control initialization, physical replay, diagnosis, selection, and stopping, together with candidate-bound mechanism analysis, condition-wise control optimization, and comparison of saved control-adapted responses. Task configurations specify the enabled subset.\par}
+
+The \href{https://github.com/wran021004-gif/softrobot-agent/tree/codex/gated-harness-paper-20261124/paper_handoff/supplementary_data/reproducibility}{supplementary reproducibility records} preserve the verbatim system messages from the archived baseline requests, the full-framework study instructions, and the context-replay system prompt and tool schemas, with source paths and file hashes.
+
+\section{Context Evidence Checklist and Retrieval Records}
+For parameter tradeoff (checkpoint PHS\_C037\_A), the five factual groups in Table~\ref{tab:context-evidence-checklist} were frozen before blind scoring. A group is covered only when the decision correctly uses its substantive content. Exact numbers and every listed source reference are not required; a partial reference counts if it preserves the relevant physical interpretation, whereas a bare citation or an incorrect interpretation does not. Coverage is binary per group and reported as covered groups divided by five, separately from the five-dimension decision score. Flat access covers G1--G5; hierarchical access covers G2, G4, and G5.
+
+\begin{table}[H]
+\centering
+\caption{Predefined decision-critical evidence at the parameter-tradeoff checkpoint. Source identifiers refer to the frozen research archive.}
+\label{tab:context-evidence-checklist}
+\papertablestyle
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.045\textwidth}>{\raggedright\arraybackslash}p{0.46\textwidth}Y@{}}
+\toprule
+\textbf{ID} & \textbf{Decision-critical evidence} & \textbf{Coverage criterion} \\
+\midrule
+G1 & Matched near-load results for viscosity variants F2/F3/F4 show reduced drift but nonmonotone speed and static-balance residuals (C029, C032, C035). & Recognizes the mixed trends rather than inferring uniform improvement from reduced drift. \\
+G2 & Loaded qualification remains unsuccessful despite some unloaded or local mathematical qualification (C031, C034, C036, C037). & Distinguishes unloaded/local qualification from loaded dynamic qualification. \\
+G3 & F3 has much larger finite-load motion transfer under distal loading than near loading (C032, C037). & Uses the near/distal contrast with the correct load-case and candidate scope. \\
+G4 & Raw route records detect a cable--solid intersection at the initial pose/time (C031, C034, C036). & Separates installed-route invalidity from contact counts and late-time settling. \\
+G5 & Sampled exploratory evidence covers selected cases, without establishing every-step qualification, full independent acceptance, numerical convergence, or a unique failure cause (C027, C031, C034, C036, C037). & Keeps the proposed decision within the demonstrated scope of the sampled evidence. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+{\raggedright The hierarchical session makes three \texttt{research\_recall} calls with \texttt{view=details}: step~31 reads \texttt{C031\_EP0\_qualifications}, step~34 reads \texttt{C034\_EP0\_qualifications}, and step~36 reads \texttt{C036\_EP0\_route\_geometry}. Each call selects its record through the exact \texttt{/information/} pointer. The first two expose loaded-qualification records for the matched viscosity variants; the third exposes the installed-route geometry check. Coverage is assessed from the final decision, separately from whether a record was retrieved.\par}
+
+\end{document}
